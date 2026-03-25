@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Fontawesome cdn link -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
+    />
+
+    <title><%= title %></title>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/trust.css" />
+    <link rel="stylesheet" href="/css/brands.css" />
+    <link rel="stylesheet" href="/css/best-sellers.css" />
+
+    <!-- Web Icon -->
+    <link rel="icon" href="/images/logo/snusvillage-logo.png" />
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+
+    <main><%- body %></main>
+
+    <%- include('../partials/footer') %>
+
+    <script src="/js/main.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+.best-sellers {
+  padding: 80px 20px;
+  background: #f5f7fb;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 32px;
+  color: var(--navy);
+  margin-bottom: 50px;
+}
+
+/* SLIDER */
+.slider-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.slider-track {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.5s ease;
+}
+
+/* CARD */
+.product-card {
+  min-width: calc(25% - 15px);
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  transition: 0.3s;
+  max-height: 330px;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+}
+
+.product-card h3 {
+  margin: 10px 0;
+  color: var(--navy);
+}
+
+.product-card p {
+  color: gray;
+  font-size: 14px;
+}
+
+.product-card span {
+  display: block;
+  margin: 10px 0;
+  color: var(--red);
+  font-weight: bold;
+}
+
+/* CART BUTTON */
+.cart-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+
+  background: var(--navy);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* ARROWS */
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+
+  background: var(--navy);
+  color: white;
+
+  cursor: pointer;
+  z-index: 10;
+}
+
+.prev {
+  left: -0px;
+}
+.next {
+  right: -0px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .product-card {
+    min-width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 500px) {
+  .product-card {
+    min-width: 100%;
+  }
+}

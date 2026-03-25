@@ -1,0 +1,28 @@
+[
+  {
+    "_id": "94740e56-a03e-455f-98b8-b824fd6c0048",
+    "businessName": "Preview Trader",
+    "contactName": "Test Trader",
+    "email": "preview@example.com",
+    "phone": "123456789",
+    "businessType": "Retail store",
+    "message": "Preview local fallback",
+    "status": "pending",
+    "createdAt": "2026-05-03T13:44:18.328Z",
+    "updatedAt": "2026-05-03T13:44:18.328Z"
+  },
+  {
+    "_id": "c90afebf-77a8-462d-a57c-fe47796355d9",
+    "businessName": "nbnb",
+    "contactName": "bbnbn",
+    "email": "abdulnoor21092003@gmail.com",
+    "phone": "07564380062",
+    "companyNumber": "464656564",
+    "businessType": "Retail store",
+    "website": "",
+    "message": "snus",
+    "status": "pending",
+    "createdAt": "2026-05-03T13:52:52.412Z",
+    "updatedAt": "2026-05-03T13:52:52.412Z"
+  }
+]
