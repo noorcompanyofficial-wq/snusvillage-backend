@@ -15,7 +15,7 @@
 
 /* ===== NAVBAR ===== */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 1000;
   background: var(--white);
@@ -116,11 +116,13 @@
   position: relative;
 }
 .mega-menu {
-  position: absolute;
+  /*  
+  
+    position problem with abslute*/
+  position: fixed;
   top: 60px;
   left: 0;
   width: 100%;
-  background: var(--white);
   display: flex;
   justify-content: center;
   gap: 80px;
@@ -129,6 +131,7 @@
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.3s ease;
+  background: var(--white);
 }
 .shop-item:hover .mega-menu {
   opacity: 1;
