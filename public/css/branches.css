@@ -1,207 +1,186 @@
-/* SECTION */
-.branches {
-  position: relative;
+.sv-map-stores {
+  padding: 64px 20px;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(15, 45, 107, 0.05),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(200, 16, 46, 0.05),
+      transparent 30%
+    ),
+    #fff;
+}
+
+.sv-map-stores__wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sv-map-stores__head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.sv-map-stores__eyebrow {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c8102e;
+}
+
+.sv-map-stores__title {
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #0f2d6b;
+}
+
+.sv-map-stores__sub {
+  margin: 12px auto 0;
+  max-width: 700px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #5b6778;
+}
+
+.sv-map-stores__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.sv-map-card {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  padding: 80px 20px;
-  background: linear-gradient(to bottom, #f5f7fb, #ffffff);
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid rgba(15, 45, 107, 0.1);
+  box-shadow: 0 12px 34px rgba(15, 45, 107, 0.07);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  min-height: 100%;
 }
-.container {
+
+.sv-map-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 45, 107, 0.11);
+  border-color: rgba(200, 16, 46, 0.24);
+}
+
+.sv-map-card__content {
+  padding: 22px 22px 18px;
   position: relative;
-  z-index: 1;
 }
 
-/*  Glow */
-.branches-glow {
+.sv-map-card__content::before {
+  content: "";
   position: absolute;
-  width: 500px;
-  height: 500px;
-
-  background: radial-gradient(
-    circle,
-    rgba(10, 31, 68, 0.8) 0%,
-    transparent 70%
-  );
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  filter: blur(80px);
-  z-index: 0;
-}
-
-/* NAVY GLOW */
-.branch-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-  width: 500px;
-  height: 500px;
-
-  background: radial-gradient(
-    circle,
-    rgba(10, 31, 68, 0.35) 0%,
-    transparent 70%
-  );
-
-  transform: translate(-50%, -50%);
-  filter: blur(120px);
-
-  animation: navyGlowMove 14s ease-in-out infinite alternate;
-
-  z-index: 0;
-}
-
-/* ANIMATION (SMOOTH FLOAT) */
-@keyframes navyGlowMove {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-40%, -55%) scale(1.1);
-  }
-  100% {
-    transform: translate(-55%, -45%) scale(1);
-  }
-}
-
-/* FIX CONTENT ABOVE GLOW */
-.container {
-  position: relative;
-  z-index: 1;
-}
-
-/* HEADER */
-.section-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.section-header h2 {
-  font-size: 32px;
-  color: var(--navy);
-}
-
-/* GRID */
-.branches-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  justify-content: center;
-}
-
-/* CARD */
-.branch-card {
-  width: 250px;
-  padding: 30px;
-  border-radius: 15px;
-
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-
-  text-align: center;
-  transition: 0.4s;
-}
-
-.branch-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 35px rgba(209, 0, 28, 0.2);
-}
-
-/* ICON */
-.branch-icon {
-  width: 60px;
-  height: 60px;
-  margin: auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--navy), var(--red));
-  color: var(--navy);
-  font-size: 25px;
-}
-
-/* BUTTON */
-.map-btn {
-  margin-top: 15px;
-  padding: 8px 18px;
-  border-radius: 20px;
-  border: none;
-  background: var(--navy);
-  color: white;
-  cursor: pointer;
-}
-
-.map-btn.disabled {
-  background: gray;
-  cursor: not-allowed;
-}
-
-/* ===== MODAL ===== */
-.map-modal {
-  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0f2d6b 0%, #c8102e 100%);
+}
 
-  background: rgba(0, 0, 0, 0.7);
-  display: none;
-  justify-content: center;
+.sv-map-card__pill {
+  display: inline-flex;
   align-items: center;
-  z-index: 2000;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(15, 45, 107, 0.08);
+  color: #0f2d6b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
 
-.map-modal.active {
-  display: flex;
+.sv-map-card h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 900;
+  color: #0f2d6b;
 }
 
-.map-content {
-  width: 90%;
-  max-width: 800px;
-  height: 500px;
-  background: white;
-  border-radius: 10px;
-  position: relative;
+.sv-map-card p {
+  margin: 0 0 18px;
+  color: #5b6778;
+  font-size: 15px;
+  line-height: 1.7;
 }
 
-.map-content iframe {
+.sv-map-card a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 14px;
+  background: #0f2d6b;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 800;
+  transition: 0.22s ease;
+}
+
+.sv-map-card a:hover {
+  background: #c8102e;
+  transform: translateY(-1px);
+}
+
+.sv-map-card__map {
+  height: 300px;
+  border-top: 1px solid rgba(15, 45, 107, 0.08);
+}
+
+.sv-map-card__map iframe {
   width: 100%;
   height: 100%;
-  border: none;
+  border: 0;
+  display: block;
 }
 
-.close-map {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 28px;
-  cursor: pointer;
-}
+@media (max-width: 1100px) {
+  .sv-map-stores__grid {
+    grid-template-columns: 1fr;
+  }
 
-/* ===== ANIMATION (NEW NAME) ===== */
-.branch-animate {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: 0.6s;
-}
-
-.branch-animate.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  .branch-card {
-    width: 45%;
+  .sv-map-card__map {
+    height: 360px;
   }
 }
 
-@media (max-width: 500px) {
-  .branch-card {
-    width: 100%;
+@media (max-width: 640px) {
+  .sv-map-stores {
+    padding: 46px 16px;
+  }
+
+  .sv-map-card {
+    border-radius: 20px;
+  }
+
+  .sv-map-card__content {
+    padding: 18px 18px 16px;
+  }
+
+  .sv-map-card h3 {
+    font-size: 21px;
+  }
+
+  .sv-map-card__map {
+    height: 280px;
   }
 }

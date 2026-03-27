@@ -1,58 +1,90 @@
-<section class="branches">
-  <div class="branch-glow"></div>
-  <div class="container">
-    <!-- SECTION HEADER -->
-    <div class="section-header branch-animate">
-      <h2>London Branches</h2>
-      <p>Visit our stores across London</p>
+<section class="sv-map-stores">
+  <div class="sv-map-stores__wrap page-width">
+    <div class="sv-map-stores__head">
+      <h2 class="sv-map-stores__title">Our London Shops</h2>
+      <p class="sv-map-stores__sub">
+        Find Snus Village in Camden Town, Oxford Street, and Edgware Road.
+      </p>
     </div>
 
-    <!-- GRID -->
-    <div class="branches-grid">
-      <!-- CARD -->
-      <div class="branch-card branch-animate">
-        <div class="branch-icon">
-          <i class="fa-solid fa-location-dot"></i>
+    <div class="sv-map-stores__grid">
+      <!-- Camden Town -->
+      <article class="sv-map-card">
+        <div class="sv-map-card__content">
+          <span class="sv-map-card__pill">Camden Town</span>
+          <h3>Snus Village Camden Town</h3>
+          <p>Visit our Camden Town branch and explore your favourite brands.</p>
+          <a
+            href="https://www.google.com/maps/search/Snus+Village+Camden+Town"
+            target="_blank"
+            rel="noopener"
+          >
+            Get Directions
+          </a>
         </div>
-        <h3>Camden Town</h3>
-        <p>Open 9:00 AM – 11:00 PM</p>
-        <button class="map-btn" data-map="camden">View Map</button>
-      </div>
+        <div class="sv-map-card__map">
+          <iframe
+            src="https://www.google.com/maps?q=Snus+Village+Camden+Town&output=embed"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          >
+          </iframe>
+        </div>
+      </article>
 
-      <div class="branch-card branch-animate">
-        <div class="branch-icon">
-          <i class="fa-solid fa-location-dot"></i>
+      <!-- Oxford Street -->
+      <article class="sv-map-card">
+        <div class="sv-map-card__content">
+          <span class="sv-map-card__pill">Oxford Street</span>
+          <h3>Snus Village Oxford Street</h3>
+          <p>Shop top nicotine pouch and snus brands in central London.</p>
+          <a
+            href="https://www.google.com/maps/search/Snus+Village+Oxford+Street"
+            target="_blank"
+            rel="noopener"
+          >
+            Get Directions
+          </a>
         </div>
-        <h3>Oxford Street</h3>
-        <p>Open 9:00 AM – 11:00 PM</p>
-        <button class="map-btn" data-map="oxford">View Map</button>
-      </div>
+        <div class="sv-map-card__map">
+          <iframe
+            src="https://www.google.com/maps?q=Snus+Village+Oxford+Street&output=embed"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          >
+          </iframe>
+        </div>
+      </article>
 
-      <div class="branch-card branch-animate">
-        <div class="branch-icon">
-          <i class="fa-solid fa-location-dot"></i>
+      <!-- Edgware Road -->
+      <article class="sv-map-card">
+        <div class="sv-map-card__content">
+          <span class="sv-map-card__pill">Edgware Road</span>
+          <h3>Snus Village Edgware Road</h3>
+          <p>
+            Stop by our Edgware Road store and browse popular flavours and
+            brands.
+          </p>
+          <a
+            href="https://www.google.com/maps/search/Snus+Village+Edgware+Road"
+            target="_blank"
+            rel="noopener"
+          >
+            Get Directions
+          </a>
         </div>
-        <h3>Edgware Road</h3>
-        <p>Open 10:00 AM – 10:00 PM</p>
-        <button class="map-btn" data-map="edgware">View Map</button>
-      </div>
-
-      <div class="branch-card branch-animate">
-        <div class="branch-icon">
-          <i class="fa-solid fa-location-dot"></i>
+        <div class="sv-map-card__map">
+          <iframe
+            src="https://www.google.com/maps?q=Snus+Village+Edgware+Road&output=embed"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          >
+          </iframe>
         </div>
-        <h3>Southall</h3>
-        <p>Coming Soon</p>
-        <button class="map-btn disabled">Coming Soon</button>
-      </div>
+      </article>
     </div>
   </div>
 </section>
-
-<!-- MAP MODAL -->
-<div class="map-modal" id="mapModal">
-  <div class="map-content">
-    <span class="close-map" id="closeMap">&times;</span>
-    <iframe id="mapFrame" src="" loading="lazy"></iframe>
-  </div>
-</div>

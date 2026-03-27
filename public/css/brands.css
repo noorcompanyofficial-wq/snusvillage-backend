@@ -19,6 +19,15 @@
   z-index: 0;
 }
 
+/* TITLE */
+.section-title {
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #0f2d6b;
+  padding-bottom: 30px !important;
+}
+
 /* CONTENT */
 .brands-section .container {
   position: relative;
@@ -26,13 +35,6 @@
   max-width: 1200px;
   margin: auto;
   text-align: center;
-}
-
-/* TITLE */
-.section-title {
-  font-size: 34px;
-  color: var(--navy);
-  margin-bottom: 10px;
 }
 
 /* SUBTITLE */

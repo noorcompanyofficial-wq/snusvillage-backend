@@ -3,11 +3,13 @@
   background: #f5f7fb;
 }
 
+/* TITLE */
 .section-title {
-  text-align: center;
-  font-size: 32px;
-  color: var(--navy);
-  margin-bottom: 50px;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #0f2d6b;
+  padding-bottom: 30px !important;
 }
 
 /* SLIDER */
