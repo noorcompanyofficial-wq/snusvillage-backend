@@ -81,8 +81,6 @@
   border-radius: 7px;
 }
 
-/* HOVER */
-
 /* RESPONSIVE  */
 @media (max-width: 900px) {
   .brands-grid {
@@ -97,6 +95,11 @@
 
 @media (max-width: 500px) {
   .brands-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .brand-card {
+    height: 90px;
   }
 }

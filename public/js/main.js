@@ -1,9 +1,77 @@
 // HAMBURGER TOGGLE
-const hamburger = document.getElementById("hamburger");
+const navbar = document.querySelector(".navbar");
+
 const navLinks = document.getElementById("navLinks");
 
+/* Age Verfication */
+const ageModal = document.getElementById("ageModal");
+const enterBtn = document.getElementById("enterSite");
+const exitBtn = document.getElementById("exitSite");
+
+// check if already accepted
+if (localStorage.getItem("ageVerified") === "true") {
+  ageModal.style.display = "none";
+}
+
+// ENTER
+enterBtn.addEventListener("click", () => {
+  localStorage.setItem("ageVerified", "true");
+  ageModal.style.display = "none";
+});
+
+// EXIT
+exitBtn.addEventListener("click", () => {
+  window.location.href = "https://www.google.com"; //
+});
+
+/* Cookies Js */
+const cookieBanner = document.getElementById("cookieBanner");
+const acceptBtn = document.getElementById("acceptCookies");
+const rejectBtn = document.getElementById("rejectCookies");
+
+// check
+if (localStorage.getItem("cookiesChoice")) {
+  cookieBanner.style.display = "none";
+}
+
+// ACCEPT
+acceptBtn.addEventListener("click", () => {
+  localStorage.setItem("cookiesChoice", "accepted");
+  cookieBanner.style.display = "none";
+});
+
+// REJECT
+rejectBtn.addEventListener("click", () => {
+  localStorage.setItem("cookiesChoice", "rejected");
+  cookieBanner.style.display = "none";
+});
+
+// Hamburger //
+const hamburger = document.getElementById("nav-icon4");
+
+hamburger.innerHTML = `
+  <span></span>
+  <span></span>
+  <span></span>
+`;
+
 hamburger.addEventListener("click", () => {
+  hamburger.classList.toggle("open");
   navLinks.classList.toggle("active");
+});
+
+// User Dropdown
+const userToggle = document.querySelector(".user-toggle");
+const navUser = document.querySelector(".nav-user");
+
+userToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  navUser.classList.toggle("active");
+});
+
+// CLOSE WHEN CLICK OUTSIDE
+document.addEventListener("click", () => {
+  navUser.classList.remove("active");
 });
 
 // DROPDOWN SHOP MOBILE
@@ -32,6 +100,15 @@ shopLink.addEventListener("click", (e) => {
       megaMenu.style.height = 0; // CLOSE DROPDOWN
       shopItem.classList.remove("active");
     }
+  }
+});
+
+/* Navbar Scroll */
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 0) {
+    navbar.classList.add("navbar-shadow");
+  } else {
+    navbar.classList.remove("navbar-shadow");
   }
 });
 
@@ -191,3 +268,19 @@ function deliveryReveal() {
 }
 
 window.addEventListener("scroll", deliveryReveal);
+
+/* Social design js */
+// SOCIAL SCROLL ANIMATION
+const socialItems = document.querySelectorAll(".social-animate");
+
+function socialReveal() {
+  socialItems.forEach((el, i) => {
+    if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+      setTimeout(() => {
+        el.classList.add("active");
+      }, i * 120);
+    }
+  });
+}
+
+window.addEventListener("scroll", socialReveal);

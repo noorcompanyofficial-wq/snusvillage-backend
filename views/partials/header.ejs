@@ -1,4 +1,4 @@
-<header>
+<header class="header">
   <nav class="navbar">
     <div class="nav-container">
       <!-- LOGO -->
@@ -55,6 +55,7 @@
             </div>
           </div>
         </li>
+        <li><a href="#">Wholesale</a></li>
 
         <li><a href="/about">About</a></li>
         <li><a href="/contact">Contact</a></li>
@@ -68,17 +69,21 @@
         <button class="icon-btn">
           <i class="fa-solid fa-cart-shopping"></i>
         </button>
-        <button class="icon-btn">
-          <i class="fa-solid fa-user"></i>
-        </button>
+        <div class="nav-user">
+          <button class="icon-btn user-toggle">
+            <i class="fa-solid fa-user"></i>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+
+          <div class="user-dropdown">
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+          </div>
+        </div>
       </div>
 
       <!-- HAMBURGER -->
-      <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      <div id="nav-icon4"></div>
     </div>
 
     <!--  DESKTOP SEARCH -->

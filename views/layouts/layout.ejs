@@ -27,11 +27,32 @@
     <link rel="stylesheet" href="/css/best-sellers.css" />
     <link rel="stylesheet" href="/css/branches.css" />
     <link rel="stylesheet" href="/css/delivery.css" />
+    <link rel="stylesheet" href="/css/social.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
 
     <!-- Web Icon -->
     <link rel="icon" href="/images/logo/snusvillage-logo.png" />
   </head>
   <body>
+    <div class="age-modal" id="ageModal">
+      <div class="age-box">
+        <h2>Age Verification</h2>
+        <p>You must be 18+ to enter this website</p>
+
+        <div class="age-buttons">
+          <button id="enterSite">I am over 18</button>
+          <button id="exitSite">I am under 18</button>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-banner" id="cookieBanner">
+      <p>We use cookies to improve your experience.</p>
+
+      <div class="cookie-buttons">
+        <button id="acceptCookies">Accept All</button>
+        <button id="rejectCookies">Reject</button>
+      </div>
+    </div>
     <%- include('../partials/header') %>
 
     <main><%- body %></main>

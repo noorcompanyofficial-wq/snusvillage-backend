@@ -1,0 +1,118 @@
+.age-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.age-box {
+  background: white;
+  padding: 40px;
+  text-align: center;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.age-box h2 {
+  margin-bottom: 15px;
+  color: var(--navy);
+}
+
+.age-box p {
+  margin-bottom: 25px;
+  color: #555;
+}
+
+.age-buttons button {
+  padding: 12px 20px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+#enterSite {
+  background: red;
+  color: white;
+}
+
+#exitSite {
+  background: #ccc;
+  color: #000;
+}
+
+.cookie-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: #0a1f44;
+  color: white;
+
+  padding: 15px 20px;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  width: 90%;
+  max-width: 600px;
+
+  z-index: 9999;
+}
+
+/* TEXT */
+.cookie-banner p {
+  font-size: 14px;
+  flex: 1;
+}
+
+/* BUTTONS */
+.cookie-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.cookie-buttons button {
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+#acceptCookies {
+  background: var(--red);
+  color: white;
+}
+
+#rejectCookies {
+  background: white;
+  color: black;
+}
+
+/* ===== MOBILE FIX  ===== */
+@media (max-width: 600px) {
+  .cookie-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .cookie-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cookie-buttons button {
+    flex: 1;
+  }
+}

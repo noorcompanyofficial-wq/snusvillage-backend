@@ -1,0 +1,129 @@
+.footer {
+  position: relative;
+  background: #0a1f44;
+  color: white;
+  padding: 90px 20px 30px;
+  overflow: hidden;
+}
+
+/* GRID */
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 40px;
+}
+
+/* COLUMN */
+.footer-col h4 {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.footer-col a {
+  display: block;
+  margin-bottom: 8px;
+  color: #bbb;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.footer-col a:hover {
+  color: var(--red);
+  transform: translateX(5px);
+}
+
+/* LOGO */
+.footer-logo {
+  width: 100px;
+  margin-bottom: 15px;
+  margin-left: -25px;
+}
+
+/* TEXT */
+.footer-col p {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* CONTACT ICONS */
+.footer-col p i {
+  margin-right: 8px;
+  color: var(--red);
+}
+
+/* ===== SOCIAL (CIRCLE STYLE) ===== */
+.footer-socials {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.social-icon {
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  transition: 0.3s;
+  padding: 12px;
+}
+
+/* ===== NEWSLETTER ===== */
+.newsletter {
+  display: flex;
+  margin-top: 10px;
+}
+
+.newsletter input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  outline: none;
+  border-radius: 5px 0 0 5px;
+}
+
+.newsletter button {
+  background: var(--red);
+  border: none;
+  padding: 12px 15px;
+  color: white;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+  background: #a80017;
+}
+
+/* ===== BOTTOM ===== */
+.footer-bottom {
+  text-align: center;
+  margin-top: 50px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  font-size: 14px;
+}
+
+@keyframes footerGlow {
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-40%, -60%);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1000px) {
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
+}
