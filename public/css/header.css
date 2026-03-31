@@ -251,6 +251,10 @@
   display: none;
 }
 
+.mobile-shop-link {
+  display: none;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   #searchBtn {
@@ -344,6 +348,9 @@
     font-size: 14px;
     display: block;
     padding: 6px 0;
+  }
+  .mobile-shop-link {
+    display: block;
   }
 }
 

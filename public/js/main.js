@@ -284,3 +284,5 @@ function socialReveal() {
 }
 
 window.addEventListener("scroll", socialReveal);
+
+/* Shop js */

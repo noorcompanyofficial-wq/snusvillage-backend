@@ -9,6 +9,7 @@ require("dotenv").config();
 
 // ====== Routes ======
 const indexRoutes = require("./routes/index");
+const shopRoutes = require("./routes/shop");
 
 // ====== Database connection ======
 /* mongoose
@@ -31,6 +32,7 @@ app.use(ejsLayouts);
 
 // Use Routes
 app.use("/", indexRoutes);
+app.use("/shop", shopRoutes);
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;

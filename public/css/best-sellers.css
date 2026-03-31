@@ -111,6 +111,10 @@
   right: -0px;
 }
 
+.card-price {
+  color: #d1001c !important;
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .product-card {
