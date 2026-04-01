@@ -22,6 +22,9 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/shop.css" />
+    <link rel="stylesheet" href="/css/products.css" />
+    <link rel="stylesheet" href="/css/cart.css" />
+    <link rel="stylesheet" href="/css/auth.css" />
     <link rel="stylesheet" href="/css/header.css" />
     <link rel="stylesheet" href="/css/trust.css" />
     <link rel="stylesheet" href="/css/brands.css" />
@@ -58,11 +61,13 @@
 
     <main><%- body %></main>
 
-    <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %> <%- include('../partials/cart') %>
 
     <script src="/js/main.js" defer></script>
     <script src="/js/shop.js" defer></script>
-
+    <script src="/js/products.js" defer></script>
+    <script src="/js/cart.js" defer></script>
+    <script src="/js/auth.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
   </body>
 </html>

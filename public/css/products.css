@@ -1,0 +1,173 @@
+/* LAYOUT */
+.product-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 60px;
+  padding: 80px 40px;
+}
+
+/* IMAGE */
+.main-image {
+  max-width: 400px;
+  margin: auto;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.main-image img {
+  width: 100%;
+  transition: 0.4s;
+}
+
+/* ZOOM */
+.main-image:hover img {
+  transform: scale(1.2);
+}
+
+.thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.thumb {
+  width: 70px;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.thumb.active {
+  opacity: 1;
+  border: 2px solid #d1001c;
+}
+
+/* INFO */
+.product-title {
+  font-size: clamp(26px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #0f2d6b;
+}
+
+/* RATING */
+.rating {
+  color: gold;
+  margin: 10px 0;
+}
+
+/* PRICE */
+.price {
+  font-size: 28px;
+  color: #d1001c;
+  font-weight: bold;
+}
+
+.stock {
+  color: green;
+}
+
+/* CART */
+.cart-section {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+}
+
+.add-cart {
+  background: linear-gradient(45deg, #d1001c, #0a1f44);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin: 40px;
+}
+
+.tab {
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: #eee;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #0a1f44;
+  color: white;
+}
+
+/* SLIDE ANIMATION */
+.tab-content {
+  display: none;
+  margin: 0 40px;
+  animation: slideFade 0.4s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes slideFade {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* RELATED */
+.related {
+  padding: 60px 40px;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.r-card {
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.r-card:hover {
+  transform: translateY(-6px);
+}
+
+.r-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .product-page {
+    grid-template-columns: 1fr;
+  }
+
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+}

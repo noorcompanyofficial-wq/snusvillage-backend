@@ -265,6 +265,11 @@
   transform: rotate(180deg);
 }
 
+.link-card {
+  text-decoration: none;
+  color: #000;
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .products {
