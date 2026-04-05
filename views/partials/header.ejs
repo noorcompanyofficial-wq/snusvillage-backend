@@ -80,8 +80,13 @@
           </button>
 
           <div class="user-dropdown">
-            <a href="/auth/login">Login</a>
-            <a href="/auth/register">Sign Up</a>
+          <% if (!user) { %>
+  <a href="/auth/login">Login</a>
+  <a href="/auth/register">Sign Up</a>
+<% } else { %>
+  <a href="/auth/dashboard">Dashboard</a>
+  <a href="/auth/logout">Logout</a>
+<% } %>
           </div>
         </div>
       </div>

@@ -1,0 +1,100 @@
+<!-- Verify Register page -->
+<link rel="stylesheet" href="/css/auth.css" />
+<div id="flash-container">
+
+  <% if (error && error.length > 0) { %>
+    <div class="flash flash-error">
+      <span><%= error %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+  <% if (success && success.length > 0) { %>
+    <div class="flash flash-success">
+      <span><%= success %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+</div>
+<section class="auth-container">
+  <div class="auth-box">
+    <h2>VERIFY CODE</h2>
+ <form method="POST" action="/auth/verify">
+  <div class="otp-container">
+    <input maxlength="1" class="otp" />
+    <input maxlength="1" class="otp" />
+    <input maxlength="1" class="otp" />
+    <input maxlength="1" class="otp" />
+    <input maxlength="1" class="otp" />
+    <input maxlength="1" class="otp" />
+  </div>
+
+  <input type="hidden" name="code" id="code" />
+  <button class="auth-btn" type="submit">VERIFY</button>
+</form>
+
+<form method="POST" action="/auth/resend-code" id="resendForm">
+  <button type="submit" id="resendBtn" class="resend-link">
+    Resend Code
+  </button>
+  <span id="timer"></span>
+</form>
+
+  </div>
+</section>
+
+
+<script>
+const inputs = document.querySelectorAll(".otp");
+const hidden = document.getElementById("code");
+
+inputs.forEach((input, i) => {
+  input.addEventListener("input", () => {
+    if (input.value && i < inputs.length - 1)
+      inputs[i + 1].focus();
+
+    hidden.value = [...inputs].map(i => i.value).join("");
+  });
+});
+</script>
+
+<script>
+const resendBtn = document.getElementById("resendBtn");
+const timerText = document.getElementById("timer");
+
+let time = 60;
+
+if (localStorage.getItem("resendTime")) {
+  time = parseInt(localStorage.getItem("resendTime"));
+}
+
+function startTimer() {
+  resendBtn.disabled = true;
+  resendBtn.style.opacity = "0.5";
+
+  const interval = setInterval(() => {
+    timerText.innerText = ` (${time}s)`;
+
+    localStorage.setItem("resendTime", time);
+
+    time--;
+
+    if (time < 0) {
+      clearInterval(interval);
+      resendBtn.disabled = false;
+      resendBtn.style.opacity = "1";
+      timerText.innerText = "";
+      localStorage.removeItem("resendTime");
+    }
+  }, 1000);
+}
+
+if (time > 0 && localStorage.getItem("resendTime")) {
+  startTimer();
+}
+
+document.getElementById("resendForm").addEventListener("submit", () => {
+  localStorage.setItem("resendTime", 60);
+});
+</script>

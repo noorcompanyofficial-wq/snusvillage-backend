@@ -1,0 +1,34 @@
+<link rel="stylesheet" href="/css/auth.css" />
+<div id="flash-container">
+
+  <% if (error && error.length > 0) { %>
+    <div class="flash flash-error">
+      <span><%= error %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+  <% if (success && success.length > 0) { %>
+    <div class="flash flash-success">
+      <span><%= success %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+</div>
+<section class="auth-container">
+  <div class="auth-box">
+    <h2>RESET PASSWORD</h2>
+    <form method="POST" action="/auth/reset-password">
+      <div class="input-group">
+        <input type="password" name="password" autocomplete="off" placeholder="New Password" required />
+      </div>
+
+      <div class="input-group">
+        <input type="password" name="confirm" autocomplete="off" placeholder="Confirm Password" required />
+      </div>
+
+      <button class="auth-btn">SAVE PASSWORD</button>
+    </form>
+  </div>
+</section>

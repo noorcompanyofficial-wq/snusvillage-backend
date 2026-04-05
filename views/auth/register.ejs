@@ -4,37 +4,86 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 
+<div id="flash-container">
+
+  <% if (error && error.length > 0) { %>
+    <div class="flash flash-error">
+      <span><%= error %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+  <% if (success && success.length > 0) { %>
+    <div class="flash flash-success">
+      <span><%= success %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+</div>
+
 <section class="auth-container">
   <div class="auth-box">
     <h2>CREATE AN ACCOUNT</h2>
 
-    <form class="auth-form">
+    <form action="/auth/register" method="post" class="auth-form">
       <div class="input-group">
         <i class="fa-solid fa-user"></i>
-        <input type="text" placeholder="First Name" required />
+        <input
+          type="text"
+          autocomplete="off"
+          name="firstName"
+          placeholder="First Name"
+          required
+        />
       </div>
 
       <div class="input-group">
         <i class="fa-solid fa-user"></i>
-        <input type="text" placeholder="Last Name" required />
+        <input
+          type="text"
+          autocomplete="off"
+          name="lastName"
+          placeholder="Last Name"
+          required
+        />
       </div>
 
       <div class="input-group">
         <i class="fa-solid fa-calendar"></i>
-        <input type="date" required />
+        <input
+          type="date"
+          autocomplete="off"
+          name="birthDate"
+          placeholder="Date"
+          class="input-date"
+          required
+        />
       </div>
 
       <div class="input-group">
         <i class="fa-solid fa-envelope"></i>
-        <input type="email" placeholder="Email" required />
+        <input
+          type="email"
+          autocomplete="off"
+          name="email"
+          placeholder="Email"
+          required
+        />
       </div>
 
       <div class="input-group">
         <i class="fa-solid fa-lock"></i>
-        <input type="password" placeholder="Password" required />
+        <input
+          type="password"
+          autocomplete="off"
+          name="password"
+          placeholder="Password"
+          required
+        />
       </div>
 
-      <button class="auth-btn">CREATE ACCOUNT</button>
+      <button class="auth-btn" type="submit">CREATE ACCOUNT</button>
 
       <p class="switch">
         Already have an account?

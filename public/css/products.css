@@ -132,6 +132,12 @@
   padding: 60px 40px;
 }
 
+.related-title {
+  color: #0f2d6b;
+  padding: 20px;
+  font-weight: 900;
+}
+
 .related-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

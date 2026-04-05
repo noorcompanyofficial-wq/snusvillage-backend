@@ -4,31 +4,61 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 
+<div id="flash-container">
+
+  <% if (error && error.length > 0) { %>
+    <div class="flash flash-error">
+      <span><%= error %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+  <% if (success && success.length > 0) { %>
+    <div class="flash flash-success">
+      <span><%= success %></span>
+      <button class="flash-close" onclick="closeFlash(this)">×</button>
+    </div>
+  <% } %>
+
+</div>
+
 <section class="auth-container">
   <div class="auth-box">
     <h2>LOG IN</h2>
 
-    <form class="auth-form">
+    <form class="auth-form" method="post" action="/auth/login">
       <div class="input-group">
         <i class="fa-solid fa-envelope"></i>
-        <input type="email" placeholder="Email" required />
+        <input type="email" autocomplete="off" name="email" placeholder="Email" required />
       </div>
 
       <div class="input-group">
         <i class="fa-solid fa-lock"></i>
-        <input type="password" placeholder="Password" required />
+        <input
+          type="password"
+          autocomplete="off"
+          name="password"
+          placeholder="Password"
+          required
+        />
       </div>
 
       <div class="extra">
-        <a href="#">Forgot Password?</a>
-      </div>
+  <label>
+    <input type="checkbox" name="remember" />
+    Remember Me
+  </label>
 
-      <button class="auth-btn">LOG IN</button>
+  <a href="/auth/forgot">Forgot Password?</a>
+</div>
+
+      <button class="auth-btn" type="submit">LOG IN</button>
 
       <p class="switch">
         Don’t have an account?
         <a href="/auth/register">Register</a>
       </p>
+    
     </form>
   </div>
 </section>
