@@ -1,0 +1,202 @@
+.admin-add-wrapper {
+  padding: 40px;
+}
+
+/* BACK */
+.admin-add-back {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #0a1f44;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.admin-add-back:hover {
+  color: #d1001c;
+}
+
+/* TITLE */
+.admin-add-title {
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: #0a1f44;
+}
+
+/* CARD */
+.admin-add-card {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* GRID */
+.admin-add-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* INPUT BOX */
+.input-box {
+  position: relative;
+}
+
+.input-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px 12px 12px 38px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-box input:focus {
+  border-color: #0a1f44;
+}
+
+/* TEXTAREA */
+.textarea-box {
+  margin-top: 20px;
+}
+
+.textarea-box textarea {
+  width: 100%;
+  height: 120px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  resize: none;
+  outline: none;
+}
+
+.textarea-box textarea:focus {
+  border-color: #0a1f44;
+}
+
+/* FILE */
+.file-box {
+  margin-top: 20px;
+}
+
+.file-box label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.file-box input {
+  width: 100%;
+}
+
+/* BUTTON */
+.admin-add-btn {
+  margin-top: 25px;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: linear-gradient(45deg, #d1001c, #0a1f44);
+  color: white;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* ===== SELECT GROUP ===== */
+.admin-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 25px;
+}
+
+/* LABEL */
+.admin-select-group label {
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+}
+
+/* BOX */
+.admin-select-box {
+  position: relative;
+}
+
+/* ICON */
+.admin-select-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+/* SELECT */
+.admin-select-box select {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  appearance: none; /* hide default arrow */
+  background: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* CUSTOM ARROW */
+.admin-select-box::after {
+  content: "\f078"; /* fa-chevron-down */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+/* HOVER */
+.admin-select-box:hover select {
+  border-color: #0a1f44;
+}
+
+/* FOCUS */
+.admin-select-box select:focus {
+  border-color: #0a1f44;
+  box-shadow: 0 0 0 2px rgba(10, 31, 68, 0.1);
+}
+
+/* ACTIVE ARROW ROTATE */
+.admin-select-box select:focus + i,
+.admin-select-box:focus-within::after {
+  transform: translateY(-50%) rotate(180deg);
+  color: #0a1f44;
+}
+
+.admin-add-btn:hover {
+  transform: scale(1.03);
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .admin-add-grid {
+    grid-template-columns: 1fr;
+  }
+}

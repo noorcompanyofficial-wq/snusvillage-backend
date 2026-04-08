@@ -3,182 +3,200 @@
   <p class="shop-sub">Premium snus products</p>
 
   <!-- FILTERS -->
-  <div class="filters">
-    <button class="filter-btn active dropdown-toggle">All</button>
+  
+<div class="filters">
 
-    <div class="dropdown">
-      <button class="filter-btn dropdown-toggle">
-        Brands <i class="fa-solid fa-chevron-down"></i>
-      </button>
-      <div class="dropdown-menu">
-        <a>WHITE FOX</a>
-        <a>SIBERIA</a>
-        <a>VELO</a>
-        <a>KILLA</a>
-        <a>PABLO</a>
-        <a>GARANT</a>
-        <a>ICEBERG CUBA</a>
-        <a>LOOP</a>
-        <a>CAFERO</a>
-        <a>HIT</a>
-        <a>ODEN'S</a>
-      </div>
-    </div>
+  <!-- ALL -->
+  <button id="resetFilters" class="filter-btn active">All</button>
 
-    <div class="dropdown">
-      <button class="filter-btn dropdown-toggle">
-        Strength <i class="fa-solid fa-chevron-down"></i>
-      </button>
-      <div class="dropdown-menu">
-        <a>LOW</a>
-        <a>MEDIUM</a>
-        <a>STRONG</a>
-        <a>X-STRONG</a>
-        <a>EXTREME</a>
-      </div>
-    </div>
+  <!-- BRANDS -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle">
+      Brands <i class="fa-solid fa-chevron-down"></i>
+    </button>
 
-    <div class="dropdown">
-      <button class="filter-btn dropdown-toggle">
-        Flavours <i class="fa-solid fa-chevron-down"></i>
-      </button>
-      <div class="dropdown-menu">
-        <a>MINTY MOOD</a>
-        <a>FRUITY FANTASY</a>
-        <a>CITRUS CYCLONE</a>
-        <a>FIZZY FUN</a>
-      </div>
+    <div class="dropdown-menu">
+      <a class="filter-item" data-filter="brand" data-value="white fox">WHITE FOX</a>
+      <a class="filter-item" data-filter="brand" data-value="siberia">SIBERIA</a>
+      <a class="filter-item" data-filter="brand" data-value="velo">VELO</a>
+      <a class="filter-item" data-filter="brand" data-value="killa">KILLA</a>
+      <a class="filter-item" data-filter="brand" data-value="pablo">PABLO</a>
+      <a class="filter-item" data-filter="brand" data-value="garant">GARANT</a>
+      <a class="filter-item" data-filter="brand" data-value="iceberg cuba">ICEBERG CUBA</a>
+      <a class="filter-item" data-filter="brand" data-value="loop">LOOP</a>
+      <a class="filter-item" data-filter="brand" data-value="cafero">CAFERO</a>
+      <a class="filter-item" data-filter="brand" data-value="hit">HIT</a>
+      <a class="filter-item" data-filter="brand" data-value="oden's">ODEN'S</a>
     </div>
   </div>
 
-  <!-- PRODUCTS -->
-  <div class="products">
-    <!-- CARD -->
-    <!-- 1 -->
-    <a href="/products" class="link-card">
+  <!-- STRENGTH -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle">
+      Strength <i class="fa-solid fa-chevron-down"></i>
+    </button>
+
+    <div class="dropdown-menu">
+      <a class="filter-item" data-filter="strength" data-value="LOW">LOW</a>
+      <a class="filter-item" data-filter="strength" data-value="MEDIUM">MEDIUM</a>
+      <a class="filter-item" data-filter="strength" data-value="STRONG">STRONG</a>
+      <a class="filter-item" data-filter="strength" data-value="X-STRONG">X-STRONG</a>
+      <a class="filter-item" data-filter="strength" data-value="EXTREME">EXTREME</a>
+    </div>
+  </div>
+
+  <!-- FLAVOURS -->
+  <div class="dropdown">
+    <button class="filter-btn dropdown-toggle">
+      Flavours <i class="fa-solid fa-chevron-down"></i>
+    </button>
+
+    <div class="dropdown-menu">
+      <a class="filter-item" data-filter="flavour" data-value="minty mood">MINTY MOOD</a>
+      <a class="filter-item" data-filter="flavour" data-value="fruity fantasy">FRUITY FANTASY</a>
+      <a class="filter-item" data-filter="flavour" data-value="cittus cyclone">CITRUS CYCLONE</a>
+      <a class="filter-item" data-filter="flavour" data-value="fizzy fun">FIZZY FUN</a>
+    </div>
+  </div>
+
+</div>
+
+    <div class="products">
+       <% products.forEach(p => { %>
+    <a href="/products/<%= p._id %>" class="link-card">
       <div class="card">
-        <span class="label">EXTREME</span>
-        <img src="/images/shop/sb-1.png" />
-        <h4>Siberia -80°C</h4>
+
+        <!-- LABEL -->
+        <span class="label"><%= p.strength || 'NORMAL' %></span>
+
+        <!-- IMAGE -->
+        <img src="<%= p.images[0] %>" />
+
+        <!-- NAME -->
+        <h4><%= p.name %></h4>
+
+        <!-- DESC -->
         <p class="desc">
-          One of the strongest nicotine pouches with icy mint hit.
+          <%= p.description.substring(0, 60) %>...
         </p>
-        <p class="meta">Extreme • 25mg</p>
+
+        <!-- META -->
+        <p class="meta">
+          <%= p.strength %> • <%= p.nicotine || '0mg' %>mg
+        </p>
+
+        <!-- PRICE -->
         <div class="bottom">
-          <span class="price">£6.49</span>
+          <span class="price">£<%= p.price.toFixed(2) %></span>
+
           <button class="cart-btn">
             <i class="fa-solid fa-cart-shopping"></i>
           </button>
         </div>
+
       </div>
     </a>
-    <!-- 2 -->
-    <div class="card">
-      <span class="label">STRONG</span>
-      <img src="/images/shop/wf-1.png" />
-      <h4>White Fox Mint</h4>
-      <p class="desc">Clean tobacco-free pouch with refreshing mint taste.</p>
-      <p class="meta">Strong • 18mg</p>
-      <div class="bottom">
-        <span class="price">£5.99</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
 
-    <!-- 3 -->
-    <div class="card">
-      <span class="label">LOW</span>
-      <img src="/images/shop/velo-1.webp" />
-      <h4>Velo Ice Cool</h4>
-      <p class="desc">Smooth and light nicotine pouch for beginners.</p>
-      <p class="meta">Low • 6mg</p>
-      <div class="bottom">
-        <span class="price">£3.99</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
+  <% }) %>
 
-    <!-- 4 -->
-    <div class="card">
-      <span class="label">MEDIUM</span>
-      <img src="/images/shop/killa-1.png" />
-      <h4>Killa Cold Mint</h4>
-      <p class="desc">Balanced strength with powerful mint freshness.</p>
-      <p class="meta">Medium • 12mg</p>
-      <div class="bottom">
-        <span class="price">£5.20</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
+</div>
 
-    <!-- 5 -->
-    <div class="card">
-      <span class="label">EXTREME</span>
-      <img src="/images/shop/pablo-1.png" />
-      <h4>Pablo Ice Cold</h4>
-      <p class="desc">High nicotine pouch for experienced users.</p>
-      <p class="meta">Extreme • 20mg</p>
-      <div class="bottom">
-        <span class="price">£6.99</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 6 -->
-    <div class="card">
-      <span class="label">MEDIUM</span>
-      <img src="/images/shop/loop-1.webp" />
-      <h4>Loop Jalapeno Lime</h4>
-      <p class="desc">Unique spicy and citrus flavour combination.</p>
-      <p class="meta">Medium • 10mg</p>
-      <div class="bottom">
-        <span class="price">£4.80</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 7 -->
-    <div class="card">
-      <span class="label">STRONG</span>
-      <img src="/images/shop/iceberg-1.webp" />
-      <h4>Iceberg Mint</h4>
-      <p class="desc">Strong cooling effect with long-lasting flavour.</p>
-      <p class="meta">Strong • 16mg</p>
-      <div class="bottom">
-        <span class="price">£5.50</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 8 -->
-    <div class="card">
-      <span class="label">LOW</span>
-      <img src="/images/shop/odens-1.png" />
-      <h4>Oden's Cold Dry</h4>
-      <p class="desc">Light strength pouch with classic mint profile.</p>
-      <p class="meta">Low • 8mg</p>
-      <div class="bottom">
-        <span class="price">£3.70</span>
-        <button class="cart-btn">
-          <i class="fa-solid fa-cart-shopping"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- copy same card 12 times -->
-  </div>
 
   <button class="load-more">Load More</button>
 </section>
+
+
+<script>
+let page = 1;
+let filters = {};
+
+const container = document.querySelector(".products");
+const loadBtn = document.getElementById("loadMore");
+
+//FILTER CLICK 
+document.querySelectorAll(".filter-item").forEach(item => {
+  item.addEventListener("click", async () => {
+
+    const type = item.dataset.filter;
+    const value = item.dataset.value;
+
+    filters[type] = value;
+    page = 1;
+
+    await loadProducts(true);
+  });
+});
+
+//RESET 
+document.getElementById("resetFilters").addEventListener("click", async () => {
+  filters = {};
+  page = 1;
+  await loadProducts(true);
+});
+
+//  LOAD MORE 
+loadBtn.addEventListener("click", async () => {
+  page++;
+  await loadProducts();
+});
+
+//FETCH FUNCTION 
+async function loadProducts(reset = false) {
+
+  const params = new URLSearchParams(filters);
+  params.set("page", page);
+
+  const res = await fetch("/shop?" + params.toString(), {
+    headers: { "Accept": "application/json" }
+  });
+
+  const data = await res.json();
+
+  if (reset) {
+    container.innerHTML = "";
+  }
+
+  data.products.forEach(p => {
+    const card = `
+      <a href="/products/${p._id}" class="link-card">
+        <div class="card">
+
+          <span class="label">${p.strength || 'NORMAL'}</span>
+
+          <img src="${p.images?.[0] || ''}" />
+
+          <h4>${p.name}</h4>
+
+          <p class="desc">
+            ${(p.description || '').substring(0, 60)}...
+          </p>
+
+          <p class="meta">
+            ${p.strength || ''} • ${p.nicotine || '0'}mg
+          </p>
+
+          <div class="bottom">
+            <span class="price">£${p.price}</span>
+            <button class="cart-btn">
+              <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+          </div>
+
+        </div>
+      </a>
+    `;
+
+    container.insertAdjacentHTML("beforeend", card);
+  });
+
+  // hide load more
+  if (!data.hasMore) {
+    loadBtn.style.display = "none";
+  } else {
+    loadBtn.style.display = "block";
+  }
+
+  //  update URL (PRO level)
+  window.history.pushState({}, "", "/shop?" + params.toString());
+}
+</script>

@@ -1,0 +1,186 @@
+<link rel="stylesheet" href="/css/admin-products.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+
+
+
+<div class="admin-products">
+
+  <div class="admin-header">
+    <h1>All Products: (<%= totalProducts %>)</h1>
+
+    <a href="/admin/products/add" class="admin-add-btn">
+      <i class="fa-solid fa-plus"></i> Add Product
+    </a>
+  </div>
+
+  <div class="admin-grid">
+    <% products.forEach(p => { %>
+
+      <div class="admin-card">
+
+        <!-- IMAGE -->
+        <div class="admin-img-box">
+          <img src="<%= p.images[0] %>" />
+
+          <span class="admin-stock <%= p.stock > 0 ? 'in' : 'out' %>">
+            <%= p.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+          </span>
+        </div>
+
+        <!-- INFO -->
+        <div class="admin-info">
+          <h3><%= p.name %></h3>
+
+          <div class="admin-price-box">
+            <span class="admin-price">Price: £<%= p.price.toFixed(2) %></span>
+
+            <% if(p.discountPrice) { %>
+              <span class="admin-discount">Discount Price: £<%= p.discountPrice.toFixed(2) %></span>
+            <% } %>
+          </div>
+
+          <p class="admin-category">
+            <i class="fa-solid fa-tag"></i>Category: <%= p.category %>
+          </p>
+
+            <p class="admin-category">
+            <i class="fa-solid fa-dot"></i> Nicotine: <%= p.nicotine %>
+          </p>
+
+           <p class="admin-category">
+            <i class="fa-solid fa-dot"></i> Stock: <%= p.stock %>
+          </p>
+
+          <p class="admin-desc">
+           Description: <%= p.description.substring(0, 80) %>...
+          </p>
+
+          
+          <p class="admin-desc">
+            Strength: <%= p.strength %>
+          </p>
+
+          <!-- ACTIONS -->
+          <div class="admin-actions">
+            <a href="/admin/products/edit/<%= p._id %>" class="edit">
+              <i class="fa-solid fa-pen"></i>
+            </a>
+
+           <button class="delete-btn" data-id="<%= p._id %>">
+                <i class="fa-solid fa-trash"></i>
+          </button>
+          </div>
+        </div>
+
+      </div>
+
+    <% }) %>
+  </div>
+
+  <button id="loadMore" class="admin-load-more">Load More</button>
+
+</div>
+
+<div id="deleteModal" class="delete-modal">
+  <div class="delete-box">
+    <h3>Delete Product</h3>
+    <p>Are you sure you want to delete?</p>
+
+    <div class="delete-actions">
+      <button id="cancelDelete">Cancel</button>
+      <form id="deleteForm" method="POST">
+        <button type="submit" class="confirm-delete">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  let page = 1;
+
+  const loadBtn = document.getElementById("loadMore");
+  const container = document.querySelector(".admin-grid");
+
+  console.log("LoadMore ready");
+
+  loadBtn.addEventListener("click", async () => {
+
+    console.log("CLICKED");
+
+    page++;
+
+    const res = await fetch(`/admin/products?page=${page}`, {
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    const data = await res.json();
+
+    console.log("DATA:", data);
+
+    if (!data.products || data.products.length === 0) {
+      loadBtn.style.display = "none";
+      return;
+    }
+
+    data.products.forEach(p => {
+      const card = `
+        <div class="admin-card">
+
+          <div class="admin-img-box">
+            <img src="${p.images?.[0] || ''}" />
+          </div>
+
+          <div class="admin-info">
+            <h3>${p.name}</h3>
+            <p>£${p.price}</p>
+          </div>
+
+        </div>
+      `;
+
+      container.insertAdjacentHTML("beforeend", card);
+    });
+
+    if (!data.hasMore) {
+      loadBtn.style.display = "none";
+    }
+
+  });
+
+});
+</script>
+<!-- Delete Product -->
+<script>
+const modal = document.getElementById("deleteModal");
+const deleteForm = document.getElementById("deleteForm");
+const cancelBtn = document.getElementById("cancelDelete");
+
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.id;
+
+    // set form action dynamically
+    deleteForm.action = "/admin/products/delete/" + id;
+
+    modal.classList.add("active");
+  });
+});
+
+// cancel
+cancelBtn.addEventListener("click", () => {
+  modal.classList.remove("active");
+});
+
+// click outside to close
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.classList.remove("active");
+  }
+});
+</script>

@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="/css/admin-add-product.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+
+<div class="admin-add-wrapper">
+  <!-- BACK -->
+
+  <!-- FORM CARD -->
+  <div class="admin-add-card">
+    <a href="/admin/products" class="admin-add-back">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+
+    <h2 class="admin-add-title">Add Product</h2>
+    <form
+      action="/admin/products/add"
+      method="POST"
+      enctype="multipart/form-data"
+      class="admin-add-form"
+    >
+      <!-- GRID -->
+      <div class="admin-add-grid">
+        <div class="input-box">
+          <i class="fa-solid fa-box"></i>
+          <input type="text" name="name" placeholder="Product Name" required />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-solid fa-pound-sign"></i>
+          <input
+            type="number"
+            name="price"
+            step="0.01"
+            min="0"
+            placeholder="Price"
+            required
+          />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-solid fa-tag"></i>
+          <input
+            type="number"
+            name="discountPrice"
+            step="0.01"
+            min="0"
+            placeholder="Discount Price"
+            required
+          />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-solid fa-layer-group"></i>
+          <input type="text" name="category" placeholder="Category" />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-brands fa-font-awesome"></i>
+          <input type="text" name="brand" placeholder="Brand" />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-solid fa-leaf"></i>
+          <input type="text" name="flavour" placeholder="Flavour" />
+        </div>
+
+        <div class="input-box">
+          <i class="fa-solid fa-warehouse"></i>
+          <input type="number" name="stock" placeholder="Stock" />
+        </div>
+        <div class="input-box">
+          <i class="fa-solid fa-circle-dot"></i>
+          <input
+            type="text"
+            name="nicotine"
+            placeholder="Amount of Nicotine (mg)"
+          />
+        </div>
+      </div>
+
+      <div class="admin-select-group">
+        <div class="admin-select-box">
+          <i class="fa-solid fa-bolt"></i>
+
+          <select name="strength" required>
+            <option value="">Select strength</option>
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="STRONG">STRONG</option>
+            <option value="X-STRONG">X-STRONG</option>
+            <option value="EXTREME">EXTREME</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TEXTAREA -->
+      <div class="textarea-box">
+        <textarea
+          name="description"
+          placeholder="Product Description"
+        ></textarea>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="file-box">
+        <label>
+          <i class="fa-solid fa-image"></i>
+          Upload Images
+        </label>
+        <input type="file" name="images" multiple />
+      </div>
+
+      <!-- BUTTON -->
+      <button type="submit" class="admin-add-btn">
+        <i class="fa-solid fa-floppy-disk"></i> Save Product
+      </button>
+    </form>
+  </div>
+</div>

@@ -17,6 +17,7 @@ const checkoutRoutes = require("./routes/checkout");
 const shopRoutes = require("./routes/shop");
 const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/admin");
 
 // ====== Database connection ======
 mongoose
@@ -34,7 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser());
 
-// ====== Session (باید قبل از هر چیزی باشد که session استفاده میکند) ======
+// ====== Session ======
 app.use(
   session({
     secret: "secret123",
@@ -46,7 +47,7 @@ app.use(
 // ====== Flash ======
 app.use(flash());
 
-// ====== Auto Login via JWT (خیلی مهم: بعد از session) ======
+// ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {
   try {
     if (!req.session?.user && req.cookies?.jwt) {
@@ -88,6 +89,8 @@ app.use("/shop", shopRoutes);
 app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
+
+app.use("/admin", adminRoutes);
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;

@@ -1,0 +1,674 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
+}
+
+/* ===== LAYOUT ===== */
+.admin-container {
+  display: flex;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 250px;
+  background: #111827;
+  color: white;
+  transition: 0.3s;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: 0.3s;
+  background: #f3f4f6;
+  min-height: 100vh;
+}
+
+.main.expanded {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+}
+
+/* ===== LOGO ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  font-weight: bold;
+}
+
+/* ===== MENU ===== */
+.menu {
+  list-style: none;
+}
+
+.menu li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  color: white;
+  text-decoration: none;
+  transition: 0.2s;
+  border-radius: 8px;
+}
+
+.menu li a:hover {
+  background: #1f2937;
+}
+
+/*  ACTIVE LINK */
+.menu li a.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* hide text in collapsed */
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .menu span {
+  opacity: 0;
+  pointer-events: none;
+}
+/* ===== TOPBAR ===== */
+.topbar {
+  height: 60px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* ===== SEARCH ===== */
+.search input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ===== ICONS ===== */
+.icons i {
+  margin-left: 15px;
+  cursor: pointer;
+}
+
+/* ===== HAMBURGER BUTTON (professional) ===== */
+.toggle-btn {
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #1f2937;
+}
+
+/* ===== CONTENT ===== */
+.content {
+  padding: 20px;
+}
+
+/* Product Form */
+/* Layout */
+.page-title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* Back Button */
+.btn-back {
+  display: inline-block;
+  margin-bottom: 15px;
+  color: #111827;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+/* Card */
+.card {
+  padding: 25px;
+  border-radius: 14px;
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Form */
+.form {
+  width: 100%;
+}
+
+/* Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Group */
+.form-group {
+  width: 100%;
+}
+
+/* Input */
+.input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  color: #fff;
+  outline: none;
+  transition: 0.3s;
+}
+
+/* Textarea */
+.textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  color: #fff;
+  min-height: 120px;
+  resize: none;
+  margin-top: 15px;
+}
+
+/* File Input */
+.file-input {
+  margin-top: 15px;
+  color: #fff;
+}
+
+/* Button */
+.btn-submit {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Products Admin Page */
+.admin-products {
+  padding: 40px;
+}
+
+/* HEADER */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h1 {
+  color: #0a1f44;
+  font-size: clamp(25px, 4vw, 35px);
+}
+
+/* ADD BUTTON */
+.admin-add-btn {
+  background: linear-gradient(45deg, #d1001c, #0a1f44);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.admin-add-btn:hover {
+  transform: scale(1.05);
+}
+
+/* GRID */
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+/* CARD */
+.admin-card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.admin-card:hover {
+  transform: translateY(-6px);
+}
+
+/* IMAGE */
+.admin-img-box {
+  position: relative;
+}
+
+.admin-img-box img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* STOCK */
+.admin-stock {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: white;
+}
+
+.admin-stock.in {
+  background: green;
+}
+
+.admin-stock.out {
+  background: red;
+}
+
+/* INFO */
+.admin-info {
+  padding: 15px;
+}
+
+.admin-info h3 {
+  margin-bottom: 10px;
+  color: #0a1f44;
+}
+
+/* PRICE */
+.admin-price-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-price {
+  color: #d1001c;
+  font-weight: bold;
+}
+
+.admin-discount {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* CATEGORY */
+.admin-category {
+  font-size: 13px;
+  margin: 8px 0;
+  color: #666;
+}
+
+/* DESC */
+.admin-desc {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+/* ACTIONS */
+.admin-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.admin-actions a,
+.admin-actions button {
+  border: none;
+  background: #f1f1f1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-actions a:hover {
+  background: #0a1f44;
+  color: white;
+}
+
+.admin-actions button:hover {
+  background: #d1001c;
+  color: white;
+}
+
+/* LOAD MORE */
+.admin-load-more {
+  margin: 40px auto 0;
+  display: block;
+  padding: 12px 30px;
+  border: none;
+  background: linear-gradient(45deg, #d1001c, #0a1f44);
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+/* Edit form i */
+
+/* ===== WRAPPER ===== */
+.form-card {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== GRID ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* ===== INPUT ===== */
+.grid input,
+.grid select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.grid input:focus,
+.grid select:focus {
+  border-color: #0a1f44;
+  box-shadow: 0 0 0 2px rgba(10, 31, 68, 0.1);
+}
+
+/* ===== SELECT CUSTOM ===== */
+.grid select {
+  appearance: none;
+  background: white;
+  cursor: pointer;
+}
+
+/* ===== TEXTAREA ===== */
+textarea {
+  width: 100%;
+  margin-top: 20px;
+  height: 140px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  resize: none;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: #0a1f44;
+}
+
+/* Image Manager */
+.image-manager {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.image-box {
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 5px;
+  text-align: center;
+  background: #fff;
+}
+
+.image-box img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.image-box label {
+  display: block;
+  font-size: 12px;
+  margin-top: 5px;
+  cursor: pointer;
+  color: #e74c3c;
+}
+
+.upload-box {
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px dashed #aaa;
+  border-radius: 10px;
+}
+
+/* ===== BUTTON ===== */
+.btn-primary {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(45deg, #d1001c, #0a1f44);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+}
+
+/* ===== FLASH ===== */
+#flash-container {
+  max-width: 900px;
+  margin: 20px auto;
+}
+
+/* FLASH BOX */
+.flash {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  animation: slideDown 0.4s ease;
+}
+
+.flash-error {
+  background: #ffe5e5;
+  color: #d1001c;
+}
+
+.flash-success {
+  background: #e6fff0;
+  color: #0a8a4b;
+}
+
+/* CLOSE BTN */
+.flash button {
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Delete Model Design */
+/* DELETE MODAL */
+.delete-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.delete-modal.active {
+  display: flex;
+}
+
+.delete-box {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 320px;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.delete-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete-actions button {
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.confirm-delete {
+  background: red;
+  color: #fff;
+}
+
+#cancelDelete {
+  background: #ccc;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ANIMATION */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sidebar .menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .menu li {
+  width: 100%;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  .image-preview img {
+    height: 80px;
+  }
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .admin-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px;
+    z-index: 1000;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+  }
+}

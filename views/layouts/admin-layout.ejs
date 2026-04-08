@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Panel</title>
+
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+
+  <body>
+    <div class="admin-container">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="logo-text">Snusvillage Admin</span>
+        </div>
+
+        <ul class="menu">
+          <li class="menu-item">
+            <a href="/admin/dashboard">
+              <i class="fa-solid fa-gauge"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="menu-item">
+            <a href="/admin/products">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="/admin/orders">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="/admin/users">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+
+          <li class="menu-item">
+            <a href="/admin/security">
+              <i class="fa-solid fa-shield"></i>
+              <span>Security</span>
+            </a>
+          </li>
+
+          <li class="menu-item">
+            <a href="/auth/logout">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="main" id="main">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <button class="toggle-btn" id="toggleBtn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="search">
+            <input type="text" placeholder="Search..." />
+          </div>
+
+          <div class="icons">
+            <i class="fa-solid fa-bell"></i>
+            <i class="fa-solid fa-envelope"></i>
+            <i class="fa-solid fa-gear"></i>
+          </div>
+        </header>
+
+        <main class="content"><%- body %></main>
+      </div>
+    </div>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<link rel="stylesheet" href="/css/admin.css" />
+
+
+  <!-- Flash Messages -->
+  <div id="flash-container">
+    <% if (error && error.length > 0) { %>
+      <div class="flash flash-error">
+        <span><%= error %></span>
+        <button onclick="closeFlash(this)">×</button>
+      </div>
+    <% } %>
+
+    <% if (success && success.length > 0) { %>
+      <div class="flash flash-success">
+        <span><%= success %></span>
+        <button onclick="closeFlash(this)">×</button>
+      </div>
+    <% } %>
+  </div>
+
+
+  <!-- Form -->
+  <form
+    action="/admin/products/edit/<%= product._id %>"
+    method="POST"
+    enctype="multipart/form-data"
+    class="form-card"
+  >
+    <div class="grid">
+      
+      <input type="text" placeholder="Product Name" name="name" value="<%= product.name %>" required />
+      
+
+      <input
+        type="number"
+        placeholder="Price"
+        name="price"
+        step="0.01"
+        value="<%= product.price.toFixed(2) %>"
+        required
+      />
+
+      <input
+        type="number"
+        placeholder="Discount Price"
+        name="discountPrice"
+        step="0.01"
+        value="<%= product.discountPrice.toFixed(2) %>"
+      />
+
+      <input
+        type="number"
+        placeholder="Stock"
+        name="stock"
+        value="<%= product.stock %>"
+        required
+      />
+
+         <input
+        type="text"
+        placeholder="Brnad"
+        name="brand"
+        value="<%= product.brand %>"
+        required
+      />
+
+        <input 
+        type="text"
+         name="flavour" 
+         placeholder="Flavour"
+          value="<%= product.flavour %>"
+        required />
+
+          <input
+            type="text"
+            name="nicotine"
+            placeholder="Amount of Nicotine (mg)"
+          value="<%= product.nicotine %>"
+
+          />
+        
+
+      <select name="strength" required>
+        <option value="">Select strength</option>
+        <option value="LOW" <%= product.strength === "LOW" ? "selected" : "" %>>LOW</option>
+        <option value="MEDIUM" <%= product.strength === "MEDIUM" ? "selected" : "" %>>MEDIUM</option>
+        <option value="STRONG" <%= product.strength === "STRONG" ? "selected" : "" %>>STRONG</option>
+        <option value="X-STRONG" <%= product.strength === "X-STRONG" ? "selected" : "" %>>X-STRONG</option>
+        <option value="EXTREME" <%= product.strength === "EXTREME" ? "selected" : "" %>>EXTREME</option>
+      </select>
+
+      <input type="text" placeholder="Category" name="category" value="<%= product.category %>" />
+
+    </div>
+
+    <textarea  name="description" placeholder="Description">
+<%= product.description %>
+    </textarea>
+
+  <!-- IMAGE MANAGER -->
+<div class="image-manager">
+
+  <% product.images.forEach((img, index) => { %>
+    <div class="image-box">
+      
+      <img src="<%= img %>" />
+
+      <label>
+        <input type="checkbox" name="removeImages" value="<%= img %>">
+        Remove
+      </label>
+
+    </div>
+  <% }) %>
+
+</div>
+
+<!-- ADD NEW IMAGES -->
+<div class="upload-box">
+  <p>Add new images</p>
+  <input type="file" name="images" multiple />
+</div>
+
+
+    <button type="submit" class="btn-primary">Update Product</button>
+  </form>
+
+
+<script>
+function closeFlash(btn) {
+  btn.parentElement.remove();
+}
+</script>
