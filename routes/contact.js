@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.render("checkout/checkout", {
-    layout: "layouts/checkout-layout",
+  res.render("contact/contact", {
+    layout: "layouts/contact-layout",
   });
 });
 

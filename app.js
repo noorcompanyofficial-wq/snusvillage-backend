@@ -10,14 +10,19 @@ require("dotenv").config();
 
 const app = express();
 
+// ====== Cart Middlware ====
+const cartSession = require("./middleware/cartSession");
+
 // ====== Routes ======
 const indexRoutes = require("./routes/index");
 const checkoutRoutes = require("./routes/checkout");
+const contactRoutes = require("./routes/contact");
 
 const shopRoutes = require("./routes/shop");
 const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
+const cartRoutes = require("./routes/cart");
 
 // ====== Database connection ======
 mongoose
@@ -43,6 +48,9 @@ app.use(
     saveUninitialized: false,
   }),
 );
+
+// ====== Cart Session
+app.use(cartSession);
 
 // ====== Flash ======
 app.use(flash());
@@ -89,8 +97,10 @@ app.use("/shop", shopRoutes);
 app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
-
 app.use("/admin", adminRoutes);
+app.use("/contact", contactRoutes);
+
+app.use("/cart", cartRoutes);
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;

@@ -178,13 +178,11 @@ router.post("/login", authLimiter, async (req, res) => {
 
   const currentIP = req.headers["x-forwarded-for"] || req.ip;
 
-  // 🚫 اگر IP قبلاً بلاک شده
   if (user.blockedIPs && user.blockedIPs.includes(currentIP)) {
     req.flash("error", "🚫 Your IP is blocked due to suspicious activity!");
     return res.redirect("/auth/login");
   }
 
-  // 🔒 اگر اکانت lock شده
   if (user.lockUntil && user.lockUntil > Date.now()) {
     req.flash("error", "Account locked! Try later.");
     return res.redirect("/auth/login");

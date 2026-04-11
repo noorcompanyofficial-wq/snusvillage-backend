@@ -1,1 +1,86 @@
-<h1>Checkout</h1>
+<div class="checkout">
+  <!-- LEFT SIDE -->
+  <div class="checkout-left">
+    <!-- LOGO -->
+    <a href="/" class="linkToHome">
+      <h1 class="logo-checkout">SNUS VILLAGE</h1>
+    </a>
+    <!-- EXPRESS -->
+    <div class="express">
+      <button class="pay-btn paypal">PayPal</button>
+      <button class="pay-btn gpay">Google Pay</button>
+    </div>
+
+    <div class="divider">OR</div>
+
+    <!-- CONTACT -->
+    <h3 class="checkout-title">Contact</h3>
+    <input class="checkout-inp" type="email" placeholder="Email" />
+
+    <!-- DELIVERY -->
+    <h3 class="checkout-title">Delivery</h3>
+
+    <select class="checkout-inp">
+      <option>United Kingdom</option>
+    </select>
+
+    <div class="row">
+      <input class="checkout-inp" type="text" placeholder="First Name" />
+      <input class="checkout-inp" type="text" placeholder="Last Name" />
+    </div>
+
+    <input class="checkout-inp" type="text" placeholder="Address" />
+
+    <div class="row">
+      <input class="checkout-inp" type="text" placeholder="City" />
+      <input class="checkout-inp" type="text" placeholder="Postcode" />
+    </div>
+
+    <input class="checkout-inp" type="text" placeholder="Phone" />
+
+    <!-- PAYMENT -->
+    <h3 class="checkout-title">Payment</h3>
+
+    <div class="card-box">
+      <input class="checkout-inp" type="text" placeholder="Card Number" />
+      <div class="row">
+        <input class="checkout-inp" type="text" placeholder="MM/YY" />
+        <input class="checkout-inp" type="text" placeholder="CVC" />
+      </div>
+      <input class="checkout-inp" type="text" placeholder="Name on card" />
+    </div>
+
+    <button class="pay-now">Pay Now</button>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="checkout-right">
+    <div class="order-box">
+      <!-- ITEM -->
+      <div class="order-item">
+        <img src="/images/shop/sb-1.png" />
+        <div class="order-info">
+          <span>Siberia -80°C</span>
+          <span>Extreme mint nicotine pouch</span>
+          <span>£6.49</span>
+        </div>
+      </div>
+
+      <!-- DISCOUNT -->
+      <div class="discount">
+        <input class="checkout-inp" type="text" placeholder="Discount code" />
+        <button>Apply</button>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="summary">
+        <div><span>Subtotal</span><span>£6.49</span></div>
+        <div><span>Shipping</span><span>Free</span></div>
+        <div class="total">
+          <span>Total</span>
+          <span>£6.49</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
