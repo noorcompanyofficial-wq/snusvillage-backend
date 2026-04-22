@@ -1,0 +1,70 @@
+<link rel="stylesheet" href="/css/contact.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+
+<section class="contact-wrapper">
+  <div class="contact-card">
+    <!-- LEFT -->
+    <div class="contact-left">
+      <h2>Send us a <span>message</span></h2>
+      <p class="desc">
+        We are here to help you with anything related to Snus products.
+      </p>
+
+      <div class="info-box">
+        <i class="fa-solid fa-location-dot"></i>
+        <div>
+          <h4>Address</h4>
+          <p>257 Camden High St, London NW1 7BU</p>
+          <p>Snus Village, 339 Oxford St, London W1C 2JB</p>
+          <p></p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <i class="fa-solid fa-envelope"></i>
+        <div>
+          <h4>Email</h4>
+          <p>info@snusvillage.co.uk</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <i class="fa-solid fa-phone"></i>
+        <div>
+          <h4>Phone</h4>
+          <p>+44 7777 222771</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="contact-right">
+      <h2>Contact for <span>Services</span></h2>
+
+      <form class="contact-form" method="POST" action="/contact">
+        <div class="row">
+          <input type="text" name="name" placeholder="Your Name" required />
+          <input type="email" name="email" placeholder="Your Email" required />
+        </div>
+
+        <div class="row">
+          <input type="text" name="phone" placeholder="Your Phone" />
+          <input type="text" name="subject" placeholder="Subject" required />
+        </div>
+
+        <textarea name="message" placeholder="Your Message" required></textarea>
+
+        <button type="submit" class="send-btn">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<% if (query.success) { %>
+  <p style="color: green; margin-bottom: 10px;">
+    Message sent successfully ✅
+  </p>
+<% } %>
