@@ -4,6 +4,8 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 
+<script src="https://www.google.com/recaptcha/api.js?render=<%= siteKey %>"></script>
+
 <section class="contact-wrapper">
   <div class="contact-card">
     <!-- LEFT -->
@@ -43,22 +45,33 @@
     <!-- RIGHT -->
     <div class="contact-right">
       <h2>Contact for <span>Services</span></h2>
+<form class="contact-form" method="POST" action="/contact/contact">
+  <div class="row">
+    <input type="text" name="name" placeholder="Your Name" required />
+    <input type="email" name="email" placeholder="Your Email" required />
+  </div>
 
-      <form class="contact-form" method="POST" action="/contact">
-        <div class="row">
-          <input type="text" name="name" placeholder="Your Name" required />
-          <input type="email" name="email" placeholder="Your Email" required />
-        </div>
+  <div class="row">
+    <input type="text" name="phone" placeholder="Your Phone" />
+    <input type="text" name="subject" placeholder="Subject" required />
+  </div>
 
-        <div class="row">
-          <input type="text" name="phone" placeholder="Your Phone" />
-          <input type="text" name="subject" placeholder="Subject" required />
-        </div>
+  <textarea name="message" placeholder="Your Message" required></textarea>
 
-        <textarea name="message" placeholder="Your Message" required></textarea>
+  <input type="hidden" name="token" id="token" />
 
-        <button type="submit" class="send-btn">Send Message</button>
-      </form>
+  <button type="submit" class="send-btn">Send Message</button>
+</form>
+
+<script>
+grecaptcha.ready(function() {
+  grecaptcha.execute("<%= siteKey %>", { action: "submit" })
+    .then(function(token) {
+      document.getElementById("token").value = token;
+    });
+});
+</script>
+   
     </div>
   </div>
 </section>

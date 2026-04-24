@@ -15,8 +15,9 @@ const cartSession = require("./middleware/cartSession");
 
 // ====== Routes ======
 const indexRoutes = require("./routes/index");
+const contactRouter = require("./routes/contact");
+
 const checkoutRoutes = require("./routes/checkout");
-const contactRoutes = require("./routes/contact");
 
 const shopRoutes = require("./routes/shop");
 const productsRoutes = require("./routes/products");
@@ -31,7 +32,9 @@ mongoose
   .catch((err) => console.error(err));
 
 // ====== Trust Proxy (for real IP) ======
-app.set("trust proxy", true);
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 // ====== Basic Middleware ======
 app.use(express.json());
@@ -93,12 +96,13 @@ app.use(ejsLayouts);
 
 // ====== Routes ======
 app.use("/", indexRoutes);
+app.use("/contact", contactRouter);
+
 app.use("/shop", shopRoutes);
 app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
-app.use("/contact", contactRoutes);
 
 app.use("/cart", cartRoutes);
 
