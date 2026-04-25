@@ -357,8 +357,8 @@
 /* ===== GLASS NAVBAR ON SCROLL ===== */
 .navbar.scrolled {
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 
@@ -384,8 +384,8 @@
 .navbar.scrolled .user-dropdown,
 .navbar.scrolled .search-bar {
   background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 
   border: 1px solid rgba(255, 255, 255, 0.4);
 
