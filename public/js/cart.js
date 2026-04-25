@@ -75,7 +75,7 @@ function renderCart(items) {
   if (!items.length) {
     cartContainer.innerHTML = `
       <h3 style="text-align:center;margin-top:50px;">
-        YOUR CART IS EMPTY
+        YOUR BAG IS EMPTY
       </h3>
     `;
 

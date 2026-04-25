@@ -19,6 +19,19 @@ enterBtn.addEventListener("click", () => {
   ageModal.style.display = "none";
 });
 
+const slides = document.querySelectorAll(".slide");
+let current = 0;
+
+function showSlide(index) {
+  slides.forEach((slide) => slide.classList.remove("active"));
+  slides[index].classList.add("active");
+}
+
+setInterval(() => {
+  current = (current + 1) % slides.length;
+  showSlide(current);
+}, 5000);
+
 // EXIT
 exitBtn.addEventListener("click", () => {
   window.location.href = "https://www.google.com"; //
@@ -112,6 +125,14 @@ window.addEventListener("scroll", () => {
   }
 });
 
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 50) {
+    navbar.classList.add("scrolled");
+  } else {
+    navbar.classList.remove("scrolled");
+  }
+});
+
 // CLOSE NAV ON LINK CLICK (EXCEPT SHOP)
 document.querySelectorAll(".nav-links li a").forEach((link) => {
   const parent = link.parentElement;
@@ -129,54 +150,9 @@ searchBtn.addEventListener("click", () => {
   searchBar.classList.toggle("active");
 });
 
-var interleaveOffset = 0.5;
-
-var swiperOptions = {
-  loop: true,
-  speed: 1000,
-  grabCursor: true,
-  watchSlidesProgress: true,
-  mousewheel: true,
-  keyboard: true,
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  on: {
-    progress: function () {
-      var swiper = this;
-      for (var i = 0; i < swiper.slides.length; i++) {
-        var slideProgress = swiper.slides[i].progress;
-        var innerOffset = swiper.width * interleaveOffset;
-        var innerTranslate = slideProgress * innerOffset;
-        swiper.slides[i].querySelector(".slide-inner").style.transform =
-          "translate3d(" + innerTranslate + "px, 0, 0)";
-      }
-    },
-    touchStart: function () {
-      var swiper = this;
-      for (var i = 0; i < swiper.slides.length; i++) {
-        swiper.slides[i].style.transition = "";
-      }
-    },
-    setTransition: function (speed) {
-      var swiper = this;
-      for (var i = 0; i < swiper.slides.length; i++) {
-        swiper.slides[i].style.transition = speed + "ms";
-        swiper.slides[i].querySelector(".slide-inner").style.transition =
-          speed + "ms";
-      }
-    },
-  },
-};
-
-var swiper = new Swiper(".swiper-container", swiperOptions);
-
 //Scroll Reveals
+// ===== REVEAL ON SCROLL =====
+// ===== REVEAL + COUNTER =====
 const reveals = document.querySelectorAll(".reveal");
 
 const observer = new IntersectionObserver(
@@ -184,6 +160,7 @@ const observer = new IntersectionObserver(
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add("active");
+        animateCounter(entry.target);
       }
     });
   },
@@ -192,6 +169,30 @@ const observer = new IntersectionObserver(
 
 reveals.forEach((el) => observer.observe(el));
 
+function animateCounter(card) {
+  const counters = card.querySelectorAll(".counter");
+
+  counters.forEach((counter) => {
+    if (counter.dataset.done) return;
+    counter.dataset.done = "true";
+
+    const target = +counter.getAttribute("data-target");
+    let count = 0;
+    const speed = target / 40;
+
+    const update = () => {
+      if (count < target) {
+        count += speed;
+        counter.innerText = Math.ceil(count);
+        requestAnimationFrame(update);
+      } else {
+        counter.innerText = target;
+      }
+    };
+
+    update();
+  });
+}
 // ===== SCROLL ANIMATION (NO CONFLICT) =====
 const branchElements = document.querySelectorAll(".branch-animate");
 
