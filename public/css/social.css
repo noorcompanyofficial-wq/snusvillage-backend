@@ -1,150 +1,338 @@
-/* SECTION */
-.social {
-  position: relative;
-  padding: 100px 20px;
-  background: #ffffff;
-  overflow: hidden;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Playfair+Display:wght@600&display=swap");
+
+/* =========================================
+   1. Core Variables & Math
+   ========================================= */
+:root {
+  --hex-width: 220px;
+  --hex-gap: 16px;
+  --sqrt3: 1.73205;
+  --hex-height: calc(var(--hex-width) * 2 / var(--sqrt3));
+  --hex-margin-x: calc(var(--hex-gap) / 2);
+  --hex-margin-y: calc(
+    (var(--sqrt3) / 4 * var(--hex-gap)) - (0.125 * var(--hex-height))
+  );
 }
 
-/* HEADER */
-.social-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
+/* =========================================
+   2. Base Setup & Ambiance
+   ========================================= */
 
-.social-header h2 {
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.05;
+.section-title {
+  font-size: clamp(34px, 4vw, 52px);
   font-weight: 900;
   color: #0f2d6b;
-  padding-bottom: 30px !important;
+  letter-spacing: -0.03em;
+  text-align: center;
+  padding: 40px;
 }
 
-.social-header p {
-  color: #666;
+.social {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial;
+  font-weight: 900;
+
+  overflow-x: hidden;
+  padding: 80px 0;
+  margin-bottom: 40px;
 }
 
-/* GRID */
-.social-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+.gallery-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  perspective: 1000px;
 }
 
-/* ITEM */
-.social-item {
+.hex-grid {
+  display: flex;
+  flex-wrap: wrap;
+  width: calc((var(--hex-width) + var(--hex-gap)) * 4);
+  padding: calc(var(--hex-margin-y) * -1) 0;
+}
+
+/* =========================================
+   3. Hexagon Shape, Structure & Depth
+   ========================================= */
+.hex {
+  width: var(--hex-width);
+  height: var(--hex-height);
+  margin: var(--hex-margin-y) var(--hex-margin-x);
+  position: relative;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  transform: translateY(0);
+  transition:
+    filter 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: all 0.6s ease;
+}
+
+.hex.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.hex:nth-child(7n + 5) {
+  margin-left: calc((var(--hex-width) / 2) + var(--hex-gap));
+}
+
+.hex-shape {
+  width: 100%;
+  height: 100%;
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-color: #1e2025;
 }
 
-.social-item img {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  transition: 0.4s;
-}
-
-/* OVERLAY */
-.social-overlay {
+.hex-shape::after {
+  content: "";
   position: absolute;
   inset: 0;
-  background: rgba(10, 31, 68, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  opacity: 0;
-  transition: 0.4s;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.8) 120%
+  );
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.5s ease;
 }
 
-.social-overlay i {
+/* =========================================
+   4. Images & Immersive Interactions
+   ========================================= */
+
+.hex:focus-visible {
+  outline: none;
+}
+
+.hex::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: -1;
+  opacity: 0;
+  transform: scale(1);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hex:focus-visible::before {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.hex:hover,
+.hex:focus-within {
+  z-index: 10;
+  transform: translateY(-6px);
+  filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.7));
+}
+
+.hex:hover .hex-shape::after,
+.hex:focus-within .hex-shape::after {
+  opacity: 0;
+}
+
+.hex img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  filter: grayscale(70%) brightness(0.7) contrast(1.1);
+  transform: scale(1.02);
+  backface-visibility: hidden;
+  will-change: transform;
+  transition:
+    transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+    filter 0.6s ease;
+}
+
+.hex:hover img,
+.hex:focus-visible img {
+  transform: scale(1.15);
+  filter: grayscale(0%) brightness(1.05) contrast(1.05);
+}
+
+/* =========================================
+   5. Caption Overlay
+   ========================================= */
+.hex-caption1 {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px 70px 20px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.hex-caption1 h3 {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+  transform: translateY(15px);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  font-family: Arial;
+  font-weight: 900;
+}
+
+.hex1:hover .hex-caption1,
+.hex1:focus-visible .hex-caption1 {
+  opacity: 1;
+}
+.hex1:hover .hex-caption1 h3,
+.hex1:focus-visible .hex-caption1 h3 {
+  transform: translateY(0);
+}
+.hex1:hover .hex-caption1 p,
+.hex1:focus-visible .hex-caption1 p {
+  transform: translateY(0);
+  transition-delay: 0.05s;
+}
+
+/* =========================================
+   5. Caption Overlay & Editorial Typography
+   ========================================= */
+.hex-caption {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px 70px 20px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.hex-caption h3 {
+  font-family: Arial;
+  font-weight: 900;
+  color: #ffffff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+
+  transform: translateY(15px);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hex-caption p {
+  font-family: "Montserrat", sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  letter-spacing: 3px;
+  margin: 0;
+
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+
+  transform: translateY(15px);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.fa-instagram {
   color: white;
   font-size: 28px;
 }
 
-/* HOVER EFFECT */
-.social-item:hover img {
-  transform: scale(1.1);
-}
-
-.social-item:hover .social-overlay {
+.hex:hover .hex-caption,
+.hex:focus-visible .hex-caption {
   opacity: 1;
 }
 
-/* CTA */
-.social-cta {
-  text-align: center;
-  margin-top: 40px;
-}
-
-.follow-btn {
-  background: var(--navy);
-  border: 2px solid var(--navy);
-  color: white;
-  padding: 12px 25px;
-  border-radius: 25px;
-  text-decoration: none;
-  transition: 0.3s;
-  font-weight: 700;
-}
-
-.instagram-icon {
-  font-weight: 700;
-}
-
-.follow-btn:hover {
-  background: none;
-  border: 2px solid var(--navy);
-  color: var(--navy);
-}
-
-/* ===== GLOW ===== */
-.social-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 500px;
-  height: 500px;
-
-  background: radial-gradient(circle, rgba(10, 31, 68, 0.2), transparent 70%);
-  filter: blur(120px);
-
-  transform: translate(-50%, -50%);
-  animation: socialGlow 15s ease-in-out infinite alternate;
-}
-
-/* GLOW ANIMATION */
-@keyframes socialGlow {
-  0% {
-    transform: translate(-50%, -50%);
-  }
-  100% {
-    transform: translate(-40%, -60%);
-  }
-}
-
-/* ===== ANIMATION ===== */
-.social-animate {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: 0.6s;
-}
-
-.social-animate.active {
-  opacity: 1;
+.hex:hover .hex-caption h3,
+.hex:focus-visible .hex-caption h3 {
   transform: translateY(0);
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .social-grid {
-    grid-template-columns: repeat(2, 1fr);
+.hex:hover .hex-caption p,
+.hex:focus-visible .hex-caption p {
+  transform: translateY(0);
+  transition-delay: 0.05s;
+}
+
+/* =========================================
+   6. Responsive Layouts
+   ========================================= */
+@media (max-width: 1024px) {
+  .hex-grid {
+    width: calc((var(--hex-width) + var(--hex-gap)) * 3);
+  }
+  .hex:nth-child(7n + 5) {
+    margin-left: var(--hex-margin-x);
+  }
+  .hex:nth-child(5n + 4) {
+    margin-left: calc((var(--hex-width) / 2) + var(--hex-gap));
   }
 }
 
-@media (max-width: 500px) {
-  .social-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .hex-grid {
+    width: calc((var(--hex-width) + var(--hex-gap)) * 2);
+  }
+  .hex:nth-child(5n + 4) {
+    margin-left: var(--hex-margin-x);
+  }
+  .hex:nth-child(3n + 3) {
+    margin-left: calc((var(--hex-width) / 2) + var(--hex-gap));
+  }
+}
+
+@media (max-width: 550px) {
+  .hex-grid {
+    width: calc((var(--hex-width) * 1.5) + (var(--hex-gap) * 1.5));
+  }
+  .hex:nth-child(3n + 3) {
+    margin-left: var(--hex-margin-x);
+  }
+  .hex:nth-child(even) {
+    margin-left: calc((var(--hex-width) / 2) + var(--hex-gap));
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --hex-width: 160px;
+    --hex-gap: 10px;
   }
 }

@@ -18,32 +18,90 @@ router.get("/products/add", isAdmin, (req, res) => {
   });
 });
 
-//  Create Product
-
+// Get All products
 router.get("/products", isAdmin, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = 8;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 8;
 
-  const products = await Product.find()
-    .skip((page - 1) * limit)
-    .limit(limit);
+    // ===== FILTERS =====
+    let filter = {};
 
-  const total = await Product.countDocuments();
-  if (req.xhr || req.headers.accept?.includes("application/json")) {
-    return res.json({
+    // BRAND FILTER (SUPER FIXED)
+    if (req.query.brand && req.query.brand !== "") {
+      const cleanBrand = req.query.brand.toLowerCase().replace(/\s+/g, "");
+
+      filter.$expr = {
+        $regexMatch: {
+          input: {
+            $replaceAll: {
+              input: { $toLower: "$brand" },
+              find: " ",
+              replacement: "",
+            },
+          },
+          regex: cleanBrand,
+        },
+      };
+    }
+
+    if (req.query.strength && req.query.strength !== "") {
+      filter.strength = req.query.strength;
+    }
+
+    if (req.query.stock === "in") {
+      filter.stock = { $gt: 0 };
+    }
+
+    if (req.query.stock === "out") {
+      filter.stock = 0;
+    }
+
+    let sort = { createdAt: -1 };
+
+    if (req.query.sort === "price-low") sort = { price: 1 };
+    if (req.query.sort === "price-high") sort = { price: -1 };
+    if (req.query.sort === "name") sort = { name: 1 };
+
+    // ===== QUERY =====
+    const products = await Product.find(filter)
+      .sort(sort)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Product.countDocuments(filter);
+
+    // ===== STATS =====
+    const totalProducts = await Product.countDocuments();
+    const inStock = await Product.countDocuments({ stock: { $gt: 0 } });
+    const outStock = await Product.countDocuments({ stock: 0 });
+
+    if (req.xhr || req.headers.accept?.includes("application/json")) {
+      return res.json({
+        products,
+        hasMore: page * limit < total,
+      });
+    }
+
+    res.render("admin/products", {
+      layout: "layouts/admin-layout",
       products,
       hasMore: page * limit < total,
-    });
-  }
+      nextPage: page + 1,
 
-  res.render("admin/products", {
-    layout: "layouts/admin-layout",
-    products,
-    hasMore: page * limit < total,
-    nextPage: page + 1,
-    totalProducts: total,
-  });
+      totalProducts,
+      inStock,
+      outStock,
+
+      query: req.query,
+    });
+  } catch (err) {
+    console.log(err);
+    res.send("Error loading products");
+  }
 });
+
+//  Create Product
 
 router.post(
   "/products/add",

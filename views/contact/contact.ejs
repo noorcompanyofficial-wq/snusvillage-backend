@@ -75,10 +75,21 @@ grecaptcha.ready(function() {
     </div>
   </div>
 </section>
-
 <% if (query.success) { %>
-  <p style="color: green; margin-bottom: 10px;">
-    Message sent successfully ✅
-  </p>
+  <div class="flash-message success" id="flashMessage">
+    <div class="flash-content">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Message sent successfully</span>
+    </div>
+
+    <div class="flash-progress"></div>
+
+    <button class="flash-close" id="flashClose">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
 <% } %>
+
+    <script src="/js/contact.js" defer></script>
+
 

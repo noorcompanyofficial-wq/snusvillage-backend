@@ -15,6 +15,8 @@ const cartSession = require("./middleware/cartSession");
 
 // ====== Routes ======
 const indexRoutes = require("./routes/index");
+const aboutRoutes = require("./routes/about");
+
 const contactRouter = require("./routes/contact");
 
 const checkoutRoutes = require("./routes/checkout");
@@ -96,6 +98,8 @@ app.use(ejsLayouts);
 
 // ====== Routes ======
 app.use("/", indexRoutes);
+app.use("/about", aboutRoutes);
+
 app.use("/contact", contactRouter);
 
 app.use("/shop", shopRoutes);

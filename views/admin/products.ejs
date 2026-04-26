@@ -8,13 +8,78 @@
 
 <div class="admin-products">
 
+  <div class="admin-stats">
+
+  <div class="stat-box">
+    <h3><%= totalProducts %></h3>
+    <p>Total Products</p>
+  </div>
+
+  <div class="stat-box green">
+    <h3><%= inStock %></h3>
+    <p>In Stock</p>
+  </div>
+
+  <div class="stat-box red">
+    <h3><%= outStock %></h3>
+    <p>Out of Stock</p>
+  </div>
+
+</div>
+
+  <!-- ===== FILTER BAR ===== -->
+<div class="admin-filters">
+
+  <!-- BRAND -->
+  <select onchange="applyFilter()" id="brandFilter">
+    <option value="">All Brands</option>
+   <option value="WHITE FOX" <%= query.brand === "WHITE FOX" ? "selected" : "" %>>WHITE FOX</option>
+<option value="SIBERIA" <%= query.brand === "SIBERIA" ? "selected" : "" %>>SIBERIA</option>
+<option value="VELO" <%= query.brand === "VELO" ? "selected" : "" %>>VELO</option>
+<option value="KILLA" <%= query.brand === "KILLA" ? "selected" : "" %>>KILLA</option>
+<option value="PABLO" <%= query.brand === "PABLO" ? "selected" : "" %>>PABLO</option>
+<option value="GARANT" <%= query.brand === "GARANT" ? "selected" : "" %>>GARANT</option>
+<option value="ICEBERG CUBA" <%= query.brand === "ICEBERG CUBA" ? "selected" : "" %>>ICEBERG CUBA</option>
+<option value="LOOP" <%= query.brand === "LOOP" ? "selected" : "" %>>LOOP</option>
+<option value="CAFERO" <%= query.brand === "CAFERO" ? "selected" : "" %>>CAFERO</option>
+<option value="HIT" <%= query.brand === "HIT" ? "selected" : "" %>>HIT</option>
+<option value="ODEN'S" <%= query.brand === "ODEN'S" ? "selected" : "" %>>ODEN'S</option>
+  </select>
+
+  <!-- STRENGTH -->
+  <select onchange="applyFilter()" id="strengthFilter">
+    <option value="">All Strength</option>
+    <option>LOW</option>
+    <option>MEDIUM</option>
+    <option>STRONG</option>
+    <option>X-STRONG</option>
+    <option>EXTREME</option>
+  </select>
+
+  <!-- SORT -->
+  <select onchange="applyFilter()" id="sortFilter">
+    <option value="">Newest</option>
+    <option value="price-low">Price Low</option>
+    <option value="price-high">Price High</option>
+    <option value="name">Name A-Z</option>
+  </select>
+
+  <!-- STOCK -->
+  <select onchange="applyFilter()" id="stockFilter">
+    <option value="">All</option>
+    <option value="in">In Stock</option>
+    <option value="out">Out of Stock</option>
+  </select>
+
+</div>
+
   <div class="admin-header">
-    <h1>All Products: (<%= totalProducts %>)</h1>
 
     <a href="/admin/products/add" class="admin-add-btn">
       <i class="fa-solid fa-plus"></i> Add Product
     </a>
   </div>
+
 
   <div class="admin-grid">
     <% products.forEach(p => { %>
@@ -183,4 +248,22 @@ modal.addEventListener("click", (e) => {
     modal.classList.remove("active");
   }
 });
+</script>
+
+<script>
+function applyFilter() {
+  const brand = document.getElementById("brandFilter").value;
+  const strength = document.getElementById("strengthFilter").value;
+  const sort = document.getElementById("sortFilter").value;
+  const stock = document.getElementById("stockFilter").value;
+
+  let params = new URLSearchParams();
+
+  if (brand) params.append("brand", brand);
+  if (strength) params.append("strength", strength);
+  if (sort) params.append("sort", sort);
+  if (stock) params.append("stock", stock);
+
+  window.location.href = "/admin/products?" + params.toString();
+}
 </script>

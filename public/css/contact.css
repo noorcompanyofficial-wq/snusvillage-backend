@@ -135,6 +135,88 @@ body {
   transform: scale(1.05);
 }
 
+/* FLASH MESSAGE BASE */
+.flash-message {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  min-width: 280px;
+  max-width: 350px;
+
+  padding: 16px 20px;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.7);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  transform: translateX(120%);
+  opacity: 0;
+
+  transition: all 0.5s ease;
+  z-index: 9999;
+}
+
+/* SHOW */
+.flash-message.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* SUCCESS STYLE */
+.flash-message.success {
+  border-left: 5px solid #22c55e;
+}
+
+/* CONTENT */
+.flash-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #0a1f44;
+  font-weight: 600;
+}
+
+.flash-content i {
+  color: #22c55e;
+  font-size: 18px;
+}
+
+/* CLOSE BUTTON */
+.flash-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  font-size: 16px;
+}
+
+/* PROGRESS BAR */
+.flash-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: #22c55e;
+
+  animation: progress 5s linear forwards;
+}
+
+@keyframes progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .contact-card {
