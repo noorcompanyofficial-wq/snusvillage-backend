@@ -1,95 +1,130 @@
 <link rel="stylesheet" href="/css/contact.css" />
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
 
-<script src="https://www.google.com/recaptcha/api.js?render=<%= siteKey %>"></script>
-
-<section class="contact-wrapper">
-  <div class="contact-card">
-    <!-- LEFT -->
-    <div class="contact-left">
-      <h2>Send us a <span>message</span></h2>
-      <p class="desc">
-        We are here to help you with anything related to Snus products.
-      </p>
-
-      <div class="info-box">
-        <i class="fa-solid fa-location-dot"></i>
-        <div>
-          <h4>Address</h4>
-          <p>257 Camden High St, London NW1 7BU</p>
-          <p>Snus Village, 339 Oxford St, London W1C 2JB</p>
-          <p></p>
-        </div>
-      </div>
-
-      <div class="info-box">
-        <i class="fa-solid fa-envelope"></i>
-        <div>
-          <h4>Email</h4>
-          <p>info@snusvillage.co.uk</p>
-        </div>
-      </div>
-
-      <div class="info-box">
-        <i class="fa-solid fa-phone"></i>
-        <div>
-          <h4>Phone</h4>
-          <p>+44 7777 222771</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="contact-right">
-      <h2>Contact for <span>Services</span></h2>
-<form class="contact-form" method="POST" action="/contact/contact">
-  <div class="row">
-    <input type="text" name="name" placeholder="Your Name" required />
-    <input type="email" name="email" placeholder="Your Email" required />
-  </div>
-
-  <div class="row">
-    <input type="text" name="phone" placeholder="Your Phone" />
-    <input type="text" name="subject" placeholder="Subject" required />
-  </div>
-
-  <textarea name="message" placeholder="Your Message" required></textarea>
-
-  <input type="hidden" name="token" id="token" />
-
-  <button type="submit" class="send-btn">Send Message</button>
-</form>
-
-<script>
-grecaptcha.ready(function() {
-  grecaptcha.execute("<%= siteKey %>", { action: "submit" })
-    .then(function(token) {
-      document.getElementById("token").value = token;
-    });
-});
-</script>
-   
-    </div>
-  </div>
-</section>
-<% if (query.success) { %>
-  <div class="flash-message success" id="flashMessage">
-    <div class="flash-content">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Message sent successfully</span>
-    </div>
-
-    <div class="flash-progress"></div>
-
-    <button class="flash-close" id="flashClose">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  </div>
+<% if (captchaEnabled) { %>
+  <script src="https://www.google.com/recaptcha/api.js?render=<%= siteKey %>"></script>
 <% } %>
 
-    <script src="/js/contact.js" defer></script>
+<section class="contact-page">
+  <div class="contact-hero">
+    <div class="contact-hero__copy">
+      <span class="contact-pill">Contact Us</span>
+      <h1>Speak with Snus Village.</h1>
+      <p>
+        Questions about products, store stock, delivery, or wholesale access can
+        be sent directly to the team.
+      </p>
+    </div>
 
+    <div class="contact-quick">
+      <a href="mailto:info@snusvillage.co.uk">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Email</span>
+        <strong>info@snusvillage.co.uk</strong>
+      </a>
+      <a href="tel:+447777222771">
+        <i class="fa-solid fa-phone"></i>
+        <span>Phone</span>
+        <strong>+44 7777 222771</strong>
+      </a>
+      <a href="/wholesale">
+        <i class="fa-solid fa-store"></i>
+        <span>Wholesale</span>
+        <strong>Trader enquiries</strong>
+      </a>
+    </div>
+  </div>
 
+  <% if (query.success) { %>
+    <div class="contact-alert contact-alert--success" id="flashMessage">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Message sent successfully.</span>
+      <button class="flash-close" id="flashClose" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  <% } %>
+
+  <% if (query.error) { %>
+    <div class="contact-alert contact-alert--error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>Unable to send the message. Please check the form and try again.</span>
+    </div>
+  <% } %>
+
+  <div class="contact-grid">
+    <form class="contact-form-panel" method="POST" action="/contact/contact">
+      <div class="contact-form-head">
+        <span class="contact-pill">Message</span>
+        <h2>Send an enquiry</h2>
+      </div>
+
+      <div class="contact-row">
+        <label>
+          <span>Name</span>
+          <input type="text" name="name" placeholder="Your name" required />
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </label>
+      </div>
+
+      <div class="contact-row">
+        <label>
+          <span>Phone</span>
+          <input type="text" name="phone" placeholder="+44" />
+        </label>
+        <label>
+          <span>Subject</span>
+          <input type="text" name="subject" placeholder="How can we help?" required />
+        </label>
+      </div>
+
+      <label>
+        <span>Message</span>
+        <textarea name="message" placeholder="Write your message" required></textarea>
+      </label>
+
+      <input type="hidden" name="token" id="token" />
+      <button type="submit" class="contact-submit">Send Message</button>
+    </form>
+
+    <aside class="contact-locations">
+      <div class="contact-location">
+        <iframe
+          loading="lazy"
+          src="https://www.google.com/maps?q=257+Camden+High+St+London+NW1+7BU&output=embed"
+          title="Camden High Street"
+        ></iframe>
+        <div>
+          <h3>Camden Town</h3>
+          <p>257 Camden High St, London NW1 7BU</p>
+        </div>
+      </div>
+
+      <div class="contact-location">
+        <iframe
+          loading="lazy"
+          src="https://www.google.com/maps?q=339+Oxford+Street+London+W1C+2JB&output=embed"
+          title="Oxford Street"
+        ></iframe>
+        <div>
+          <h3>Oxford Street</h3>
+          <p>Snus Village, 339 Oxford St, London W1C 2JB</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<% if (captchaEnabled) { %>
+  <script>
+    grecaptcha.ready(function () {
+      grecaptcha.execute("<%= siteKey %>", { action: "submit" }).then(function (token) {
+        document.getElementById("token").value = token;
+      });
+    });
+  </script>
+<% } %>
+
+<script src="/js/contact.js" defer></script>

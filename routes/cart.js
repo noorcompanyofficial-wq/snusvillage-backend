@@ -3,8 +3,19 @@ const router = express.Router();
 const Cart = require("../models/cart");
 const Product = require("../models/Products");
 
+function databaseReady(res) {
+  if (Cart.db.readyState === 1) return true;
+  res.status(503).json({
+    items: [],
+    message: "Cart is unavailable until MongoDB is connected.",
+  });
+  return false;
+}
+
 // GET CART
 router.get("/", async (req, res) => {
+  if (!databaseReady(res)) return;
+
   const cart = await Cart.findOne({
     $or: [{ user: req.user?._id }, { sessionId: req.session.cartId }],
   }).populate("items.product");
@@ -13,6 +24,8 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
+  if (!databaseReady(res)) return;
+
   const { productId } = req.body;
 
   const product = await Product.findById(productId);
@@ -61,6 +74,8 @@ router.post("/add", async (req, res) => {
 });
 
 router.post("/update", async (req, res) => {
+  if (!databaseReady(res)) return;
+
   const { productId, action } = req.body;
 
   const cart = await Cart.findOne({
@@ -79,6 +94,8 @@ router.post("/update", async (req, res) => {
 });
 
 router.post("/remove", async (req, res) => {
+  if (!databaseReady(res)) return;
+
   const { productId } = req.body;
 
   const cart = await Cart.findOne({

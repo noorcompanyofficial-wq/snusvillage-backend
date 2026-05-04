@@ -1,0 +1,75 @@
+<section class="admin-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Users & Traders</span>
+      <h1>Access management</h1>
+      <p>Review customer accounts and approved trader login records.</p>
+    </div>
+  </div>
+
+  <div class="admin-dashboard-grid">
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Customers</h2>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Verified</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (users.length) { %>
+              <% users.forEach((account) => { %>
+                <tr>
+                  <td><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User" %></td>
+                  <td><%= account.email %></td>
+                  <td><%= account.role || "user" %></td>
+                  <td><%= account.isVerified ? "Yes" : "No" %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="4">No users found.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Trader logins</h2>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Business</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Last Login</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (traders.length) { %>
+              <% traders.forEach((trader) => { %>
+                <tr>
+                  <td><%= trader.businessName %></td>
+                  <td><%= trader.email %></td>
+                  <td><%= trader.status %></td>
+                  <td><%= trader.lastLoginAt ? trader.lastLoginAt.toLocaleString() : "Never" %></td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr><td colspan="4">No trader logins found.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>

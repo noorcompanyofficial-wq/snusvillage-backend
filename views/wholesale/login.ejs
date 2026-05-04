@@ -1,0 +1,33 @@
+<section class="wholesale-auth">
+  <div class="wholesale-auth__panel">
+    <p class="wholesale-hero__eyebrow">Trader portal</p>
+    <h1>Trader login</h1>
+    <p>Use the wholesale login created after your trader application was approved.</p>
+
+    <% if (success && success.length > 0) { %>
+      <div class="wholesale-alert wholesale-alert--success"><%= success %></div>
+    <% } %>
+
+    <% if (error && error.length > 0) { %>
+      <div class="wholesale-alert wholesale-alert--error"><%= error %></div>
+    <% } %>
+
+    <form class="wholesale-auth__form" method="post" action="/wholesale/login">
+      <label>
+        Trader email
+        <input type="email" name="email" required />
+      </label>
+
+      <label>
+        Password
+        <input type="password" name="password" required />
+      </label>
+
+      <button class="wholesale-form__submit" type="submit">Log in</button>
+    </form>
+
+    <a class="wholesale-auth__link" href="/wholesale/register">
+      Approved but no password yet? Create trader login
+    </a>
+  </div>
+</section>

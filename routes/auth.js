@@ -1,12 +1,15 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const WholesaleApplication = require("../models/WholesaleApplication");
 const transporter = require("../config/mailer");
 const { isGuest, isAuth } = require("../middleware/authMiddleware");
 const { authLimiter } = require("../middleware/rateLimit");
 const { generateRefreshToken } = require("../utils/jwt");
 const UAParser = require("ua-parser-js");
+const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
 // ================= GET =================
 router.get("/register", isGuest, (req, res) => res.render("auth/register"));
@@ -54,12 +57,22 @@ router.post("/register", async (req, res) => {
   const hashed = await bcrypt.hash(password, 10);
   const code = Math.floor(100000 + Math.random() * 900000).toString();
 
+  const normalizedEmail = email.toLowerCase().trim();
+  const approvedWholesaleApplication =
+    mongoose.connection.readyState === 1
+      ? await WholesaleApplication.findOne({
+          email: normalizedEmail,
+          status: "approved",
+        })
+      : await wholesaleApplicationStore.findApprovedByEmail(normalizedEmail);
+
   await User.create({
     firstName,
     lastName,
     birthDate,
-    email,
+    email: normalizedEmail,
     password: hashed,
+    traderStatus: approvedWholesaleApplication ? "approved" : "none",
     verifyCode: code,
     verifyCodeExpire: Date.now() + 10 * 60 * 1000,
   });

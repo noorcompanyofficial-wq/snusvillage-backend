@@ -1,0 +1,40 @@
+<section class="admin-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Security</span>
+      <h1>Login monitoring</h1>
+      <p>Accounts with failed attempts, locks, suspicious IPs, or blocked IPs.</p>
+    </div>
+  </div>
+
+  <section class="admin-panel">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Attempts</th>
+            <th>Locked Until</th>
+            <th>Suspicious IPs</th>
+            <th>Blocked IPs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (users.length) { %>
+            <% users.forEach((account) => { %>
+              <tr>
+                <td><%= account.email %></td>
+                <td><%= account.loginAttempts || 0 %></td>
+                <td><%= account.lockUntil ? account.lockUntil.toLocaleString() : "Not locked" %></td>
+                <td><%= (account.suspiciousIPs || []).join(", ") || "None" %></td>
+                <td><%= (account.blockedIPs || []).join(", ") || "None" %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr><td colspan="5">No suspicious login activity found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

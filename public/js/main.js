@@ -8,15 +8,19 @@ const ageModal = document.getElementById("ageModal");
 const enterBtn = document.getElementById("enterSite");
 const exitBtn = document.getElementById("exitSite");
 
+if (new URLSearchParams(window.location.search).get("age") === "reset") {
+  localStorage.removeItem("ageVerified");
+}
+
 // check if already accepted
-if (localStorage.getItem("ageVerified") === "true") {
+if (ageModal && localStorage.getItem("ageVerified") === "true") {
   ageModal.style.display = "none";
 }
 
 // ENTER
-enterBtn.addEventListener("click", () => {
+enterBtn?.addEventListener("click", () => {
   localStorage.setItem("ageVerified", "true");
-  ageModal.style.display = "none";
+  if (ageModal) ageModal.style.display = "none";
 });
 
 const slides = document.querySelectorAll(".slide");
@@ -24,16 +28,18 @@ let current = 0;
 
 function showSlide(index) {
   slides.forEach((slide) => slide.classList.remove("active"));
-  slides[index].classList.add("active");
+  slides[index]?.classList.add("active");
 }
 
-setInterval(() => {
-  current = (current + 1) % slides.length;
-  showSlide(current);
-}, 5000);
+if (slides.length > 0) {
+  setInterval(() => {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+  }, 5000);
+}
 
 // EXIT
-exitBtn.addEventListener("click", () => {
+exitBtn?.addEventListener("click", () => {
   window.location.href = "https://www.google.com"; //
 });
 
@@ -43,20 +49,20 @@ const acceptBtn = document.getElementById("acceptCookies");
 const rejectBtn = document.getElementById("rejectCookies");
 
 // check
-if (localStorage.getItem("cookiesChoice")) {
+if (cookieBanner && localStorage.getItem("cookiesChoice")) {
   cookieBanner.style.display = "none";
 }
 
 // ACCEPT
-acceptBtn.addEventListener("click", () => {
+acceptBtn?.addEventListener("click", () => {
   localStorage.setItem("cookiesChoice", "accepted");
-  cookieBanner.style.display = "none";
+  if (cookieBanner) cookieBanner.style.display = "none";
 });
 
 // REJECT
-rejectBtn.addEventListener("click", () => {
+rejectBtn?.addEventListener("click", () => {
   localStorage.setItem("cookiesChoice", "rejected");
-  cookieBanner.style.display = "none";
+  if (cookieBanner) cookieBanner.style.display = "none";
 });
 
 // Hamburger //
@@ -68,31 +74,31 @@ hamburger.innerHTML = `
   <span></span>
 `;
 
-hamburger.addEventListener("click", () => {
+hamburger?.addEventListener("click", () => {
   hamburger.classList.toggle("open");
-  navLinks.classList.toggle("active");
+  navLinks?.classList.toggle("active");
 });
 
 // User Dropdown
 const userToggle = document.querySelector(".user-toggle");
 const navUser = document.querySelector(".nav-user");
 
-userToggle.addEventListener("click", (e) => {
+userToggle?.addEventListener("click", (e) => {
   e.stopPropagation();
-  navUser.classList.toggle("active");
+  navUser?.classList.toggle("active");
 });
 
 // CLOSE WHEN CLICK OUTSIDE
 document.addEventListener("click", () => {
-  navUser.classList.remove("active");
+  navUser?.classList.remove("active");
 });
 
 // DROPDOWN SHOP MOBILE
 const shopItem = document.querySelector(".shop-item");
-const shopLink = shopItem.querySelector("a");
-const megaMenu = shopItem.querySelector(".mega-menu");
+const shopLink = shopItem?.querySelector("a");
+const megaMenu = shopItem?.querySelector(".mega-menu");
 
-shopLink.addEventListener("click", (e) => {
+shopLink?.addEventListener("click", (e) => {
   if (window.innerWidth <= 900) {
     e.preventDefault();
 
@@ -108,9 +114,9 @@ shopLink.addEventListener("click", (e) => {
     // TOGGLE CURRENT DROPDOWN
     if (!shopItem.classList.contains("active")) {
       shopItem.classList.add("active");
-      megaMenu.style.height = megaMenu.scrollHeight + "px"; // SET HEIGHT TO SCROLLHEIGHT
+      if (megaMenu) megaMenu.style.height = megaMenu.scrollHeight + "px";
     } else {
-      megaMenu.style.height = 0; // CLOSE DROPDOWN
+      if (megaMenu) megaMenu.style.height = 0;
       shopItem.classList.remove("active");
     }
   }
@@ -146,8 +152,8 @@ document.querySelectorAll(".nav-links li a").forEach((link) => {
 // SEARCH TOGGLE
 const searchBtn = document.getElementById("searchBtn");
 const searchBar = document.getElementById("searchBar");
-searchBtn.addEventListener("click", () => {
-  searchBar.classList.toggle("active");
+searchBtn?.addEventListener("click", () => {
+  searchBar?.classList.toggle("active");
 });
 
 //Scroll Reveals

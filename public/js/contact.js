@@ -13,10 +13,11 @@ if (flash) {
   }, 5000);
 
   // close button
-  closeBtn.addEventListener("click", hideFlash);
+  closeBtn?.addEventListener("click", hideFlash);
 }
 
 function hideFlash() {
+  if (!flash) return;
   flash.classList.remove("show");
 
   setTimeout(() => {

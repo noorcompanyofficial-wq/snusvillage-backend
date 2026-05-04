@@ -1,0 +1,146 @@
+<section class="wholesale-hero">
+  <div class="wholesale-hero__content">
+    <p class="wholesale-hero__eyebrow">Trade access only</p>
+
+    <% if (isApprovedTrader) { %>
+      <h1>Wholesale products for <%= trader.businessName %></h1>
+      <p>
+        Your trader login is active. You can now view wholesale stock, trade
+        pricing, and order information.
+      </p>
+      <div class="wholesale-actions">
+        <a class="wholesale-hero__button" href="/shop">View wholesale stock</a>
+        <a class="wholesale-secondary" href="/wholesale/logout">Trader logout</a>
+      </div>
+    <% } else { %>
+      <h1>Wholesale access is reviewed before entry</h1>
+      <p>
+        SNUS VILLAGE wholesale is only available to verified traders. Submit
+        your business details and our team will review your application before
+        enabling wholesale access on your account.
+      </p>
+      <div class="wholesale-actions">
+        <button class="wholesale-hero__button" type="button" data-open-wholesale>
+          Apply for trader access
+        </button>
+        <a class="wholesale-secondary" href="/wholesale/login">Trader login</a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<% if (success && success.length > 0) { %>
+  <div class="wholesale-alert wholesale-alert--success"><%= success %></div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="wholesale-alert wholesale-alert--error"><%= error %></div>
+<% } %>
+
+<% if (isApprovedTrader) { %>
+  <section class="wholesale-info">
+    <div class="wholesale-info__item">
+      <h2>Trade pricing</h2>
+      <p>Access approved pricing for larger and repeat product orders.</p>
+    </div>
+
+    <div class="wholesale-info__item">
+      <h2>Fast-moving brands</h2>
+      <p>Build your order around the products customers ask for most.</p>
+    </div>
+
+    <div class="wholesale-info__item">
+      <h2>Account support</h2>
+      <p>Speak directly with the team about stock requirements and dispatch.</p>
+    </div>
+  </section>
+<% } else { %>
+  <section class="wholesale-locked">
+    <div>
+      <h2>Already applied?</h2>
+      <p>
+        Applications are reviewed manually. Once approved, create your trader
+        login with the same email address used on your application.
+      </p>
+    </div>
+
+    <div class="wholesale-actions">
+      <a class="wholesale-secondary" href="/wholesale/register">Create trader login</a>
+      <a class="wholesale-secondary" href="/wholesale/login">Trader login</a>
+    </div>
+  </section>
+
+  <div class="wholesale-modal" id="wholesaleModal" aria-hidden="true">
+    <div class="wholesale-modal__backdrop" data-close-wholesale></div>
+
+    <div class="wholesale-modal__panel" role="dialog" aria-modal="true" aria-labelledby="wholesaleModalTitle">
+      <button class="wholesale-modal__close" type="button" data-close-wholesale aria-label="Close wholesale enquiry">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h2 id="wholesaleModalTitle">Trader application</h2>
+      <p>
+        Complete the form below. Wholesale access is enabled only after review.
+      </p>
+
+      <form class="wholesale-form" method="post" action="/wholesale/apply">
+        <label>
+          Business name
+          <input type="text" name="businessName" required />
+        </label>
+
+        <label>
+          Contact name
+          <input
+            type="text"
+            name="contactName"
+            value="<%= user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '' %>"
+            required
+          />
+        </label>
+
+        <label>
+          Business email
+          <input type="email" name="email" value="<%= user?.email || '' %>" required />
+        </label>
+
+        <label>
+          Phone number
+          <input type="tel" name="phone" required />
+        </label>
+
+        <label>
+          Company number
+          <input type="text" name="companyNumber" />
+        </label>
+
+        <label>
+          Business type
+          <select name="businessType" required>
+            <option value="">Select business type</option>
+            <option value="Retail store">Retail store</option>
+            <option value="Online retailer">Online retailer</option>
+            <option value="Distributor">Distributor</option>
+            <option value="Other trader">Other trader</option>
+          </select>
+        </label>
+
+        <label class="wholesale-form__full">
+          Website or social page
+          <input type="url" name="website" placeholder="https://example.com" />
+        </label>
+
+        <label class="wholesale-form__full">
+          What products or quantities are you interested in?
+          <textarea name="message" required></textarea>
+        </label>
+
+        <button class="wholesale-form__submit" type="submit">
+          Submit for review
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/wholesale.js" defer></script>
+<% } %>

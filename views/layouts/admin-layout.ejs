@@ -1,89 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Admin Panel</title>
-
-    <!-- FontAwesome -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snus Village Admin</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/admin.css" />
   </head>
 
-  <body>
-    <div class="admin-container">
-      <!-- SIDEBAR -->
-      <aside class="sidebar" id="sidebar">
-        <div class="logo">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <span class="logo-text">Snusvillage Admin</span>
+  <body class="admin-body">
+    <div class="admin-shell">
+      <aside class="admin-sidebar" id="sidebar">
+        <a class="admin-brand" href="/admin/dashboard">
+          <span><i class="fa-solid fa-store"></i></span>
+          <strong>Snus Village</strong>
+        </a>
+
+        <nav class="admin-nav" aria-label="Admin navigation">
+          <a href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i>Dashboard</a>
+          <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i>Products</a>
+          <a href="/admin/products/add"><i class="fa-solid fa-plus"></i>Add Product</a>
+          <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i>Wholesale</a>
+          <a href="/admin/users"><i class="fa-solid fa-users"></i>Users & Traders</a>
+          <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i>Security</a>
+          <a href="/admin/orders"><i class="fa-solid fa-receipt"></i>Orders</a>
+        </nav>
+
+        <div class="admin-sidebar__bottom">
+          <a href="/shop"><i class="fa-solid fa-arrow-up-right-from-square"></i>View Shop</a>
+          <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
         </div>
-
-        <ul class="menu">
-          <li class="menu-item">
-            <a href="/admin/dashboard">
-              <i class="fa-solid fa-gauge"></i>
-              <span>Dashboard</span>
-            </a>
-          </li>
-
-          <li class="menu-item">
-            <a href="/admin/products">
-              <i class="fa-solid fa-box"></i>
-              <span>Products</span>
-            </a>
-          </li>
-          <li class="menu-item">
-            <a href="/admin/orders">
-              <i class="fa-solid fa-cart-shopping"></i>
-              <span>Orders</span>
-            </a>
-          </li>
-          <li class="menu-item">
-            <a href="/admin/users">
-              <i class="fa-solid fa-users"></i>
-              <span>Users</span>
-            </a>
-          </li>
-
-          <li class="menu-item">
-            <a href="/admin/security">
-              <i class="fa-solid fa-shield"></i>
-              <span>Security</span>
-            </a>
-          </li>
-
-          <li class="menu-item">
-            <a href="/auth/logout">
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span>Logout</span>
-            </a>
-          </li>
-        </ul>
       </aside>
 
-      <!-- MAIN -->
-      <div class="main" id="main">
-        <!-- TOPBAR -->
-        <header class="topbar">
-          <button class="toggle-btn" id="toggleBtn">
+      <div class="admin-main" id="main">
+        <header class="admin-topbar">
+          <button class="admin-menu-btn" id="toggleBtn" type="button" aria-label="Toggle menu">
             <i class="fa-solid fa-bars"></i>
           </button>
-
-          <div class="search">
-            <input type="text" placeholder="Search..." />
+          <div>
+            <span>Operations Panel</span>
+            <strong><%= user?.firstName || "Admin" %></strong>
           </div>
-
-          <div class="icons">
-            <i class="fa-solid fa-bell"></i>
-            <i class="fa-solid fa-envelope"></i>
-            <i class="fa-solid fa-gear"></i>
-          </div>
+          <a class="admin-topbar__action" href="/admin/products/add">
+            <i class="fa-solid fa-plus"></i>
+            Add Product
+          </a>
         </header>
 
-        <main class="content"><%- body %></main>
+        <% if (success && success.length) { %>
+          <div class="admin-flash admin-flash--success"><%= success[0] %></div>
+        <% } %>
+        <% if (error && error.length) { %>
+          <div class="admin-flash admin-flash--error"><%= error[0] %></div>
+        <% } %>
+
+        <main class="admin-content"><%- body %></main>
       </div>
     </div>
     <script src="/js/admin.js"></script>

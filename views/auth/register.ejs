@@ -1,93 +1,107 @@
 <link rel="stylesheet" href="/css/auth.css" />
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
 
 <div id="flash-container">
-
   <% if (error && error.length > 0) { %>
     <div class="flash flash-error">
       <span><%= error %></span>
-      <button class="flash-close" onclick="closeFlash(this)">×</button>
+      <button class="flash-close" onclick="closeFlash(this)" type="button">×</button>
     </div>
   <% } %>
 
   <% if (success && success.length > 0) { %>
     <div class="flash flash-success">
       <span><%= success %></span>
-      <button class="flash-close" onclick="closeFlash(this)">×</button>
+      <button class="flash-close" onclick="closeFlash(this)" type="button">×</button>
     </div>
   <% } %>
-
 </div>
 
-<section class="auth-container">
+<section class="auth-page auth-page--register">
+  <div class="auth-visual">
+    <span class="auth-pill">Create Account</span>
+    <h1>Customer access for Snus Village.</h1>
+    <p>
+      Create a verified 18+ customer login. Wholesale traders still need to apply
+      and use the separate trader login after approval.
+    </p>
+    <div class="auth-visual__stats">
+      <div><strong>Code</strong><span>Email verification required</span></div>
+      <div><strong>18+</strong><span>Date of birth checked</span></div>
+    </div>
+  </div>
+
   <div class="auth-box">
-    <h2>CREATE AN ACCOUNT</h2>
+    <span class="auth-pill">Register</span>
+    <h2>Create customer account</h2>
+    <p class="auth-sub">Enter your details exactly as you want them saved.</p>
 
     <form action="/auth/register" method="post" class="auth-form">
-      <div class="input-group">
-        <i class="fa-solid fa-user"></i>
-        <input
-          type="text"
-          autocomplete="off"
-          name="firstName"
-          placeholder="First Name"
-          required
-        />
+      <div class="auth-grid">
+        <label class="input-group">
+          <i class="fa-solid fa-user"></i>
+          <input
+            type="text"
+            autocomplete="given-name"
+            name="firstName"
+            placeholder="First name"
+            required
+          />
+        </label>
+
+        <label class="input-group">
+          <i class="fa-solid fa-user"></i>
+          <input
+            type="text"
+            autocomplete="family-name"
+            name="lastName"
+            placeholder="Last name"
+            required
+          />
+        </label>
       </div>
 
-      <div class="input-group">
-        <i class="fa-solid fa-user"></i>
-        <input
-          type="text"
-          autocomplete="off"
-          name="lastName"
-          placeholder="Last Name"
-          required
-        />
-      </div>
-
-      <div class="input-group">
+      <label class="input-group">
         <i class="fa-solid fa-calendar"></i>
         <input
           type="date"
-          autocomplete="off"
+          autocomplete="bday"
           name="birthDate"
-          placeholder="Date"
           class="input-date"
           required
         />
-      </div>
+      </label>
 
-      <div class="input-group">
+      <label class="input-group">
         <i class="fa-solid fa-envelope"></i>
         <input
           type="email"
-          autocomplete="off"
+          autocomplete="email"
           name="email"
           placeholder="Email"
           required
         />
-      </div>
+      </label>
 
-      <div class="input-group">
+      <label class="input-group">
         <i class="fa-solid fa-lock"></i>
         <input
           type="password"
-          autocomplete="off"
+          autocomplete="new-password"
           name="password"
           placeholder="Password"
           required
         />
-      </div>
+      </label>
 
-      <button class="auth-btn" type="submit">CREATE ACCOUNT</button>
+      <p class="auth-note">
+        Password must include uppercase, lowercase, a number, and a symbol.
+      </p>
+
+      <button class="auth-btn" type="submit">Create Account</button>
 
       <p class="switch">
         Already have an account?
-        <a href="/auth/login">Login</a>
+        <a href="/auth/login">Log in</a>
       </p>
     </form>
   </div>

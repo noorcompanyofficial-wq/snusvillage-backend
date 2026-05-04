@@ -22,16 +22,23 @@ const contactRouter = require("./routes/contact");
 const checkoutRoutes = require("./routes/checkout");
 
 const shopRoutes = require("./routes/shop");
+const collectionsRoutes = require("./routes/collections");
 const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
 
+const wholesaleRoutes = require("./routes/wholesale");
+
 // ====== Database connection ======
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("mongodb connected"))
-  .catch((err) => console.error(err));
+if (process.env.MONGO_URI) {
+  mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log("mongodb connected"))
+    .catch((err) => console.error("MongoDB connection error:", err.message));
+} else {
+  console.warn("MONGO_URI is missing. Database-backed features will not save.");
+}
 
 // ====== Trust Proxy (for real IP) ======
 if (process.env.NODE_ENV === "production") {
@@ -63,7 +70,11 @@ app.use(flash());
 // ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {
   try {
-    if (!req.session?.user && req.cookies?.jwt) {
+    if (
+      mongoose.connection.readyState === 1 &&
+      !req.session?.user &&
+      req.cookies?.jwt
+    ) {
       const User = require("./models/User");
 
       const user = await User.findOne({
@@ -103,12 +114,16 @@ app.use("/about", aboutRoutes);
 app.use("/contact", contactRouter);
 
 app.use("/shop", shopRoutes);
+app.use("/collections", collectionsRoutes);
 app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
 
 app.use("/cart", cartRoutes);
+
+app.use("/wholesale", wholesaleRoutes);
+
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;

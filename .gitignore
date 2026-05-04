@@ -1,4 +1,14 @@
 node_modules
 .env
+
 .env.local
 .DS_Store
+=======
+
+# Local development data fallback
+data/
+
+# System files
+.DS_Store
+npm-debug.log
+ 276bb21 (backend setup)

@@ -1,0 +1,82 @@
+<section class="admin-page">
+  <div class="admin-page-header">
+    <div>
+      <h1 class="page-title">Wholesale Applications</h1>
+      <p>Review trader requests before enabling wholesale access.</p>
+    </div>
+  </div>
+
+  <% if (success && success.length > 0) { %>
+    <div class="admin-alert admin-alert--success"><%= success %></div>
+  <% } %>
+
+  <% if (error && error.length > 0) { %>
+    <div class="admin-alert admin-alert--error"><%= error %></div>
+  <% } %>
+
+  <% if (!applications || applications.length === 0) { %>
+    <div class="admin-empty">No wholesale applications yet.</div>
+  <% } else { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Business</th>
+            <th>Contact</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach((application) => { %>
+            <tr>
+              <td>
+                <strong><%= application.businessName %></strong>
+                <% if (application.companyNumber) { %>
+                  <span>Company no: <%= application.companyNumber %></span>
+                <% } %>
+                <% if (application.website) { %>
+                  <a href="<%= application.website %>" target="_blank" rel="noopener">
+                    <%= application.website %>
+                  </a>
+                <% } %>
+              </td>
+              <td>
+                <strong><%= application.contactName %></strong>
+                <span><%= application.email %></span>
+                <span><%= application.phone %></span>
+              </td>
+              <td><%= application.businessType %></td>
+              <td>
+                <span class="status-pill status-pill--<%= application.status %>">
+                  <%= application.status %>
+                </span>
+              </td>
+              <td><%= application.createdAt ? application.createdAt.toLocaleDateString("en-GB") : "" %></td>
+              <td>
+                <div class="admin-actions">
+                  <% if (application.status !== "approved") { %>
+                    <form method="post" action="/admin/wholesale/<%= application._id %>/approve">
+                      <button class="admin-action admin-action--approve" type="submit">Approve</button>
+                    </form>
+                  <% } %>
+
+                  <% if (application.status !== "rejected") { %>
+                    <form method="post" action="/admin/wholesale/<%= application._id %>/reject">
+                      <button class="admin-action admin-action--reject" type="submit">Reject</button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+            <tr class="admin-table-note">
+              <td colspan="6"><%= application.message %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>

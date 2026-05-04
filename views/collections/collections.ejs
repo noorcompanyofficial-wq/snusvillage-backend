@@ -1,0 +1,98 @@
+<section class="collections-page">
+  <div class="collections-hero">
+    <div class="collections-hero__copy">
+      <span class="collections-pill">Curated Stock</span>
+      <h1>Collections built for fast product discovery.</h1>
+      <p>
+        Browse by brand, flavour, and strength, then jump straight into the live
+        shop filters.
+      </p>
+      <div class="collections-actions">
+        <a class="collections-btn" href="/shop">All Products</a>
+        <a class="collections-btn collections-btn--ghost" href="/wholesale">
+          Wholesale Access
+        </a>
+      </div>
+    </div>
+
+    <div class="collections-hero__panel" aria-label="Collection stats">
+      <div>
+        <strong><%= stats.totalProducts %></strong>
+        <span>Products</span>
+      </div>
+      <div>
+        <strong><%= stats.totalBrands %></strong>
+        <span>Brands</span>
+      </div>
+      <div>
+        <strong><%= stats.totalFlavours %></strong>
+        <span>Flavours</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="collections-toolbar">
+    <div class="collections-tabs" role="tablist" aria-label="Collection filters">
+      <button class="is-active" type="button" data-filter="all">All</button>
+      <button type="button" data-filter="brand">Brands</button>
+      <button type="button" data-filter="flavour">Flavours</button>
+      <button type="button" data-filter="strength">Strength</button>
+    </div>
+    <label class="collections-search">
+      <span><i class="fa-solid fa-magnifying-glass"></i></span>
+      <input id="collectionSearch" type="search" placeholder="Search collections" />
+    </label>
+  </div>
+
+  <div class="collections-grid" id="collectionsGrid">
+    <% collections.forEach((collection, index) => { %>
+      <article
+        class="collection-tile"
+        data-type="<%= collection.type %>"
+        data-title="<%= collection.title.toLowerCase() %>"
+        style="--delay:<%= index * 70 %>ms; --tile-image:url('<%= collection.image %>')"
+      >
+        <div class="collection-tile__image"></div>
+        <div class="collection-tile__body">
+          <span><%= collection.type %></span>
+          <h2><%= collection.title %></h2>
+          <p><%= collection.description %></p>
+          <div class="collection-tile__footer">
+            <strong><%= collection.count || "Live" %></strong>
+            <a
+              href="/shop?<%= collection.type === 'sort' ? 'sort' : collection.type %>=<%= encodeURIComponent(collection.value) %>"
+            >
+              Open
+            </a>
+          </div>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+
+  <section class="collections-featured">
+    <div class="collections-section-head">
+      <span class="collections-pill">Recently Added</span>
+      <h2>Fresh products from the catalogue</h2>
+    </div>
+
+    <div class="collections-product-row">
+      <% if (featuredProducts.length) { %>
+        <% featuredProducts.forEach((product) => { %>
+          <a class="collections-product" href="/products/<%= product.slug %>">
+            <img src="<%= product.image %>" alt="<%= product.name %>" />
+            <span><%= product.brand || "Snus Village" %></span>
+            <strong><%= product.name %></strong>
+            <em>£<%= Number(product.discountPrice || product.price || 0).toFixed(2) %></em>
+          </a>
+        <% }) %>
+      <% } else { %>
+        <div class="collections-empty">
+          Add products in the admin panel and they will appear here automatically.
+        </div>
+      <% } %>
+    </div>
+  </section>
+</section>
+
+<script src="/js/collections.js" defer></script>

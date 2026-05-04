@@ -1,2 +1,32 @@
-<h1>Hi <%= user.firstName %></h1>
-<p>Welcome to your dashboard</p>
+<link rel="stylesheet" href="/css/auth.css" />
+
+<section class="account-page">
+  <div class="account-hero">
+    <span class="auth-pill">Customer Account</span>
+    <h1>Hi <%= user.firstName %>.</h1>
+    <p>Your customer login is active. Use this page to confirm your account status.</p>
+  </div>
+
+  <div class="account-grid">
+    <div class="account-card">
+      <i class="fa-solid fa-envelope"></i>
+      <span>Email</span>
+      <strong><%= user.email %></strong>
+    </div>
+    <div class="account-card">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Verification</span>
+      <strong><%= user.isVerified ? "Verified" : "Not verified" %></strong>
+    </div>
+    <div class="account-card">
+      <i class="fa-solid fa-store"></i>
+      <span>Trader Status</span>
+      <strong><%= user.traderStatus || "none" %></strong>
+    </div>
+  </div>
+
+  <div class="account-actions">
+    <a class="auth-btn account-action" href="/shop">Shop products</a>
+    <a class="auth-btn account-action account-action--ghost" href="/auth/logout">Logout</a>
+  </div>
+</section>

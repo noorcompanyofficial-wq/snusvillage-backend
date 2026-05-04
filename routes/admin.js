@@ -1,14 +1,239 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 const Product = require("../models/Products");
+const User = require("../models/User");
+const WholesaleApplication = require("../models/WholesaleApplication");
+const Trader = require("../models/Trader");
+const Contact = require("../models/contact");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
+const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
-router.get("/dashboard", isAdmin, (req, res) => {
+async function getAdminStats() {
+  if (mongoose.connection.readyState !== 1) {
+    const applications = await wholesaleApplicationStore.findAll();
+    return {
+      totalProducts: 0,
+      inStock: 0,
+      lowStock: 0,
+      totalUsers: 0,
+      approvedTraders: 0,
+      pendingWholesale: applications.filter((app) => app.status === "pending")
+        .length,
+      unreadMessages: 0,
+    };
+  }
+
+  const [
+    totalProducts,
+    inStock,
+    lowStock,
+    totalUsers,
+    approvedTraders,
+    pendingWholesale,
+    unreadMessages,
+  ] = await Promise.all([
+    Product.countDocuments(),
+    Product.countDocuments({ stock: { $gt: 0 } }),
+    Product.countDocuments({ stock: { $gt: 0, $lte: 5 } }),
+    User.countDocuments(),
+    Trader.countDocuments({ status: "approved" }),
+    WholesaleApplication.countDocuments({ status: "pending" }),
+    Contact.countDocuments({ isRead: false }),
+  ]);
+
+  return {
+    totalProducts,
+    inStock,
+    lowStock,
+    totalUsers,
+    approvedTraders,
+    pendingWholesale,
+    unreadMessages,
+  };
+}
+
+router.get("/", isAdmin, (req, res) => {
+  res.redirect("/admin/dashboard");
+});
+
+router.get("/dashboard", isAdmin, async (req, res) => {
+  const stats = await getAdminStats();
+  const recentProducts =
+    mongoose.connection.readyState === 1
+      ? await Product.find().sort({ createdAt: -1 }).limit(5).lean()
+      : [];
+
   res.render("admin/dashboard", {
     layout: "layouts/admin-layout",
+    stats,
+    recentProducts,
   });
+});
+
+router.get("/orders", isAdmin, async (req, res) => {
+  res.render("admin/orders", {
+    layout: "layouts/admin-layout",
+  });
+});
+
+router.get("/users", isAdmin, async (req, res) => {
+  try {
+    const [users, traders] =
+      mongoose.connection.readyState === 1
+        ? await Promise.all([
+            User.find().sort({ createdAt: -1 }).limit(50).lean(),
+            Trader.find().sort({ updatedAt: -1 }).limit(50).lean(),
+          ])
+        : [[], []];
+
+    res.render("admin/users", {
+      layout: "layouts/admin-layout",
+      users,
+      traders,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load users");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.get("/security", isAdmin, async (req, res) => {
+  try {
+    const users =
+      mongoose.connection.readyState === 1
+        ? await User.find({
+            $or: [
+              { loginAttempts: { $gt: 0 } },
+              { lockUntil: { $ne: null } },
+              { "suspiciousIPs.0": { $exists: true } },
+              { "blockedIPs.0": { $exists: true } },
+            ],
+          })
+            .sort({ updatedAt: -1 })
+            .limit(50)
+            .lean()
+        : [];
+
+    res.render("admin/security", {
+      layout: "layouts/admin-layout",
+      users,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load security data");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.get("/wholesale", isAdmin, async (req, res) => {
+  try {
+    const applications =
+      mongoose.connection.readyState === 1
+        ? await WholesaleApplication.find().sort({ createdAt: -1 }).lean()
+        : await wholesaleApplicationStore.findAll();
+
+    res.render("admin/wholesale-applications", {
+      layout: "layouts/admin-layout",
+      applications,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load wholesale applications");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/wholesale/:id/approve", isAdmin, async (req, res) => {
+  try {
+    const application =
+      mongoose.connection.readyState === 1
+        ? await WholesaleApplication.findById(req.params.id)
+        : await wholesaleApplicationStore.updateStatus(
+            req.params.id,
+            "approved",
+            req.session.user._id,
+          );
+
+    if (!application) {
+      req.flash("error", "Wholesale application not found");
+      return res.redirect("/admin/wholesale");
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      application.status = "approved";
+      application.reviewedAt = new Date();
+      application.reviewedBy = req.session.user._id;
+      await application.save();
+
+      await Trader.findOneAndUpdate(
+        { email: application.email },
+        {
+          businessName: application.businessName,
+          contactName: application.contactName,
+          email: application.email,
+          phone: application.phone,
+          status: "approved",
+        },
+        { upsert: true, setDefaultsOnInsert: true },
+      );
+    }
+
+    req.flash(
+      "success",
+      "Trader approved. They can now create their wholesale login.",
+    );
+    res.redirect("/admin/wholesale");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to approve trader");
+    res.redirect("/admin/wholesale");
+  }
+});
+
+router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
+  try {
+    const application =
+      mongoose.connection.readyState === 1
+        ? await WholesaleApplication.findById(req.params.id)
+        : await wholesaleApplicationStore.updateStatus(
+            req.params.id,
+            "rejected",
+            req.session.user._id,
+          );
+
+    if (!application) {
+      req.flash("error", "Wholesale application not found");
+      return res.redirect("/admin/wholesale");
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      application.status = "rejected";
+      application.reviewedAt = new Date();
+      application.reviewedBy = req.session.user._id;
+      await application.save();
+
+      await User.findOneAndUpdate(
+        { email: application.email },
+        { traderStatus: "rejected" },
+      );
+
+      await Trader.findOneAndUpdate(
+        { email: application.email },
+        { status: "suspended" },
+      );
+    }
+
+    req.flash("success", "Trader application rejected");
+    res.redirect("/admin/wholesale");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to reject trader");
+    res.redirect("/admin/wholesale");
+  }
 });
 
 //  Add Product Page

@@ -1,7 +1,69 @@
-<div style="height: 1500px">
-  <h1>Admin Dashboard</h1>
+<section class="admin-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Dashboard</span>
+      <h1>Store overview</h1>
+      <p>Track products, trader reviews, users, and key operating signals.</p>
+    </div>
+    <a class="admin-primary" href="/admin/products/add">
+      <i class="fa-solid fa-plus"></i>
+      Add Product
+    </a>
+  </div>
 
-  <p>Welcome, <%= user?.firstName %></p>
+  <div class="admin-stat-grid">
+    <a class="admin-stat-card" href="/admin/products">
+      <i class="fa-solid fa-box"></i>
+      <span>Total Products</span>
+      <strong><%= stats.totalProducts %></strong>
+    </a>
+    <a class="admin-stat-card" href="/admin/products?stock=in">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>In Stock</span>
+      <strong><%= stats.inStock %></strong>
+    </a>
+    <a class="admin-stat-card" href="/admin/wholesale">
+      <i class="fa-solid fa-clock"></i>
+      <span>Pending Wholesale</span>
+      <strong><%= stats.pendingWholesale %></strong>
+    </a>
+    <a class="admin-stat-card" href="/admin/users">
+      <i class="fa-solid fa-users"></i>
+      <span>Approved Traders</span>
+      <strong><%= stats.approvedTraders %></strong>
+    </a>
+  </div>
 
-  <p>User, <%= user?.email %></p>
-</div>
+  <div class="admin-dashboard-grid">
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Quick actions</h2>
+      </div>
+      <div class="admin-action-grid">
+        <a href="/admin/products"><i class="fa-solid fa-pen-to-square"></i>Edit catalogue</a>
+        <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i>Review traders</a>
+        <a href="/admin/users"><i class="fa-solid fa-user-shield"></i>Manage access</a>
+        <a href="/shop"><i class="fa-solid fa-eye"></i>Preview shop</a>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Recent products</h2>
+        <a href="/admin/products">View all</a>
+      </div>
+      <div class="admin-list">
+        <% if (recentProducts.length) { %>
+          <% recentProducts.forEach((product) => { %>
+            <a href="/admin/products/edit/<%= product._id %>">
+              <span><%= product.name %></span>
+              <strong>£<%= Number(product.discountPrice || product.price || 0).toFixed(2) %></strong>
+            </a>
+          <% }) %>
+        <% } else { %>
+          <p>No products found yet.</p>
+        <% } %>
+      </div>
+    </section>
+  </div>
+</section>

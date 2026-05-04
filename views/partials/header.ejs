@@ -1,152 +1,44 @@
 <header class="header">
   <nav class="navbar">
     <div class="nav-container">
-      <!-- LOGO -->
       <div class="logo">
         <a href="/">
-          <img src="/images/logo/snusvillage-logo.png" />
+          <img src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
+          <span>
+            <strong>Snus Village</strong>
+            <small>London's premium snus store</small>
+          </span>
         </a>
       </div>
 
-      <!-- LINKS -->
       <ul class="nav-links" id="navLinks">
-        <!-- MOBILE SEARCH -->
-        <div class="mobile-search">
-          <input type="text" placeholder="Search..." />
-          <i class="fa fa-search"></i>
-        </div>
-
-        <li><a href="/">Home</a></li>
-
-        <li class="shop-item">
-          <a href="/shop"
-            >Shop <i class="fa-solid fa-chevron-down arrow"></i
-          ></a>
-
-          <div class="mega-menu">
-            <div class="mega-column">
-              <a href="/shop" class="mobile-shop-link">View All Products</a>
-
-              <h4>SHOP BRANDS</h4>
-              <a>WHITE FOX</a>
-              <a>SIBERIA</a>
-              <a>VELO</a>
-              <a>KILLA</a>
-              <a>PABLO</a>
-              <a>GARANT</a>
-              <a>ICEBERG CUBA</a>
-              <a>LOOP</a>
-              <a>CAFERO</a>
-              <a>HIT</a>
-              <a>ODEN'S</a>
-            </div>
-
-            <div class="mega-column">
-              <h4>SHOP STRENGTH</h4>
-              <a>LOW</a>
-              <a>MEDIUM</a>
-              <a>STRONG</a>
-              <a>X-STRONG</a>
-              <a>EXTREME</a>
-            </div>
-
-            <div class="mega-column">
-              <h4>FLAVOURS</h4>
-              <a>MINTY MOOD</a>
-              <a>FRUITY FANTASY</a>
-              <a>CITRUS CYCLONE</a>
-              <a>FIZZY FUN</a>
-            </div>
-          </div>
-        </li>
-        <li><a href="#">Wholesale</a></li>
-
-        <li><a href="/about">About</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <li><a href="/shop">All Products</a></li>
+        <li><a href="/wholesale">Wholesale</a></li>
+        <li><a href="/about">About Us</a></li>
+        <li><a href="/contact">Contact Us</a></li>
       </ul>
 
-      <!-- ACTIONS -->
-      <div class="nav-actions">
-        <button class="icon-btn" id="searchBtn">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-        <button class="icon-btn">
-          <i class="cart-navbar fa-solid fa-cart-shopping"></i>
-        </button>
-        <div class="nav-user">
-          <button class="icon-btn user-toggle">
+      <div class="customer-nav">
+        <% if (user) { %>
+          <a class="customer-nav__link" href="/auth/dashboard">
             <i class="fa-solid fa-user"></i>
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-
-          <div class="user-dropdown">
-          <% if (!user) { %>
-  <a href="/auth/login">Login</a>
-  <a href="/auth/register">Sign Up</a>
-<% } else { %>
-  <a href="/auth/dashboard">Dashboard</a>
-  <a href="/auth/logout">Logout</a>
-<% } %>
-          </div>
-        </div>
+            Account
+          </a>
+          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/logout">
+            Logout
+          </a>
+        <% } else { %>
+          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/register">
+            Register
+          </a>
+          <a class="customer-nav__link" href="/auth/login">
+            <i class="fa-solid fa-user"></i>
+            Login
+          </a>
+        <% } %>
       </div>
 
-      <!-- HAMBURGER -->
-      <div id="nav-icon4"></div>
-    </div>
-
-    <!--  DESKTOP SEARCH -->
-    <div class="search-bar" id="searchBar">
-      <input type="text" placeholder="Search..." />
-      <i class="fa fa-search" id="search-icon1"></i>
+      <button id="nav-icon4" type="button" aria-label="Toggle navigation"></button>
     </div>
   </nav>
-
-   <div class="hero-slider">
-      <div class="slide active">
-        <img src="/images/slide1.jpg" />
-        <div class="slide-content">
-          <h2>Welcome to Snusvillage</h2>
-          <p>Your premium online Smoking store</p>
-          <a href="/shop" class="hero-btn">Shop Now</a>
-        </div>
-      </div>
-
-      <div class="slide">
-        <img src="/images/slide2.jpg" />
-        <div class="slide-content">
-          <h2>Explore Our Smoking Products</h2>
-          <p>Quality Snus & accessories for you</p>
-          <a href="/shop" class="hero-btn">Shop Now</a>
-        </div>
-      </div>
-
-      <div class="slide">
-        <img src="/images/slide3.jpg" />
-        <div class="slide-content">
-          <h2>Experience the Snusvillage Lifestyle.</h2>
-          <p>Fast delivery and premium selection</p>
-          <a href="/shop" class="hero-btn">Shop Now</a>
-        </div>
-      </div>
-
-      <div class="slide">
-        <img src="/images/slide4.jpg" />
-        <div class="slide-content">
-          <h2>Discover New Flavors</h2>
-          <p>Only at Snusvillage online shop</p>
-          <a href="/shop" class="hero-btn">Shop Now</a>
-        </div>
-      </div>
-
-      <div class="slide">
-        <img src="/images/slide5.jpg" />
-        <div class="slide-content">
-          <h2>Premium Smoking Selection</h2>
-          <p>Experience Snusvillage today</p>
-          <a href="/shop" class="hero-btn">Shop Now</a>
-        </div>
-      </div>
-    </div>
-  
 </header>

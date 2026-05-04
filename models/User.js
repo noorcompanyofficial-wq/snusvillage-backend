@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     default: "user",
   },
 
+  traderStatus: {
+    type: String,
+    enum: ["none", "pending", "approved", "rejected"],
+    default: "none",
+  },
+
   isVerified: { type: Boolean, default: false },
 
   //  VERIFY

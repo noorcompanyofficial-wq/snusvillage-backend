@@ -1,3 +1,357 @@
-<%- include('../partials/brands') %> <%-include('../partials/best-sellers') %>
-<%-include('../partials/branches') %> <%-include('../partials/delivery') %>
-<%-include('../partials/social') %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snus Village</title>
+    <meta
+      name="description"
+      content="Premium nicotine pouch and snus specialist with London stores, trusted brands, and fast UK delivery."
+    />
+    <link rel="icon" href="/images/logo/snusvillage-logo.png" />
+    <link rel="stylesheet" href="/css/landing.css" />
+  </head>
+  <body>
+    <div class="landing-age-modal" id="landingAgeModal">
+      <div class="landing-age-box">
+        <h2>Age Verification</h2>
+        <p>You must be 18+ to enter this website.</p>
+        <div class="landing-age-buttons">
+          <button type="button" id="landingEnterSite">I am over 18</button>
+          <button type="button" id="landingExitSite">I am under 18</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-shell">
+      <div class="topbar">
+        <div class="container topbar__inner">
+          <div class="topbar__pill">Premium brands - authentic stock - fast UK delivery</div>
+          <div class="topbar__pill">Camden Town - Oxford Street - Edgware Road - 18+ only</div>
+        </div>
+      </div>
+
+      <header class="nav">
+        <div class="container nav__inner">
+          <a class="brand" href="/" aria-label="Snus Village home">
+            <img class="brand__logo" src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
+            <span class="brand__text">
+              <strong>Snus Village</strong>
+              <span>London's premium snus store</span>
+            </span>
+          </a>
+
+          <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">Menu</button>
+
+          <nav class="nav__links" id="navLinks">
+            <a href="/shop">All Products</a>
+            <a href="/wholesale">Wholesale</a>
+            <a href="/about">About Us</a>
+            <a href="/contact">Contact Us</a>
+          </nav>
+
+          <div class="nav__actions">
+            <% if (user) { %>
+              <a class="ghost-btn nav-auth" href="/auth/dashboard">Account</a>
+              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/logout">Logout</a>
+            <% } else { %>
+              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/register">Register</a>
+              <a class="btn nav-auth" href="/auth/login">Login</a>
+            <% } %>
+          </div>
+        </div>
+      </header>
+
+      <main id="home">
+        <section class="hero">
+          <div class="container">
+            <div class="hero__wrap">
+              <div class="hero__slides" id="heroSlider">
+                <article class="hero__slide is-active" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.18), rgba(201,31,54,0.12)), url('/images/header/h-1.jpeg');">
+                  <div class="hero__content">
+                    <span class="eyebrow">Snus Village</span>
+                    <h1>Premium snus, stocked in London</h1>
+                    <p class="hero__lead">
+                      Shop trusted nicotine pouch brands, strong flavours, and best-selling products with fast UK delivery and support from a specialist team.
+                    </p>
+                    <div class="hero__cta">
+                      <a class="btn" href="/shop">Shop products</a>
+                      <a class="ghost-btn" href="/wholesale">Wholesale access</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="hero__slide" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.15), rgba(201,31,54,0.15)), url('/images/header/h-2.jpeg');">
+                  <div class="hero__content">
+                    <span class="eyebrow">Best sellers</span>
+                    <h1>Brands customers ask for first</h1>
+                    <p class="hero__lead">
+                      Explore White Fox, Pablo, Killa, Velo, Loop, Iceberg, Siberia, Odens, and more from one focused store.
+                    </p>
+                    <div class="hero__cta">
+                      <a class="btn" href="#bestsellers">View best sellers</a>
+                      <a class="ghost-btn" href="/shop">Browse all</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="hero__slide" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.12), rgba(201,31,54,0.18)), url('/images/delivery/delivery.jpg');">
+                  <div class="hero__content">
+                    <span class="eyebrow">London stores</span>
+                    <h1>Visit us or order online</h1>
+                    <p class="hero__lead">
+                      Find Snus Village in key London locations or order online for a fast, straightforward shopping experience.
+                    </p>
+                    <div class="hero__cta">
+                      <a class="btn" href="#shops">Store locations</a>
+                      <a class="ghost-btn" href="/contact">Contact us</a>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <div class="hero__floating">
+                <div class="hero-card">
+                  <strong>Trader approved wholesale</strong>
+                  <p>Apply for wholesale access and create a dedicated trader login after review.</p>
+                </div>
+                <div class="hero-card">
+                  <strong>Fast UK delivery</strong>
+                  <p>Order online with a curated range built for speed, strength, and flavour choice.</p>
+                </div>
+              </div>
+
+              <div class="hero__stats">
+                <div class="hero__stat">
+                  <strong>12+</strong>
+                  <span>Popular brands available across the shop.</span>
+                </div>
+                <div class="hero__stat">
+                  <strong>3</strong>
+                  <span>London locations: Camden Town, Oxford Street, and Edgware Road.</span>
+                </div>
+                <div class="hero__stat">
+                  <strong>18+</strong>
+                  <span>Age restricted products for adults only.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="collections">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow dark">Collections</span>
+                <h2>Shop by strength, flavour, and brand</h2>
+                <p>Move quickly from the flavours you like to the nicotine strength and brand range that fits your preference.</p>
+              </div>
+              <a class="ghost-btn" href="/shop">Open shop</a>
+            </div>
+
+            <div class="collection-grid">
+              <article class="collection-card" style="--bg-image:url('/images/social/s-1.jpeg');">
+                <span class="pill light">Collection 01</span>
+                <h3>Mint favourites</h3>
+                <p>Clean, cool, and reliable flavour profiles from leading nicotine pouch brands.</p>
+                <a class="ghost-btn light-btn" href="/shop">Shop mint</a>
+              </article>
+              <article class="collection-card" style="--bg-image:url('/images/social/s-6.jpeg');">
+                <span class="pill light">Collection 02</span>
+                <h3>Strong selections</h3>
+                <p>Explore higher strength products for customers who know exactly what they want.</p>
+                <a class="ghost-btn light-btn" href="/shop">Shop strong</a>
+              </article>
+              <article class="collection-card" style="--bg-image:url('/images/social/s-10.jpeg');">
+                <span class="pill light">Collection 03</span>
+                <h3>Fruity flavours</h3>
+                <p>Bright flavour ranges including berry, citrus, cola, tropical, and sweet profiles.</p>
+                <a class="ghost-btn light-btn" href="/shop">Shop flavours</a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="bestsellers">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow dark">Best Sellers</span>
+                <h2>Customer favourites</h2>
+                <p>A focused selection of the products and brands that move fastest in store and online.</p>
+              </div>
+              <a class="ghost-btn" href="/shop">View all products</a>
+            </div>
+
+            <div class="product-grid">
+              <article class="product-card">
+                <div class="product-card__media"><img src="/images/shop/wf-1.png" alt="White Fox product" /></div>
+                <div class="product-card__top"><span class="product-card__tag">White Fox</span><span class="product-card__tag">Strong</span></div>
+                <h3>White Fox range</h3>
+                <p>Popular mint-led cans with a clean profile and strong customer demand.</p>
+                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span></div>
+                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
+              </article>
+
+              <article class="product-card">
+                <div class="product-card__media"><img src="/images/shop/pablo-1.png" alt="Pablo product" /></div>
+                <div class="product-card__top"><span class="product-card__tag">Pablo</span><span class="product-card__tag">Extreme</span></div>
+                <h3>Pablo range</h3>
+                <p>High strength cans with bold flavours for experienced adult users.</p>
+                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span></div>
+                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
+              </article>
+
+              <article class="product-card">
+                <div class="product-card__media"><img src="/images/shop/velo-1.webp" alt="Velo product" /></div>
+                <div class="product-card__top"><span class="product-card__tag">Velo</span><span class="product-card__tag">Smooth</span></div>
+                <h3>Velo range</h3>
+                <p>Everyday pouches with familiar flavours and balanced strength options.</p>
+                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span><span></span></div>
+                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
+              </article>
+
+              <article class="product-card">
+                <div class="product-card__media"><img src="/images/shop/loop-1.webp" alt="Loop product" /></div>
+                <div class="product-card__top"><span class="product-card__tag">Loop</span><span class="product-card__tag">Flavour</span></div>
+                <h3>Loop range</h3>
+                <p>Modern pouch flavours with clean packaging and reliable popularity.</p>
+                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span></span><span></span><span></span></div>
+                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="shops">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow dark">Location</span>
+                <h2>Find Snus Village in London</h2>
+                <p>Visit one of our London areas or contact the team before you travel for stock questions.</p>
+              </div>
+              <a class="ghost-btn" href="/contact">Contact us</a>
+            </div>
+
+            <div class="shops-grid">
+              <article class="shop-card">
+                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Camden+Town+London&output=embed" title="Camden Town"></iframe>
+                <div class="shop-card__body">
+                  <div class="shop-card__meta"><h3>Camden Town</h3><strong>London</strong></div>
+                  <p>Central north London access with a strong range of best-selling products.</p>
+                  <a class="ghost-btn" href="/contact">Ask about stock</a>
+                </div>
+              </article>
+
+              <article class="shop-card">
+                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Oxford+Street+London&output=embed" title="Oxford Street"></iframe>
+                <div class="shop-card__body">
+                  <div class="shop-card__meta"><h3>Oxford Street</h3><strong>London</strong></div>
+                  <p>Easy access for shoppers near one of London's busiest retail destinations.</p>
+                  <a class="ghost-btn" href="/contact">Ask about stock</a>
+                </div>
+              </article>
+
+              <article class="shop-card">
+                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Edgware+Road+London&output=embed" title="Edgware Road"></iframe>
+                <div class="shop-card__body">
+                  <div class="shop-card__meta"><h3>Edgware Road</h3><strong>London</strong></div>
+                  <p>Convenient west London area for quick visits and product enquiries.</p>
+                  <a class="ghost-btn" href="/contact">Ask about stock</a>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="info">
+          <div class="container">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow dark">Information</span>
+                <h2>Simple, reliable service</h2>
+                <p>Clear routes for retail customers, wholesale traders, and anyone who needs help choosing a product.</p>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-card">
+                <span class="pill">Retail</span>
+                <h3>Shop online</h3>
+                <p>Browse products, view details, and build your basket through the main shop.</p>
+              </div>
+              <div class="info-card">
+                <span class="pill">Wholesale</span>
+                <h3>Trader review</h3>
+                <p>Wholesale access is restricted to approved traders with a separate trader login.</p>
+              </div>
+              <div class="info-card">
+                <span class="pill">Support</span>
+                <h3>Contact the team</h3>
+                <p>Use the contact page for store, stock, delivery, or wholesale questions.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer" id="footer">
+        <div class="container">
+          <div class="footer__panel">
+            <div class="footer__grid">
+              <div>
+                <div class="brand">
+                  <img class="brand__logo" src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
+                  <span class="brand__text">
+                    <strong>Snus Village</strong>
+                    <span>London's premium snus store</span>
+                  </span>
+                </div>
+                <p style="margin-top:16px; max-width:42ch;">Premium nicotine pouch and snus specialist with trusted brands, London stores, and fast UK delivery.</p>
+              </div>
+
+              <div>
+                <h4>Shop</h4>
+                <ul>
+                  <li><a href="/shop">All products</a></li>
+                  <li><a href="#bestsellers">Best Sellers</a></li>
+                  <li><a href="/wholesale">Wholesale</a></li>
+                  <li><a href="/about">About</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4>Stores</h4>
+                <ul>
+                  <li><a href="#shops">Camden Town</a></li>
+                  <li><a href="#shops">Oxford Street</a></li>
+                  <li><a href="#shops">Edgware Road</a></li>
+                  <li><a href="/contact">Store enquiries</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4>Contact</h4>
+                <ul>
+                  <li><a href="mailto:info@snusvillage.co.uk">info@snusvillage.co.uk</a></li>
+                  <li><a href="tel:+447777222771">+44 7777 222771</a></li>
+                  <li><a href="https://www.instagram.com/snusvillage.uk/">Instagram</a></li>
+                  <li><a href="/contact">Contact form</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="footer__bottom">
+              <span>© 2026 Snus Village.</span>
+              <span>Adults only. Products are restricted to customers aged 18+.</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/js/landing.js"></script>
+  </body>
+</html>
