@@ -31,14 +31,7 @@ const cartRoutes = require("./routes/cart");
 const wholesaleRoutes = require("./routes/wholesale");
 
 // ====== Database connection ======
-if (process.env.MONGO_URI) {
-  mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => console.log("mongodb connected"))
-    .catch((err) => console.error("MongoDB connection error:", err.message));
-} else {
-  console.warn("MONGO_URI is missing. Database-backed features will not save.");
-}
+
 
 // ====== Trust Proxy (for real IP) ======
 if (process.env.NODE_ENV === "production") {
@@ -127,6 +120,22 @@ app.use("/wholesale", wholesaleRoutes);
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+
+async function startServer() {
+  try {
+    if (!process.env.MONGO_URI) {
+      console.warn("MONGO_URI is missing. Database-backed features will not save.");
+    } else {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log("MongoDB connected");
+    }
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("MongoDB connection failed:", err.message);
+  }
+}
+
+startServer();
