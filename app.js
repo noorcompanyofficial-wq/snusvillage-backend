@@ -48,7 +48,7 @@ app.use(cookieParser());
 // ====== Session ======
 app.use(
   session({
-    secret: "secret123",
+    secret: process.env.SESSION_SECRET
     resave: false,
     saveUninitialized: false,
   }),
