@@ -117,6 +117,11 @@ app.use("/cart", cartRoutes);
 
 app.use("/wholesale", wholesaleRoutes);
 
+app.use((req, res) => {
+  res.status(404).render("404", {
+    title: "Page Not Found",
+  });
+});
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;
