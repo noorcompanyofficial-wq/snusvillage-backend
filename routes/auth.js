@@ -30,7 +30,7 @@ function calculateAge(birthDate) {
 }
 
 // ================= REGISTER =================
-router.post("/register", async (req, res) => {
+router.post("/register", authLimiter, async (req, res) => {
   const { firstName, lastName, birthDate, email, password } = req.body;
 
   const age = calculateAge(birthDate);
