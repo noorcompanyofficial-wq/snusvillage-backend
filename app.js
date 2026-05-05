@@ -123,6 +123,14 @@ app.use((req, res) => {
   });
 });
 
+app.use((err, req, res, next) => {
+  console.error("Server error:", err);
+
+  res.status(500).render("500", {
+    title: "Server Error",
+  });
+});
+
 // ====== Start Server ======
 const PORT = process.env.PORT || 3000;
 
