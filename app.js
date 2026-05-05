@@ -100,6 +100,15 @@ app.set("layout", "layouts/layout");
 
 app.use(ejsLayouts);
 
+// ====== Health Check ======
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Snus Village backend is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // ====== Routes ======
 app.use("/", indexRoutes);
 app.use("/about", aboutRoutes);
