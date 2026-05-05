@@ -108,6 +108,22 @@ app.get("/health", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+app.get("/health/db", (req, res) => {
+  const mongoState = mongoose.connection.readyState;
+
+  const states = {
+    0: "disconnected",
+    1: "connected",
+    2: "connecting",
+    3: "disconnecting",
+  };
+
+  res.status(mongoState === 1 ? 200 : 503).json({
+    status: mongoState === 1 ? "ok" : "error",
+    database: states[mongoState] || "unknown",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // ====== Routes ======
 app.use("/", indexRoutes);
