@@ -356,6 +356,11 @@ router.get("/logout", async (req, res) => {
   res.clearCookie("jwt");
 
   req.session.destroy(() => {
+    res.clearCookie("jwt", {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+});
     res.redirect("/auth/login");
   });
 });
