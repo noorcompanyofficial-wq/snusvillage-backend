@@ -1,130 +1,105 @@
-<link rel="stylesheet" href="/css/contact.css" />
-
-<% if (captchaEnabled) { %>
-  <script src="https://www.google.com/recaptcha/api.js?render=<%= siteKey %>"></script>
-<% } %>
-
 <section class="contact-page">
   <div class="contact-hero">
-    <div class="contact-hero__copy">
-      <span class="contact-pill">Contact Us</span>
+    <div class="contact-copy">
+      <span class="eyebrow">CONTACT US</span>
       <h1>Speak with Snus Village.</h1>
       <p>
         Questions about products, store stock, delivery, or wholesale access can
-        be sent directly to the team.
+        be sent directly to our team.
       </p>
     </div>
 
-    <div class="contact-quick">
-      <a href="mailto:info@snusvillage.co.uk">
-        <i class="fa-solid fa-envelope"></i>
+    <div class="contact-cards">
+      <a class="contact-card" href="mailto:info@snusvillage.co.uk">
         <span>Email</span>
         <strong>info@snusvillage.co.uk</strong>
       </a>
-      <a href="tel:+447777222771">
-        <i class="fa-solid fa-phone"></i>
+
+      <a class="contact-card" href="tel:+447777222771">
         <span>Phone</span>
         <strong>+44 7777 222771</strong>
       </a>
-      <a href="/wholesale">
-        <i class="fa-solid fa-store"></i>
+
+      <a class="contact-card" href="/wholesale">
         <span>Wholesale</span>
         <strong>Trader enquiries</strong>
       </a>
     </div>
   </div>
 
-  <% if (query.success) { %>
-    <div class="contact-alert contact-alert--success" id="flashMessage">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Message sent successfully.</span>
-      <button class="flash-close" id="flashClose" type="button" aria-label="Close">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-  <% } %>
-
-  <% if (query.error) { %>
-    <div class="contact-alert contact-alert--error">
-      <i class="fa-solid fa-circle-exclamation"></i>
-      <span>Unable to send the message. Please check the form and try again.</span>
-    </div>
-  <% } %>
-
   <div class="contact-grid">
-    <form class="contact-form-panel" method="POST" action="/contact/contact">
-      <div class="contact-form-head">
-        <span class="contact-pill">Message</span>
-        <h2>Send an enquiry</h2>
+    <form class="contact-form" action="/contact" method="POST">
+      <span class="eyebrow">MESSAGE</span>
+      <h2>Send an enquiry</h2>
+
+      <div class="form-row">
+        <label>
+          Name
+          <input type="text" name="name" required>
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" required>
+        </label>
       </div>
 
-      <div class="contact-row">
+      <div class="form-row">
         <label>
-          <span>Name</span>
-          <input type="text" name="name" placeholder="Your name" required />
+          Phone
+          <input type="text" name="phone">
         </label>
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" placeholder="you@example.com" required />
-        </label>
-      </div>
 
-      <div class="contact-row">
         <label>
-          <span>Phone</span>
-          <input type="text" name="phone" placeholder="+44" />
-        </label>
-        <label>
-          <span>Subject</span>
-          <input type="text" name="subject" placeholder="How can we help?" required />
+          Subject
+          <input type="text" name="subject" required>
         </label>
       </div>
 
       <label>
-        <span>Message</span>
-        <textarea name="message" placeholder="Write your message" required></textarea>
+        Message
+        <textarea name="message" rows="6" required></textarea>
       </label>
 
-      <input type="hidden" name="token" id="token" />
-      <button type="submit" class="contact-submit">Send Message</button>
+      <button type="submit">Send Message</button>
     </form>
 
-    <aside class="contact-locations">
-      <div class="contact-location">
+    <div class="store-locations">
+      <span class="eyebrow">LOCATIONS</span>
+      <h2>Visit our London stores</h2>
+
+      <div class="store-card">
         <iframe
-          loading="lazy"
-          src="https://www.google.com/maps?q=257+Camden+High+St+London+NW1+7BU&output=embed"
-          title="Camden High Street"
-        ></iframe>
+          src="https://www.google.com/maps?q=257%20Camden%20High%20St%20London%20NW1%207BU&output=embed"
+          loading="lazy">
+        </iframe>
         <div>
           <h3>Camden Town</h3>
           <p>257 Camden High St, London NW1 7BU</p>
         </div>
       </div>
 
-      <div class="contact-location">
+      <div class="store-card">
         <iframe
-          loading="lazy"
-          src="https://www.google.com/maps?q=339+Oxford+Street+London+W1C+2JB&output=embed"
-          title="Oxford Street"
-        ></iframe>
+          src="https://www.google.com/maps?q=339%20Oxford%20St%20London%20W1C%202JB&output=embed"
+          loading="lazy">
+        </iframe>
         <div>
           <h3>Oxford Street</h3>
           <p>Snus Village, 339 Oxford St, London W1C 2JB</p>
         </div>
       </div>
-    </aside>
+
+      <div class="store-card">
+        <iframe
+          src="https://www.google.com/maps?q=Edgware%20Road%20London&output=embed"
+          loading="lazy">
+        </iframe>
+        <div>
+          <h3>Edgware Road</h3>
+          <p>Snus Village, Edgware Road, London</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-
-<% if (captchaEnabled) { %>
-  <script>
-    grecaptcha.ready(function () {
-      grecaptcha.execute("<%= siteKey %>", { action: "submit" }).then(function (token) {
-        document.getElementById("token").value = token;
-      });
-    });
-  </script>
-<% } %>
-
-<script src="/js/contact.js" defer></script>

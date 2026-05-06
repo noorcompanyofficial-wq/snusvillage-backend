@@ -116,3 +116,630 @@
     flex: 1;
   }
 }
+
+/* ===== GLOBAL DESKTOP LAYOUT FIX ===== */
+
+:root {
+  --site-max-width: 1180px;
+  --site-padding: 24px;
+}
+
+/* Main page wrapper */
+body {
+  background: #f8faff;
+}
+
+/* Make common page containers wider */
+.container,
+.page-container,
+.section-container,
+.home-container,
+.shop-container,
+.products-container,
+.contact-container,
+.admin-container {
+  width: min(100% - 48px, var(--site-max-width));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Make sections breathe better */
+section {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Desktop spacing */
+@media (min-width: 1024px) {
+  main {
+    width: min(100% - 48px, var(--site-max-width));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Mobile safety */
+@media (max-width: 768px) {
+  main,
+  .container,
+  .page-container,
+  .section-container,
+  .home-container,
+  .shop-container,
+  .products-container,
+  .contact-container,
+  .admin-container {
+    width: min(100% - 28px, var(--site-max-width));
+  }
+}/* ===== GLOBAL DESKTOP LAYOUT FIX ===== */
+
+:root {
+  --site-max-width: 1180px;
+  --site-padding: 24px;
+}
+
+/* Main page wrapper */
+body {
+  background: #f8faff;
+}
+
+/* Make common page containers wider */
+.container,
+.page-container,
+.section-container,
+.home-container,
+.shop-container,
+.products-container,
+.contact-container,
+.admin-container {
+  width: min(100% - 48px, var(--site-max-width));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Make sections breathe better */
+section {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Desktop spacing */
+@media (min-width: 1024px) {
+  main {
+    width: min(100% - 48px, var(--site-max-width));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Mobile safety */
+@media (max-width: 768px) {
+  main,
+  .container,
+  .page-container,
+  .section-container,
+  .home-container,
+  .shop-container,
+  .products-container,
+  .contact-container,
+  .admin-container {
+    width: min(100% - 28px, var(--site-max-width));
+  }
+}
+
+/* ===== CONTACT PAGE FIX ===== */
+
+.contact-page {
+  width: min(100% - 48px, 1180px);
+  margin: 48px auto 80px;
+}
+
+.contact-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: stretch;
+  padding: 42px;
+  border-radius: 32px;
+  background:
+    linear-gradient(135deg, rgba(9, 31, 77, 0.9), rgba(180, 18, 50, 0.78)),
+    url("/images/logo/snusvillage-logo.png");
+  background-size: 360px, 260px;
+  background-position: center, right 40px center;
+  background-repeat: no-repeat;
+  color: #fff;
+  box-shadow: 0 24px 70px rgba(9, 31, 77, 0.16);
+}
+
+.contact-copy h1 {
+  margin: 12px 0 16px;
+  font-size: clamp(42px, 5vw, 76px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.contact-copy p {
+  max-width: 560px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #123b8a;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 130px;
+  padding: 24px;
+  border-radius: 24px;
+  color: #061633;
+  background: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(9, 31, 77, 0.08);
+}
+
+.contact-card span {
+  margin-bottom: 10px;
+  color: #123b8a;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.contact-card strong {
+  font-size: 20px;
+}
+
+.contact-alert {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  font-weight: 800;
+}
+
+.contact-alert.success {
+  color: #14532d;
+  background: #dcfce7;
+}
+
+.contact-alert.error {
+  color: #7f1d1d;
+  background: #fee2e2;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 28px;
+  margin-top: 32px;
+}
+
+.contact-form,
+.store-locations {
+  padding: 30px;
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.09);
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.contact-form h2,
+.store-locations h2 {
+  margin: 14px 0 22px;
+  color: #061633;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contact-form label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #061633;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid rgba(9, 31, 77, 0.16);
+  border-radius: 14px;
+  font: inherit;
+  background: #f8faff;
+  outline: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #123b8a;
+  box-shadow: 0 0 0 4px rgba(18, 59, 138, 0.08);
+}
+
+.contact-form button {
+  border: 0;
+  border-radius: 999px;
+  padding: 15px 22px;
+  color: #fff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.store-locations {
+  display: grid;
+  gap: 18px;
+}
+
+.store-card {
+  overflow: hidden;
+  border-radius: 22px;
+  background: #f8faff;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.store-card iframe {
+  width: 100%;
+  height: 210px;
+  border: 0;
+  display: block;
+}
+
+.store-card div {
+  padding: 18px;
+}
+
+.store-card h3 {
+  margin: 0 0 6px;
+  color: #061633;
+}
+
+.store-card p {
+  margin: 0;
+  color: #465a7a;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .contact-page {
+    width: min(100% - 28px, 1180px);
+    margin-top: 24px;
+  }
+
+  .contact-hero,
+  .contact-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-hero {
+    padding: 26px;
+  }
+
+  .contact-copy h1 {
+    font-size: 46px;
+  }
+}
+
+/* ===== GLOBAL RESPONSIVE SCALE FIX ===== */
+
+html {
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  min-width: 320px;
+}
+
+/* Stop sections from stretching or collapsing weirdly */
+main,
+section,
+.container,
+.page-container,
+.section-container,
+.contact-page,
+.product-page,
+.products-page,
+.home-page {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Give all main content safe desktop padding */
+main {
+  width: min(100% - 48px, 1180px);
+}
+
+/* Prevent images/cards from forcing bad widths */
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* Better desktop scaling */
+@media (min-width: 1200px) {
+  main {
+    width: min(100% - 64px, 1180px);
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  main {
+    width: min(100% - 36px, 100%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  main {
+    width: min(100% - 24px, 100%);
+  }
+
+  section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+/* ===== STABLE CONTACT PAGE FIX ===== */
+
+.contact-page,
+main .contact-page {
+  width: min(100% - 48px, 1180px) !important;
+  max-width: 1180px !important;
+  margin: 48px auto 90px !important;
+  padding: 0 !important;
+  display: block !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+.contact-page * {
+  box-sizing: border-box;
+}
+
+.contact-hero {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr) !important;
+  gap: 0 !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+  border-radius: 32px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(9, 31, 77, 0.08) !important;
+  box-shadow: 0 24px 70px rgba(9, 31, 77, 0.12) !important;
+}
+
+.contact-copy {
+  min-width: 0 !important;
+  padding: 54px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #071f52, #b51234) !important;
+}
+
+.contact-copy .eyebrow {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #123b8a !important;
+}
+
+.contact-copy h1 {
+  margin: 18px 0 20px !important;
+  color: #ffffff !important;
+  font-size: clamp(48px, 5vw, 76px) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.06em !important;
+  max-width: 520px !important;
+}
+
+.contact-copy p {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 17px !important;
+  line-height: 1.7 !important;
+  max-width: 520px !important;
+}
+
+.contact-cards {
+  min-width: 0 !important;
+  width: 100% !important;
+  padding: 34px !important;
+  display: grid !important;
+  gap: 18px !important;
+  background: #ffffff !important;
+}
+
+.contact-card {
+  width: 100% !important;
+  min-height: 120px !important;
+  padding: 26px !important;
+  border-radius: 24px !important;
+  background: #f8faff !important;
+  border: 1px solid rgba(9, 31, 77, 0.1) !important;
+  color: #061633 !important;
+  text-decoration: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+.contact-card span {
+  display: block !important;
+  margin-bottom: 10px !important;
+  color: #123b8a !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.contact-card strong {
+  color: #061633 !important;
+  font-size: 21px !important;
+  line-height: 1.3 !important;
+  word-break: break-word !important;
+}
+
+.contact-grid {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr) !important;
+  gap: 28px !important;
+  margin-top: 32px !important;
+}
+
+.contact-form,
+.store-locations {
+  width: 100% !important;
+  padding: 34px !important;
+  border-radius: 28px !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(9, 31, 77, 0.08) !important;
+  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08) !important;
+}
+
+.contact-form h2,
+.store-locations h2 {
+  margin: 14px 0 24px !important;
+  color: #061633 !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
+}
+
+.form-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+.contact-form label {
+  display: grid !important;
+  gap: 8px !important;
+  margin-bottom: 16px !important;
+  color: #061633 !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100% !important;
+  padding: 14px 15px !important;
+  border: 1px solid rgba(9, 31, 77, 0.16) !important;
+  border-radius: 14px !important;
+  background: #f8faff !important;
+  font: inherit !important;
+  outline: none !important;
+}
+
+.contact-form button {
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 15px 24px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #123b8a, #b41232) !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+}
+
+.store-locations {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.store-card {
+  overflow: hidden !important;
+  border-radius: 22px !important;
+  background: #f8faff !important;
+  border: 1px solid rgba(9, 31, 77, 0.08) !important;
+}
+
+.store-card iframe {
+  width: 100% !important;
+  height: 210px !important;
+  border: 0 !important;
+  display: block !important;
+}
+
+.store-card div {
+  padding: 18px !important;
+}
+
+.store-card h3 {
+  margin: 0 0 6px !important;
+  color: #061633 !important;
+}
+
+.store-card p {
+  margin: 0 !important;
+  color: #465a7a !important;
+  line-height: 1.5 !important;
+}
+
+@media (max-width: 900px) {
+  .contact-page,
+  main .contact-page {
+    width: min(100% - 28px, 1180px) !important;
+    margin-top: 24px !important;
+  }
+
+  .contact-hero,
+  .contact-grid,
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .contact-copy,
+  .contact-cards,
+  .contact-form,
+  .store-locations {
+    padding: 26px !important;
+  }
+
+  .contact-copy h1 {
+    font-size: 44px !important;
+  }
+}
