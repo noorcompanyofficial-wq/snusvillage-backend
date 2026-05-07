@@ -176,7 +176,7 @@ section {
   .admin-container {
     width: min(100% - 28px, var(--site-max-width));
   }
-}/* ===== GLOBAL DESKTOP LAYOUT FIX ===== */
+} /* ===== GLOBAL DESKTOP LAYOUT FIX ===== */
 
 :root {
   --site-max-width: 1180px;
@@ -255,7 +255,9 @@ section {
     linear-gradient(135deg, rgba(9, 31, 77, 0.9), rgba(180, 18, 50, 0.78)),
     url("/images/logo/snusvillage-logo.png");
   background-size: 360px, 260px;
-  background-position: center, right 40px center;
+  background-position:
+    center,
+    right 40px center;
   background-repeat: no-repeat;
   color: #fff;
   box-shadow: 0 24px 70px rgba(9, 31, 77, 0.16);
@@ -894,7 +896,11 @@ main .contact-page {
   margin-top: 22px;
   padding: 22px;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(18, 59, 138, 0.06), rgba(180, 18, 50, 0.06));
+  background: linear-gradient(
+    135deg,
+    rgba(18, 59, 138, 0.06),
+    rgba(180, 18, 50, 0.06)
+  );
   border: 1px solid rgba(9, 31, 77, 0.08);
 }
 
@@ -1134,7 +1140,9 @@ main .contact-page {
   background: #ffffff;
   border: 1px solid rgba(9, 31, 77, 0.08);
   box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .shop-product-card:hover {

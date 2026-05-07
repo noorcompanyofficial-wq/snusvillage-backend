@@ -8,8 +8,14 @@
 .contact-locations,
 .contact-alert {
   border: 1px solid rgba(12, 23, 48, 0.1);
-  background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(245,248,252,0.98));
-  box-shadow: 0 20px 60px rgba(21,63,184,0.09), 0 16px 40px rgba(201,31,54,0.07);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(245, 248, 252, 0.98)
+  );
+  box-shadow:
+    0 20px 60px rgba(21, 63, 184, 0.09),
+    0 16px 40px rgba(201, 31, 54, 0.07);
 }
 
 .contact-hero {
@@ -28,8 +34,9 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(21,63,184,0.09), rgba(201,31,54,0.08)),
-    url("https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80") center/cover;
+    linear-gradient(135deg, rgba(21, 63, 184, 0.09), rgba(201, 31, 54, 0.08)),
+    url("https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80")
+      center/cover;
   opacity: 0.2;
 }
 
@@ -46,7 +53,11 @@
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(21,63,184,0.08), rgba(201,31,54,0.08));
+  background: linear-gradient(
+    90deg,
+    rgba(21, 63, 184, 0.08),
+    rgba(201, 31, 54, 0.08)
+  );
   color: #0d2f86;
   font-size: 12px;
   font-weight: 900;
@@ -82,8 +93,8 @@
   align-items: center;
   padding: 18px;
   border-radius: 22px;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid rgba(21,63,184,0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(21, 63, 184, 0.1);
 }
 
 .contact-quick i {
@@ -132,7 +143,7 @@
   height: 34px;
   border: 0;
   border-radius: 999px;
-  background: rgba(12,23,48,0.06);
+  background: rgba(12, 23, 48, 0.06);
   cursor: pointer;
 }
 
@@ -178,7 +189,7 @@
 .contact-form-panel input,
 .contact-form-panel textarea {
   width: 100%;
-  border: 1px solid rgba(21,63,184,0.12);
+  border: 1px solid rgba(21, 63, 184, 0.12);
   border-radius: 18px;
   background: #fff;
   color: #0c1730;
@@ -209,7 +220,7 @@
 
 .contact-location {
   overflow: hidden;
-  border: 1px solid rgba(21,63,184,0.1);
+  border: 1px solid rgba(21, 63, 184, 0.1);
   border-radius: 22px;
   background: #fff;
 }

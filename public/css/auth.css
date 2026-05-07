@@ -5,7 +5,8 @@
   --auth-blue: #153fb8;
   --auth-blue-deep: #0d2f86;
   --auth-red: #c91f36;
-  --auth-shadow: 0 20px 60px rgba(21,63,184,0.09), 0 16px 40px rgba(201,31,54,0.07);
+  --auth-shadow:
+    0 20px 60px rgba(21, 63, 184, 0.09), 0 16px 40px rgba(201, 31, 54, 0.07);
 }
 
 .auth-page,
@@ -33,7 +34,11 @@
 .account-hero,
 .account-card {
   border: 1px solid var(--auth-line);
-  background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(245,248,252,0.98));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(245, 248, 252, 0.98)
+  );
   box-shadow: var(--auth-shadow);
 }
 
@@ -53,15 +58,17 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(21,63,184,0.1), rgba(201,31,54,0.08)),
-    url("https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=1600&q=80") center/cover;
+    linear-gradient(135deg, rgba(21, 63, 184, 0.1), rgba(201, 31, 54, 0.08)),
+    url("https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=1600&q=80")
+      center/cover;
   opacity: 0.2;
 }
 
 .auth-page--register .auth-visual::before {
   background:
-    linear-gradient(135deg, rgba(21,63,184,0.1), rgba(201,31,54,0.08)),
-    url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80") center/cover;
+    linear-gradient(135deg, rgba(21, 63, 184, 0.1), rgba(201, 31, 54, 0.08)),
+    url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80")
+      center/cover;
 }
 
 .auth-visual > * {
@@ -73,7 +80,11 @@
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(21,63,184,0.08), rgba(201,31,54,0.08));
+  background: linear-gradient(
+    90deg,
+    rgba(21, 63, 184, 0.08),
+    rgba(201, 31, 54, 0.08)
+  );
   color: var(--auth-blue-deep);
   font-size: 12px;
   font-weight: 900;
@@ -114,10 +125,10 @@
 }
 
 .auth-visual__stats div {
-  border: 1px solid rgba(21,63,184,0.1);
+  border: 1px solid rgba(21, 63, 184, 0.1);
   border-radius: 20px;
   padding: 18px;
-  background: rgba(255,255,255,0.86);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .auth-visual__stats strong {
@@ -181,7 +192,7 @@
   min-height: 54px;
   padding: 0 16px 0 44px;
   border-radius: 18px;
-  border: 1px solid rgba(21,63,184,0.12);
+  border: 1px solid rgba(21, 63, 184, 0.12);
   outline: none;
   background: #fff;
   color: var(--auth-text);
@@ -189,8 +200,8 @@
 }
 
 .input-group input:focus {
-  border-color: rgba(21,63,184,0.35);
-  box-shadow: 0 0 0 4px rgba(21,63,184,0.08);
+  border-color: rgba(21, 63, 184, 0.35);
+  box-shadow: 0 0 0 4px rgba(21, 63, 184, 0.08);
 }
 
 .extra {
@@ -299,14 +310,14 @@
   height: 56px;
   text-align: center;
   font-size: 22px;
-  border: 1px solid rgba(21,63,184,0.16);
+  border: 1px solid rgba(21, 63, 184, 0.16);
   border-radius: 14px;
   outline: none;
 }
 
 .otp:focus {
   border-color: var(--auth-blue);
-  box-shadow: 0 0 0 4px rgba(21,63,184,0.08);
+  box-shadow: 0 0 0 4px rgba(21, 63, 184, 0.08);
 }
 
 .resend-link {
@@ -379,8 +390,12 @@
 
 .account-action--ghost {
   color: var(--auth-text);
-  background: linear-gradient(90deg, rgba(21,63,184,0.06), rgba(201,31,54,0.06));
-  border: 1px solid rgba(21,63,184,0.12);
+  background: linear-gradient(
+    90deg,
+    rgba(21, 63, 184, 0.06),
+    rgba(201, 31, 54, 0.06)
+  );
+  border: 1px solid rgba(21, 63, 184, 0.12);
 }
 
 @keyframes slideIn {

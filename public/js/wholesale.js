@@ -1,6 +1,8 @@
 const wholesaleModal = document.getElementById("wholesaleModal");
 const openWholesaleButtons = document.querySelectorAll("[data-open-wholesale]");
-const closeWholesaleButtons = document.querySelectorAll("[data-close-wholesale]");
+const closeWholesaleButtons = document.querySelectorAll(
+  "[data-close-wholesale]",
+);
 
 function openWholesaleModal() {
   wholesaleModal?.classList.add("is-open");

@@ -96,7 +96,12 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
 
-    const allowedOrderStatuses = ["new", "processing", "completed", "cancelled"];
+    const allowedOrderStatuses = [
+      "new",
+      "processing",
+      "completed",
+      "cancelled",
+    ];
     const allowedPaymentStatuses = ["pending", "paid", "failed"];
 
     const update = {};

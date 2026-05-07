@@ -68,13 +68,13 @@ router.post("/add/:productId", async (req, res, next) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      (i) => i.product.toString() === productId
+      (i) => i.product.toString() === productId,
     );
 
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity = Math.min(
         cart.items[itemIndex].quantity + quantity,
-        product.stock
+        product.stock,
       );
     } else {
       cart.items.push({

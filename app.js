@@ -32,7 +32,6 @@ const wholesaleRoutes = require("./routes/wholesale");
 
 // ====== Database connection ======
 
-
 // ====== Trust Proxy (for real IP) ======
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -162,7 +161,9 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   try {
     if (!process.env.MONGO_URI) {
-      console.warn("MONGO_URI is missing. Database-backed features will not save.");
+      console.warn(
+        "MONGO_URI is missing. Database-backed features will not save.",
+      );
     } else {
       await mongoose.connect(process.env.MONGO_URI);
       console.log("MongoDB connected");

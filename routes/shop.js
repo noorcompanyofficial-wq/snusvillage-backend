@@ -23,9 +23,12 @@ router.get("/", async (req, res) => {
 
     let filter = {};
 
-    if (brand) filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
-    if (strength) filter.strength = { $regex: `^${escapeRegex(strength)}$`, $options: "i" };
-    if (flavour) filter.flavour = { $regex: `^${escapeRegex(flavour)}$`, $options: "i" };
+    if (brand)
+      filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
+    if (strength)
+      filter.strength = { $regex: `^${escapeRegex(strength)}$`, $options: "i" };
+    if (flavour)
+      filter.flavour = { $regex: `^${escapeRegex(flavour)}$`, $options: "i" };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },

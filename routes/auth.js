@@ -357,10 +357,10 @@ router.get("/logout", async (req, res) => {
 
   req.session.destroy(() => {
     res.clearCookie("jwt", {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-});
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
     res.redirect("/auth/login");
   });
 });
