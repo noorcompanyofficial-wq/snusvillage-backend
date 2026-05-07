@@ -92,6 +92,33 @@ router.get("/orders", isAdmin, async (req, res) => {
   }
 });
 
+router.post("/orders/:id/status", isAdmin, async (req, res) => {
+  try {
+    const { orderStatus, paymentStatus } = req.body;
+
+    const allowedOrderStatuses = ["new", "processing", "completed", "cancelled"];
+    const allowedPaymentStatuses = ["pending", "paid", "failed"];
+
+    const update = {};
+
+    if (allowedOrderStatuses.includes(orderStatus)) {
+      update.orderStatus = orderStatus;
+    }
+
+    if (allowedPaymentStatuses.includes(paymentStatus)) {
+      update.paymentStatus = paymentStatus;
+    }
+
+    await Order.findByIdAndUpdate(req.params.id, update);
+
+    res.redirect("/admin/orders");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update order status");
+    res.redirect("/admin/orders");
+  }
+});
+
 router.get("/users", isAdmin, async (req, res) => {
   try {
     const [users, traders] =

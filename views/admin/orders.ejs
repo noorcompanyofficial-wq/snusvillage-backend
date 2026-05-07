@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">B2C ORDERS</span>
       <h1>Customer Orders</h1>
-      <p>View new B2C orders placed from the checkout.</p>
+      <p>View and manage new B2C orders placed from checkout.</p>
     </div>
   </div>
 
@@ -21,8 +21,7 @@
             <th>Customer</th>
             <th>Items</th>
             <th>Total</th>
-            <th>Payment</th>
-            <th>Status</th>
+            <th>Manage</th>
             <th>Date</th>
           </tr>
         </thead>
@@ -64,15 +63,28 @@
               </td>
 
               <td>
-                <span class="status-pill payment-<%= order.paymentStatus %>">
-                  <%= order.paymentStatus %>
-                </span>
-              </td>
+                <form class="admin-order-status-form" action="/admin/orders/<%= order._id %>/status" method="POST">
+                  <label>
+                    Payment
+                    <select name="paymentStatus">
+                      <option value="pending" <%= order.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
+                      <option value="paid" <%= order.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
+                      <option value="failed" <%= order.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
+                    </select>
+                  </label>
 
-              <td>
-                <span class="status-pill order-<%= order.orderStatus %>">
-                  <%= order.orderStatus %>
-                </span>
+                  <label>
+                    Order
+                    <select name="orderStatus">
+                      <option value="new" <%= order.orderStatus === "new" ? "selected" : "" %>>New</option>
+                      <option value="processing" <%= order.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
+                      <option value="completed" <%= order.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
+                      <option value="cancelled" <%= order.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
+                    </select>
+                  </label>
+
+                  <button type="submit">Update</button>
+                </form>
               </td>
 
               <td>

@@ -1504,3 +1504,38 @@ textarea:focus {
   color: #1e3a8a;
   background: #dbeafe;
 }
+.admin-order-status-form {
+  display: grid;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.admin-order-status-form label {
+  display: grid;
+  gap: 5px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-order-status-form select {
+  width: 100%;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: #f8faff;
+  color: #061633;
+  font-weight: 800;
+}
+
+.admin-order-status-form button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-weight: 900;
+  cursor: pointer;
+}
