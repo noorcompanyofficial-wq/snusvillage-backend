@@ -87,26 +87,27 @@
                   <button type="submit">Update</button>
                 </form>
               </td>
-<td>
-  <% if (order.royalMail && order.royalMail.syncStatus === "sent") { %>
-    <span class="status-pill order-completed">Sent</span>
-    <small>ID: <%= order.royalMail.orderIdentifier || "N/A" %></small>
 
-    <% if (order.royalMail.trackingNumber) { %>
-      <small>Tracking: <%= order.royalMail.trackingNumber %></small>
-    <% } %>
+              <td>
+                <% if (order.royalMail && order.royalMail.syncStatus === "sent") { %>
+                  <span class="status-pill order-completed">Sent</span>
+                  <small>ID: <%= order.royalMail.orderIdentifier || "N/A" %></small>
 
-  <% } else if (order.royalMail && order.royalMail.syncStatus === "failed") { %>
-    <span class="status-pill payment-failed">Failed</span>
-    <small><%= order.royalMail.syncError || "Royal Mail sync failed" %></small>
+                  <% if (order.royalMail.trackingNumber) { %>
+                    <small>Tracking: <%= order.royalMail.trackingNumber %></small>
+                  <% } %>
+                <% } else if (order.royalMail && order.royalMail.syncStatus === "failed") { %>
+                  <span class="status-pill payment-failed">Failed</span>
+                  <small><%= order.royalMail.syncError || "Royal Mail sync failed" %></small>
+                <% } else { %>
+                  <span class="status-pill payment-pending">Not sent</span>
 
-  <% } else { %>
-    <span class="status-pill payment-pending">Not sent</span>
-    <% if (order.royalMail && order.royalMail.syncError) { %>
-      <small><%= order.royalMail.syncError %></small>
-    <% } %>
-  <% } %>
-</td>
+                  <% if (order.royalMail && order.royalMail.syncError) { %>
+                    <small><%= order.royalMail.syncError %></small>
+                  <% } %>
+                <% } %>
+              </td>
+
               <td>
                 <%= new Date(order.createdAt).toLocaleDateString("en-GB") %>
               </td>
