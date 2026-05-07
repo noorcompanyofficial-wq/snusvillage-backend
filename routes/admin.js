@@ -4,6 +4,7 @@ const router = express.Router();
 
 const Product = require("../models/Products");
 const User = require("../models/User");
+const Order = require("../models/order");
 const WholesaleApplication = require("../models/WholesaleApplication");
 const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
@@ -74,9 +75,21 @@ router.get("/dashboard", isAdmin, async (req, res) => {
 });
 
 router.get("/orders", isAdmin, async (req, res) => {
-  res.render("admin/orders", {
-    layout: "layouts/admin-layout",
-  });
+  try {
+    const orders =
+      mongoose.connection.readyState === 1
+        ? await Order.find().sort({ createdAt: -1 }).lean()
+        : [];
+
+    res.render("admin/orders", {
+      layout: "layouts/admin-layout",
+      orders,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load orders");
+    res.redirect("/admin/dashboard");
+  }
 });
 
 router.get("/users", isAdmin, async (req, res) => {

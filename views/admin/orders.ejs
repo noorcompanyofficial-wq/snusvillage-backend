@@ -1,18 +1,87 @@
-<section class="admin-page">
-  <div class="admin-page-head">
+<section class="admin-orders-page">
+  <div class="admin-page-header">
     <div>
-      <span>Orders</span>
-      <h1>Order management</h1>
-      <p>
-        The current checkout flow does not create order records yet. When order
-        storage is added, this page is ready for fulfilment tracking.
-      </p>
+      <span class="eyebrow">B2C ORDERS</span>
+      <h1>Customer Orders</h1>
+      <p>View new B2C orders placed from the checkout.</p>
     </div>
   </div>
 
-  <section class="admin-panel admin-empty-state">
-    <i class="fa-solid fa-receipt"></i>
-    <h2>No order database connected</h2>
-    <p>Add an Order model and save checkout submissions to populate this panel.</p>
-  </section>
+  <% if (!orders || orders.length === 0) { %>
+    <div class="admin-empty-state">
+      <h2>No orders yet</h2>
+      <p>Orders placed from checkout will appear here.</p>
+    </div>
+  <% } else { %>
+    <div class="admin-orders-table-wrap">
+      <table class="admin-orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% orders.forEach(order => { %>
+            <tr>
+              <td>
+                <strong>#<%= order._id.toString().slice(-6).toUpperCase() %></strong>
+                <small><%= order._id %></small>
+              </td>
+
+              <td>
+                <strong>
+                  <%= order.customer?.firstName || "" %>
+                  <%= order.customer?.lastName || "" %>
+                </strong>
+                <small><%= order.customer?.email || "No email" %></small>
+                <small><%= order.customer?.phone || "" %></small>
+              </td>
+
+              <td>
+                <% order.items.forEach(item => { %>
+                  <div class="admin-order-item">
+                    <% if (item.image) { %>
+                      <img src="<%= item.image %>" alt="<%= item.name %>">
+                    <% } %>
+
+                    <span>
+                      <strong><%= item.name %></strong>
+                      <small>Qty: <%= item.quantity %> × £<%= item.price.toFixed(2) %></small>
+                    </span>
+                  </div>
+                <% }) %>
+              </td>
+
+              <td>
+                <strong>£<%= order.total.toFixed(2) %></strong>
+              </td>
+
+              <td>
+                <span class="status-pill payment-<%= order.paymentStatus %>">
+                  <%= order.paymentStatus %>
+                </span>
+              </td>
+
+              <td>
+                <span class="status-pill order-<%= order.orderStatus %>">
+                  <%= order.orderStatus %>
+                </span>
+              </td>
+
+              <td>
+                <%= new Date(order.createdAt).toLocaleDateString("en-GB") %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
 </section>
