@@ -1,86 +1,93 @@
-<div class="checkout">
-  <!-- LEFT SIDE -->
-  <div class="checkout-left">
-    <!-- LOGO -->
-    <a href="/" class="linkToHome">
-      <h1 class="logo-checkout">SNUS VILLAGE</h1>
-    </a>
-    <!-- EXPRESS -->
-    <div class="express">
-      <button class="pay-btn paypal">PayPal</button>
-      <button class="pay-btn gpay">Google Pay</button>
+<div class="checkout-page">
+  <section class="checkout-form-panel">
+    <h1>SNUS VILLAGE</h1>
+
+    <div class="express-payments">
+      <button type="button" class="paypal-btn">PayPal</button>
+      <button type="button" class="gpay-btn">Google Pay</button>
     </div>
 
-    <div class="divider">OR</div>
+    <div class="checkout-divider">OR</div>
 
-    <!-- CONTACT -->
-    <h3 class="checkout-title">Contact</h3>
-    <input class="checkout-inp" type="email" placeholder="Email" />
+    <form action="/checkout/place-order" method="POST">
+      <h3>Contact</h3>
+      <input type="email" name="email" placeholder="Email" required>
 
-    <!-- DELIVERY -->
-    <h3 class="checkout-title">Delivery</h3>
+      <h3>Delivery</h3>
+      <select name="country" required>
+        <option value="United Kingdom">United Kingdom</option>
+      </select>
 
-    <select class="checkout-inp">
-      <option>United Kingdom</option>
-    </select>
-
-    <div class="row">
-      <input class="checkout-inp" type="text" placeholder="First Name" />
-      <input class="checkout-inp" type="text" placeholder="Last Name" />
-    </div>
-
-    <input class="checkout-inp" type="text" placeholder="Address" />
-
-    <div class="row">
-      <input class="checkout-inp" type="text" placeholder="City" />
-      <input class="checkout-inp" type="text" placeholder="Postcode" />
-    </div>
-
-    <input class="checkout-inp" type="text" placeholder="Phone" />
-
-    <!-- PAYMENT -->
-    <h3 class="checkout-title">Payment</h3>
-
-    <div class="card-box">
-      <input class="checkout-inp" type="text" placeholder="Card Number" />
-      <div class="row">
-        <input class="checkout-inp" type="text" placeholder="MM/YY" />
-        <input class="checkout-inp" type="text" placeholder="CVC" />
+      <div class="checkout-row">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required>
       </div>
-      <input class="checkout-inp" type="text" placeholder="Name on card" />
-    </div>
 
-    <button class="pay-now">Pay Now</button>
-  </div>
+      <input type="text" name="address" placeholder="Address" required>
 
-  <!-- RIGHT SIDE -->
-  <div class="checkout-right">
-    <div class="order-box">
-      <!-- ITEM -->
-      <div class="order-item">
-        <img src="/images/shop/sb-1.png" />
-        <div class="order-info">
-          <span>Siberia -80°C</span>
-          <span>Extreme mint nicotine pouch</span>
-          <span>£6.49</span>
+      <div class="checkout-row">
+        <input type="text" name="city" placeholder="City" required>
+        <input type="text" name="postcode" placeholder="Postcode" required>
+      </div>
+
+      <input type="text" name="phone" placeholder="Phone" required>
+
+      <h3>Payment</h3>
+      <input type="text" name="cardNumber" placeholder="Card Number" disabled>
+
+      <div class="checkout-row">
+        <input type="text" name="expiry" placeholder="MM/YY" disabled>
+        <input type="text" name="cvc" placeholder="CVC" disabled>
+      </div>
+
+      <input type="text" name="cardName" placeholder="Name on card" disabled>
+
+      <button type="submit" class="pay-now-btn">Pay Now</button>
+    </form>
+  </section>
+
+  <aside class="checkout-summary-panel">
+    <% cart.items.forEach(item => { %>
+      <% if (item.product) { %>
+        <div class="checkout-item">
+          <div class="checkout-item-image">
+            <% if (item.product.images && item.product.images.length > 0) { %>
+              <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+            <% } %>
+          </div>
+
+          <div>
+            <h3><%= item.product.name %></h3>
+            <p><%= item.product.description || item.product.brand || "Snus Village product" %></p>
+            <span>Qty: <%= item.quantity %></span>
+          </div>
+
+          <strong>
+            £<%= ((item.priceAtTime || item.product.price || 0) * item.quantity).toFixed(2) %>
+          </strong>
         </div>
-      </div>
+      <% } %>
+    <% }) %>
 
-      <!-- DISCOUNT -->
-      <div class="discount">
-        <input class="checkout-inp" type="text" placeholder="Discount code" />
-        <button>Apply</button>
-      </div>
-
-      <!-- TOTAL -->
-      <div class="summary">
-        <div><span>Subtotal</span><span>£6.49</span></div>
-        <div><span>Shipping</span><span>Free</span></div>
-        <div class="total">
-          <span>Total</span>
-          <span>£6.49</span>
-        </div>
-      </div>
+    <div class="discount-row">
+      <input type="text" placeholder="Discount code">
+      <button type="button">Apply</button>
     </div>
-  </div>
+
+    <div class="checkout-total-row">
+      <span>Subtotal</span>
+      <strong>£<%= subtotal.toFixed(2) %></strong>
+    </div>
+
+    <div class="checkout-total-row">
+      <span>Shipping</span>
+      <strong><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
+    </div>
+
+    <div class="checkout-grand-total">
+      <span>Total</span>
+      <strong>£<%= total.toFixed(2) %></strong>
+    </div>
+  </aside>
 </div>
+
