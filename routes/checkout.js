@@ -4,6 +4,7 @@ const router = express.Router();
 const Cart = require("../models/cart");
 const Order = require("../models/order");
 const Product = require("../models/Products");
+const { sendOrderToRoyalMail } = require("../utils/royalMail");
 
 function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
@@ -65,6 +66,18 @@ router.post("/place-order", async (req, res, next) => {
       return res.redirect("/cart");
     }
 
+    for (const item of cart.items) {
+      if (!item.product || !item.product._id) {
+        return res.redirect("/cart");
+      }
+
+      const freshProduct = await Product.findById(item.product._id);
+
+      if (!freshProduct || freshProduct.stock < item.quantity) {
+        return res.redirect("/cart");
+      }
+    }
+
     const { subtotal, shipping, total } = calculateCartTotals(cart);
 
     const orderItems = cart.items
@@ -107,12 +120,57 @@ router.post("/place-order", async (req, res, next) => {
       orderStatus: "new",
     });
 
-    for (const item of cart.items) {
-      if (item.product && item.product._id) {
-        await Product.findByIdAndUpdate(item.product._id, {
-          $inc: { stock: -item.quantity },
-        });
+    try {
+      const royalMailResult = await sendOrderToRoyalMail(order);
+
+      if (royalMailResult.ok) {
+        const createdOrder =
+          royalMailResult.data?.createdOrders?.[0] ||
+          royalMailResult.data?.orders?.[0] ||
+          null;
+
+        order.royalMail = {
+          synced: true,
+          orderIdentifier: createdOrder?.orderIdentifier
+            ? String(createdOrder.orderIdentifier)
+            : "",
+          orderReference: createdOrder?.orderReference || "",
+          trackingNumber: createdOrder?.trackingNumber || "",
+          syncStatus: "sent",
+          syncError: "",
+          syncedAt: new Date(),
+        };
+      } else {
+        order.royalMail = {
+          synced: false,
+          orderIdentifier: "",
+          orderReference: "",
+          trackingNumber: "",
+          syncStatus: royalMailResult.skipped ? "not_sent" : "failed",
+          syncError: royalMailResult.message || "Royal Mail sync failed",
+          syncedAt: null,
+        };
       }
+
+      await order.save();
+    } catch (royalMailError) {
+      order.royalMail = {
+        synced: false,
+        orderIdentifier: "",
+        orderReference: "",
+        trackingNumber: "",
+        syncStatus: "failed",
+        syncError: royalMailError.message,
+        syncedAt: null,
+      };
+
+      await order.save();
+    }
+
+    for (const item of cart.items) {
+      await Product.findByIdAndUpdate(item.product._id, {
+        $inc: { stock: -item.quantity },
+      });
     }
 
     cart.items = [];

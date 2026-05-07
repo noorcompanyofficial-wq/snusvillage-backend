@@ -68,6 +68,38 @@ const orderSchema = new mongoose.Schema(
       enum: ["new", "processing", "completed", "cancelled"],
       default: "new",
     },
+
+    royalMail: {
+      synced: {
+        type: Boolean,
+        default: false,
+      },
+      orderIdentifier: {
+        type: String,
+        default: "",
+      },
+      orderReference: {
+        type: String,
+        default: "",
+      },
+      trackingNumber: {
+        type: String,
+        default: "",
+      },
+      syncStatus: {
+        type: String,
+        enum: ["not_sent", "sent", "failed"],
+        default: "not_sent",
+      },
+      syncError: {
+        type: String,
+        default: "",
+      },
+      syncedAt: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   { timestamps: true }
 );
