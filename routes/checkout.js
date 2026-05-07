@@ -3,6 +3,7 @@ const router = express.Router();
 
 const Cart = require("../models/cart");
 const Order = require("../models/order");
+const Product = require("../models/Products");
 
 function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
@@ -105,6 +106,14 @@ router.post("/place-order", async (req, res, next) => {
       paymentStatus: "pending",
       orderStatus: "new",
     });
+
+    for (const item of cart.items) {
+      if (item.product && item.product._id) {
+        await Product.findByIdAndUpdate(item.product._id, {
+          $inc: { stock: -item.quantity },
+        });
+      }
+    }
 
     cart.items = [];
     await cart.save();
