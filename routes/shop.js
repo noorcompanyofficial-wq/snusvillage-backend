@@ -23,12 +23,9 @@ router.get("/", async (req, res) => {
 
     let filter = {};
 
-    if (brand)
-      filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
-    if (strength)
-      filter.strength = { $regex: `^${escapeRegex(strength)}$`, $options: "i" };
-    if (flavour)
-      filter.flavour = { $regex: `^${escapeRegex(flavour)}$`, $options: "i" };
+    if (brand) filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
+    if (strength) filter.strength = { $regex: `^${escapeRegex(strength)}$`, $options: "i" };
+    if (flavour) filter.flavour = { $regex: `^${escapeRegex(flavour)}$`, $options: "i" };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -38,10 +35,7 @@ router.get("/", async (req, res) => {
       ];
     }
 
-    const products = await Product.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const products = await Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const total = await Product.countDocuments(filter);
 

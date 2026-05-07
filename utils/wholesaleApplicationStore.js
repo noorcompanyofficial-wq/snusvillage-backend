@@ -27,16 +27,14 @@ exports.findAll = async () => {
   const applications = await readApplications();
 
   return applications.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 };
 
 exports.upsertPending = async (applicationData) => {
   const applications = await readApplications();
   const existingIndex = applications.findIndex(
-    (application) =>
-      application.email === applicationData.email &&
-      application.status === "pending",
+    (application) => application.email === applicationData.email && application.status === "pending"
   );
 
   const now = new Date().toISOString();
@@ -85,7 +83,6 @@ exports.findApprovedByEmail = async (email) => {
 
   return applications.find(
     (application) =>
-      application.email === email.toLowerCase().trim() &&
-      application.status === "approved",
+      application.email === email.toLowerCase().trim() && application.status === "approved"
   );
 };

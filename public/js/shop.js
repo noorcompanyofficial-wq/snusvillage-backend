@@ -25,9 +25,7 @@ document.addEventListener("click", () => {
 });
 
 // ===== FILTER BUTTONS (WITHOUT BREAKING DROPDOWN) =====
-const normalFilters = document.querySelectorAll(
-  ".filter-btn:not(.dropdown-toggle)",
-);
+const normalFilters = document.querySelectorAll(".filter-btn:not(.dropdown-toggle)");
 
 normalFilters.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -45,7 +43,7 @@ const cardsObserver = new IntersectionObserver(
       }
     });
   },
-  { threshold: 0.2 },
+  { threshold: 0.2 }
 );
 
 document.querySelectorAll(".card").forEach((card) => {

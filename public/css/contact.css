@@ -8,11 +8,7 @@
 .contact-locations,
 .contact-alert {
   border: 1px solid rgba(12, 23, 48, 0.1);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.97),
-    rgba(245, 248, 252, 0.98)
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(245, 248, 252, 0.98));
   box-shadow:
     0 20px 60px rgba(21, 63, 184, 0.09),
     0 16px 40px rgba(201, 31, 54, 0.07);
@@ -53,11 +49,7 @@
   display: inline-flex;
   padding: 8px 12px;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(21, 63, 184, 0.08),
-    rgba(201, 31, 54, 0.08)
-  );
+  background: linear-gradient(90deg, rgba(21, 63, 184, 0.08), rgba(201, 31, 54, 0.08));
   color: #0d2f86;
   font-size: 12px;
   font-weight: 900;

@@ -1,17 +1,8 @@
 .sv-map-stores {
   padding: 64px 20px;
   background:
-    radial-gradient(
-      circle at top left,
-      rgba(15, 45, 107, 0.05),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(200, 16, 46, 0.05),
-      transparent 30%
-    ),
-    #fff;
+    radial-gradient(circle at top left, rgba(15, 45, 107, 0.05), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(200, 16, 46, 0.05), transparent 30%), #fff;
 }
 
 .sv-map-stores__wrap {

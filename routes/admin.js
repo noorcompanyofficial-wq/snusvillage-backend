@@ -21,8 +21,7 @@ async function getAdminStats() {
       lowStock: 0,
       totalUsers: 0,
       approvedTraders: 0,
-      pendingWholesale: applications.filter((app) => app.status === "pending")
-        .length,
+      pendingWholesale: applications.filter((app) => app.status === "pending").length,
       unreadMessages: 0,
     };
   }
@@ -77,9 +76,7 @@ router.get("/dashboard", isAdmin, async (req, res) => {
 router.get("/orders", isAdmin, async (req, res) => {
   try {
     const orders =
-      mongoose.connection.readyState === 1
-        ? await Order.find().sort({ createdAt: -1 }).lean()
-        : [];
+      mongoose.connection.readyState === 1 ? await Order.find().sort({ createdAt: -1 }).lean() : [];
 
     res.render("admin/orders", {
       layout: "layouts/admin-layout",
@@ -96,12 +93,7 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
 
-    const allowedOrderStatuses = [
-      "new",
-      "processing",
-      "completed",
-      "cancelled",
-    ];
+    const allowedOrderStatuses = ["new", "processing", "completed", "cancelled"];
     const allowedPaymentStatuses = ["pending", "paid", "failed"];
 
     const update = {};
@@ -200,7 +192,7 @@ router.post("/wholesale/:id/approve", isAdmin, async (req, res) => {
         : await wholesaleApplicationStore.updateStatus(
             req.params.id,
             "approved",
-            req.session.user._id,
+            req.session.user._id
           );
 
     if (!application) {
@@ -223,14 +215,11 @@ router.post("/wholesale/:id/approve", isAdmin, async (req, res) => {
           phone: application.phone,
           status: "approved",
         },
-        { upsert: true, setDefaultsOnInsert: true },
+        { upsert: true, setDefaultsOnInsert: true }
       );
     }
 
-    req.flash(
-      "success",
-      "Trader approved. They can now create their wholesale login.",
-    );
+    req.flash("success", "Trader approved. They can now create their wholesale login.");
     res.redirect("/admin/wholesale");
   } catch (err) {
     console.log(err);
@@ -247,7 +236,7 @@ router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
         : await wholesaleApplicationStore.updateStatus(
             req.params.id,
             "rejected",
-            req.session.user._id,
+            req.session.user._id
           );
 
     if (!application) {
@@ -261,15 +250,9 @@ router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
       application.reviewedBy = req.session.user._id;
       await application.save();
 
-      await User.findOneAndUpdate(
-        { email: application.email },
-        { traderStatus: "rejected" },
-      );
+      await User.findOneAndUpdate({ email: application.email }, { traderStatus: "rejected" });
 
-      await Trader.findOneAndUpdate(
-        { email: application.email },
-        { status: "suspended" },
-      );
+      await Trader.findOneAndUpdate({ email: application.email }, { status: "suspended" });
     }
 
     req.flash("success", "Trader application rejected");
@@ -373,59 +356,54 @@ router.get("/products", isAdmin, async (req, res) => {
 
 //  Create Product
 
-router.post(
-  "/products/add",
-  isAdmin,
-  upload.array("images", 5),
-  async (req, res) => {
-    try {
-      const {
-        name,
-        price,
-        discountPrice,
-        description,
-        strength,
-        nicotine,
-        brand,
-        flavour,
-        category,
-        stock,
-      } = req.body;
+router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res) => {
+  try {
+    const {
+      name,
+      price,
+      discountPrice,
+      description,
+      strength,
+      nicotine,
+      brand,
+      flavour,
+      category,
+      stock,
+    } = req.body;
 
-      const parsedPrice = parseFloat(price);
-      const parsedDiscount = discountPrice ? parseFloat(discountPrice) : 0;
+    const parsedPrice = parseFloat(price);
+    const parsedDiscount = discountPrice ? parseFloat(discountPrice) : 0;
 
-      const slug = name
-        .toLowerCase()
-        .replace(/ /g, "-")
-        .replace(/[^\w-]+/g, "");
+    const slug = name
+      .toLowerCase()
+      .replace(/ /g, "-")
+      .replace(/[^\w-]+/g, "");
 
-      const images = req.files.map((file) => "/uploads/" + file.filename);
+    const images = req.files.map((file) => "/uploads/" + file.filename);
 
-      await Product.create({
-        name,
-        slug,
-        price: parsedPrice,
-        discountPrice: parsedDiscount,
-        description,
-        strength,
-        nicotine,
-        brand,
-        flavour,
-        category,
-        stock,
-        images,
-      });
+    await Product.create({
+      name,
+      slug,
+      price: parsedPrice,
+      discountPrice: parsedDiscount,
+      description,
+      strength,
+      nicotine,
+      brand,
+      flavour,
+      category,
+      stock,
+      images,
+    });
 
-      req.flash("success", "Product added successfully!");
-      res.redirect("/admin/products");
-    } catch (err) {
-      console.log(err);
-      req.flash("error", "Error creating product");
-      res.redirect("/admin/products/add");
-    }
-  },
-);
+    req.flash("success", "Product added successfully!");
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Error creating product");
+    res.redirect("/admin/products/add");
+  }
+});
 
 // Delete Product
 router.post("/products/delete/:id", isAdmin, async (req, res) => {
@@ -450,64 +428,51 @@ router.get("/products/edit/:id", isAdmin, async (req, res) => {
   });
 });
 
-router.post(
-  "/products/edit/:id",
-  isAdmin,
-  upload.array("images", 5),
-  async (req, res) => {
-    try {
-      const {
-        name,
-        price,
-        discountPrice,
-        description,
-        strength,
-        nicotine,
-        category,
-        stock,
-      } = req.body;
+router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req, res) => {
+  try {
+    const { name, price, discountPrice, description, strength, nicotine, category, stock } =
+      req.body;
 
-      const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-      const updatedData = {
-        name,
-        price: parseFloat(price),
-        discountPrice: discountPrice ? parseFloat(discountPrice) : 0,
-        description,
-        strength,
-        nicotine,
-        category,
-        stock,
-      };
+    const updatedData = {
+      name,
+      price: parseFloat(price),
+      discountPrice: discountPrice ? parseFloat(discountPrice) : 0,
+      description,
+      strength,
+      nicotine,
+      category,
+      stock,
+    };
 
-      let images = product.images || [];
+    let images = product.images || [];
 
-      if (req.body.removeImages) {
-        const removeList = Array.isArray(req.body.removeImages)
-          ? req.body.removeImages
-          : [req.body.removeImages];
+    if (req.body.removeImages) {
+      const removeList = Array.isArray(req.body.removeImages)
+        ? req.body.removeImages
+        : [req.body.removeImages];
 
-        images = images.filter((img) => !removeList.includes(img));
-      }
-
-      if (req.files && req.files.length > 0) {
-        const newImages = req.files.map((file) => "/uploads/" + file.filename);
-
-        images = [...images, ...newImages];
-      }
-
-      updatedData.images = images;
-
-      await Product.findByIdAndUpdate(req.params.id, updatedData);
-
-      req.flash("success", "Product updated!");
-      res.redirect("/admin/products");
-    } catch (err) {
-      console.log(err);
-      req.flash("error", "Update failed");
-      res.redirect("/admin/products");
+      images = images.filter((img) => !removeList.includes(img));
     }
-  },
-);
+
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map((file) => "/uploads/" + file.filename);
+
+      images = [...images, ...newImages];
+    }
+
+    updatedData.images = images;
+
+    await Product.findByIdAndUpdate(req.params.id, updatedData);
+
+    req.flash("success", "Product updated!");
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Update failed");
+    res.redirect("/admin/products");
+  }
+});
 
 module.exports = router;

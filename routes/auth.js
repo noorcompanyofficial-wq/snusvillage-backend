@@ -43,7 +43,7 @@ router.post("/register", authLimiter, async (req, res) => {
   if (!isStrongPassword(password)) {
     req.flash(
       "error",
-      "Password must be 6+ chars and include uppercase, lowercase number and symbol",
+      "Password must be 6+ chars and include uppercase, lowercase number and symbol"
     );
     return res.redirect("/auth/register");
   }

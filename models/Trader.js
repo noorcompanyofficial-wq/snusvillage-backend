@@ -21,7 +21,7 @@ const traderSchema = new mongoose.Schema(
     lastLoginAt: Date,
     lastLoginIp: String,
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Trader", traderSchema);

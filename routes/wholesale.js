@@ -158,14 +158,7 @@ router.post("/apply", async (req, res) => {
       message,
     } = req.body;
 
-    if (
-      !businessName ||
-      !contactName ||
-      !email ||
-      !phone ||
-      !businessType ||
-      !message
-    ) {
+    if (!businessName || !contactName || !email || !phone || !businessType || !message) {
       req.flash("error", "Please complete all required wholesale fields.");
       return res.redirect("/wholesale");
     }
@@ -188,7 +181,7 @@ router.post("/apply", async (req, res) => {
       await WholesaleApplication.findOneAndUpdate(
         { email: normalizedEmail, status: "pending" },
         applicationData,
-        { returnDocument: "after", upsert: true, setDefaultsOnInsert: true },
+        { returnDocument: "after", upsert: true, setDefaultsOnInsert: true }
       );
     } else {
       await wholesaleApplicationStore.upsertPending(applicationData);
@@ -196,7 +189,7 @@ router.post("/apply", async (req, res) => {
 
     req.flash(
       "success",
-      "Wholesale enquiry submitted. We will review your trader details before access is approved.",
+      "Wholesale enquiry submitted. We will review your trader details before access is approved."
     );
     res.redirect("/wholesale");
   } catch (err) {

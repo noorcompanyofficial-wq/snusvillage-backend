@@ -22,8 +22,7 @@ async function loadCart() {
   // force UI update (important fix)
   const checkoutBtn = document.querySelector(".checkout-btn");
   if (checkoutBtn) {
-    checkoutBtn.style.display =
-      data.items && data.items.length ? "block" : "none";
+    checkoutBtn.style.display = data.items && data.items.length ? "block" : "none";
   }
 }
 // ========================
@@ -85,8 +84,7 @@ function renderCart(items) {
     subtotalEl.textContent = "£0.00";
     cartCount.textContent = "0";
 
-    if (checkoutBtn)
-      checkoutBtn.style.display = items.length ? "block" : "none";
+    if (checkoutBtn) checkoutBtn.style.display = items.length ? "block" : "none";
     return;
   }
 

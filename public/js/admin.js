@@ -11,9 +11,7 @@ toggleBtn?.addEventListener("click", () => {
   }
 });
 
-const links = document.querySelectorAll(
-  ".admin-nav a, .admin-sidebar__bottom a",
-);
+const links = document.querySelectorAll(".admin-nav a, .admin-sidebar__bottom a");
 const currentPath = window.location.pathname;
 
 links.forEach((link) => {

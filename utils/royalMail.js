@@ -2,11 +2,8 @@ function getRoyalMailConfig() {
   return {
     baseUrl: process.env.ROYAL_MAIL_API_BASE_URL,
     token: process.env.ROYAL_MAIL_API_TOKEN,
-    defaultWeight: Number(
-      process.env.ROYAL_MAIL_DEFAULT_PACKAGE_WEIGHT_GRAMS || 250,
-    ),
-    defaultPackageFormat:
-      process.env.ROYAL_MAIL_DEFAULT_PACKAGE_FORMAT || "smallParcel",
+    defaultWeight: Number(process.env.ROYAL_MAIL_DEFAULT_PACKAGE_WEIGHT_GRAMS || 250),
+    defaultPackageFormat: process.env.ROYAL_MAIL_DEFAULT_PACKAGE_FORMAT || "smallParcel",
   };
 }
 
@@ -18,8 +15,7 @@ function hasRoyalMailConfig() {
 function buildRoyalMailOrderPayload(order) {
   const config = getRoyalMailConfig();
 
-  const fullName =
-    `${order.customer?.firstName || ""} ${order.customer?.lastName || ""}`.trim();
+  const fullName = `${order.customer?.firstName || ""} ${order.customer?.lastName || ""}`.trim();
 
   return {
     items: [

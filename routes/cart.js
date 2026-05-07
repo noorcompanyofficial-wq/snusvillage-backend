@@ -51,9 +51,7 @@ router.post("/add/:productId", async (req, res, next) => {
     }
 
     const finalPrice =
-      product.discountPrice && product.discountPrice > 0
-        ? product.discountPrice
-        : product.price;
+      product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
 
     let cart = await getCart(req);
 
@@ -61,20 +59,16 @@ router.post("/add/:productId", async (req, res, next) => {
       cart = new Cart({
         user: req.session?.user?._id || null,
         sessionId: req.session.cartId,
-        expiresAt: req.session?.user
-          ? null
-          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        expiresAt: req.session?.user ? null : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
     }
 
-    const itemIndex = cart.items.findIndex(
-      (i) => i.product.toString() === productId,
-    );
+    const itemIndex = cart.items.findIndex((i) => i.product.toString() === productId);
 
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity = Math.min(
         cart.items[itemIndex].quantity + quantity,
-        product.stock,
+        product.stock
       );
     } else {
       cart.items.push({

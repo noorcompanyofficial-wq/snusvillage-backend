@@ -50,7 +50,7 @@ app.use(
     secret: process.env.SESSION_SECRET || "dev_fallback_secret_change_later",
     resave: false,
     saveUninitialized: false,
-  }),
+  })
 );
 
 // ====== Cart Session
@@ -62,11 +62,7 @@ app.use(flash());
 // ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {
   try {
-    if (
-      mongoose.connection.readyState === 1 &&
-      !req.session?.user &&
-      req.cookies?.jwt
-    ) {
+    if (mongoose.connection.readyState === 1 && !req.session?.user && req.cookies?.jwt) {
       const User = require("./models/User");
 
       const user = await User.findOne({
@@ -161,9 +157,7 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   try {
     if (!process.env.MONGO_URI) {
-      console.warn(
-        "MONGO_URI is missing. Database-backed features will not save.",
-      );
+      console.warn("MONGO_URI is missing. Database-backed features will not save.");
     } else {
       await mongoose.connect(process.env.MONGO_URI);
       console.log("MongoDB connected");

@@ -90,9 +90,7 @@ router.post("/place-order", async (req, res, next) => {
           name: item.product.name,
           brand: item.product.brand,
           image:
-            item.product.images && item.product.images.length > 0
-              ? item.product.images[0]
-              : "",
+            item.product.images && item.product.images.length > 0 ? item.product.images[0] : "",
           quantity: item.quantity,
           price,
         };
@@ -125,9 +123,7 @@ router.post("/place-order", async (req, res, next) => {
 
       if (royalMailResult.ok) {
         const createdOrder =
-          royalMailResult.data?.createdOrders?.[0] ||
-          royalMailResult.data?.orders?.[0] ||
-          null;
+          royalMailResult.data?.createdOrders?.[0] || royalMailResult.data?.orders?.[0] || null;
 
         order.royalMail = {
           synced: true,

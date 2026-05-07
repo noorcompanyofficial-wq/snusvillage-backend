@@ -52,38 +52,37 @@ router.get("/", async (req, res) => {
 
   try {
     if (mongoose.connection.readyState === 1) {
-      const [brandGroups, flavourGroups, products, totalProducts] =
-        await Promise.all([
-          Product.aggregate([
-            { $match: { brand: { $nin: [null, ""] } } },
-            {
-              $group: {
-                _id: "$brand",
-                count: { $sum: 1 },
-                image: { $first: { $arrayElemAt: ["$images", 0] } },
-              },
+      const [brandGroups, flavourGroups, products, totalProducts] = await Promise.all([
+        Product.aggregate([
+          { $match: { brand: { $nin: [null, ""] } } },
+          {
+            $group: {
+              _id: "$brand",
+              count: { $sum: 1 },
+              image: { $first: { $arrayElemAt: ["$images", 0] } },
             },
-            { $sort: { count: -1, _id: 1 } },
-            { $limit: 6 },
-          ]),
-          Product.aggregate([
-            { $match: { flavour: { $nin: [null, ""] } } },
-            {
-              $group: {
-                _id: "$flavour",
-                count: { $sum: 1 },
-                image: { $first: { $arrayElemAt: ["$images", 0] } },
-              },
+          },
+          { $sort: { count: -1, _id: 1 } },
+          { $limit: 6 },
+        ]),
+        Product.aggregate([
+          { $match: { flavour: { $nin: [null, ""] } } },
+          {
+            $group: {
+              _id: "$flavour",
+              count: { $sum: 1 },
+              image: { $first: { $arrayElemAt: ["$images", 0] } },
             },
-            { $sort: { count: -1, _id: 1 } },
-            { $limit: 6 },
-          ]),
-          Product.find({ isActive: { $ne: false } })
-            .sort({ createdAt: -1 })
-            .limit(6)
-            .lean(),
-          Product.countDocuments({ isActive: { $ne: false } }),
-        ]);
+          },
+          { $sort: { count: -1, _id: 1 } },
+          { $limit: 6 },
+        ]),
+        Product.find({ isActive: { $ne: false } })
+          .sort({ createdAt: -1 })
+          .limit(6)
+          .lean(),
+        Product.countDocuments({ isActive: { $ne: false } }),
+      ]);
 
       const brandCards = brandGroups.map((brand) => ({
         key: `brand-${brand._id}`,

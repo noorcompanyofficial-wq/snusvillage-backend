@@ -9,9 +9,7 @@
   --sqrt3: 1.73205;
   --hex-height: calc(var(--hex-width) * 2 / var(--sqrt3));
   --hex-margin-x: calc(var(--hex-gap) / 2);
-  --hex-margin-y: calc(
-    (var(--sqrt3) / 4 * var(--hex-gap)) - (0.125 * var(--hex-height))
-  );
+  --hex-margin-y: calc((var(--sqrt3) / 4 * var(--hex-gap)) - (0.125 * var(--hex-height)));
 }
 
 /* =========================================
@@ -96,11 +94,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 40%,
-    rgba(0, 0, 0, 0.8) 120%
-  );
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.8) 120%);
   pointer-events: none;
   z-index: 1;
   transition: opacity 0.5s ease;

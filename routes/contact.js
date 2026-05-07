@@ -8,8 +8,7 @@ const mongoose = require("mongoose");
 const { contactLimiter } = require("../middleware/rateLimit");
 const { sendEmail } = require("../utils/mailer");
 
-const captchaEnabled = () =>
-  Boolean(process.env.RECAPTCHA_SITE && process.env.RECAPTCHA_SECRET);
+const captchaEnabled = () => Boolean(process.env.RECAPTCHA_SITE && process.env.RECAPTCHA_SECRET);
 
 // validation
 const schema = Joi.object({
@@ -43,16 +42,12 @@ router.post("/contact", contactLimiter, async (req, res) => {
         return res.redirect("/contact?error=captcha");
       }
 
-      const verify = await axios.post(
-        "https://www.google.com/recaptcha/api/siteverify",
-        null,
-        {
-          params: {
-            secret: process.env.RECAPTCHA_SECRET,
-            response: req.body.token,
-          },
+      const verify = await axios.post("https://www.google.com/recaptcha/api/siteverify", null, {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET,
+          response: req.body.token,
         },
-      );
+      });
 
       if (!verify.data.success) {
         return res.redirect("/contact?error=captcha");

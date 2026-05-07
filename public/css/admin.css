@@ -959,17 +959,8 @@ textarea:focus {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(
-      circle at top left,
-      rgba(21, 63, 184, 0.12),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(201, 31, 54, 0.1),
-      transparent 26%
-    ),
-    #f6f8fc;
+    radial-gradient(circle at top left, rgba(21, 63, 184, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(201, 31, 54, 0.1), transparent 26%), #f6f8fc;
   color: #0c1730;
   font-family:
     Inter,
@@ -1052,11 +1043,7 @@ textarea:focus {
 .admin-nav a.active,
 .admin-sidebar__bottom a:hover {
   color: #0c1730;
-  background: linear-gradient(
-    90deg,
-    rgba(21, 63, 184, 0.08),
-    rgba(201, 31, 54, 0.07)
-  );
+  background: linear-gradient(90deg, rgba(21, 63, 184, 0.08), rgba(201, 31, 54, 0.07));
 }
 
 .admin-main {
@@ -1186,11 +1173,7 @@ textarea:focus {
 .admin-action-grid a,
 .admin-table-wrap {
   border: 1px solid rgba(12, 23, 48, 0.1);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.97),
-    rgba(245, 248, 252, 0.98)
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(245, 248, 252, 0.98));
   box-shadow:
     0 16px 44px rgba(21, 63, 184, 0.08),
     0 12px 30px rgba(201, 31, 54, 0.06);
