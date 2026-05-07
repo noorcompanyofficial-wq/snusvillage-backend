@@ -1,0 +1,88 @@
+<section class="cart-page">
+  <div class="cart-header">
+    <span class="eyebrow">CART</span>
+    <h1>Your Cart</h1>
+    <p>Review your items before checkout.</p>
+  </div>
+
+  <% if (!cart || !cart.items || cart.items.length === 0) { %>
+    <div class="empty-cart">
+      <h2>Your cart is empty</h2>
+      <p>Add products from the shop to start your order.</p>
+      <a href="/shop">Continue Shopping</a>
+    </div>
+  <% } else { %>
+    <div class="cart-layout">
+      <div class="cart-items">
+        <% cart.items.forEach(item => { %>
+          <% if (item.product) { %>
+            <div class="cart-item">
+              <div class="cart-item-image">
+                <% if (item.product.images && item.product.images.length > 0) { %>
+                  <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                <% } else { %>
+                  <span>No image</span>
+                <% } %>
+              </div>
+
+              <div class="cart-item-info">
+                <h2><%= item.product.name %></h2>
+                <p><%= item.product.brand || "Snus Village" %></p>
+                <strong>£<%= item.priceAtTime.toFixed(2) %></strong>
+              </div>
+
+              <div class="cart-item-actions">
+                <form action="/cart/update" method="POST">
+                  <input type="hidden" name="productId" value="<%= item.product._id %>">
+                  <input type="hidden" name="action" value="minus">
+                  <button type="submit">−</button>
+                </form>
+
+                <span><%= item.quantity %></span>
+
+                <form action="/cart/update" method="POST">
+                  <input type="hidden" name="productId" value="<%= item.product._id %>">
+                  <input type="hidden" name="action" value="plus">
+                  <button type="submit">+</button>
+                </form>
+
+                <form action="/cart/remove" method="POST">
+                  <input type="hidden" name="productId" value="<%= item.product._id %>">
+                  <button type="submit" class="remove-btn">Remove</button>
+                </form>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+
+      <aside class="cart-summary">
+        <h2>Order Summary</h2>
+
+        <% 
+          const subtotal = cart.items.reduce((sum, item) => {
+            return sum + (item.priceAtTime * item.quantity);
+          }, 0);
+        %>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <strong>£<%= subtotal.toFixed(2) %></strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Delivery</span>
+          <strong>Calculated at checkout</strong>
+        </div>
+
+        <div class="summary-total">
+          <span>Total</span>
+          <strong>£<%= subtotal.toFixed(2) %></strong>
+        </div>
+
+        <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
+        <a href="/shop" class="continue-btn">Continue Shopping</a>
+      </aside>
+    </div>
+  <% } %>
+</section>
