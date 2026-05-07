@@ -1,0 +1,23 @@
+<div class="checkout-success-page">
+  <div class="success-card">
+    <span class="success-icon">✓</span>
+
+    <h1>Order received</h1>
+
+    <p>
+      Thank you for your order. Your order has been saved and is now pending payment/processing.
+    </p>
+
+    <div class="success-order-box">
+      <span>Order ID</span>
+      <strong><%= order._id %></strong>
+    </div>
+
+    <div class="success-order-box">
+      <span>Total</span>
+      <strong>£<%= order.total.toFixed(2) %></strong>
+    </div>
+
+    <a href="/shop">Continue Shopping</a>
+  </div>
+</div>
