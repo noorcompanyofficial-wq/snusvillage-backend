@@ -35,6 +35,28 @@ function calculateCartTotals(cart) {
   return { subtotal, shipping, total };
 }
 
+function extractRoyalMailError(data) {
+  const failedOrder = data?.failedOrders?.[0];
+
+  if (failedOrder?.errors?.length) {
+    return failedOrder.errors
+      .map((err) => err.errorMessage || err.message || JSON.stringify(err))
+      .join(", ");
+  }
+
+  if (data?.message) {
+    return data.message;
+  }
+
+  if (data?.errors?.length) {
+    return data.errors
+      .map((err) => err.errorMessage || err.message || JSON.stringify(err))
+      .join(", ");
+  }
+
+  return "Royal Mail did not return an order identifier.";
+}
+
 router.get("/", async (req, res, next) => {
   try {
     const cart = await getCart(req);
@@ -90,7 +112,9 @@ router.post("/place-order", async (req, res, next) => {
           name: item.product.name,
           brand: item.product.brand,
           image:
-            item.product.images && item.product.images.length > 0 ? item.product.images[0] : "",
+            item.product.images && item.product.images.length > 0
+              ? item.product.images[0]
+              : "",
           quantity: item.quantity,
           price,
         };
@@ -121,21 +145,35 @@ router.post("/place-order", async (req, res, next) => {
     try {
       const royalMailResult = await sendOrderToRoyalMail(order);
 
+      console.log("Royal Mail result:", JSON.stringify(royalMailResult, null, 2));
+
       if (royalMailResult.ok) {
         const createdOrder =
-          royalMailResult.data?.createdOrders?.[0] || royalMailResult.data?.orders?.[0] || null;
+          royalMailResult.data?.createdOrders?.[0] ||
+          royalMailResult.data?.orders?.[0] ||
+          null;
 
-        order.royalMail = {
-          synced: true,
-          orderIdentifier: createdOrder?.orderIdentifier
-            ? String(createdOrder.orderIdentifier)
-            : "",
-          orderReference: createdOrder?.orderReference || "",
-          trackingNumber: createdOrder?.trackingNumber || "",
-          syncStatus: "sent",
-          syncError: "",
-          syncedAt: new Date(),
-        };
+        if (createdOrder?.orderIdentifier) {
+          order.royalMail = {
+            synced: true,
+            orderIdentifier: String(createdOrder.orderIdentifier),
+            orderReference: createdOrder.orderReference || "",
+            trackingNumber: createdOrder.trackingNumber || "",
+            syncStatus: "sent",
+            syncError: "",
+            syncedAt: new Date(),
+          };
+        } else {
+          order.royalMail = {
+            synced: false,
+            orderIdentifier: "",
+            orderReference: "",
+            trackingNumber: "",
+            syncStatus: "failed",
+            syncError: extractRoyalMailError(royalMailResult.data),
+            syncedAt: null,
+          };
+        }
       } else {
         order.royalMail = {
           synced: false,

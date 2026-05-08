@@ -38,9 +38,9 @@ function buildRoyalMailOrderPayload(order) {
             packageFormatIdentifier: config.defaultPackageFormat,
             contents: order.items.map((item) => ({
               name: item.name || "Product",
-              SKU: item.product ? item.product.toString() : "",
               quantity: item.quantity,
-              unitValue: item.price,
+              unitValue: Number(item.price || 0),
+              unitWeightInGrams: config.defaultWeight,
             })),
           },
         ],
