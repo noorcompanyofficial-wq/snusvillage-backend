@@ -92,6 +92,7 @@
                 <% if (order.royalMail && order.royalMail.syncStatus === "sent") { %>
                   <span class="status-pill order-completed">Sent</span>
                   <small>ID: <%= order.royalMail.orderIdentifier || "N/A" %></small>
+                  <small>Label: create in Click & Drop</small>
 
                   <% if (order.royalMail.trackingNumber) { %>
                     <small>Tracking: <%= order.royalMail.trackingNumber %></small>
@@ -101,15 +102,17 @@
                   <span class="status-pill payment-failed">Failed</span>
                   <small><%= order.royalMail.syncError || "Royal Mail sync failed" %></small>
 
+                  <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST" style="margin-top: 8px;">
+                    <button type="submit" class="admin-mini-btn">Send to Royal Mail</button>
+                  </form>
+
                 <% } else { %>
                   <span class="status-pill payment-pending">Not sent</span>
 
                   <% if (order.royalMail && order.royalMail.syncError) { %>
                     <small><%= order.royalMail.syncError %></small>
                   <% } %>
-                <% } %>
 
-                <% if (!order.royalMail || order.royalMail.syncStatus !== "sent") { %>
                   <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST" style="margin-top: 8px;">
                     <button type="submit" class="admin-mini-btn">Send to Royal Mail</button>
                   </form>
