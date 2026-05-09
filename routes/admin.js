@@ -475,4 +475,72 @@ router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req
   }
 });
 
+
+router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      req.flash("error", "Order not found");
+      return res.redirect("/admin/orders");
+    }
+
+    if (order.royalMail && order.royalMail.syncStatus === "sent") {
+      req.flash("error", "This order has already been sent to Royal Mail");
+      return res.redirect("/admin/orders");
+    }
+
+    const { sendOrderToRoyalMail } = require("../utils/royalMail");
+    const royalMailResult = await sendOrderToRoyalMail(order);
+
+    if (royalMailResult.ok) {
+      const createdOrder =
+        royalMailResult.data?.createdOrders?.[0] ||
+        royalMailResult.data?.orders?.[0] ||
+        null;
+
+      if (createdOrder?.orderIdentifier) {
+        order.royalMail = {
+          synced: true,
+          orderIdentifier: String(createdOrder.orderIdentifier),
+          orderReference: createdOrder.orderReference || "",
+          trackingNumber: createdOrder.trackingNumber || "",
+          syncStatus: "sent",
+          syncError: "",
+          syncedAt: new Date(),
+        };
+      } else {
+        order.royalMail = {
+          synced: false,
+          orderIdentifier: "",
+          orderReference: "",
+          trackingNumber: "",
+          syncStatus: "failed",
+          syncError: "Royal Mail did not return an order identifier.",
+          syncedAt: null,
+        };
+      }
+    } else {
+      order.royalMail = {
+        synced: false,
+        orderIdentifier: "",
+        orderReference: "",
+        trackingNumber: "",
+        syncStatus: royalMailResult.skipped ? "not_sent" : "failed",
+        syncError: royalMailResult.message || "Royal Mail sync failed",
+        syncedAt: null,
+      };
+    }
+
+    await order.save();
+
+    res.redirect("/admin/orders");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to send order to Royal Mail");
+    res.redirect("/admin/orders");
+  }
+});
+
+
 module.exports = router;

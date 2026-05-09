@@ -96,15 +96,23 @@
                   <% if (order.royalMail.trackingNumber) { %>
                     <small>Tracking: <%= order.royalMail.trackingNumber %></small>
                   <% } %>
+
                 <% } else if (order.royalMail && order.royalMail.syncStatus === "failed") { %>
                   <span class="status-pill payment-failed">Failed</span>
                   <small><%= order.royalMail.syncError || "Royal Mail sync failed" %></small>
+
                 <% } else { %>
                   <span class="status-pill payment-pending">Not sent</span>
 
                   <% if (order.royalMail && order.royalMail.syncError) { %>
                     <small><%= order.royalMail.syncError %></small>
                   <% } %>
+                <% } %>
+
+                <% if (!order.royalMail || order.royalMail.syncStatus !== "sent") { %>
+                  <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST" style="margin-top: 8px;">
+                    <button type="submit" class="admin-mini-btn">Send to Royal Mail</button>
+                  </form>
                 <% } %>
               </td>
 
