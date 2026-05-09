@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
@@ -538,6 +540,87 @@ router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to send order to Royal Mail");
+    res.redirect("/admin/orders");
+  }
+});
+
+
+
+router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      req.flash("error", "Order not found");
+      return res.redirect("/admin/orders");
+    }
+
+    if (!order.royalMail || order.royalMail.syncStatus !== "sent") {
+      req.flash("error", "Order must be sent to Royal Mail before generating a label");
+      return res.redirect("/admin/orders");
+    }
+
+    if (!order.royalMail.orderIdentifier) {
+      req.flash("error", "Royal Mail order identifier is missing");
+      return res.redirect("/admin/orders");
+    }
+
+    const { getRoyalMailLabel } = require("../utils/royalMail");
+    const labelResult = await getRoyalMailLabel(order.royalMail.orderIdentifier);
+
+    if (!labelResult.ok) {
+      order.royalMail.labelGenerated = false;
+      order.royalMail.labelError = labelResult.message || "Unable to generate Royal Mail label";
+      await order.save();
+
+      req.flash("error", order.royalMail.labelError);
+      return res.redirect("/admin/orders");
+    }
+
+    const labelsDir = path.join(__dirname, "..", "private", "labels");
+
+    if (!fs.existsSync(labelsDir)) {
+      fs.mkdirSync(labelsDir, { recursive: true });
+    }
+
+    const fileName = `royal-mail-label-${order._id}.pdf`;
+    const filePath = path.join(labelsDir, fileName);
+
+    fs.writeFileSync(filePath, labelResult.buffer);
+
+    order.royalMail.labelGenerated = true;
+    order.royalMail.labelPath = filePath;
+    order.royalMail.labelGeneratedAt = new Date();
+    order.royalMail.labelError = "";
+
+    await order.save();
+
+    res.redirect("/admin/orders");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to generate Royal Mail label");
+    res.redirect("/admin/orders");
+  }
+});
+
+router.get("/orders/:id/download-label", isAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order || !order.royalMail || !order.royalMail.labelPath) {
+      req.flash("error", "Label not found");
+      return res.redirect("/admin/orders");
+    }
+
+    if (!fs.existsSync(order.royalMail.labelPath)) {
+      req.flash("error", "Label file is missing");
+      return res.redirect("/admin/orders");
+    }
+
+    res.download(order.royalMail.labelPath, `royal-mail-label-${order._id}.pdf`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to download label");
     res.redirect("/admin/orders");
   }
 });

@@ -1559,3 +1559,13 @@ textarea:focus {
   font-weight: 900;
   cursor: pointer;
 }
+.admin-mini-link {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}

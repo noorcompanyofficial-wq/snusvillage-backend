@@ -99,6 +99,22 @@ const orderSchema = new mongoose.Schema(
         type: Date,
         default: null,
       },
+      labelGenerated: {
+        type: Boolean,
+        default: false,
+      },
+      labelPath: {
+        type: String,
+        default: "",
+      },
+      labelGeneratedAt: {
+        type: Date,
+        default: null,
+      },
+      labelError: {
+        type: String,
+        default: "",
+      },
     },
   },
   { timestamps: true }

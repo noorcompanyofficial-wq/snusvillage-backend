@@ -94,8 +94,70 @@ async function sendOrderToRoyalMail(order) {
   };
 }
 
+
+async function getRoyalMailLabel(orderIdentifier) {
+  const config = getRoyalMailConfig();
+
+  if (!hasRoyalMailConfig()) {
+    return {
+      ok: false,
+      skipped: true,
+      message: "Royal Mail API credentials are missing",
+    };
+  }
+
+  if (!orderIdentifier) {
+    return {
+      ok: false,
+      message: "Royal Mail order identifier is missing",
+    };
+  }
+
+  const url = new URL(`${config.baseUrl}/orders/${orderIdentifier}/label`);
+  url.searchParams.set("documentType", "postageLabel");
+  url.searchParams.set("includeReturnsLabel", "false");
+  url.searchParams.set("includeCN", "false");
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${config.token}`,
+      Accept: "application/pdf, application/json",
+    },
+  });
+
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "");
+    return {
+      ok: false,
+      status: response.status,
+      message: errorText || "Royal Mail label generation failed",
+    };
+  }
+
+  if (!contentType.includes("application/pdf")) {
+    const text = await response.text().catch(() => "");
+    return {
+      ok: false,
+      status: response.status,
+      message: text || "Royal Mail did not return a PDF label",
+    };
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+
+  return {
+    ok: true,
+    buffer: Buffer.from(arrayBuffer),
+  };
+}
+
+
 module.exports = {
   hasRoyalMailConfig,
   buildRoyalMailOrderPayload,
   sendOrderToRoyalMail,
+  getRoyalMailLabel,
 };
