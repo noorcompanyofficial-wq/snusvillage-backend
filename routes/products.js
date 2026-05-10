@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../models/products");
+const Product = require("../models/Products");
 
 // PRODUCT DETAILS PAGE
 router.get("/:id", async (req, res) => {

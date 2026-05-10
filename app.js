@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const session = require("express-session");
@@ -9,6 +10,13 @@ const flash = require("connect-flash");
 require("dotenv").config();
 
 const app = express();
+
+// ====== Security Headers ======
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // ====== Cart Middlware ====
 const cartSession = require("./middleware/cartSession");
@@ -50,6 +58,12 @@ app.use(
     secret: process.env.SESSION_SECRET || "dev_fallback_secret_change_later",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 
