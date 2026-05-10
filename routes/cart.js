@@ -100,7 +100,22 @@ router.post("/update", async (req, res, next) => {
 
     if (!item) return res.redirect("/cart");
 
-    if (action === "plus") item.quantity += 1;
+    if (action === "plus") {
+      const freshProduct = await Product.findById(productId);
+
+      if (!freshProduct || freshProduct.stock <= 0) {
+        req.flash("error", "This product is currently out of stock.");
+        return res.redirect("/cart");
+      }
+
+      if (item.quantity >= freshProduct.stock) {
+        req.flash("error", `Only ${freshProduct.stock} available in stock.`);
+        return res.redirect("/cart");
+      }
+
+      item.quantity += 1;
+    }
+
     if (action === "minus" && item.quantity > 1) item.quantity -= 1;
 
     await cart.save();
