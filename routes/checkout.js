@@ -89,6 +89,10 @@ router.post("/place-order", async (req, res, next) => {
       return res.redirect("/cart");
     }
 
+    if (req.body.ageConfirm !== "yes") {
+      return res.redirect("/checkout");
+    }
+
     for (const item of cart.items) {
       if (!item.product || !item.product._id) {
         return res.redirect("/cart");

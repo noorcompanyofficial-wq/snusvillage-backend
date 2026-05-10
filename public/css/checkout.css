@@ -302,3 +302,29 @@ body {
   text-decoration: none;
   font-weight: 900;
 }
+
+.checkout-age-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8faff;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  color: #061633;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.checkout-age-confirm input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: #123b8a;
+  flex-shrink: 0;
+}
+
+.checkout-age-confirm span {
+  display: block;
+}
