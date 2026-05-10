@@ -5,6 +5,7 @@ const Cart = require("../models/cart");
 const Order = require("../models/order");
 const Product = require("../models/Products");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
+const { sendOrderEmails } = require("../utils/orderEmails");
 
 function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
@@ -207,7 +208,15 @@ router.post("/place-order", async (req, res, next) => {
       });
     }
 
-    cart.items = [];
+    
+    try {
+      const emailResults = await sendOrderEmails(order);
+      console.log("Order email results:", JSON.stringify(emailResults, null, 2));
+    } catch (emailError) {
+      console.log("Order email error:", emailError.message);
+    }
+
+cart.items = [];
     await cart.save();
 
     res.redirect(`/checkout/success/${order._id}`);
