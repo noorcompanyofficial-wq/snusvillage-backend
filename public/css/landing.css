@@ -888,3 +888,237 @@ input {
     max-width: 12ch;
   }
 }
+
+
+/* ===== SNUS VILLAGE FRONTEND REDESIGN START ===== */
+
+:root {
+  --sv-red-glow: rgba(255, 22, 68, 0.95);
+  --sv-blue-glow: rgba(28, 105, 255, 0.95);
+  --sv-card-dark: #071225;
+  --sv-card-deep: #0b1630;
+}
+
+.hero-card,
+.hero__stat,
+.product-card,
+.shop-card,
+.info-card,
+.collection-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-card,
+.hero__stat,
+.product-card,
+.shop-card,
+.info-card {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-card::before,
+.hero__stat::before,
+.product-card::before,
+.shop-card::before,
+.info-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--sv-angle, 0deg),
+    rgba(255,255,255,0.08),
+    var(--sv-blue-glow),
+    var(--sv-red-glow),
+    rgba(255,255,255,0.12),
+    var(--sv-blue-glow)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 1;
+  animation: svBorderSpin 4s linear infinite;
+}
+
+.hero-card::after,
+.hero__stat::after,
+.product-card::after,
+.shop-card::after,
+.info-card::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(196, 18, 48, 0.18), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(18, 59, 138, 0.22), transparent 30%),
+    radial-gradient(circle at 60% 90%, rgba(255, 255, 255, 0.08), transparent 26%);
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.55s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-card > *,
+.hero__stat > *,
+.product-card > *,
+.shop-card > *,
+.info-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-card:hover::after,
+.hero__stat:hover::after,
+.product-card:hover::after,
+.shop-card:hover::after,
+.info-card:hover::after {
+  opacity: 1;
+  transform: rotate(4deg) scale(1.04);
+}
+
+.hero-card:hover,
+.hero__stat:hover,
+.product-card:hover,
+.shop-card:hover,
+.info-card:hover,
+.collection-card:hover {
+  box-shadow:
+    0 30px 80px rgba(7, 18, 37, 0.30),
+    0 0 0 1px rgba(255, 22, 68, 0.24),
+    0 0 28px rgba(255, 22, 68, 0.28),
+    0 0 44px rgba(28, 105, 255, 0.28);
+}
+
+.collection-card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 28px 80px rgba(7, 18, 37, 0.24),
+    0 0 30px rgba(255, 22, 68, 0.20),
+    0 0 42px rgba(28, 105, 255, 0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.14);
+}
+
+.collection-card::before {
+  background:
+    linear-gradient(180deg, rgba(7, 18, 37, 0.14), rgba(7, 18, 37, 0.88)),
+    radial-gradient(circle at 12% 16%, rgba(255, 22, 68, 0.62), transparent 34%),
+    radial-gradient(circle at 88% 12%, rgba(28, 105, 255, 0.62), transparent 30%);
+  z-index: 1;
+}
+
+.collection-card::after {
+  background-image:
+    linear-gradient(135deg, rgba(18, 59, 138, 0.28), rgba(196, 18, 48, 0.22)),
+    var(--bg-image);
+  filter: saturate(1.12) contrast(1.04);
+}
+
+.collection-card {
+  outline: 1px solid rgba(255,255,255,0.08);
+  outline-offset: -6px;
+}
+
+.collection-card:hover {
+  transform: translateY(-7px) scale(1.01);
+}
+
+.collection-card:hover::after {
+  transform: scale(1.08);
+}
+
+.collection-card h3,
+.product-card h3,
+.shop-card h3,
+.info-card h3 {
+  letter-spacing: -0.03em;
+}
+
+.product-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(241,245,251,0.94)),
+    radial-gradient(circle at 15% 10%, rgba(196, 18, 48, 0.08), transparent 35%),
+    radial-gradient(circle at 90% 0%, rgba(18, 59, 138, 0.10), transparent 32%);
+}
+
+.product-card__media {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.95), rgba(226,232,240,0.78)),
+    linear-gradient(135deg, rgba(18,59,138,0.12), rgba(196,18,48,0.08));
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.hero-card {
+  background:
+    linear-gradient(135deg, rgba(7,18,37,0.58), rgba(18,59,138,0.22)),
+    rgba(255,255,255,0.10);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+}
+
+.hero__stat {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,248,252,0.88));
+}
+
+.light-btn,
+.collection-card .light-btn {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+@keyframes svBorderSpin {
+  to {
+    --sv-angle: 360deg;
+  }
+}
+
+@property --sv-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-card::before,
+  .hero__stat::before,
+  .product-card::before,
+  .shop-card::before,
+  .info-card::before {
+    animation: none;
+  }
+}
+
+/* ===== SNUS VILLAGE FRONTEND REDESIGN END ===== */
+
+
+/* ===== FRONTEND REDESIGN BRIGHTNESS BOOST ===== */
+.hero-card::before,
+.hero__stat::before,
+.product-card::before,
+.shop-card::before,
+.info-card::before {
+  padding: 2px;
+  filter: drop-shadow(0 0 12px rgba(255, 22, 68, 0.45)) drop-shadow(0 0 16px rgba(28, 105, 255, 0.38));
+}
+
+.collection-card {
+  box-shadow:
+    0 28px 80px rgba(7, 18, 37, 0.24),
+    0 0 22px rgba(255, 22, 68, 0.24),
+    0 0 34px rgba(28, 105, 255, 0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.16);
+}
+
+.collection-card:hover {
+  box-shadow:
+    0 34px 90px rgba(7, 18, 37, 0.32),
+    0 0 34px rgba(255, 22, 68, 0.38),
+    0 0 52px rgba(28, 105, 255, 0.34),
+    inset 0 0 0 1px rgba(255,255,255,0.20);
+}
