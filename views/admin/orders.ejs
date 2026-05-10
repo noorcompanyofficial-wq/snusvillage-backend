@@ -5,6 +5,8 @@
       <h1>Customer Orders</h1>
       <p>View and manage new B2C orders placed from checkout.</p>
     </div>
+
+    <a href="/admin/orders/export/csv" class="admin-mini-btn">Export CSV</a>
   </div>
 
   <% if (!orders || orders.length === 0) { %>
@@ -80,6 +82,8 @@
                     <select name="orderStatus">
                       <option value="new" <%= order.orderStatus === "new" ? "selected" : "" %>>New</option>
                       <option value="processing" <%= order.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
+                      <option value="packed" <%= order.orderStatus === "packed" ? "selected" : "" %>>Packed</option>
+                      <option value="shipped" <%= order.orderStatus === "shipped" ? "selected" : "" %>>Shipped</option>
                       <option value="completed" <%= order.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
                       <option value="cancelled" <%= order.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
                     </select>

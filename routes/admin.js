@@ -14,6 +14,17 @@ const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
+function csvCell(value) {
+  const text = value === undefined || value === null ? "" : String(value);
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+function orderItemsText(order) {
+  return (order.items || [])
+    .map((item) => `${item.quantity} x ${item.name} (£${Number(item.price || 0).toFixed(2)})`)
+    .join(" | ");
+}
+
 async function getAdminStats() {
   if (mongoose.connection.readyState !== 1) {
     const applications = await wholesaleApplicationStore.findAll();
@@ -75,6 +86,67 @@ router.get("/dashboard", isAdmin, async (req, res) => {
   });
 });
 
+router.get("/orders/export/csv", isAdmin, async (req, res) => {
+  try {
+    const orders =
+      mongoose.connection.readyState === 1 ? await Order.find().sort({ createdAt: -1 }).lean() : [];
+
+    const headers = [
+      "Order ID",
+      "Short Order ID",
+      "Date",
+      "Payment Status",
+      "Order Status",
+      "First Name",
+      "Last Name",
+      "Email",
+      "Phone",
+      "Address",
+      "City",
+      "Postcode",
+      "Country",
+      "Items",
+      "Subtotal",
+      "Shipping",
+      "Total",
+      "Tracking Number",
+      "Royal Mail Reference",
+    ];
+
+    const rows = orders.map((order) => [
+      order._id,
+      order._id.toString().slice(-6).toUpperCase(),
+      order.createdAt ? new Date(order.createdAt).toLocaleString("en-GB") : "",
+      order.paymentStatus || "",
+      order.orderStatus || "",
+      order.customer?.firstName || "",
+      order.customer?.lastName || "",
+      order.customer?.email || "",
+      order.customer?.phone || "",
+      order.delivery?.address || "",
+      order.delivery?.city || "",
+      order.delivery?.postcode || "",
+      order.delivery?.country || "United Kingdom",
+      orderItemsText(order),
+      Number(order.subtotal || 0).toFixed(2),
+      Number(order.shipping || 0).toFixed(2),
+      Number(order.total || 0).toFixed(2),
+      order.royalMail?.trackingNumber || "",
+      order.royalMail?.orderReference || "",
+    ]);
+
+    const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=snus-village-orders.csv");
+    res.send(csv);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to export orders");
+    res.redirect("/admin/orders");
+  }
+});
+
 router.get("/orders", isAdmin, async (req, res) => {
   try {
     const orders =
@@ -95,7 +167,7 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
 
-    const allowedOrderStatuses = ["new", "processing", "completed", "cancelled"];
+    const allowedOrderStatuses = ["new", "processing", "packed", "shipped", "completed", "cancelled"];
     const allowedPaymentStatuses = ["pending", "paid", "failed"];
 
     const update = {};
