@@ -3,10 +3,32 @@
     <div>
       <span class="eyebrow">ORDER DETAIL</span>
       <h1>Order #<%= order._id.toString().slice(-6).toUpperCase() %></h1>
-      <p>Full customer, delivery, product, payment and Royal Mail details.</p>
+      <p>Customer, delivery, products, payment status and fulfilment details.</p>
     </div>
 
-    <a href="/admin/orders" class="admin-back-link">Back to Orders</a>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/admin/orders/export/csv" class="admin-back-link">Export CSV</a>
+      <a href="/admin/orders" class="admin-back-link">Back to Orders</a>
+    </div>
+  </div>
+
+  <div class="admin-detail-card" style="margin-bottom: 18px;">
+    <h2>Manual Fulfilment Steps</h2>
+
+    <p>
+      <strong>Step 1</strong>
+      <span>Check payment and order details before sending.</span>
+    </p>
+
+    <p>
+      <strong>Step 2</strong>
+      <span>Export CSV or copy the delivery details into Royal Mail Click & Drop.</span>
+    </p>
+
+    <p>
+      <strong>Step 3</strong>
+      <span>Update the order status to Packed, Shipped, then Completed.</span>
+    </p>
   </div>
 
   <div class="admin-order-detail-grid">
@@ -70,10 +92,35 @@
         <strong>Created</strong>
         <span><%= new Date(order.createdAt).toLocaleString("en-GB") %></span>
       </p>
+
+      <form class="admin-order-status-form" action="/admin/orders/<%= order._id %>/status" method="POST" style="margin-top: 16px;">
+        <label>
+          Payment
+          <select name="paymentStatus">
+            <option value="pending" <%= order.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
+            <option value="paid" <%= order.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
+            <option value="failed" <%= order.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
+          </select>
+        </label>
+
+        <label>
+          Order
+          <select name="orderStatus">
+            <option value="new" <%= order.orderStatus === "new" ? "selected" : "" %>>New</option>
+            <option value="processing" <%= order.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
+            <option value="packed" <%= order.orderStatus === "packed" ? "selected" : "" %>>Packed</option>
+            <option value="shipped" <%= order.orderStatus === "shipped" ? "selected" : "" %>>Shipped</option>
+            <option value="completed" <%= order.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
+            <option value="cancelled" <%= order.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
+          </select>
+        </label>
+
+        <button type="submit">Update Status</button>
+      </form>
     </div>
 
     <div class="admin-detail-card">
-      <h2>Royal Mail</h2>
+      <h2>Royal Mail / Fulfilment</h2>
 
       <% if (order.royalMail && order.royalMail.syncStatus === "sent") { %>
         <p>
@@ -93,22 +140,27 @@
 
         <p>
           <strong>Label</strong>
-          <span>Create in Click & Drop</span>
+          <span>Create in Click & Drop manually if label is not already generated.</span>
         </p>
       <% } else if (order.royalMail && order.royalMail.syncStatus === "failed") { %>
         <p>
           <strong>Status</strong>
-          <span class="status-pill payment-failed">Failed</span>
+          <span class="status-pill payment-failed">Manual required</span>
         </p>
 
         <p>
-          <strong>Error</strong>
-          <span><%= order.royalMail.syncError || "Royal Mail sync failed" %></span>
+          <strong>Note</strong>
+          <span>Create this shipment manually in Royal Mail Click & Drop.</span>
         </p>
       <% } else { %>
         <p>
           <strong>Status</strong>
-          <span class="status-pill payment-pending">Not sent</span>
+          <span class="status-pill payment-pending">Manual</span>
+        </p>
+
+        <p>
+          <strong>Next step</strong>
+          <span>Use Export CSV or copy the customer delivery details into Royal Mail Click & Drop.</span>
         </p>
       <% } %>
     </div>
