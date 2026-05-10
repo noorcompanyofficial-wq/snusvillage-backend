@@ -1,0 +1,155 @@
+<section class="admin-order-detail-page">
+  <div class="admin-page-header">
+    <div>
+      <span class="eyebrow">ORDER DETAIL</span>
+      <h1>Order #<%= order._id.toString().slice(-6).toUpperCase() %></h1>
+      <p>Full customer, delivery, product, payment and Royal Mail details.</p>
+    </div>
+
+    <a href="/admin/orders" class="admin-back-link">Back to Orders</a>
+  </div>
+
+  <div class="admin-order-detail-grid">
+    <div class="admin-detail-card">
+      <h2>Customer</h2>
+
+      <p>
+        <strong>Name</strong>
+        <span><%= order.customer?.firstName || "" %> <%= order.customer?.lastName || "" %></span>
+      </p>
+
+      <p>
+        <strong>Email</strong>
+        <span><%= order.customer?.email || "No email" %></span>
+      </p>
+
+      <p>
+        <strong>Phone</strong>
+        <span><%= order.customer?.phone || "No phone" %></span>
+      </p>
+    </div>
+
+    <div class="admin-detail-card">
+      <h2>Delivery</h2>
+
+      <p>
+        <strong>Address</strong>
+        <span><%= order.delivery?.address || "No address" %></span>
+      </p>
+
+      <p>
+        <strong>City</strong>
+        <span><%= order.delivery?.city || "No city" %></span>
+      </p>
+
+      <p>
+        <strong>Postcode</strong>
+        <span><%= order.delivery?.postcode || "No postcode" %></span>
+      </p>
+
+      <p>
+        <strong>Country</strong>
+        <span><%= order.delivery?.country || "United Kingdom" %></span>
+      </p>
+    </div>
+
+    <div class="admin-detail-card">
+      <h2>Status</h2>
+
+      <p>
+        <strong>Payment</strong>
+        <span class="status-pill payment-<%= order.paymentStatus %>"><%= order.paymentStatus %></span>
+      </p>
+
+      <p>
+        <strong>Order</strong>
+        <span class="status-pill order-<%= order.orderStatus %>"><%= order.orderStatus %></span>
+      </p>
+
+      <p>
+        <strong>Created</strong>
+        <span><%= new Date(order.createdAt).toLocaleString("en-GB") %></span>
+      </p>
+    </div>
+
+    <div class="admin-detail-card">
+      <h2>Royal Mail</h2>
+
+      <% if (order.royalMail && order.royalMail.syncStatus === "sent") { %>
+        <p>
+          <strong>Status</strong>
+          <span class="status-pill order-completed">Sent</span>
+        </p>
+
+        <p>
+          <strong>Royal Mail ID</strong>
+          <span><%= order.royalMail.orderIdentifier || "N/A" %></span>
+        </p>
+
+        <p>
+          <strong>Reference</strong>
+          <span><%= order.royalMail.orderReference || "N/A" %></span>
+        </p>
+
+        <p>
+          <strong>Label</strong>
+          <span>Create in Click & Drop</span>
+        </p>
+      <% } else if (order.royalMail && order.royalMail.syncStatus === "failed") { %>
+        <p>
+          <strong>Status</strong>
+          <span class="status-pill payment-failed">Failed</span>
+        </p>
+
+        <p>
+          <strong>Error</strong>
+          <span><%= order.royalMail.syncError || "Royal Mail sync failed" %></span>
+        </p>
+      <% } else { %>
+        <p>
+          <strong>Status</strong>
+          <span class="status-pill payment-pending">Not sent</span>
+        </p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="admin-detail-card admin-items-card">
+    <h2>Items</h2>
+
+    <% order.items.forEach(item => { %>
+      <div class="admin-detail-item">
+        <% if (item.image) { %>
+          <img src="<%= item.image %>" alt="<%= item.name %>">
+        <% } %>
+
+        <div>
+          <strong><%= item.name %></strong>
+          <span><%= item.brand || "Snus Village" %></span>
+          <small>Qty: <%= item.quantity %> × £<%= item.price.toFixed(2) %></small>
+        </div>
+
+        <strong>£<%= (item.quantity * item.price).toFixed(2) %></strong>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="admin-detail-card admin-total-card">
+    <h2>Totals</h2>
+
+    <p>
+      <strong>Subtotal</strong>
+      <span>£<%= order.subtotal.toFixed(2) %></span>
+    </p>
+
+    <p>
+      <strong>Shipping</strong>
+      <span>£<%= order.shipping.toFixed(2) %></span>
+    </p>
+
+    <p class="admin-grand-total">
+      <strong>Total</strong>
+      <span>£<%= order.total.toFixed(2) %></span>
+    </p>
+  </div>
+</section>

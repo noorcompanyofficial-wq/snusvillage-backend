@@ -626,4 +626,26 @@ router.get("/orders/:id/download-label", isAdmin, async (req, res) => {
 });
 
 
+
+router.get("/orders/:id", isAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).lean();
+
+    if (!order) {
+      req.flash("error", "Order not found");
+      return res.redirect("/admin/orders");
+    }
+
+    res.render("admin/order-detail", {
+      layout: "layouts/admin-layout",
+      order,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load order");
+    res.redirect("/admin/orders");
+  }
+});
+
+
 module.exports = router;
