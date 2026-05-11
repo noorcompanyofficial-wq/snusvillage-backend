@@ -164,7 +164,23 @@ async function finalisePaidOrder(order) {
   await order.save();
 
   await reduceStockForPaidOrder(order);
-  await syncOrderToRoyalMail(order);
+
+  if (order.fulfilment?.method === "click_collect") {
+    order.royalMail = {
+      ...order.royalMail,
+      synced: false,
+      orderIdentifier: "",
+      orderReference: "",
+      trackingNumber: "",
+      syncStatus: "not_sent",
+      syncError: "Click & Collect order - Royal Mail not required.",
+      syncedAt: null,
+    };
+
+    await order.save();
+  } else {
+    await syncOrderToRoyalMail(order);
+  }
 
   try {
     const emailResults = await sendOrderEmails(order);
@@ -237,6 +253,18 @@ router.post("/place-order", async (req, res, next) => {
 
     const { subtotal, shipping, total } = calculateCartTotals(cart);
 
+    const fulfilmentMethod =
+      req.body.fulfilmentMethod === "click_collect" ? "click_collect" : "delivery";
+
+    const isClickCollect = fulfilmentMethod === "click_collect";
+
+    if (!isClickCollect) {
+      if (!req.body.address || !req.body.city || !req.body.postcode) {
+        req.flash("error", "Please enter your delivery address.");
+        return res.redirect("/checkout");
+      }
+    }
+
     const orderItems = cart.items
       .filter((item) => item.product)
       .map((item) => {
@@ -265,10 +293,15 @@ router.post("/place-order", async (req, res, next) => {
         phone: req.body.phone,
       },
       delivery: {
-        country: req.body.country,
-        address: req.body.address,
-        city: req.body.city,
-        postcode: req.body.postcode,
+        country: "United Kingdom",
+        address: isClickCollect ? "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" : req.body.address,
+        city: isClickCollect ? "London" : req.body.city,
+        postcode: isClickCollect ? "W2 2HX" : req.body.postcode,
+      },
+      fulfilment: {
+        method: fulfilmentMethod,
+        collectionBranch: isClickCollect ? "Edgware Road" : "",
+        collectionAddress: isClickCollect ? "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" : "",
       },
       items: orderItems,
       subtotal,

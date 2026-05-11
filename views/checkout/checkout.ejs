@@ -2,28 +2,57 @@
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
-    <form action="/checkout/place-order" method="POST">
+    <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
-
-      <h3>Delivery</h3>
-      <select name="country" required>
-        <option value="United Kingdom">United Kingdom</option>
-      </select>
 
       <div class="checkout-row">
         <input type="text" name="firstName" placeholder="First Name" required>
         <input type="text" name="lastName" placeholder="Last Name" required>
       </div>
 
-      <input type="text" name="address" placeholder="Address" required>
+      <input type="text" name="phone" placeholder="Phone" required>
 
-      <div class="checkout-row">
-        <input type="text" name="city" placeholder="City" required>
-        <input type="text" name="postcode" placeholder="Postcode" required>
+      <h3>Fulfilment</h3>
+
+      <div class="checkout-fulfilment-options">
+        <label class="checkout-fulfilment-card is-active" data-fulfilment-card="delivery">
+          <input type="radio" name="fulfilmentMethod" value="delivery" checked>
+          <span>
+            <strong>Delivery</strong>
+            <small>Pay online and have your order delivered.</small>
+          </span>
+        </label>
+
+        <label class="checkout-fulfilment-card" data-fulfilment-card="click_collect">
+          <input type="radio" name="fulfilmentMethod" value="click_collect">
+          <span>
+            <strong>Click & Collect</strong>
+            <small>Pay online and collect from Edgware Road only.</small>
+          </span>
+        </label>
       </div>
 
-      <input type="text" name="phone" placeholder="Phone" required>
+      <div class="checkout-collect-notice" id="clickCollectNotice" hidden>
+        <strong>Collection Address</strong>
+        <span>SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX</span>
+        <small>Your order will not be sent to Royal Mail. Bring your order confirmation and valid ID when collecting.</small>
+      </div>
+
+      <div id="deliveryFields">
+        <h3>Delivery</h3>
+
+        <select name="country" required>
+          <option value="United Kingdom">United Kingdom</option>
+        </select>
+
+        <input type="text" name="address" placeholder="Address" required>
+
+        <div class="checkout-row">
+          <input type="text" name="city" placeholder="City" required>
+          <input type="text" name="postcode" placeholder="Postcode" required>
+        </div>
+      </div>
 
       <h3>Payment</h3>
       <div class="checkout-sumup-notice">
@@ -63,11 +92,6 @@
       <% } %>
     <% }) %>
 
-    <div class="discount-row">
-      <input type="text" placeholder="Discount code">
-      <button type="button">Apply</button>
-    </div>
-
     <div class="checkout-total-row">
       <span>Subtotal</span>
       <strong>£<%= subtotal.toFixed(2) %></strong>
@@ -85,3 +109,43 @@
   </aside>
 </div>
 
+<script>
+  (function () {
+    const deliveryFields = document.getElementById("deliveryFields");
+    const collectNotice = document.getElementById("clickCollectNotice");
+    const radios = document.querySelectorAll('input[name="fulfilmentMethod"]');
+    const cards = document.querySelectorAll("[data-fulfilment-card]");
+    const deliveryInputs = deliveryFields ? deliveryFields.querySelectorAll("input, select") : [];
+
+    function updateFulfilment() {
+      const selected = document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery";
+      const isCollect = selected === "click_collect";
+
+      if (deliveryFields) {
+        deliveryFields.hidden = isCollect;
+      }
+
+      if (collectNotice) {
+        collectNotice.hidden = !isCollect;
+      }
+
+      deliveryInputs.forEach((input) => {
+        if (isCollect) {
+          input.removeAttribute("required");
+        } else {
+          input.setAttribute("required", "required");
+        }
+      });
+
+      cards.forEach((card) => {
+        card.classList.toggle("is-active", card.dataset.fulfilmentCard === selected);
+      });
+    }
+
+    radios.forEach((radio) => {
+      radio.addEventListener("change", updateFulfilment);
+    });
+
+    updateFulfilment();
+  })();
+</script>

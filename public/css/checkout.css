@@ -364,3 +364,128 @@ body {
 }
 
 /* ===== REMOVE UNUSED EXPRESS PAYMENT UI END ===== */
+
+/* ===== CLICK AND COLLECT CHECKOUT START ===== */
+
+.checkout-fulfilment-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.checkout-fulfilment-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.checkout-fulfilment-card:hover,
+.checkout-fulfilment-card.is-active {
+  border-color: rgba(18, 59, 138, 0.35);
+  box-shadow: 0 12px 28px rgba(9, 31, 77, 0.08);
+  transform: translateY(-2px);
+}
+
+.checkout-fulfilment-card input {
+  margin-top: 3px;
+}
+
+.checkout-fulfilment-card strong {
+  display: block;
+  color: #061633;
+  font-size: 0.96rem;
+}
+
+.checkout-fulfilment-card small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.checkout-collect-notice {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 22, 68, 0.07);
+  border: 1px solid rgba(255, 22, 68, 0.14);
+}
+
+.checkout-collect-notice strong {
+  color: #b41232;
+}
+
+.checkout-collect-notice span {
+  color: #061633;
+  font-weight: 900;
+}
+
+.checkout-collect-notice small {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .checkout-fulfilment-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== CLICK AND COLLECT CHECKOUT END ===== */
+
+/* ===== SUCCESS FULFILMENT BOX START ===== */
+
+.success-collection-box {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(18, 59, 138, 0.08);
+  border: 1px solid rgba(18, 59, 138, 0.14);
+  text-align: left;
+}
+
+.success-collection-box span {
+  display: block;
+  color: #b41232;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.success-collection-box strong {
+  display: block;
+  margin-top: 6px;
+  color: #061633;
+  font-size: 1.05rem;
+}
+
+.success-collection-box p {
+  margin: 8px 0 0;
+  color: #64748b;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+/* ===== SUCCESS FULFILMENT BOX END ===== */
+
+/* ===== CLICK COLLECT HIDE FIX START ===== */
+
+.checkout-collect-notice[hidden],
+#clickCollectNotice[hidden] {
+  display: none !important;
+}
+
+/* ===== CLICK COLLECT HIDE FIX END ===== */

@@ -45,6 +45,22 @@ const orderSchema = new mongoose.Schema(
       postcode: String,
     },
 
+    fulfilment: {
+      method: {
+        type: String,
+        enum: ["delivery", "click_collect"],
+        default: "delivery",
+      },
+      collectionBranch: {
+        type: String,
+        default: "",
+      },
+      collectionAddress: {
+        type: String,
+        default: "",
+      },
+    },
+
     items: [orderItemSchema],
 
     subtotal: {
