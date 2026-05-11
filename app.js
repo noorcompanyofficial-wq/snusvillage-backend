@@ -1,4 +1,5 @@
 const express = require("express");
+const maintenanceMode = require("./middleware/maintenanceMode");
 const helmet = require("helmet");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
@@ -49,6 +50,8 @@ if (process.env.NODE_ENV === "production") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(maintenanceMode);
 
 app.use(cookieParser());
 
