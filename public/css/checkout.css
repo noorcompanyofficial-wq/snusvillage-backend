@@ -328,3 +328,28 @@ body {
 .checkout-age-confirm span {
   display: block;
 }
+
+/* ===== SUMUP CHECKOUT NOTICE START ===== */
+
+.checkout-sumup-notice {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(18, 59, 138, 0.08);
+  border: 1px solid rgba(18, 59, 138, 0.14);
+}
+
+.checkout-sumup-notice strong {
+  color: #061633;
+  font-size: 0.98rem;
+}
+
+.checkout-sumup-notice span {
+  color: #64748b;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ===== SUMUP CHECKOUT NOTICE END ===== */
