@@ -11,6 +11,24 @@ const { generateRefreshToken } = require("../utils/jwt");
 const UAParser = require("ua-parser-js");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
+async function safeSendMail(mailOptions, label = "auth email") {
+  try {
+    const timeout = Number(process.env.EMAIL_TIMEOUT_MS || 5000);
+
+    await Promise.race([
+      transporter.sendMail(mailOptions),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`${label} timed out after ${timeout}ms`)), timeout)
+      ),
+    ]);
+
+    return { ok: true };
+  } catch (error) {
+    console.log(`${label} failed:`, error.message);
+    return { ok: false, message: error.message };
+  }
+}
+
 // ================= GET =================
 router.get("/register", isGuest, (req, res) => res.render("auth/register"));
 router.get("/login", isGuest, (req, res) => res.render("auth/login"));
@@ -77,11 +95,11 @@ router.post("/register", authLimiter, async (req, res) => {
     verifyCodeExpire: Date.now() + 10 * 60 * 1000,
   });
 
-  await transporter.sendMail({
+  await safeSendMail({
     to: email,
     subject: "Verify Code",
     text: `Code: ${code}`,
-  });
+  }, "auth email");
 
   req.session.verifyEmail = email;
   res.redirect("/auth/verify");
@@ -111,11 +129,11 @@ router.post("/resend-code", async (req, res) => {
 
   await user.save();
 
-  await transporter.sendMail({
+  await safeSendMail({
     to: user.email,
     subject: "New Code",
     text: `Code: ${code}`,
-  });
+  }, "auth email");
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/verify");
@@ -145,11 +163,11 @@ router.post("/resend-reset", async (req, res) => {
 
   await user.save();
 
-  await transporter.sendMail({
+  await safeSendMail({
     to: user.email,
     subject: "New Reset Code",
     text: `Code: ${code}`,
-  });
+  }, "auth email");
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/reset-verify");
@@ -230,13 +248,13 @@ router.post("/login", authLimiter, async (req, res) => {
     if (user.suspiciousIPs.length >= 2) {
       user.blockedIPs.push(currentIP);
 
-      await transporter.sendMail({
+      await safeSendMail({
         to: user.email,
         subject: "🚨 Security Alert",
         text: `We detected multiple suspicious login attempts.
 IP: ${currentIP}
 Your account has been protected.`,
-      });
+  }, "auth email");
 
       await user.save();
 
@@ -249,11 +267,11 @@ Your account has been protected.`,
     user.verifyCode = code;
     user.verifyCodeExpire = Date.now() + 10 * 60 * 1000;
 
-    await transporter.sendMail({
+    await safeSendMail({
       to: user.email,
       subject: "New Login Verification",
       text: `New login detected. Code: ${code}`,
-    });
+  }, "auth email");
 
     await user.save();
 
@@ -303,11 +321,11 @@ router.post("/forgot", async (req, res) => {
 
   await user.save();
 
-  await transporter.sendMail({
+  await safeSendMail({
     to: user.email,
     subject: "Reset Code",
     text: `Code: ${code}`,
-  });
+  }, "auth email");
 
   req.session.resetEmail = user.email;
 
