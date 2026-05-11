@@ -158,3 +158,84 @@ document.querySelectorAll("#navLinks a").forEach((link) => {
   }, 4500);
 })();
 // ===== SNUS VILLAGE DISTRO CAROUSEL END =====
+
+
+// ===== SNUS VILLAGE SOCIAL IPHONE START =====
+(function () {
+  const reel = document.getElementById("svSocialReel");
+  if (!reel) return;
+
+  const slides = Array.from(reel.querySelectorAll(".sv-social-slide"));
+  const dots = Array.from(document.querySelectorAll(".sv-social-dots button"));
+  const prevBtn = document.querySelector(".sv-social-prev");
+  const nextBtn = document.querySelector(".sv-social-next");
+
+  let current = 0;
+  let autoRotate;
+
+  function pauseAllVideos() {
+    slides.forEach((slide) => {
+      const video = slide.querySelector("video");
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }
+
+  function playCurrentVideo() {
+    const activeVideo = slides[current]?.querySelector("video");
+    if (activeVideo) {
+      activeVideo.play().catch(() => {});
+    }
+  }
+
+  function showSlide(index) {
+    current = (index + slides.length) % slides.length;
+
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("is-active", i === current);
+    });
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("is-active", i === current);
+    });
+
+    pauseAllVideos();
+    playCurrentVideo();
+  }
+
+  function nextSlide() {
+    showSlide(current + 1);
+  }
+
+  function prevSlide() {
+    showSlide(current - 1);
+  }
+
+  function startAutoRotate() {
+    clearInterval(autoRotate);
+    autoRotate = setInterval(nextSlide, 5000);
+  }
+
+  prevBtn?.addEventListener("click", () => {
+    prevSlide();
+    startAutoRotate();
+  });
+
+  nextBtn?.addEventListener("click", () => {
+    nextSlide();
+    startAutoRotate();
+  });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showSlide(index);
+      startAutoRotate();
+    });
+  });
+
+  showSlide(0);
+  startAutoRotate();
+})();
+// ===== SNUS VILLAGE SOCIAL IPHONE END =====

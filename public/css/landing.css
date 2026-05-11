@@ -3225,3 +3225,750 @@ input {
 }
 
 /* ===== TRUST SECTION SPACING FIX END ===== */
+
+
+/* ===== SNUS VILLAGE FOOTER REDESIGN START ===== */
+
+.sv-footer-redesign {
+  padding: 0 0 34px;
+}
+
+.sv-footer-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 30px;
+  border-radius: 34px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255, 22, 68, 0.09), transparent 32%),
+    radial-gradient(circle at 88% 10%, rgba(18, 59, 138, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,249,254,0.96));
+  box-shadow:
+    0 28px 90px rgba(9, 31, 77, 0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.72);
+}
+
+.sv-footer-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--sv-angle, 0deg),
+    rgba(255,255,255,0.08),
+    rgba(255, 22, 68, 0.46),
+    rgba(28, 105, 255, 0.44),
+    rgba(255,255,255,0.14)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: svBorderSpin 7s linear infinite;
+}
+
+.sv-footer-top {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.35fr 0.7fr 0.8fr 0.9fr;
+  gap: 28px;
+}
+
+.sv-footer-brand p {
+  max-width: 48ch;
+  margin: 18px 0 0;
+  color: #64748b;
+  line-height: 1.75;
+}
+
+.sv-footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.sv-footer-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 11px;
+  border-radius: 999px;
+  color: #123b8a;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(9, 31, 77, 0.10);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sv-footer-column h4 {
+  margin: 0 0 16px;
+  color: #123b8a;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sv-footer-column ul {
+  list-style: none;
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.sv-footer-column a {
+  color: #52617a;
+  text-decoration: none;
+  font-weight: 700;
+  transition:
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.sv-footer-column a:hover {
+  color: #ff1644;
+  transform: translateX(4px);
+}
+
+.sv-footer-warning {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, rgba(255, 22, 68, 0.92), rgba(18, 59, 138, 0.90));
+  box-shadow:
+    0 18px 42px rgba(255, 22, 68, 0.18),
+    0 0 30px rgba(18, 59, 138, 0.12);
+}
+
+.sv-footer-warning strong {
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sv-footer-warning span {
+  color: rgba(255,255,255,0.82);
+  line-height: 1.55;
+}
+
+.sv-footer-bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(9, 31, 77, 0.08);
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .sv-footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sv-footer-warning,
+  .sv-footer-bottom {
+    display: grid;
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-footer-panel {
+    padding: 22px;
+    border-radius: 28px;
+  }
+
+  .sv-footer-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== SNUS VILLAGE FOOTER REDESIGN END ===== */
+
+/* ===== NATURAL FOOTER FIX START ===== */
+
+.footer,
+.footer__panel,
+.footer__grid,
+.footer__bottom,
+.sv-footer-redesign,
+.sv-footer-panel,
+.sv-footer-top,
+.sv-footer-warning,
+.sv-footer-bottom {
+  display: none !important;
+}
+
+.sv-natural-footer {
+  margin-top: 30px;
+  padding: 54px 0 28px;
+  background:
+    linear-gradient(180deg, #f8fafc 0%, #eef3fb 100%);
+  border-top: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.sv-natural-footer__top {
+  display: grid;
+  grid-template-columns: 1.35fr 0.65fr 0.75fr 0.85fr;
+  gap: 34px;
+  padding-bottom: 34px;
+}
+
+.sv-natural-footer__brand p {
+  max-width: 44ch;
+  margin: 18px 0 0;
+  color: #64748b;
+  line-height: 1.75;
+}
+
+.sv-natural-footer__notice {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 18px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sv-natural-footer__links {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.sv-natural-footer__links h4 {
+  margin: 0 0 8px;
+  color: #123b8a;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.sv-natural-footer__links a {
+  color: #52617a;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sv-natural-footer__links a:hover {
+  color: #ff1644;
+  transform: translateX(3px);
+}
+
+.sv-natural-footer__warning {
+  padding: 16px 0;
+  border-top: 1px solid rgba(9, 31, 77, 0.08);
+  border-bottom: 1px solid rgba(9, 31, 77, 0.08);
+  color: #64748b;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.sv-natural-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .sv-natural-footer__top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sv-natural-footer__bottom {
+    display: grid;
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-natural-footer {
+    padding: 40px 0 24px;
+  }
+
+  .sv-natural-footer__top {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== NATURAL FOOTER FIX END ===== */
+
+/* ===== FOOTER FINAL POLISH START ===== */
+
+.sv-natural-footer {
+  margin-top: 16px;
+  padding: 44px 0 24px;
+  background:
+    linear-gradient(180deg, #f3f6fb 0%, #e9eef7 100%);
+  border-top: 1px solid rgba(9, 31, 77, 0.10);
+}
+
+.sv-natural-footer__top {
+  grid-template-columns: 1.25fr 0.7fr 0.8fr 0.85fr;
+  gap: 44px;
+  padding-bottom: 28px;
+}
+
+.sv-natural-footer__brand p {
+  max-width: 40ch;
+  margin-top: 14px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.sv-natural-footer__notice {
+  min-height: 30px;
+  margin-top: 14px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: rgba(255, 22, 68, 0.10);
+  border: 1px solid rgba(255, 22, 68, 0.18);
+  color: #b41232;
+  box-shadow: none;
+}
+
+.sv-natural-footer__links {
+  gap: 8px;
+}
+
+.sv-natural-footer__links h4 {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.sv-natural-footer__links a {
+  width: fit-content;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.sv-natural-footer__warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  color: #52617a;
+  font-size: 0.9rem;
+}
+
+.sv-natural-footer__warning::before {
+  content: "18+";
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 28px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.sv-natural-footer__bottom {
+  padding-top: 16px;
+  font-size: 0.84rem;
+}
+
+.sv-natural-footer__bottom span:last-child {
+  color: #123b8a;
+}
+
+@media (max-width: 980px) {
+  .sv-natural-footer__top {
+    gap: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-natural-footer {
+    padding: 34px 0 22px;
+  }
+
+  .sv-natural-footer__warning {
+    align-items: flex-start;
+  }
+}
+
+/* ===== FOOTER FINAL POLISH END ===== */
+
+/* ===== FOOTER 18 PLUS CLEANUP START ===== */
+
+.sv-natural-footer__notice {
+  display: none !important;
+}
+
+/* ===== FOOTER 18 PLUS CLEANUP END ===== */
+
+
+/* ===== SNUS VILLAGE SOCIAL IPHONE SECTION START ===== */
+
+.sv-social-showcase {
+  padding-top: 36px;
+  padding-bottom: 34px;
+}
+
+.sv-social-iphone-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 520px;
+  gap: 30px;
+  align-items: center;
+}
+
+.sv-social-copy-card {
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid rgba(17, 40, 92, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(255, 22, 68, 0.07), transparent 32%),
+    radial-gradient(circle at top right, rgba(18, 59, 138, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 252, 0.98));
+  box-shadow: 0 24px 70px rgba(9, 31, 77, 0.10);
+}
+
+.sv-social-copy-card h3 {
+  margin: 18px 0 10px;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: #061633;
+}
+
+.sv-social-copy-card > p {
+  margin: 0 0 18px;
+  color: #64748b;
+  line-height: 1.8;
+  max-width: 58ch;
+}
+
+.sv-social-points {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 24px;
+}
+
+.sv-social-point {
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(17, 40, 92, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.sv-social-point strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #123b8a;
+  font-size: 1rem;
+}
+
+.sv-social-point span {
+  display: block;
+  color: #64748b;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.sv-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sv-phone-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sv-phone {
+  position: relative;
+  width: 100%;
+  max-width: 410px;
+  padding: 14px;
+  border-radius: 46px;
+  background: linear-gradient(145deg, #0d1117, #202734);
+  box-shadow:
+    0 42px 95px rgba(6, 17, 42, 0.26),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 36px rgba(255, 22, 68, 0.12),
+    0 0 36px rgba(18, 59, 138, 0.12);
+  animation: svPhoneFloat 6s ease-in-out infinite;
+}
+
+.sv-phone__notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 132px;
+  height: 28px;
+  border-radius: 18px;
+  background: #0a0d12;
+  z-index: 5;
+}
+
+.sv-phone__screen {
+  position: relative;
+  min-height: 720px;
+  border-radius: 34px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.sv-ig-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 24px 18px 14px;
+}
+
+.sv-ig-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sv-ig-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #123b8a, #ff1644);
+  display: grid;
+  place-items: center;
+}
+
+.sv-ig-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.sv-ig-profile strong {
+  display: block;
+  color: #061633;
+  font-size: 14px;
+}
+
+.sv-ig-profile span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.sv-ig-live {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.sv-ig-stories {
+  display: flex;
+  gap: 10px;
+  padding: 0 18px 16px;
+}
+
+.sv-ig-stories span {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, #ff1644, #123b8a) border-box;
+  border: 2px solid transparent;
+}
+
+.sv-social-reel {
+  position: relative;
+  padding: 0 18px;
+  min-height: 500px;
+}
+
+.sv-social-slide {
+  display: none;
+  position: relative;
+}
+
+.sv-social-slide.is-active {
+  display: block;
+}
+
+.sv-social-slide video,
+.sv-social-slide img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 26px;
+  display: block;
+  background:
+    linear-gradient(135deg, rgba(255,22,68,0.12), rgba(18,59,138,0.12)),
+    #e8edf6;
+}
+
+.sv-social-caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(6, 17, 42, 0.62);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+}
+
+.sv-social-caption strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.sv-social-caption span {
+  display: block;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.6;
+}
+
+.sv-social-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px;
+}
+
+.sv-social-arrow {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 22px;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  box-shadow: 0 12px 24px rgba(18, 59, 138, 0.15);
+}
+
+.sv-social-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sv-social-dots button {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(17, 40, 92, 0.18);
+  cursor: pointer;
+}
+
+.sv-social-dots button.is-active {
+  width: 26px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff1644, #123b8a);
+}
+
+.sv-ig-bottom {
+  display: flex;
+  justify-content: center;
+  padding: 0 0 16px;
+}
+
+.sv-ig-bottom span {
+  width: 120px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(17, 40, 92, 0.14);
+}
+
+@keyframes svPhoneFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+@media (max-width: 1100px) {
+  .sv-social-iphone-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-phone-wrap {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 860px) {
+  .sv-phone {
+    max-width: 100%;
+  }
+
+  .sv-phone__screen {
+    min-height: 660px;
+  }
+
+  .sv-social-slide video,
+  .sv-social-slide img {
+    height: 450px;
+  }
+
+  .sv-social-copy-card {
+    padding: 22px;
+  }
+
+  .sv-social-links {
+    flex-direction: column;
+  }
+
+  .sv-social-links .sv-ab-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ===== SNUS VILLAGE SOCIAL IPHONE SECTION END ===== */
