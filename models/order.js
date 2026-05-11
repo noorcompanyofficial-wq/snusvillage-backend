@@ -26,6 +26,11 @@ const orderSchema = new mongoose.Schema(
       default: null,
     },
 
+    sessionId: {
+      type: String,
+      default: "",
+    },
+
     customer: {
       email: String,
       firstName: String,
@@ -67,6 +72,37 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["new", "processing", "packed", "shipped", "completed", "cancelled"],
       default: "new",
+    },
+
+    sumup: {
+      checkoutId: {
+        type: String,
+        default: "",
+      },
+      checkoutReference: {
+        type: String,
+        default: "",
+      },
+      checkoutUrl: {
+        type: String,
+        default: "",
+      },
+      status: {
+        type: String,
+        default: "",
+      },
+      paidAt: {
+        type: Date,
+        default: null,
+      },
+      error: {
+        type: String,
+        default: "",
+      },
+      fulfilmentFinalised: {
+        type: Boolean,
+        default: false,
+      },
     },
 
     royalMail: {
