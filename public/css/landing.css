@@ -2654,3 +2654,378 @@ input {
 }
 
 /* ===== SNUS VILLAGE BESTSELLERS REDESIGN END ===== */
+
+
+/* ===== SNUS VILLAGE LOCATIONS REDESIGN START ===== */
+
+.sv-locations-redesign {
+  padding-top: 44px;
+  padding-bottom: 50px;
+}
+
+.sv-location-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.sv-location-card {
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background: rgba(255,255,255,0.92);
+  box-shadow:
+    0 24px 70px rgba(9, 31, 77, 0.10),
+    inset 0 0 0 1px rgba(255,255,255,0.68);
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.sv-location-card:hover {
+  transform: translateY(-7px);
+  box-shadow:
+    0 32px 88px rgba(9, 31, 77, 0.16),
+    0 0 30px rgba(255, 22, 68, 0.12),
+    0 0 38px rgba(18, 59, 138, 0.10);
+}
+
+.sv-location-map {
+  width: 100%;
+  height: 245px;
+  border: 0;
+  display: block;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.sv-location-body {
+  padding: 22px;
+}
+
+.sv-location-body span,
+.sv-distro-kicker {
+  display: inline-flex;
+  margin-bottom: 10px;
+  color: #ff1644;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sv-location-body h3,
+.sv-distro-copy h3 {
+  margin: 0;
+  color: #061633;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.sv-location-body p,
+.sv-distro-copy p {
+  margin: 12px 0 0;
+  color: #64748b;
+  line-height: 1.65;
+}
+
+.sv-location-body a {
+  display: inline-flex;
+  margin-top: 16px;
+  color: #123b8a;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sv-location-body a::after {
+  content: "→";
+  margin-left: 8px;
+  transition: transform 0.22s ease;
+}
+
+.sv-location-body a:hover::after {
+  transform: translateX(5px);
+}
+
+.sv-distro-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(420px, 1fr);
+  gap: 26px;
+  align-items: center;
+  margin-top: 22px;
+  padding: 26px;
+  overflow: hidden;
+  border-radius: 34px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background:
+    radial-gradient(circle at 20% 16%, rgba(255, 22, 68, 0.10), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(18, 59, 138, 0.13), transparent 36%),
+    linear-gradient(135deg, rgba(255,255,255,0.96), rgba(246,249,254,0.95));
+  box-shadow:
+    0 28px 90px rgba(9, 31, 77, 0.12),
+    inset 0 0 0 1px rgba(255,255,255,0.72);
+}
+
+.sv-distro-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--sv-angle, 0deg),
+    rgba(255,255,255,0.08),
+    rgba(255, 22, 68, 0.55),
+    rgba(28, 105, 255, 0.52),
+    rgba(255,255,255,0.14)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: svBorderSpin 5s linear infinite;
+}
+
+.sv-distro-copy {
+  position: relative;
+  z-index: 2;
+}
+
+.sv-distro-address {
+  color: #123b8a !important;
+  font-weight: 900;
+}
+
+.sv-distro-copy .sv-ab-btn {
+  margin-top: 22px;
+}
+
+.sv-distro-carousel {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  min-height: 360px;
+  border-radius: 28px;
+  background: #071225;
+  box-shadow:
+    0 24px 70px rgba(9, 31, 77, 0.18),
+    0 0 28px rgba(255, 22, 68, 0.10);
+}
+
+.sv-distro-track {
+  position: absolute;
+  inset: 0;
+}
+
+.sv-distro-track img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition:
+    opacity 0.55s ease,
+    transform 0.7s ease;
+}
+
+.sv-distro-track img.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sv-distro-carousel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 48%, rgba(5,12,28,0.62)),
+    radial-gradient(circle at 18% 20%, rgba(255,22,68,0.12), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(28,105,255,0.12), transparent 34%);
+  pointer-events: none;
+}
+
+.sv-distro-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+}
+
+.sv-distro-controls button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.24);
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.sv-distro-dots {
+  position: absolute;
+  left: 18px;
+  bottom: 22px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+}
+
+.sv-distro-dots button {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.45);
+  cursor: pointer;
+}
+
+.sv-distro-dots button.is-active {
+  width: 26px;
+  background: #ffffff;
+}
+
+@media (max-width: 1040px) {
+  .sv-location-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-distro-card {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-distro-carousel {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-distro-card {
+    padding: 18px;
+    border-radius: 26px;
+  }
+
+  .sv-distro-carousel {
+    min-height: 260px;
+  }
+}
+
+/* ===== SNUS VILLAGE LOCATIONS REDESIGN END ===== */
+
+
+/* ===== SVG DISTRO POLISH START ===== */
+
+.sv-distro-card {
+  grid-template-columns: minmax(0, 0.76fr) minmax(480px, 1fr);
+  padding: 30px;
+}
+
+.sv-distro-copy h3 {
+  font-size: clamp(2.1rem, 3vw, 3.3rem);
+}
+
+.sv-distro-address {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 14px !important;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(18, 59, 138, 0.08);
+  border: 1px solid rgba(18, 59, 138, 0.12);
+}
+
+.sv-distro-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sv-distro-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #123b8a;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(9, 31, 77, 0.10);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 24px rgba(9, 31, 77, 0.06);
+}
+
+.sv-distro-copy .sv-ab-btn {
+  margin-top: 24px;
+}
+
+.sv-distro-carousel {
+  min-height: 385px;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.sv-distro-gallery-label {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  padding: 12px 14px;
+  border-radius: 18px;
+  color: #ffffff;
+  background: rgba(5, 12, 28, 0.58);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+
+.sv-distro-gallery-label span {
+  display: block;
+  color: #ff1644;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sv-distro-gallery-label strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.98rem;
+  line-height: 1;
+}
+
+.sv-distro-track img {
+  filter: saturate(1.04) contrast(1.04);
+}
+
+@media (max-width: 1040px) {
+  .sv-distro-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== SVG DISTRO POLISH END ===== */
+
+
+/* ===== SVG DISTRO CLEANUP START ===== */
+
+.sv-distro-gallery-label {
+  display: none !important;
+}
+
+/* ===== SVG DISTRO CLEANUP END ===== */
