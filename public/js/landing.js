@@ -82,3 +82,39 @@ mobileToggle?.addEventListener("click", () => {
 document.querySelectorAll("#navLinks a").forEach((link) => {
   link.addEventListener("click", () => navLinks?.classList.remove("is-open"));
 });
+
+
+
+
+
+
+
+
+
+
+
+// ===== SNUS VILLAGE AB STYLE HERO START =====
+(function () {
+  const hero = document.getElementById("svAbHero");
+  if (!hero) return;
+
+  const cards = hero.querySelectorAll(".sv-ab-product-card, .sv-ab-feature-card");
+
+  hero.addEventListener("mousemove", (event) => {
+    const rect = hero.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+
+    cards.forEach((card, index) => {
+      const strength = (index + 1) * 3;
+      card.style.transform = `translate3d(${x * strength}px, ${y * strength}px, 0)`;
+    });
+  });
+
+  hero.addEventListener("mouseleave", () => {
+    cards.forEach((card) => {
+      card.style.transform = "";
+    });
+  });
+})();
+// ===== SNUS VILLAGE AB STYLE HERO END =====

@@ -1122,3 +1122,1013 @@ input {
     0 0 52px rgba(28, 105, 255, 0.34),
     inset 0 0 0 1px rgba(255,255,255,0.20);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== SNUS VILLAGE AB STYLE HERO START ===== */
+
+.page-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.topbar,
+.nav {
+  border-radius: 0;
+}
+
+.sv-ab-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 72px 0 64px;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255, 22, 68, 0.13), transparent 28%),
+    radial-gradient(circle at 88% 10%, rgba(18, 59, 138, 0.17), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #f7f9fd 100%);
+}
+
+.sv-ab-hero::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 34px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.74), rgba(255,255,255,0.46)),
+    radial-gradient(circle at 20% 26%, rgba(255, 22, 68, 0.08), transparent 34%),
+    radial-gradient(circle at 82% 24%, rgba(18, 59, 138, 0.10), transparent 34%);
+  pointer-events: none;
+}
+
+.sv-ab-hero__inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 0.85fr);
+  gap: clamp(34px, 6vw, 86px);
+  align-items: center;
+  min-height: 620px;
+}
+
+.sv-ab-hero__copy {
+  opacity: 0;
+  transform: translateY(22px);
+  animation: svAbReveal 0.85s ease forwards;
+}
+
+.sv-ab-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: #123b8a;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.sv-ab-hero__eyebrow::before {
+  content: "";
+  width: 38px;
+  height: 2px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #ff1644, #123b8a);
+}
+
+.sv-ab-hero h1 {
+  margin: 0;
+  max-width: 780px;
+  color: #061633;
+  font-size: clamp(3.8rem, 7vw, 8.2rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+  font-weight: 950;
+}
+
+.sv-ab-hero h1 span {
+  display: block;
+  color: #ff1644;
+  text-shadow: 0 12px 32px rgba(255, 22, 68, 0.16);
+}
+
+.sv-ab-hero__copy p {
+  max-width: 620px;
+  margin: 24px 0 0;
+  color: #52617a;
+  font-size: clamp(1rem, 1.22vw, 1.18rem);
+  line-height: 1.85;
+}
+
+.sv-ab-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.sv-ab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.sv-ab-btn:hover {
+  transform: translateY(-3px);
+}
+
+.sv-ab-btn--primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  box-shadow:
+    0 18px 42px rgba(255, 22, 68, 0.24),
+    0 0 26px rgba(18, 59, 138, 0.16);
+}
+
+.sv-ab-btn--ghost {
+  color: #061633;
+  border: 1px solid rgba(9, 31, 77, 0.16);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.sv-ab-btn--ghost:hover {
+  border-color: rgba(255, 22, 68, 0.38);
+  box-shadow: 0 14px 34px rgba(9, 31, 77, 0.10);
+}
+
+.sv-ab-hero__badges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-width: 620px;
+  margin-top: 40px;
+}
+
+.sv-ab-hero__badges div {
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background: rgba(255,255,255,0.72);
+  box-shadow: 0 16px 44px rgba(9, 31, 77, 0.07);
+}
+
+.sv-ab-hero__badges strong {
+  display: block;
+  color: #123b8a;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.sv-ab-hero__badges span {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.sv-ab-hero__visual {
+  position: relative;
+  min-height: 590px;
+  perspective: 1100px;
+}
+
+.sv-ab-orbit {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid rgba(18, 59, 138, 0.12);
+  pointer-events: none;
+}
+
+.sv-ab-orbit--one {
+  width: 420px;
+  height: 420px;
+  right: 42px;
+  top: 72px;
+  animation: svAbSpin 18s linear infinite;
+}
+
+.sv-ab-orbit--two {
+  width: 300px;
+  height: 300px;
+  right: 120px;
+  top: 140px;
+  border-color: rgba(255, 22, 68, 0.14);
+  animation: svAbSpin 14s linear infinite reverse;
+}
+
+.sv-ab-product-card,
+.sv-ab-feature-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.72);
+  box-shadow:
+    0 28px 80px rgba(9, 31, 77, 0.16),
+    0 0 34px rgba(255, 22, 68, 0.08);
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.sv-ab-product-card:hover,
+.sv-ab-feature-card:hover {
+  box-shadow:
+    0 34px 90px rgba(9, 31, 77, 0.20),
+    0 0 38px rgba(255, 22, 68, 0.14),
+    0 0 42px rgba(18, 59, 138, 0.10);
+}
+
+.sv-ab-product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sv-ab-product-card--main {
+  right: 34px;
+  top: 54px;
+  width: min(470px, 92%);
+  height: 420px;
+  animation: svAbFloat 6s ease-in-out infinite;
+}
+
+.sv-ab-product-card--main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 42%, rgba(5, 12, 28, 0.78)),
+    radial-gradient(circle at 18% 24%, rgba(255, 22, 68, 0.18), transparent 34%),
+    radial-gradient(circle at 80% 18%, rgba(18, 59, 138, 0.18), transparent 32%);
+}
+
+.sv-ab-product-card--main div {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 22px;
+  z-index: 2;
+  color: #ffffff;
+}
+
+.sv-ab-product-card span,
+.sv-ab-feature-card span {
+  display: block;
+  color: #ff1644;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sv-ab-product-card strong,
+.sv-ab-feature-card strong {
+  display: block;
+  margin-top: 6px;
+  color: inherit;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+.sv-ab-product-card--small {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  width: 270px;
+  min-height: 108px;
+}
+
+.sv-ab-product-card--small img {
+  height: 82px;
+  border-radius: 20px;
+  background: #f1f5f9;
+  object-fit: contain;
+  padding: 10px;
+}
+
+.sv-ab-product-card--small strong {
+  color: #061633;
+}
+
+.sv-ab-float-one {
+  left: 10px;
+  top: 120px;
+  animation: svAbFloat 5.5s ease-in-out infinite 0.4s;
+}
+
+.sv-ab-float-two {
+  right: 0;
+  bottom: 58px;
+  animation: svAbFloat 6.4s ease-in-out infinite 0.9s;
+}
+
+.sv-ab-feature-card {
+  left: 48px;
+  bottom: 44px;
+  width: 250px;
+  padding: 22px;
+  animation: svAbFloat 7s ease-in-out infinite 0.2s;
+}
+
+.sv-ab-feature-card span {
+  color: #123b8a;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.sv-ab-feature-card strong {
+  color: #061633;
+  font-size: 1.1rem;
+}
+
+.sv-ab-feature-card p {
+  margin: 10px 0 0;
+  color: #64748b;
+  line-height: 1.65;
+  font-size: 0.92rem;
+}
+
+@keyframes svAbReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes svAbFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -16px, 0) rotate(1deg);
+  }
+}
+
+@keyframes svAbSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1040px) {
+  .sv-ab-hero {
+    padding: 52px 0;
+  }
+
+  .sv-ab-hero__inner {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .sv-ab-hero__visual {
+    min-height: 560px;
+  }
+
+  .sv-ab-product-card--main {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .sv-ab-float-one {
+    left: 4%;
+  }
+
+  .sv-ab-float-two {
+    right: 4%;
+  }
+}
+
+@media (max-width: 720px) {
+  .sv-ab-hero::before {
+    inset: 10px;
+    border-radius: 26px;
+  }
+
+  .sv-ab-hero h1 {
+    font-size: clamp(3rem, 15vw, 5.2rem);
+  }
+
+  .sv-ab-hero__actions {
+    display: grid;
+  }
+
+  .sv-ab-btn {
+    width: 100%;
+  }
+
+  .sv-ab-hero__badges {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-ab-hero__visual {
+    min-height: 500px;
+  }
+
+  .sv-ab-product-card--main {
+    width: 100%;
+    height: 330px;
+    top: 30px;
+  }
+
+  .sv-ab-product-card--small,
+  .sv-ab-feature-card {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: 14px;
+  }
+
+  .sv-ab-orbit {
+    display: none;
+  }
+}
+
+/* ===== SNUS VILLAGE AB STYLE HERO END ===== */
+
+
+/* ===== SNUS VILLAGE AB HERO SIZE FIX START ===== */
+
+.sv-ab-hero {
+  padding: 38px 0 42px;
+}
+
+.sv-ab-hero::before {
+  inset: 12px;
+  border-radius: 28px;
+}
+
+.sv-ab-hero__inner {
+  min-height: 500px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
+  gap: clamp(24px, 4vw, 56px);
+}
+
+.sv-ab-hero h1 {
+  max-width: 720px;
+  font-size: clamp(3rem, 5.6vw, 6.4rem);
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+}
+
+.sv-ab-hero__copy p {
+  max-width: 540px;
+  margin-top: 18px;
+  font-size: clamp(0.96rem, 1.06vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.sv-ab-hero__actions {
+  margin-top: 24px;
+}
+
+.sv-ab-hero__badges {
+  max-width: 520px;
+  margin-top: 26px;
+}
+
+.sv-ab-hero__badges div {
+  padding: 13px;
+  border-radius: 18px;
+}
+
+.sv-ab-hero__badges strong {
+  font-size: 1.35rem;
+}
+
+.sv-ab-hero__visual {
+  min-height: 450px;
+}
+
+.sv-ab-orbit--one {
+  width: 310px;
+  height: 310px;
+  right: 44px;
+  top: 58px;
+}
+
+.sv-ab-orbit--two {
+  width: 220px;
+  height: 220px;
+  right: 98px;
+  top: 102px;
+}
+
+.sv-ab-product-card--main {
+  right: 28px;
+  top: 48px;
+  width: min(360px, 92%);
+  height: 315px;
+  border-radius: 24px;
+}
+
+.sv-ab-product-card--main div {
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+}
+
+.sv-ab-product-card--small {
+  width: 220px;
+  min-height: 88px;
+  grid-template-columns: 66px 1fr;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.sv-ab-product-card--small img {
+  height: 66px;
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.sv-ab-product-card--small strong,
+.sv-ab-feature-card strong {
+  font-size: 0.95rem;
+}
+
+.sv-ab-product-card span,
+.sv-ab-feature-card span {
+  font-size: 9px;
+}
+
+.sv-ab-float-one {
+  left: 8px;
+  top: 94px;
+}
+
+.sv-ab-float-two {
+  right: 2px;
+  bottom: 48px;
+}
+
+.sv-ab-feature-card {
+  left: 34px;
+  bottom: 34px;
+  width: 210px;
+  padding: 18px;
+  border-radius: 22px;
+}
+
+.sv-ab-feature-card p {
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 1040px) {
+  .sv-ab-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-ab-hero__visual {
+    min-height: 420px;
+  }
+
+  .sv-ab-product-card--main {
+    left: 50%;
+    right: auto;
+    width: min(360px, 88vw);
+    height: 300px;
+    transform: translateX(-50%);
+  }
+
+  .sv-ab-float-one {
+    left: 5%;
+    top: 86px;
+  }
+
+  .sv-ab-float-two {
+    right: 5%;
+    bottom: 38px;
+  }
+
+  .sv-ab-feature-card {
+    left: 8%;
+    bottom: 28px;
+  }
+}
+
+@media (max-width: 720px) {
+  .sv-ab-hero {
+    padding: 34px 0;
+  }
+
+  .sv-ab-hero h1 {
+    font-size: clamp(2.7rem, 12vw, 4.5rem);
+  }
+
+  .sv-ab-hero__visual {
+    min-height: auto;
+    display: grid;
+    gap: 14px;
+  }
+
+  .sv-ab-product-card--main,
+  .sv-ab-product-card--small,
+  .sv-ab-feature-card {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    transform: none;
+    margin: 0;
+  }
+
+  .sv-ab-product-card--main {
+    height: 260px;
+  }
+}
+
+/* ===== SNUS VILLAGE AB HERO SIZE FIX END ===== */
+
+/* ===== SNUS VILLAGE AB HERO BALANCE FIX START ===== */
+
+.sv-ab-hero__inner {
+  grid-template-columns: minmax(0, 1.05fr) minmax(440px, 0.85fr);
+  gap: clamp(14px, 2.4vw, 34px);
+}
+
+.sv-ab-hero__visual {
+  min-height: 500px;
+  margin-left: -18px;
+}
+
+.sv-ab-product-card--main {
+  width: min(430px, 96%);
+  height: 365px;
+  right: 8px;
+  top: 42px;
+}
+
+.sv-ab-product-card--small {
+  width: 270px;
+  min-height: 108px;
+  grid-template-columns: 82px 1fr;
+  gap: 14px;
+  padding: 12px;
+}
+
+.sv-ab-product-card--small img {
+  height: 82px;
+}
+
+.sv-ab-float-one {
+  left: -8px;
+  top: 98px;
+}
+
+.sv-ab-float-two {
+  right: -10px;
+  bottom: 56px;
+}
+
+.sv-ab-feature-card {
+  left: 22px;
+  bottom: 40px;
+  width: 250px;
+  padding: 22px;
+}
+
+.sv-ab-product-card--small strong,
+.sv-ab-feature-card strong {
+  font-size: 1.06rem;
+}
+
+.sv-ab-product-card span,
+.sv-ab-feature-card span {
+  font-size: 10px;
+}
+
+.sv-ab-orbit--one {
+  width: 380px;
+  height: 380px;
+  right: 24px;
+  top: 52px;
+}
+
+.sv-ab-orbit--two {
+  width: 270px;
+  height: 270px;
+  right: 96px;
+  top: 108px;
+}
+
+@media (max-width: 1040px) {
+  .sv-ab-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .sv-ab-hero__visual {
+    margin-left: 0;
+    min-height: 500px;
+  }
+
+  .sv-ab-product-card--main {
+    width: min(430px, 88vw);
+    height: 350px;
+  }
+}
+
+/* ===== SNUS VILLAGE AB HERO BALANCE FIX END ===== */
+
+
+/* ===== BIGGER HERO FLOATING CARDS FIX START ===== */
+
+.sv-ab-hero {
+  padding: 34px 0 38px;
+}
+
+.sv-ab-hero__inner {
+  grid-template-columns: minmax(0, 0.92fr) minmax(560px, 1fr);
+  gap: clamp(6px, 1.2vw, 18px);
+  min-height: 560px;
+}
+
+.sv-ab-hero__visual {
+  min-height: 570px;
+  margin-left: -54px;
+  transform: scale(1.06);
+  transform-origin: center right;
+}
+
+.sv-ab-product-card--main {
+  width: min(520px, 100%);
+  height: 430px;
+  right: 0;
+  top: 36px;
+  border-radius: 34px;
+}
+
+.sv-ab-product-card--main div {
+  left: 30px;
+  right: 30px;
+  bottom: 28px;
+}
+
+.sv-ab-product-card--main strong {
+  font-size: 1.45rem;
+  line-height: 1.22;
+}
+
+.sv-ab-product-card--small {
+  width: 340px;
+  min-height: 132px;
+  grid-template-columns: 108px 1fr;
+  gap: 18px;
+  padding: 14px;
+  border-radius: 28px;
+}
+
+.sv-ab-product-card--small img {
+  height: 108px;
+  border-radius: 22px;
+  padding: 12px;
+}
+
+.sv-ab-product-card--small strong {
+  font-size: 1.25rem;
+  line-height: 1.18;
+}
+
+.sv-ab-product-card span,
+.sv-ab-feature-card span {
+  font-size: 11px;
+}
+
+.sv-ab-float-one {
+  left: -62px;
+  top: 112px;
+}
+
+.sv-ab-float-two {
+  right: -24px;
+  bottom: 62px;
+}
+
+.sv-ab-feature-card {
+  left: -14px;
+  bottom: 44px;
+  width: 315px;
+  padding: 28px;
+  border-radius: 30px;
+}
+
+.sv-ab-feature-card strong {
+  font-size: 1.28rem;
+}
+
+.sv-ab-feature-card p {
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.sv-ab-orbit--one {
+  width: 470px;
+  height: 470px;
+  right: 16px;
+  top: 32px;
+}
+
+.sv-ab-orbit--two {
+  width: 340px;
+  height: 340px;
+  right: 104px;
+  top: 94px;
+}
+
+@media (max-width: 1180px) {
+  .sv-ab-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .sv-ab-hero__visual {
+    margin-left: 0;
+    transform: none;
+    min-height: 600px;
+  }
+
+  .sv-ab-product-card--main {
+    width: min(520px, 90vw);
+    height: 420px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .sv-ab-float-one {
+    left: 4%;
+  }
+
+  .sv-ab-float-two {
+    right: 4%;
+  }
+
+  .sv-ab-feature-card {
+    left: 7%;
+  }
+}
+
+@media (max-width: 720px) {
+  .sv-ab-hero__visual {
+    min-height: auto;
+    display: grid;
+    gap: 14px;
+  }
+
+  .sv-ab-product-card--main,
+  .sv-ab-product-card--small,
+  .sv-ab-feature-card {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    transform: none;
+    margin: 0;
+  }
+
+  .sv-ab-product-card--main {
+    height: 320px;
+  }
+
+  .sv-ab-product-card--small {
+    grid-template-columns: 96px 1fr;
+  }
+
+  .sv-ab-product-card--small img {
+    height: 96px;
+  }
+}
+
+/* ===== BIGGER HERO FLOATING CARDS FIX END ===== */
+
+/* ===== FINAL HERO PROPORTION FIX START ===== */
+
+.sv-ab-hero {
+  padding: 28px 0 34px;
+}
+
+.sv-ab-hero__inner {
+  min-height: 540px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(560px, 0.95fr);
+  gap: clamp(8px, 1.4vw, 22px);
+}
+
+.sv-ab-hero h1 {
+  max-width: 680px;
+  font-size: clamp(3rem, 5.2vw, 6rem);
+}
+
+.sv-ab-hero__copy p {
+  max-width: 520px;
+}
+
+.sv-ab-hero__visual {
+  min-height: 540px;
+  margin-left: -72px;
+  transform: none;
+}
+
+.sv-ab-product-card--main {
+  width: 500px;
+  height: 390px;
+  right: 0;
+  top: 36px;
+}
+
+.sv-ab-product-card--small {
+  width: 330px;
+  min-height: 125px;
+  grid-template-columns: 104px 1fr;
+}
+
+.sv-ab-product-card--small img {
+  height: 104px;
+}
+
+.sv-ab-float-one {
+  left: -42px;
+  top: 110px;
+}
+
+.sv-ab-float-two {
+  right: -18px;
+  bottom: 72px;
+}
+
+.sv-ab-feature-card {
+  width: 300px;
+  left: -18px;
+  bottom: 52px;
+}
+
+.sv-ab-orbit--one {
+  width: 430px;
+  height: 430px;
+  right: 30px;
+  top: 42px;
+}
+
+.sv-ab-orbit--two {
+  width: 310px;
+  height: 310px;
+  right: 116px;
+  top: 104px;
+}
+
+@media (max-width: 1180px) {
+  .sv-ab-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-ab-hero__visual {
+    margin-left: 0;
+    min-height: 560px;
+  }
+}
+
+/* ===== FINAL HERO PROPORTION FIX END ===== */
