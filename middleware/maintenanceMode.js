@@ -5,6 +5,18 @@ function maintenanceMode(req, res, next) {
     return next();
   }
 
+  const previewPassword = process.env.PREVIEW_PASSWORD || "";
+  const previewQuery = req.query.preview;
+
+  if (previewPassword && previewQuery && previewQuery === previewPassword) {
+    req.session.maintenancePreview = true;
+    return res.redirect(req.path === "/" ? "/" : req.path);
+  }
+
+  if (req.session?.maintenancePreview === true) {
+    return next();
+  }
+
   const allowedPaths = [
     "/maintenance",
     "/auth",
