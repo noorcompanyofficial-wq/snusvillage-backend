@@ -19,6 +19,11 @@ async function getCart(req) {
   }).populate("items.product");
 }
 
+function getCartProductId(item) {
+  if (!item || !item.product) return "";
+  return String(item.product._id || item.product);
+}
+
 // GET CART PAGE
 router.get("/", async (req, res, next) => {
   try {
@@ -63,7 +68,7 @@ router.post("/add/:productId", async (req, res, next) => {
       });
     }
 
-    const itemIndex = cart.items.findIndex((i) => i.product.toString() === productId);
+    const itemIndex = cart.items.findIndex((i) => getCartProductId(i) === productId);
 
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity = Math.min(
@@ -96,7 +101,7 @@ router.post("/update", async (req, res, next) => {
 
     if (!cart) return res.redirect("/cart");
 
-    const item = cart.items.find((i) => i.product.toString() === productId);
+    const item = cart.items.find((i) => getCartProductId(i) === productId);
 
     if (!item) return res.redirect("/cart");
 
@@ -136,7 +141,7 @@ router.post("/remove", async (req, res, next) => {
 
     if (!cart) return res.redirect("/cart");
 
-    cart.items = cart.items.filter((i) => i.product.toString() !== productId);
+    cart.items = cart.items.filter((i) => getCartProductId(i) !== productId);
 
     await cart.save();
 
