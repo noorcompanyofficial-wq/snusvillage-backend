@@ -47,6 +47,15 @@ function calculateAge(birthDate) {
   return new Date(diff).getUTCFullYear() - 1970;
 }
 
+function isTrustedLoginEmail(email) {
+  const trustedEmails = (process.env.TRUSTED_LOGIN_EMAILS || "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  return trustedEmails.includes(String(email || "").toLowerCase());
+}
+
 // ================= REGISTER =================
 router.post("/register", authLimiter, async (req, res) => {
   const { firstName, lastName, birthDate, email, password } = req.body;
@@ -235,7 +244,7 @@ router.post("/login", authLimiter, async (req, res) => {
   }
 
   // ================= FRAUD DETECTION PRO =================
-  if (user.ip && user.ip !== currentIP) {
+  if (user.ip && user.ip !== currentIP && !isTrustedLoginEmail(user.email)) {
     console.log("⚠️ Suspicious login detected!");
 
     if (!user.suspiciousIPs) user.suspiciousIPs = [];
