@@ -3029,3 +3029,199 @@ input {
 }
 
 /* ===== SVG DISTRO CLEANUP END ===== */
+
+
+/* ===== SNUS VILLAGE TRUST REDESIGN START ===== */
+
+.sv-trust-redesign {
+  padding-top: 46px;
+  padding-bottom: 56px;
+}
+
+.sv-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.sv-trust-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 230px;
+  padding: 24px;
+  border-radius: 30px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  background:
+    radial-gradient(circle at 16% 10%, rgba(255, 22, 68, 0.08), transparent 34%),
+    radial-gradient(circle at 90% 0%, rgba(18, 59, 138, 0.10), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,249,254,0.96));
+  box-shadow:
+    0 22px 62px rgba(9, 31, 77, 0.09),
+    inset 0 0 0 1px rgba(255,255,255,0.70);
+  isolation: isolate;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.sv-trust-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--sv-angle, 0deg),
+    rgba(255,255,255,0.08),
+    rgba(255, 22, 68, 0.58),
+    rgba(28, 105, 255, 0.58),
+    rgba(255,255,255,0.16)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  animation: svBorderSpin 5s linear infinite;
+  transition: opacity 0.28s ease;
+}
+
+.sv-trust-card::after {
+  content: "";
+  position: absolute;
+  right: -50px;
+  top: -50px;
+  width: 150px;
+  height: 150px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255,22,68,0.16), transparent 68%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.sv-trust-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.sv-trust-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(255, 22, 68, 0.16);
+  box-shadow:
+    0 32px 84px rgba(9, 31, 77, 0.16),
+    0 0 30px rgba(255, 22, 68, 0.14),
+    0 0 38px rgba(18, 59, 138, 0.10);
+}
+
+.sv-trust-card:hover::before {
+  opacity: 1;
+}
+
+.sv-trust-card--dark {
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 16% 16%, rgba(255, 22, 68, 0.34), transparent 36%),
+    radial-gradient(circle at 86% 12%, rgba(28, 105, 255, 0.30), transparent 34%),
+    linear-gradient(135deg, #071225, #10234d);
+}
+
+.sv-trust-card--accent {
+  background:
+    radial-gradient(circle at 16% 16%, rgba(255, 22, 68, 0.14), transparent 36%),
+    radial-gradient(circle at 86% 12%, rgba(28, 105, 255, 0.14), transparent 34%),
+    linear-gradient(180deg, #ffffff, #f7f9fe);
+}
+
+.sv-trust-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 24px;
+  border-radius: 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff1644, #123b8a);
+  box-shadow:
+    0 16px 34px rgba(255, 22, 68, 0.22),
+    0 0 26px rgba(18, 59, 138, 0.14);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+}
+
+.sv-trust-card h3 {
+  margin: 0;
+  color: #061633;
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.sv-trust-card--dark h3,
+.sv-trust-card--dark p {
+  color: #ffffff;
+}
+
+.sv-trust-card p {
+  margin: 14px 0 0;
+  color: #64748b;
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.sv-trust-card--dark p {
+  color: rgba(255,255,255,0.78);
+}
+
+@media (max-width: 980px) {
+  .sv-trust-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-trust-card {
+    min-height: 210px;
+  }
+}
+
+/* ===== SNUS VILLAGE TRUST REDESIGN END ===== */
+
+/* ===== TRUST SECTION SPACING FIX START ===== */
+
+.sv-locations-redesign {
+  padding-bottom: 30px;
+}
+
+.sv-trust-redesign {
+  padding-top: 28px;
+  padding-bottom: 42px;
+}
+
+.sv-trust-grid {
+  gap: 16px;
+}
+
+.sv-trust-card {
+  min-height: 210px;
+  padding: 22px;
+}
+
+.sv-trust-icon {
+  margin-bottom: 18px;
+}
+
+.sv-trust-card p {
+  margin-top: 12px;
+}
+
+/* ===== TRUST SECTION SPACING FIX END ===== */
