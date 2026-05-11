@@ -353,3 +353,14 @@ body {
 }
 
 /* ===== SUMUP CHECKOUT NOTICE END ===== */
+
+/* ===== REMOVE UNUSED EXPRESS PAYMENT UI START ===== */
+
+.express-payments,
+.checkout-divider,
+.paypal-btn,
+.gpay-btn {
+  display: none !important;
+}
+
+/* ===== REMOVE UNUSED EXPRESS PAYMENT UI END ===== */
