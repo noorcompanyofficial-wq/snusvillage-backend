@@ -18,6 +18,19 @@ function formatMoney(value) {
   return `£${Number(value || 0).toFixed(2)}`;
 }
 
+function getAdminEmails() {
+  const raw =
+    process.env.ADMIN_ORDER_EMAILS ||
+    process.env.USER_EMAIL ||
+    process.env.EMAIL_USER ||
+    "";
+
+  return raw
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+}
+
 function getOrderNumber(order) {
   return order._id.toString().slice(-6).toUpperCase();
 }
@@ -110,9 +123,12 @@ ${buildDeliveryText(order)}
 Snus Village
 `.trim();
 
+  const adminEmails = getAdminEmails();
+
   await transporter.sendMail({
     from: `"Snus Village" <${process.env.EMAIL_USER}>`,
     to: order.customer.email,
+    bcc: adminEmails.length ? adminEmails.join(",") : undefined,
     subject: clickCollect
       ? `Click & Collect Order Confirmed #${orderNumber}`
       : `Snus Village Order Confirmed #${orderNumber}`,
@@ -125,9 +141,9 @@ Snus Village
 async function sendAdminOrderEmail(order) {
   const transporter = getEmailTransporter();
 
-  const adminEmail = process.env.USER_EMAIL || process.env.EMAIL_USER;
+  const adminEmails = getAdminEmails();
 
-  if (!transporter || !adminEmail) {
+  if (!transporter || !adminEmails.length) {
     return { ok: false, skipped: true, message: "Email credentials or admin email missing" };
   }
 
@@ -185,7 +201,7 @@ Error: ${order.royalMail?.syncError || "N/A"}
 
   await transporter.sendMail({
     from: `"Snus Village Website" <${process.env.EMAIL_USER}>`,
-    to: adminEmail,
+    to: adminEmails.join(","),
     subject: clickCollect
       ? `CLICK & COLLECT Order #${orderNumber}`
       : `New Delivery Order #${orderNumber}`,
