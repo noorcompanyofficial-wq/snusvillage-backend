@@ -4,6 +4,7 @@ const router = express.Router();
 const Cart = require("../models/cart");
 const Order = require("../models/order");
 const Product = require("../models/Products");
+const User = require("../models/User");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
 const { sendOrderEmails } = require("../utils/orderEmails");
 const { createHostedCheckout, getCheckoutStatus } = require("../utils/sumup");
@@ -210,6 +211,18 @@ router.get("/", async (req, res, next) => {
     }
 
     const { subtotal, shipping, total } = calculateCartTotals(cart);
+    let verificationRequired = false;
+
+    if (getUserId(req)) {
+      const user = await User.findById(getUserId(req)).lean();
+
+      if (!user) {
+        req.flash("error", "Please log in again before checkout.");
+        return res.redirect("/auth/login");
+      }
+
+      verificationRequired = !(user.isAgeVerified || user.didit?.verified);
+    }
 
     res.render("checkout/checkout", {
       layout: "layouts/checkout-layout",
@@ -218,6 +231,7 @@ router.get("/", async (req, res, next) => {
       subtotal,
       shipping,
       total,
+      verificationRequired,
     });
   } catch (error) {
     next(error);
@@ -230,6 +244,20 @@ router.post("/place-order", async (req, res, next) => {
 
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.redirect("/cart");
+    }
+
+    if (getUserId(req)) {
+      const user = await User.findById(getUserId(req)).lean();
+
+      if (!user) {
+        req.flash("error", "Please log in again before checkout.");
+        return res.redirect("/auth/login");
+      }
+
+      if (!(user.isAgeVerified || user.didit?.verified)) {
+        req.flash("error", "Age verification is required before checkout.");
+        return res.redirect("/checkout");
+      }
     }
 
     if (req.body.ageConfirm !== "yes") {

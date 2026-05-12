@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
 
   isVerified: { type: Boolean, default: false },
 
+  diditSessionId: { type: String, default: null },
+  diditStatus: { type: String, default: "not_started" },
+  isAgeVerified: { type: Boolean, default: false },
+  ageVerifiedAt: { type: Date, default: null },
+
   // DIDIT KYC
   didit: {
     sessionId: String,

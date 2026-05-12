@@ -2,6 +2,16 @@
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
+    <% if (verificationRequired) { %>
+      <div class="checkout-sumup-notice">
+        <strong>Age verification is required before checkout.</strong>
+        <span>Please complete verification before placing your order.</span>
+      </div>
+
+      <form action="/didit/start" method="POST">
+        <button type="submit" class="pay-now-btn">Start Verification</button>
+      </form>
+    <% } else { %>
     <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
@@ -67,6 +77,7 @@
 
       <button type="submit" class="pay-now-btn">Pay Securely With SumUp</button>
     </form>
+    <% } %>
   </section>
 
   <aside class="checkout-summary-panel">

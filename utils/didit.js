@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const DIDIT_API_BASE_URL = "https://verification.didit.me";
 
 function getBaseUrl(req) {
-  const configured = process.env.BASE_URL || "";
+  const configured = process.env.APP_URL || process.env.BASE_URL || "";
   if (configured.startsWith("http://") || configured.startsWith("https://")) {
     return configured.replace(/\/$/, "");
   }
@@ -27,21 +27,30 @@ function getDiditClient() {
   });
 }
 
-async function createVerificationSession(user, req) {
+async function createVerificationSession(user, req, options = {}) {
   if (!process.env.DIDIT_WORKFLOW_ID) {
     throw new Error("DIDIT_WORKFLOW_ID is not configured.");
   }
 
   const baseUrl = getBaseUrl(req);
   const client = getDiditClient();
+  const callbackPath = options.callbackPath || "/didit/complete";
+  const metadata = options.metadata || {
+    website: "Snus Village",
+    purpose: "checkout-age-verification",
+  };
+  const contactDetails = options.contactDetails || {
+    email: user.email,
+    email_lang: "en",
+    send_notification_emails: false,
+  };
+
   const { data } = await client.post("/v3/session/", {
     workflow_id: process.env.DIDIT_WORKFLOW_ID,
     vendor_data: String(user._id),
-    callback: `${baseUrl}/auth/dashboard`,
-    metadata: {
-      email: user.email,
-      source: "snusvillage-web",
-    },
+    callback: `${baseUrl}${callbackPath}`,
+    contact_details: contactDetails,
+    metadata,
   });
 
   return data;
@@ -78,7 +87,7 @@ function sortKeys(value) {
   return value;
 }
 
-function verifyWebhookSignature({ body, signature, timestamp }) {
+function verifyWebhookSignature({ body, rawBody, signature, timestamp }) {
   if (!process.env.DIDIT_WEBHOOK_SECRET) {
     throw new Error("DIDIT_WEBHOOK_SECRET is not configured.");
   }
@@ -92,23 +101,32 @@ function verifyWebhookSignature({ body, signature, timestamp }) {
     return { ok: false, reason: "missing signature" };
   }
 
-  const canonical = JSON.stringify(sortKeys(shortenFloats(body)));
-  const expected = crypto
-    .createHmac("sha256", process.env.DIDIT_WEBHOOK_SECRET)
-    .update(canonical, "utf8")
-    .digest("hex");
-
   const signatureBuffer = Buffer.from(signature, "hex");
-  const expectedBuffer = Buffer.from(expected, "hex");
+  const payloads = [];
 
-  if (
-    signatureBuffer.length !== expectedBuffer.length ||
-    !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
-  ) {
-    return { ok: false, reason: "bad signature" };
+  if (rawBody) {
+    payloads.push(rawBody);
   }
 
-  return { ok: true };
+  payloads.push(JSON.stringify(sortKeys(shortenFloats(body))));
+
+  for (const payload of payloads) {
+    const expected = crypto
+      .createHmac("sha256", process.env.DIDIT_WEBHOOK_SECRET)
+      .update(payload)
+      .digest("hex");
+
+    const expectedBuffer = Buffer.from(expected, "hex");
+
+    if (
+      signatureBuffer.length === expectedBuffer.length &&
+      crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+    ) {
+      return { ok: true };
+    }
+  }
+
+  return { ok: false, reason: "bad signature" };
 }
 
 module.exports = {

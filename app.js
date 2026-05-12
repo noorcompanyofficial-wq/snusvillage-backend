@@ -36,6 +36,7 @@ const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
 const verificationRoutes = require("./routes/verification");
+const diditRoutes = require("./routes/didit");
 
 const wholesaleRoutes = require("./routes/wholesale");
 
@@ -47,7 +48,15 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // ====== Basic Middleware ======
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      if (req.originalUrl === "/didit/webhook") {
+        req.rawBody = Buffer.from(buf);
+      }
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -148,6 +157,7 @@ app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api", verificationRoutes);
+app.use("/didit", diditRoutes);
 
 app.use("/cart", cartRoutes);
 

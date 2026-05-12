@@ -33,6 +33,8 @@ async function applyDiditDecision(event) {
   if (!event.vendor_data) return null;
 
   const update = {
+    diditSessionId: event.session_id,
+    diditStatus: normaliseStatus(event.status),
     "didit.sessionId": event.session_id,
     "didit.workflowId": event.workflow_id,
     "didit.status": normaliseStatus(event.status),
@@ -46,15 +48,20 @@ async function applyDiditDecision(event) {
 
   switch (event.status) {
     case "Approved":
+      update.isAgeVerified = true;
+      update.ageVerifiedAt = new Date();
       update["didit.verified"] = true;
       update["didit.verifiedAt"] = new Date();
       update["didit.declinedAt"] = null;
       break;
     case "Declined":
+      update.isAgeVerified = false;
       update["didit.verified"] = false;
       update["didit.declinedAt"] = new Date();
       break;
     case "Kyc Expired":
+      update.isAgeVerified = false;
+      update.ageVerifiedAt = null;
       update["didit.verified"] = false;
       update["didit.verifiedAt"] = null;
       break;
@@ -89,7 +96,13 @@ router.post("/session", isAuth, async (req, res, next) => {
       return res.redirect("/auth/login");
     }
 
-    const session = await createVerificationSession(user, req);
+    const session = await createVerificationSession(user, req, {
+      callbackPath: "/auth/dashboard",
+      metadata: {
+        email: user.email,
+        source: "snusvillage-web",
+      },
+    });
 
     user.set("didit.sessionId", session.session_id);
     user.set("didit.workflowId", session.workflow_id);
