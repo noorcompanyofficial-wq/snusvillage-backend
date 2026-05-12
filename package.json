@@ -5,6 +5,8 @@
   "scripts": {
     "start": "node app.js",
     "nodemon": "nodemon app.js",
+    "didit:account": "node scripts/didit-account.js",
+    "didit:setup": "node scripts/didit-setup.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

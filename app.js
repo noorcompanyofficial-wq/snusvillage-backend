@@ -36,6 +36,7 @@ const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
+const verificationRoutes = require("./routes/verification");
 
 const wholesaleRoutes = require("./routes/wholesale");
 
@@ -151,6 +152,7 @@ app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api", verificationRoutes);
 
 app.use("/cart", cartRoutes);
 

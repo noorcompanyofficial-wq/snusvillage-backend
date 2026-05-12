@@ -374,8 +374,20 @@ router.post("/reset-password", async (req, res) => {
 });
 
 // ================= DASHBOARD =================
-router.get("/dashboard", isAuth, (req, res) => {
-  res.render("dashboard/dashboard", { user: req.session.user });
+router.get("/dashboard", isAuth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.user._id).lean();
+
+    if (!user) {
+      req.flash("error", "Please log in again.");
+      return res.redirect("/auth/login");
+    }
+
+    req.session.user = user;
+    res.render("dashboard/dashboard", { user });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // ================= LOGOUT =================

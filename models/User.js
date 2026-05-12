@@ -28,6 +28,34 @@ const userSchema = new mongoose.Schema({
 
   isVerified: { type: Boolean, default: false },
 
+  // DIDIT KYC
+  didit: {
+    sessionId: String,
+    workflowId: String,
+    status: {
+      type: String,
+      enum: [
+        "Not Started",
+        "In Progress",
+        "Awaiting User",
+        "In Review",
+        "Approved",
+        "Declined",
+        "Resubmitted",
+        "Abandoned",
+        "Expired",
+        "Kyc Expired",
+      ],
+      default: "Not Started",
+    },
+    verified: { type: Boolean, default: false },
+    verifiedAt: Date,
+    declinedAt: Date,
+    lastWebhookAt: Date,
+    decision: mongoose.Schema.Types.Mixed,
+    metadata: mongoose.Schema.Types.Mixed,
+  },
+
   //  VERIFY
   verifyCode: String,
   verifyCodeExpire: Date,
