@@ -73,62 +73,90 @@
         <h2>Product Collection</h2>
       </div>
 
-      <p><%= products.length %> Product<%= products.length === 1 ? "" : "s" %> Showing</p>
+      <p>
+        <%= totalProducts || products.length %> Product<%= (totalProducts || products.length) === 1 ? "" : "s" %>
+        Across <%= brandSections.length %> Brand<%= brandSections.length === 1 ? "" : "s" %>
+      </p>
     </div>
 
-    <div class="shop-grid">
-      <% products.forEach(p => { %>
-        <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
-
-        <article class="shop-product-card">
-          <a href="/products/<%= p._id %>" class="shop-product-image">
-            <% if (p.images && p.images.length > 0) { %>
-              <img src="<%= p.images[0] %>" alt="<%= p.name %>">
-            <% } else { %>
-              <span>No Image</span>
-            <% } %>
-          </a>
-
-          <div class="shop-product-body">
-            <div class="shop-product-top">
-              <span class="strength-badge"><%= p.strength || "Normal" %></span>
-              <span class="<%= p.stock > 0 ? 'shop-stock in' : 'shop-stock out' %>">
-                <%= p.stock > 0 ? "In Stock" : "Out Of Stock" %>
-              </span>
+    <div class="shop-brand-layout">
+      <% brandSections.forEach(section => { %>
+        <section class="shop-brand-section" id="brand-<%= section.brand.toLowerCase().replace(/[^a-z0-9]+/g, '-') %>">
+          <div class="shop-brand-head">
+            <div>
+              <span class="shop-brand-kicker">Brand Range</span>
+              <h3><%= section.brand %></h3>
             </div>
 
-            <h2>
-              <a href="/products/<%= p._id %>"><%= p.name %></a>
-            </h2>
-
-            <p>
-              <%= p.description ? p.description.substring(0, 96) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 96 ? "..." : "" %>
-            </p>
-
-            <div class="shop-product-meta">
-              <span><%= p.brand || "Brand N/A" %></span>
-              <span><%= p.nicotine ? p.nicotine + "mg" : "Nicotine N/A" %></span>
-            </div>
-
-            <div class="shop-product-bottom">
-              <div class="shop-price-wrap">
-                <% if (p.discountPrice && p.discountPrice > 0) { %>
-                  <small>£<%= p.price.toFixed(2) %></small>
-                <% } %>
-                <strong>£<%= finalPrice.toFixed(2) %></strong>
-              </div>
-
-              <% if (p.stock > 0) { %>
-                <form action="/cart/add/<%= p._id %>" method="POST">
-                  <input type="hidden" name="quantity" value="1">
-                  <button type="submit">Add To Cart</button>
-                </form>
-              <% } else { %>
-                <a class="shop-view-btn" href="/products/<%= p._id %>">View Product</a>
-              <% } %>
-            </div>
+            <span class="shop-brand-count">
+              <%= section.count %> Product<%= section.count === 1 ? "" : "s" %>
+            </span>
           </div>
-        </article>
+
+          <div class="shop-brand-carousel-wrap">
+            <button type="button" class="shop-brand-arrow shop-brand-arrow--prev" aria-label="Scroll <%= section.brand %> Left">‹</button>
+
+            <div class="shop-brand-products" data-brand-carousel>
+              <% section.products.forEach(p => { %>
+              <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
+
+              <article class="shop-product-card">
+                <a href="/products/<%= p._id %>" class="shop-product-image">
+                  <% if (p.images && p.images.length > 0) { %>
+                    <img src="<%= p.images[0] %>" alt="<%= p.name %>">
+                  <% } else { %>
+                    <span>No Image</span>
+                  <% } %>
+                </a>
+
+                <div class="shop-product-body">
+                  <div class="shop-product-top">
+                    <span class="strength-badge"><%= p.strength || "Normal" %></span>
+                    <span class="<%= p.stock > 0 ? 'shop-stock in' : 'shop-stock out' %>">
+                      <%= p.stock > 0 ? "In Stock" : "Out Of Stock" %>
+                    </span>
+                  </div>
+
+                  <h2>
+                    <a href="/products/<%= p._id %>"><%= p.name %></a>
+                  </h2>
+
+                  <p>
+                    <%= p.description ? p.description.substring(0, 96) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 96 ? "..." : "" %>
+                  </p>
+
+                  <div class="shop-product-meta">
+                    <span><%= p.brand || "Brand N/A" %></span>
+                    <span><%= p.nicotine ? p.nicotine + "mg" : "Nicotine N/A" %></span>
+                  </div>
+
+                  <div class="shop-product-bottom">
+                    <div class="shop-price-wrap">
+                      <% if (p.discountPrice && p.discountPrice > 0) { %>
+                        <small>£<%= p.price.toFixed(2) %></small>
+                      <% } %>
+                      <strong>£<%= finalPrice.toFixed(2) %></strong>
+                    </div>
+
+                    <% if (p.stock > 0) { %>
+                      <form action="/cart/add/<%= p._id %>" method="POST">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit">Add To Cart</button>
+                      </form>
+                    <% } else { %>
+                      <a class="shop-view-btn" href="/products/<%= p._id %>">View Product</a>
+                    <% } %>
+                  </div>
+                </div>
+              </article>
+              <% }) %>
+            </div>
+
+            <button type="button" class="shop-brand-arrow shop-brand-arrow--next" aria-label="Scroll <%= section.brand %> Right">›</button>
+          </div>
+        </section>
+
+<script src="/js/shop.js"></script>
       <% }) %>
     </div>
   <% } %>

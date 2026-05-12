@@ -5,3 +5,13 @@ node_modules
 npm-debug.log
 public/uploads/
 private/labels/
+
+# Local backup files
+*.backup-*
+app.js.backup-*
+config/*.backup-*
+middleware/*.backup-*
+routes/*.backup-*
+views/**/*.backup-*
+public/css/*.backup-*
+public/js/*.backup-*
