@@ -1,5 +1,4 @@
 const express = require("express");
-const maintenanceMode = require("./middleware/maintenanceMode");
 const helmet = require("helmet");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
@@ -52,7 +51,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-
 app.use(cookieParser());
 
 // ====== Session ======
@@ -75,9 +73,6 @@ app.use(cartSession);
 
 // ====== Flash ======
 app.use(flash());
-
-// ====== Maintenance Mode ======
-app.use(maintenanceMode);
 
 // ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {
