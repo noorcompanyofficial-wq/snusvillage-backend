@@ -447,3 +447,91 @@ main {
     font-size: 15px;
   }
 }
+
+/* ===== HEADER LOGO SIZE CONTROL ===== */
+.header .navbar .nav-container .logo {
+  flex: 0 0 380px !important;
+  max-width: 380px !important;
+}
+
+.header .navbar .nav-container .logo a {
+  width: 380px !important;
+  min-width: 380px !important;
+}
+
+.header .navbar .nav-container .logo img,
+.navbar .nav-container .logo img,
+.navbar .logo img,
+.logo img {
+  width: 360px !important;
+  max-width: 360px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.header .navbar,
+.navbar,
+.header .navbar .nav-container,
+.nav-container {
+  min-height: 162px !important;
+}
+
+.nav-links {
+  gap: 18px !important;
+}
+
+.nav-links li a {
+  font-size: 15px !important;
+}
+
+@media (max-width: 1100px) {
+  .header .navbar .nav-container .logo {
+    flex-basis: 290px !important;
+    max-width: 290px !important;
+  }
+
+  .header .navbar .nav-container .logo a {
+    width: 290px !important;
+    min-width: 290px !important;
+  }
+
+  .header .navbar .nav-container .logo img,
+  .navbar .nav-container .logo img,
+  .navbar .logo img,
+  .logo img {
+    width: 275px !important;
+    max-width: 275px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .header .navbar .nav-container .logo {
+    flex-basis: 210px !important;
+    max-width: 210px !important;
+  }
+
+  .header .navbar .nav-container .logo a {
+    width: 210px !important;
+    min-width: 210px !important;
+  }
+
+  .header .navbar .nav-container .logo img,
+  .navbar .nav-container .logo img,
+  .navbar .logo img,
+  .logo img {
+    width: 200px !important;
+    max-width: 200px !important;
+  }
+
+  .header .navbar,
+  .navbar,
+  .header .navbar .nav-container,
+  .nav-container {
+    min-height: 116px !important;
+  }
+
+  .nav-links {
+    top: 116px !important;
+    height: calc(100vh - 116px) !important;
+  }
+}
