@@ -72,15 +72,25 @@ slides.forEach((slide, index) => {
 showSlide(0);
 startSlider();
 
-const mobileToggle = document.getElementById("mobileToggle");
+const mobileToggle = document.getElementById("mobileToggle") || document.getElementById("nav-icon4");
 const navLinks = document.getElementById("navLinks");
+
+if (mobileToggle && mobileToggle.id === "nav-icon4" && mobileToggle.children.length === 0) {
+  mobileToggle.innerHTML = "<span></span><span></span><span></span>";
+}
 
 mobileToggle?.addEventListener("click", () => {
   navLinks?.classList.toggle("is-open");
+  navLinks?.classList.toggle("active");
+  mobileToggle.classList.toggle("open");
 });
 
 document.querySelectorAll("#navLinks a").forEach((link) => {
-  link.addEventListener("click", () => navLinks?.classList.remove("is-open"));
+  link.addEventListener("click", () => {
+    navLinks?.classList.remove("is-open");
+    navLinks?.classList.remove("active");
+    mobileToggle?.classList.remove("open");
+  });
 });
 
 

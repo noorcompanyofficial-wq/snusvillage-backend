@@ -26,45 +26,9 @@
       </div>
     </div>
 
+    <%- include("../partials/header") %>
+
     <div class="page-shell">
-      <div class="topbar">
-        <div class="container topbar__inner">
-          <div class="topbar__pill">Premium Brands - Authentic Stock - Fast UK Delivery</div>
-          <div class="topbar__pill">Camden Town - Oxford Street - Edgware Road - 18+ Only</div>
-        </div>
-      </div>
-
-      <header class="nav">
-        <div class="container nav__inner">
-          <a class="brand" href="/" aria-label="Snus Village home">
-            <img class="brand__logo" src="/images/logo/snus-village-lion-shield.png" alt="Snus Village" />
-            <span class="brand__text">
-              <strong>Snus Village</strong>
-              <span>London's Premium Snus Store</span>
-            </span>
-          </a>
-
-          <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">Menu</button>
-
-          <nav class="nav__links" id="navLinks">
-            <a href="/shop">All Products</a>
-            <a href="/wholesale">Wholesale</a>
-            <a href="/about">About Us</a>
-            <a href="/shop?flavour=mint">Flavours</a>
-            <a href="/#reviews">Reviews</a>
-          </nav>
-
-          <div class="nav__actions">
-            <% if (user) { %>
-              <a class="ghost-btn nav-auth" href="/auth/dashboard">Account</a>
-              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/logout">Logout</a>
-            <% } else { %>
-              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/register">Register</a>
-              <a class="btn nav-auth" href="/auth/login">Login</a>
-            <% } %>
-          </div>
-        </div>
-      </header>
 
       <main id="home">
 
