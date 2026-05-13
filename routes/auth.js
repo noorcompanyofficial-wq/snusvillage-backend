@@ -13,19 +13,32 @@ const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
 async function safeSendMail(mailOptions, label = "auth email") {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    const mailConfig = transporter.snusMailConfig || {};
+    const fromEmail = mailConfig.emailUser || process.env.EMAIL_USER;
+
+    if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass) {
+      console.log(`${label} not configured:`, {
+        hasEmailUser: mailConfig.hasEmailUser,
+        hasEmailPass: mailConfig.hasEmailPass,
+      });
+
       return {
         ok: false,
-        message: "EMAIL_USER or EMAIL_PASS is missing",
+        message: "Email username or password is missing",
       };
     }
 
     const timeout = Number(process.env.EMAIL_TIMEOUT_MS || 5000);
+    const bcc = (process.env.AUTH_EMAIL_BCC || "")
+      .split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
 
     const info = await Promise.race([
       transporter.sendMail({
-        from: `"Snus Village" <${process.env.EMAIL_USER}>`,
-        replyTo: process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER,
+        from: `"Snus Village" <${fromEmail}>`,
+        replyTo: process.env.EMAIL_REPLY_TO || fromEmail,
+        bcc: bcc.length ? bcc.join(",") : undefined,
         ...mailOptions,
       }),
       new Promise((_, reject) =>
