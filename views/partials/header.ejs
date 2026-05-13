@@ -1,40 +1,37 @@
 <header class="header">
   <nav class="navbar">
     <div class="nav-container">
+      <ul class="nav-links nav-links--primary" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Brands</a></li>
+        <li><a href="/shop?strength=STRONG">Strength</a></li>
+        <li><a href="/shop?flavour=mint">Flavours</a></li>
+        <li><a href="/#reviews">Reviews</a></li>
+      </ul>
+
       <div class="logo">
         <a href="/">
           <img src="/images/logo/snus-village-lion-shield.png" alt="Snus Village" />
           <span>
             <strong>Snus Village</strong>
-            <small>London's premium snus store</small>
+            <small>Premium Snus Store</small>
           </span>
         </a>
       </div>
 
-      <ul class="nav-links" id="navLinks">
-        <li><a href="/shop">All Products</a></li>
-        <li><a href="/wholesale">Wholesale</a></li>
-        <li><a href="/about">About Us</a></li>
-        <li><a href="/contact">Contact Us</a></li>
-      </ul>
+      <div class="header-tools">
+        <form class="header-search" action="/shop" method="GET">
+          <label for="headerSearch">Search products</label>
+          <input id="headerSearch" type="search" name="search" placeholder="Search products" />
+          <button type="submit">Search</button>
+        </form>
 
-      <div class="customer-nav">
+        <a class="header-cart" href="/cart">Cart</a>
+
         <% if (user) { %>
-          <a class="customer-nav__link" href="/auth/dashboard">
-            <i class="fa-solid fa-user"></i>
-            Account
-          </a>
-          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/logout">
-            Logout
-          </a>
+          <a class="customer-nav__link" href="/auth/dashboard">Account</a>
         <% } else { %>
-          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/register">
-            Register
-          </a>
-          <a class="customer-nav__link" href="/auth/login">
-            <i class="fa-solid fa-user"></i>
-            Login
-          </a>
+          <a class="customer-nav__link" href="/auth/login">Login</a>
         <% } %>
       </div>
 
