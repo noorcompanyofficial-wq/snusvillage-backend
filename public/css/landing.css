@@ -6974,3 +6974,31 @@ input {
 }
 
 /* ===== SMOOTH INFINITE BRAND STRIP LOOP FIX END ===== */
+
+/* ===== CONNECT REAL HERO BANNER IMAGES START ===== */
+
+.sv-slide-one {
+  --slide-bg: url("/images/banner/whitefox_banner_16x6.png");
+}
+
+.sv-slide-two {
+  --slide-bg: url("/images/banner/siberia_banner_organised_16x6_allimgs.png");
+}
+
+.sv-slide-three {
+  --slide-bg:
+    radial-gradient(circle at 76% 26%, rgba(226,31,47,0.7), transparent 25%),
+    linear-gradient(135deg, #061733, #071b3f);
+}
+
+/* keep real banner images visible and text readable */
+.sv-slide::before {
+  background:
+    linear-gradient(90deg, rgba(7, 27, 63, 0.56), rgba(7, 27, 63, 0.18), rgba(7, 27, 63, 0.04)),
+    linear-gradient(180deg, rgba(7, 27, 63, 0.06), rgba(7, 27, 63, 0.42)),
+    var(--slide-bg) !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* ===== CONNECT REAL HERO BANNER IMAGES END ===== */
