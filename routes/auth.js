@@ -43,8 +43,26 @@ function isStrongPassword(password) {
 }
 
 function calculateAge(birthDate) {
-  const diff = Date.now() - new Date(birthDate).getTime();
+  const date = new Date(birthDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const diff = Date.now() - date.getTime();
   return new Date(diff).getUTCFullYear() - 1970;
+}
+
+function normalizeEmail(email) {
+  return String(email || "")
+    .toLowerCase()
+    .trim();
+}
+
+function getClientIp(req) {
+  return String(req.headers["x-forwarded-for"] || req.ip || "")
+    .split(",")[0]
+    .trim();
 }
 
 function isTrustedLoginEmail(email) {
@@ -57,61 +75,91 @@ function isTrustedLoginEmail(email) {
 }
 
 // ================= REGISTER =================
-router.post("/register", authLimiter, async (req, res) => {
-  const { firstName, lastName, birthDate, email, password } = req.body;
+router.post("/register", authLimiter, async (req, res, next) => {
+  try {
+    const { firstName, lastName, birthDate, password } = req.body;
+    const normalizedEmail = normalizeEmail(req.body.email);
 
-  const age = calculateAge(birthDate);
+    if (!firstName || !lastName || !birthDate || !normalizedEmail || !password) {
+      req.flash("error", "Please fill in all required fields.");
+      return res.redirect("/auth/register");
+    }
 
-  if (age < 18) {
-    req.flash("error", "Only 18+ allowed");
-    return res.redirect("/auth/register");
-  }
+    const age = calculateAge(birthDate);
 
-  if (!isStrongPassword(password)) {
-    req.flash(
-      "error",
-      "Password must be 6+ chars and include uppercase, lowercase number and symbol"
+    if (age === null) {
+      req.flash("error", "Please enter a valid date of birth.");
+      return res.redirect("/auth/register");
+    }
+
+    if (age < 18) {
+      req.flash("error", "Only 18+ allowed");
+      return res.redirect("/auth/register");
+    }
+
+    if (!isStrongPassword(password)) {
+      req.flash(
+        "error",
+        "Password must be 6+ chars and include uppercase, lowercase, a number, and a symbol."
+      );
+      return res.redirect("/auth/register");
+    }
+
+    const exist = await User.findOne({ email: normalizedEmail });
+    if (exist) {
+      req.flash("error", "An account with this email already exists. Please log in.");
+      return res.redirect("/auth/login");
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const approvedWholesaleApplication =
+      mongoose.connection.readyState === 1
+        ? await WholesaleApplication.findOne({
+            email: normalizedEmail,
+            status: "approved",
+          })
+        : await wholesaleApplicationStore.findApprovedByEmail(normalizedEmail);
+
+    await User.create({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      birthDate,
+      email: normalizedEmail,
+      password: hashed,
+      traderStatus: approvedWholesaleApplication ? "approved" : "none",
+      verifyCode: code,
+      verifyCodeExpire: Date.now() + 10 * 60 * 1000,
+    });
+
+    const emailResult = await safeSendMail(
+      {
+        to: normalizedEmail,
+        subject: "Verify Code",
+        text: `Code: ${code}`,
+      },
+      "auth email"
     );
-    return res.redirect("/auth/register");
+
+    req.session.verifyEmail = normalizedEmail;
+
+    if (!emailResult.ok) {
+      req.flash(
+        "error",
+        "Account created, but the verification email could not be sent. Try resend code."
+      );
+    }
+
+    return res.redirect("/auth/verify");
+  } catch (error) {
+    if (error.code === 11000) {
+      req.flash("error", "An account with this email already exists. Please log in.");
+      return res.redirect("/auth/login");
+    }
+
+    return next(error);
   }
-
-  const exist = await User.findOne({ email });
-  if (exist) {
-    req.flash("error", "Email exists");
-    return res.redirect("/auth/register");
-  }
-
-  const hashed = await bcrypt.hash(password, 10);
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-  const normalizedEmail = email.toLowerCase().trim();
-  const approvedWholesaleApplication =
-    mongoose.connection.readyState === 1
-      ? await WholesaleApplication.findOne({
-          email: normalizedEmail,
-          status: "approved",
-        })
-      : await wholesaleApplicationStore.findApprovedByEmail(normalizedEmail);
-
-  await User.create({
-    firstName,
-    lastName,
-    birthDate,
-    email: normalizedEmail,
-    password: hashed,
-    traderStatus: approvedWholesaleApplication ? "approved" : "none",
-    verifyCode: code,
-    verifyCodeExpire: Date.now() + 10 * 60 * 1000,
-  });
-
-  await safeSendMail({
-    to: email,
-    subject: "Verify Code",
-    text: `Code: ${code}`,
-  }, "auth email");
-
-  req.session.verifyEmail = email;
-  res.redirect("/auth/verify");
 });
 
 // ================= RESEND VERIFY =================
@@ -121,7 +169,7 @@ router.post("/resend-code", async (req, res) => {
     return res.redirect("/auth/register");
   }
 
-  const user = await User.findOne({ email: req.session.verifyEmail });
+  const user = await User.findOne({ email: normalizeEmail(req.session.verifyEmail) });
   if (!user) return res.redirect("/auth/register");
 
   //  cooldown
@@ -138,11 +186,14 @@ router.post("/resend-code", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail({
-    to: user.email,
-    subject: "New Code",
-    text: `Code: ${code}`,
-  }, "auth email");
+  await safeSendMail(
+    {
+      to: user.email,
+      subject: "New Code",
+      text: `Code: ${code}`,
+    },
+    "auth email"
+  );
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/verify");
@@ -155,7 +206,7 @@ router.post("/resend-reset", async (req, res) => {
     return res.redirect("/auth/forgot");
   }
 
-  const user = await User.findOne({ email: req.session.resetEmail });
+  const user = await User.findOne({ email: normalizeEmail(req.session.resetEmail) });
   if (!user) return res.redirect("/auth/forgot");
 
   //  cooldown
@@ -172,11 +223,14 @@ router.post("/resend-reset", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail({
-    to: user.email,
-    subject: "New Reset Code",
-    text: `Code: ${code}`,
-  }, "auth email");
+  await safeSendMail(
+    {
+      to: user.email,
+      subject: "New Reset Code",
+      text: `Code: ${code}`,
+    },
+    "auth email"
+  );
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/reset-verify");
@@ -184,7 +238,7 @@ router.post("/resend-reset", async (req, res) => {
 
 // ================= VERIFY =================
 router.post("/verify", async (req, res) => {
-  const user = await User.findOne({ email: req.session.verifyEmail });
+  const user = await User.findOne({ email: normalizeEmail(req.session.verifyEmail) });
 
   if (!user || user.verifyCode !== req.body.code) {
     req.flash("error", "Invalid code");
@@ -206,117 +260,93 @@ router.post("/verify", async (req, res) => {
 });
 
 // ================= LOGIN =================
-router.post("/login", authLimiter, async (req, res) => {
-  const { email, password, remember } = req.body;
+router.post("/login", authLimiter, async (req, res, next) => {
+  try {
+    const { password, remember } = req.body;
+    const email = normalizeEmail(req.body.email);
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (!user) {
-    req.flash("error", "Wrong credentials");
-    return res.redirect("/auth/login");
-  }
-
-  const currentIP = req.headers["x-forwarded-for"] || req.ip;
-
-  if (user.blockedIPs && user.blockedIPs.includes(currentIP)) {
-    req.flash("error", "🚫 Your IP is blocked due to suspicious activity!");
-    return res.redirect("/auth/login");
-  }
-
-  if (user.lockUntil && user.lockUntil > Date.now()) {
-    req.flash("error", "Account locked! Try later.");
-    return res.redirect("/auth/login");
-  }
-
-  const match = await bcrypt.compare(password, user.password);
-
-  if (!match) {
-    user.loginAttempts += 1;
-
-    if (user.loginAttempts >= 5) {
-      user.lockUntil = Date.now() + 15 * 60 * 1000;
-    }
-
-    await user.save();
-
-    req.flash("error", "Wrong credentials");
-    return res.redirect("/auth/login");
-  }
-
-  // ================= FRAUD DETECTION PRO =================
-  if (user.ip && user.ip !== currentIP && !isTrustedLoginEmail(user.email)) {
-    console.log("⚠️ Suspicious login detected!");
-
-    if (!user.suspiciousIPs) user.suspiciousIPs = [];
-    if (!user.blockedIPs) user.blockedIPs = [];
-
-    if (!user.suspiciousIPs.includes(currentIP)) {
-      user.suspiciousIPs.push(currentIP);
-    }
-
-    if (user.suspiciousIPs.length >= 2) {
-      user.blockedIPs.push(currentIP);
-
-      await safeSendMail({
-        to: user.email,
-        subject: "🚨 Security Alert",
-        text: `We detected multiple suspicious login attempts.
-IP: ${currentIP}
-Your account has been protected.`,
-  }, "auth email");
-
-      await user.save();
-
-      req.flash("error", "🚨 Suspicious activity! Your IP has been blocked.");
+    if (!user) {
+      req.flash("error", "Wrong credentials");
       return res.redirect("/auth/login");
     }
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const currentIP = getClientIp(req);
 
-    user.verifyCode = code;
-    user.verifyCodeExpire = Date.now() + 10 * 60 * 1000;
+    if (user.blockedIPs && user.blockedIPs.includes(currentIP)) {
+      req.flash("error", "Your account needs a security review. Please contact support.");
+      return res.redirect("/auth/login");
+    }
 
-    await safeSendMail({
-      to: user.email,
-      subject: "New Login Verification",
-      text: `New login detected. Code: ${code}`,
-  }, "auth email");
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      req.flash("error", "Account locked. Please try again later.");
+      return res.redirect("/auth/login");
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      user.loginAttempts += 1;
+
+      if (user.loginAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000;
+      }
+
+      await user.save();
+
+      req.flash("error", "Wrong credentials");
+      return res.redirect("/auth/login");
+    }
+
+    if (user.verifyCode && !user.isVerified) {
+      req.session.verifyEmail = user.email;
+      req.flash("error", "Please verify your email before logging in.");
+      return res.redirect("/auth/verify");
+    }
+
+    // Track new IPs for admin visibility without blocking normal customers on mobile/VPN networks.
+    if (user.ip && user.ip !== currentIP && !isTrustedLoginEmail(user.email)) {
+      if (!user.suspiciousIPs) user.suspiciousIPs = [];
+
+      if (currentIP && !user.suspiciousIPs.includes(currentIP)) {
+        user.suspiciousIPs.push(currentIP);
+      }
+    }
+
+    // ================= SUCCESS LOGIN =================
+    user.loginAttempts = 0;
+    user.lockUntil = null;
+
+    const parser = new UAParser(req.headers["user-agent"]);
+    user.device = parser.getResult().browser.name;
+    user.ip = currentIP;
+
+    const refreshToken = generateRefreshToken(user);
+    user.refreshToken = refreshToken;
 
     await user.save();
 
-    req.session.verifyEmail = user.email;
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: remember ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
+    });
 
-    req.flash("error", "⚠️ New device/IP detected. Verify your login.");
-    return res.redirect("/auth/verify");
+    req.session.user = user;
+
+    const redirectTo = req.session.returnTo || "/auth/dashboard";
+    delete req.session.returnTo;
+
+    return res.redirect(redirectTo);
+  } catch (error) {
+    return next(error);
   }
-
-  // ================= SUCCESS LOGIN =================
-  user.loginAttempts = 0;
-  user.lockUntil = null;
-
-  const parser = new UAParser(req.headers["user-agent"]);
-  user.device = parser.getResult().browser.name;
-  user.ip = currentIP;
-
-  const refreshToken = generateRefreshToken(user);
-  user.refreshToken = refreshToken;
-
-  await user.save();
-
-  res.cookie("jwt", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: remember ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
-  });
-
-  req.session.user = user;
-
-  res.redirect("/auth/dashboard");
 });
 // ================= FORGOT =================
 router.post("/forgot", async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: normalizeEmail(req.body.email) });
 
   if (!user) {
     req.flash("error", "Email not found");
@@ -330,11 +360,14 @@ router.post("/forgot", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail({
-    to: user.email,
-    subject: "Reset Code",
-    text: `Code: ${code}`,
-  }, "auth email");
+  await safeSendMail(
+    {
+      to: user.email,
+      subject: "Reset Code",
+      text: `Code: ${code}`,
+    },
+    "auth email"
+  );
 
   req.session.resetEmail = user.email;
 
@@ -343,10 +376,15 @@ router.post("/forgot", async (req, res) => {
 
 // ================= RESET VERIFY =================
 router.post("/reset-verify", async (req, res) => {
-  const user = await User.findOne({ email: req.session.resetEmail });
+  const user = await User.findOne({ email: normalizeEmail(req.session.resetEmail) });
 
   if (!user || user.resetCode !== req.body.code) {
     req.flash("error", "Invalid code");
+    return res.redirect("/auth/reset-verify");
+  }
+
+  if (user.resetCodeExpire < Date.now()) {
+    req.flash("error", "Expired code");
     return res.redirect("/auth/reset-verify");
   }
 
@@ -362,10 +400,26 @@ router.post("/reset-password", async (req, res) => {
     return res.redirect("/auth/reset");
   }
 
-  const user = await User.findOne({ email: req.session.resetEmail });
+  if (!isStrongPassword(password)) {
+    req.flash(
+      "error",
+      "Password must be 6+ chars and include uppercase, lowercase, a number, and a symbol."
+    );
+    return res.redirect("/auth/reset");
+  }
+
+  const user = await User.findOne({ email: normalizeEmail(req.session.resetEmail) });
+
+  if (!user) {
+    req.flash("error", "Session expired");
+    return res.redirect("/auth/forgot");
+  }
 
   user.password = await bcrypt.hash(password, 10);
   user.resetCode = null;
+  user.resetCodeExpire = null;
+  user.loginAttempts = 0;
+  user.lockUntil = null;
 
   await user.save();
 

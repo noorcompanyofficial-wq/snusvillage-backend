@@ -4,7 +4,10 @@ const rateLimit = require("express-rate-limit");
 exports.authLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 min
   max: 5,
-  message: "Too many login attempts. Try again later.",
+  handler: (req, res) => {
+    req.flash("error", "Too many attempts. Please wait a minute and try again.");
+    return res.redirect(req.originalUrl.includes("/register") ? "/auth/register" : "/auth/login");
+  },
 });
 
 // Just For Contact
