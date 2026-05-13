@@ -13,20 +13,52 @@ const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 
 async function safeSendMail(mailOptions, label = "auth email") {
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return {
+        ok: false,
+        message: "EMAIL_USER or EMAIL_PASS is missing",
+      };
+    }
+
     const timeout = Number(process.env.EMAIL_TIMEOUT_MS || 5000);
 
-    await Promise.race([
-      transporter.sendMail(mailOptions),
+    const info = await Promise.race([
+      transporter.sendMail({
+        from: `"Snus Village" <${process.env.EMAIL_USER}>`,
+        replyTo: process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER,
+        ...mailOptions,
+      }),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error(`${label} timed out after ${timeout}ms`)), timeout)
       ),
     ]);
 
-    return { ok: true };
+    console.log(`${label} sent:`, {
+      accepted: info.accepted,
+      rejected: info.rejected,
+      response: info.response,
+    });
+
+    return { ok: true, info };
   } catch (error) {
     console.log(`${label} failed:`, error.message);
     return { ok: false, message: error.message };
   }
+}
+
+function buildCodeEmail({ code, heading, intro }) {
+  return {
+    text: `${intro}\n\nCode: ${code}\n\nThis code expires in 10 minutes.\n\nSnus Village`,
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
+        <h2>${heading}</h2>
+        <p>${intro}</p>
+        <p style="font-size:28px;font-weight:700;letter-spacing:6px;margin:24px 0">${code}</p>
+        <p>This code expires in 10 minutes.</p>
+        <p>Snus Village</p>
+      </div>
+    `,
+  };
 }
 
 // ================= GET =================
@@ -136,8 +168,12 @@ router.post("/register", authLimiter, async (req, res, next) => {
     const emailResult = await safeSendMail(
       {
         to: normalizedEmail,
-        subject: "Verify Code",
-        text: `Code: ${code}`,
+        subject: "Your Snus Village verification code",
+        ...buildCodeEmail({
+          code,
+          heading: "Verify your Snus Village account",
+          intro: "Use this code to finish creating your account.",
+        }),
       },
       "auth email"
     );
@@ -147,7 +183,7 @@ router.post("/register", authLimiter, async (req, res, next) => {
     if (!emailResult.ok) {
       req.flash(
         "error",
-        "Account created, but the verification email could not be sent. Try resend code."
+        "Account created, but the verification email could not be sent. Please try Resend Code or contact support."
       );
     }
 
@@ -186,14 +222,23 @@ router.post("/resend-code", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail(
+  const emailResult = await safeSendMail(
     {
       to: user.email,
-      subject: "New Code",
-      text: `Code: ${code}`,
+      subject: "Your new Snus Village verification code",
+      ...buildCodeEmail({
+        code,
+        heading: "New verification code",
+        intro: "Use this code to verify your Snus Village account.",
+      }),
     },
     "auth email"
   );
+
+  if (!emailResult.ok) {
+    req.flash("error", "The code was updated, but the email could not be sent. Please contact support.");
+    return res.redirect("/auth/verify");
+  }
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/verify");
@@ -223,14 +268,23 @@ router.post("/resend-reset", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail(
+  const emailResult = await safeSendMail(
     {
       to: user.email,
-      subject: "New Reset Code",
-      text: `Code: ${code}`,
+      subject: "Your new Snus Village reset code",
+      ...buildCodeEmail({
+        code,
+        heading: "New password reset code",
+        intro: "Use this code to continue resetting your password.",
+      }),
     },
     "auth email"
   );
+
+  if (!emailResult.ok) {
+    req.flash("error", "The reset code was updated, but the email could not be sent. Please contact support.");
+    return res.redirect("/auth/reset-verify");
+  }
 
   req.flash("success", "Code resent!");
   res.redirect("/auth/reset-verify");
@@ -238,6 +292,11 @@ router.post("/resend-reset", async (req, res) => {
 
 // ================= VERIFY =================
 router.post("/verify", async (req, res) => {
+  if (!req.session.verifyEmail) {
+    req.flash("error", "Verification session expired. Please log in or register again.");
+    return res.redirect("/auth/login");
+  }
+
   const user = await User.findOne({ email: normalizeEmail(req.session.verifyEmail) });
 
   if (!user || user.verifyCode !== req.body.code) {
@@ -360,16 +419,25 @@ router.post("/forgot", async (req, res) => {
 
   await user.save();
 
-  await safeSendMail(
+  const emailResult = await safeSendMail(
     {
       to: user.email,
-      subject: "Reset Code",
-      text: `Code: ${code}`,
+      subject: "Your Snus Village password reset code",
+      ...buildCodeEmail({
+        code,
+        heading: "Password reset code",
+        intro: "Use this code to reset your Snus Village password.",
+      }),
     },
     "auth email"
   );
 
   req.session.resetEmail = user.email;
+
+  if (!emailResult.ok) {
+    req.flash("error", "The reset email could not be sent. Please try again or contact support.");
+    return res.redirect("/auth/forgot");
+  }
 
   res.redirect("/auth/reset-verify");
 });
