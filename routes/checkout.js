@@ -13,6 +13,34 @@ function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
 }
 
+function sessionIsAgeVerified(req) {
+  return req.session?.diditVerified === true || req.session?.isAgeVerified === true;
+}
+
+function userIsAgeVerified(user) {
+  return Boolean(user && (user.isAgeVerified || user.didit?.verified));
+}
+
+async function getCheckoutUser(req) {
+  const userId = getUserId(req);
+  if (!userId) return null;
+  return User.findById(userId).lean();
+}
+
+async function checkoutVerificationRequired(req) {
+  const user = await getCheckoutUser(req);
+
+  if (getUserId(req) && !user) {
+    return { missingUser: true, required: true };
+  }
+
+  return {
+    missingUser: false,
+    required: !(userIsAgeVerified(user) || sessionIsAgeVerified(req)),
+    user,
+  };
+}
+
 async function getCart(req) {
   const userId = getUserId(req);
   const sessionId = req.session?.cartId;
@@ -211,18 +239,15 @@ router.get("/", async (req, res, next) => {
     }
 
     const { subtotal, shipping, total } = calculateCartTotals(cart);
-    let verificationRequired = false;
 
-    if (getUserId(req)) {
-      const user = await User.findById(getUserId(req)).lean();
+    const verification = await checkoutVerificationRequired(req);
 
-      if (!user) {
-        req.flash("error", "Please log in again before checkout.");
-        return res.redirect("/auth/login");
-      }
-
-      verificationRequired = !(user.isAgeVerified || user.didit?.verified);
+    if (verification.missingUser) {
+      req.flash("error", "Please log in again before checkout.");
+      return res.redirect("/auth/login");
     }
+
+    const verificationRequired = verification.required;
 
     res.render("checkout/checkout", {
       layout: "layouts/checkout-layout",
@@ -246,18 +271,16 @@ router.post("/place-order", async (req, res, next) => {
       return res.redirect("/cart");
     }
 
-    if (getUserId(req)) {
-      const user = await User.findById(getUserId(req)).lean();
+    const verification = await checkoutVerificationRequired(req);
 
-      if (!user) {
-        req.flash("error", "Please log in again before checkout.");
-        return res.redirect("/auth/login");
-      }
+    if (verification.missingUser) {
+      req.flash("error", "Please log in again before checkout.");
+      return res.redirect("/auth/login");
+    }
 
-      if (!(user.isAgeVerified || user.didit?.verified)) {
-        req.flash("error", "Age verification is required before checkout.");
-        return res.redirect("/checkout");
-      }
+    if (verification.required) {
+      req.flash("error", "Age verification is required before checkout.");
+      return res.redirect("/checkout");
     }
 
     if (req.body.ageConfirm !== "yes") {

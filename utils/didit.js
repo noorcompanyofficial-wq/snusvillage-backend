@@ -27,7 +27,7 @@ function getDiditClient() {
   });
 }
 
-async function createVerificationSession(user, req, options = {}) {
+async function createVerificationSession(subject, req, options = {}) {
   if (!process.env.DIDIT_WORKFLOW_ID) {
     throw new Error("DIDIT_WORKFLOW_ID is not configured.");
   }
@@ -35,24 +35,52 @@ async function createVerificationSession(user, req, options = {}) {
   const baseUrl = getBaseUrl(req);
   const client = getDiditClient();
   const callbackPath = options.callbackPath || "/didit/complete";
-  const metadata = options.metadata || {
-    website: "Snus Village",
-    purpose: "checkout-age-verification",
-  };
-  const contactDetails = options.contactDetails || {
-    email: user.email,
-    email_lang: "en",
-    send_notification_emails: false,
-  };
 
-  const { data } = await client.post("/v3/session/", {
+  const vendorData =
+    options.vendorData ||
+    subject?.vendorData ||
+    (subject?._id ? String(subject._id) : "");
+
+  if (!vendorData) {
+    throw new Error("Didit vendor_data is missing.");
+  }
+
+  const payload = {
     workflow_id: process.env.DIDIT_WORKFLOW_ID,
-    vendor_data: String(user._id),
+    vendor_data: vendorData,
     callback: `${baseUrl}${callbackPath}`,
-    contact_details: contactDetails,
-    metadata,
-  });
+    metadata: options.metadata || {
+      website: "Snus Village",
+      purpose: "checkout-age-verification",
+      source: subject?._id ? "logged-in-checkout" : "guest-checkout",
+    },
+  };
 
+  const contactDetails = options.contactDetails || (
+    subject?.email
+      ? {
+          email: subject.email,
+          email_lang: "en",
+          send_notification_emails: false,
+        }
+      : null
+  );
+
+  if (contactDetails) {
+    payload.contact_details = contactDetails;
+  }
+
+  const { data } = await client.post("/v3/session/", payload);
+  return data;
+}
+
+async function getVerificationDecision(sessionId) {
+  if (!sessionId) {
+    throw new Error("Didit session ID is missing.");
+  }
+
+  const client = getDiditClient();
+  const { data } = await client.get(`/v3/session/${encodeURIComponent(sessionId)}/decision/`);
   return data;
 }
 
@@ -131,5 +159,6 @@ function verifyWebhookSignature({ body, rawBody, signature, timestamp }) {
 
 module.exports = {
   createVerificationSession,
+  getVerificationDecision,
   verifyWebhookSignature,
 };
