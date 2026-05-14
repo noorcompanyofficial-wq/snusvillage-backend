@@ -14,6 +14,7 @@ const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
+const { storeProductImages } = require("../utils/productImages");
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
@@ -531,7 +532,7 @@ router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res
       .replace(/ /g, "-")
       .replace(/[^\w-]+/g, "");
 
-    const images = req.files.map((file) => "/uploads/" + file.filename);
+    const images = await storeProductImages(req.files);
 
     await Product.create({
       name,
@@ -609,7 +610,7 @@ router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req
     }
 
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => "/uploads/" + file.filename);
+      const newImages = await storeProductImages(req.files);
 
       images = [...images, ...newImages];
     }
