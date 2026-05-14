@@ -3115,3 +3115,19 @@ textarea:focus {
 }
 
 /* ===== ADMIN USER DETAIL PAGE END ===== */
+
+/* ===== ADMIN SEARCH ANALYTICS PAGE START ===== */
+
+.admin-search-rank-item {
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+}
+
+.admin-search-rank-item--warning > span {
+  background: linear-gradient(135deg, #b41232, #ff1644);
+}
+
+.admin-search-analytics-page .admin-table td {
+  vertical-align: middle;
+}
+
+/* ===== ADMIN SEARCH ANALYTICS PAGE END ===== */

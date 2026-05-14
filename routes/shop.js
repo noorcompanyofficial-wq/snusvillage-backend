@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Products");
+const SearchAnalytics = require("../models/SearchAnalytics");
 
 function escapeRegex(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -79,6 +80,25 @@ router.get("/", async (req, res) => {
     });
 
     const brandSections = groupProductsByBrand(products);
+
+    if (search && String(search).trim().length >= 2) {
+      SearchAnalytics.create({
+        term: String(search).trim().toLowerCase(),
+        originalTerm: String(search).trim(),
+        resultCount: products.length,
+        hadResults: products.length > 0,
+        filters: {
+          brand: brand || "",
+          strength: strength || "",
+          flavour: flavour || "",
+        },
+        sessionId: req.sessionID || "",
+        user: req.session?.user?._id || null,
+        ip: req.ip || req.headers["x-forwarded-for"] || "",
+      }).catch((analyticsErr) => {
+        console.log("Search analytics save failed:", analyticsErr.message);
+      });
+    }
 
     if (req.headers.accept && req.headers.accept.includes("application/json")) {
       return res.json({

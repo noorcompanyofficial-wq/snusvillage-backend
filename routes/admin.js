@@ -11,6 +11,7 @@ const Cart = require("../models/cart");
 const WholesaleApplication = require("../models/WholesaleApplication");
 const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
+const SearchAnalytics = require("../models/SearchAnalytics");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
@@ -151,6 +152,95 @@ async function getAdminStats() {
 
 router.get("/", isAdmin, (req, res) => {
   res.redirect("/admin/dashboard");
+});
+
+
+
+router.get("/search-analytics", isAdmin, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.render("admin/search-analytics", {
+        layout: "layouts/admin-layout",
+        stats: {
+          totalSearches: 0,
+          noResultSearches: 0,
+          uniqueTerms: 0,
+          todaySearches: 0,
+        },
+        topTerms: [],
+        noResultTerms: [],
+        recentSearches: [],
+      });
+    }
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const [
+      totalSearches,
+      noResultSearches,
+      uniqueTerms,
+      todaySearches,
+      topTerms,
+      noResultTerms,
+      recentSearches,
+    ] = await Promise.all([
+      SearchAnalytics.countDocuments(),
+      SearchAnalytics.countDocuments({ hadResults: false }),
+      SearchAnalytics.distinct("term").then((terms) => terms.length),
+      SearchAnalytics.countDocuments({ createdAt: { $gte: todayStart } }),
+
+      SearchAnalytics.aggregate([
+        {
+          $group: {
+            _id: "$term",
+            originalTerm: { $first: "$originalTerm" },
+            count: { $sum: 1 },
+            averageResults: { $avg: "$resultCount" },
+            lastSearchedAt: { $max: "$createdAt" },
+          },
+        },
+        { $sort: { count: -1, lastSearchedAt: -1 } },
+        { $limit: 20 },
+      ]),
+
+      SearchAnalytics.aggregate([
+        { $match: { hadResults: false } },
+        {
+          $group: {
+            _id: "$term",
+            originalTerm: { $first: "$originalTerm" },
+            count: { $sum: 1 },
+            lastSearchedAt: { $max: "$createdAt" },
+          },
+        },
+        { $sort: { count: -1, lastSearchedAt: -1 } },
+        { $limit: 20 },
+      ]),
+
+      SearchAnalytics.find()
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean(),
+    ]);
+
+    res.render("admin/search-analytics", {
+      layout: "layouts/admin-layout",
+      stats: {
+        totalSearches,
+        noResultSearches,
+        uniqueTerms,
+        todaySearches,
+      },
+      topTerms,
+      noResultTerms,
+      recentSearches,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load search analytics");
+    res.redirect("/admin/dashboard");
+  }
 });
 
 
