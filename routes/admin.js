@@ -181,40 +181,115 @@ router.get("/homepage", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/homepage/social", isAdmin, async (req, res) => {
+
+router.post("/homepage/hero-distro", isAdmin, async (req, res) => {
   try {
-    const slides = [1, 2, 3].map((number) => ({
-      videoSrc: String(req.body[`videoSrc${number}`] || "").trim(),
-      posterSrc: String(req.body[`posterSrc${number}`] || "").trim(),
-      title: String(req.body[`title${number}`] || "").trim(),
-      subtitle: String(req.body[`subtitle${number}`] || "").trim(),
+    const heroSlides = [1, 2, 3].map((number) => ({
+      kicker: String(req.body[`heroKicker${number}`] || "").trim(),
+      title: String(req.body[`heroTitle${number}`] || "").trim(),
+      buttonText: String(req.body[`heroButtonText${number}`] || "").trim(),
+      buttonLink: String(req.body[`heroButtonLink${number}`] || "").trim(),
+      imageSrc: String(req.body[`heroImageSrc${number}`] || "").trim(),
     }));
+
+    const distroImages = [1, 2, 3].map((number) => ({
+      imageSrc: String(req.body[`distroImageSrc${number}`] || "").trim(),
+      alt: String(req.body[`distroImageAlt${number}`] || "").trim(),
+    }));
+
+    const badges = String(req.body.distroBadges || "")
+      .split(",")
+      .map((badge) => badge.trim())
+      .filter(Boolean);
 
     await HomepageContent.findOneAndUpdate(
       { key: "homepage" },
       {
-        key: "homepage",
-        social: {
-          eyebrow: String(req.body.eyebrow || "").trim(),
-          heading: String(req.body.heading || "").trim(),
-          description: String(req.body.description || "").trim(),
-          instagramUrl: String(req.body.instagramUrl || "").trim(),
-          cardTitle: String(req.body.cardTitle || "").trim(),
-          cardText: String(req.body.cardText || "").trim(),
-          slides,
+        $set: {
+          key: "homepage",
+          "hero.slides": heroSlides,
+          "distro.kicker": String(req.body.distroKicker || "").trim(),
+          "distro.title": String(req.body.distroTitle || "").trim(),
+          "distro.address": String(req.body.distroAddress || "").trim(),
+          "distro.description": String(req.body.distroDescription || "").trim(),
+          "distro.buttonText": String(req.body.distroButtonText || "").trim(),
+          "distro.buttonLink": String(req.body.distroButtonLink || "").trim(),
+          "distro.badges": badges,
+          "distro.images": distroImages,
         },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    req.flash("success", "Homepage social section updated");
+    req.flash("success", "Homepage hero and SVG Distro section updated");
     res.redirect("/admin/homepage");
   } catch (err) {
     console.log(err);
-    req.flash("error", "Unable to update homepage social section");
+    req.flash("error", "Unable to update homepage hero and distro section");
     res.redirect("/admin/homepage");
   }
 });
+
+
+router.post(
+  "/homepage/social",
+  isAdmin,
+  upload.fields([
+    { name: "posterImage1", maxCount: 1 },
+    { name: "posterImage2", maxCount: 1 },
+    { name: "posterImage3", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      async function imagePath(fieldName, fallbackPath) {
+        const file = req.files?.[fieldName]?.[0];
+
+        if (!file) {
+          return String(fallbackPath || "").trim();
+        }
+
+        const [storedPath] = await storeProductImages([file]);
+        return storedPath || String(fallbackPath || "").trim();
+      }
+
+      const slides = await Promise.all(
+        [1, 2, 3].map(async (number) => ({
+          videoSrc: String(req.body[`videoSrc${number}`] || "").trim(),
+          posterSrc: await imagePath(
+            `posterImage${number}`,
+            req.body[`posterSrc${number}`]
+          ),
+          title: String(req.body[`title${number}`] || "").trim(),
+          subtitle: String(req.body[`subtitle${number}`] || "").trim(),
+        }))
+      );
+
+      await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        {
+          key: "homepage",
+          social: {
+            eyebrow: String(req.body.eyebrow || "").trim(),
+            heading: String(req.body.heading || "").trim(),
+            description: String(req.body.description || "").trim(),
+            instagramUrl: String(req.body.instagramUrl || "").trim(),
+            cardTitle: String(req.body.cardTitle || "").trim(),
+            cardText: String(req.body.cardText || "").trim(),
+            slides,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      req.flash("success", "Homepage social section updated");
+      res.redirect("/admin/homepage");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to update homepage social section");
+      res.redirect("/admin/homepage");
+    }
+  }
+);
 
 
 router.get("/search-analytics", isAdmin, async (req, res) => {

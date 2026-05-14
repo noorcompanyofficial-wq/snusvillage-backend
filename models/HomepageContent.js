@@ -1,5 +1,31 @@
 const mongoose = require("mongoose");
 
+const heroSlideSchema = new mongoose.Schema(
+  {
+    kicker: {
+      type: String,
+      default: "",
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    buttonText: {
+      type: String,
+      default: "",
+    },
+    buttonLink: {
+      type: String,
+      default: "",
+    },
+    imageSrc: {
+      type: String,
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
 const socialSlideSchema = new mongoose.Schema(
   {
     videoSrc: {
@@ -22,6 +48,20 @@ const socialSlideSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const distroImageSchema = new mongoose.Schema(
+  {
+    imageSrc: {
+      type: String,
+      default: "",
+    },
+    alt: {
+      type: String,
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
 const homepageContentSchema = new mongoose.Schema(
   {
     key: {
@@ -29,6 +69,84 @@ const homepageContentSchema = new mongoose.Schema(
       default: "homepage",
       unique: true,
       index: true,
+    },
+
+    hero: {
+      slides: {
+        type: [heroSlideSchema],
+        default: [
+          {
+            kicker: "Featured Collection",
+            title: "White Fox",
+            buttonText: "Shop White Fox",
+            buttonLink: "/shop?brand=White%20Fox",
+            imageSrc: "/images/header/h-1.jpeg",
+          },
+          {
+            kicker: "Best Sellers",
+            title: "Premium Brands",
+            buttonText: "Browse Brands",
+            buttonLink: "/shop",
+            imageSrc: "/images/header/h-2.jpeg",
+          },
+          {
+            kicker: "London Retail",
+            title: "Visit Our Stores",
+            buttonText: "Find Branches",
+            buttonLink: "#shops",
+            imageSrc: "/images/delivery/delivery.jpg",
+          },
+        ],
+      },
+    },
+
+    distro: {
+      kicker: {
+        type: String,
+        default: "Distribution Hub",
+      },
+      title: {
+        type: String,
+        default: "SVG Distro",
+      },
+      address: {
+        type: String,
+        default: "Snus Village Charles House, Southall",
+      },
+      description: {
+        type: String,
+        default:
+          "Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders.",
+      },
+      buttonText: {
+        type: String,
+        default: "Contact For Details",
+      },
+      buttonLink: {
+        type: String,
+        default: "/contact",
+      },
+      badges: {
+        type: [String],
+        default: ["Stock Support", "Trade Enquiries", "Southall", "18+ Only"],
+      },
+      images: {
+        type: [distroImageSchema],
+        default: [
+          {
+            imageSrc: "/images/header/h-1.jpeg",
+            alt: "SVG Distro Location Image 1",
+          },
+          {
+            imageSrc: "/images/header/h-2.jpeg",
+            alt: "SVG Distro Location Image 2",
+          },
+          {
+            imageSrc: "/images/delivery/delivery.jpg",
+            alt: "SVG Distro Location Image 3",
+          },
+        ],
+      },
     },
 
     social: {

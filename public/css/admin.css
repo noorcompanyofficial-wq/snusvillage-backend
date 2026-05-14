@@ -3236,3 +3236,28 @@ textarea:focus {
 }
 
 /* ===== ADMIN HOMEPAGE CONTROLS END ===== */
+
+/* ===== ADMIN HOMEPAGE IMAGE UPLOADS START ===== */
+
+.admin-homepage-slide-card input[type="file"] {
+  min-height: 48px;
+  padding: 10px;
+  border-radius: 18px;
+  background: #eef3ff;
+  border: 1px dashed rgba(18, 59, 138, 0.28);
+  cursor: pointer;
+}
+
+.admin-homepage-slide-card input[type="file"]::file-selector-button {
+  min-height: 34px;
+  margin-right: 10px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ===== ADMIN HOMEPAGE IMAGE UPLOADS END ===== */

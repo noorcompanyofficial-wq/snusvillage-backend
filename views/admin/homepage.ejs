@@ -1,4 +1,40 @@
 <%
+  const hero = homepageContent?.hero || {};
+  const heroSlides = hero.slides && hero.slides.length
+    ? hero.slides
+    : [
+        {
+          kicker: "Featured Collection",
+          title: "White Fox",
+          buttonText: "Shop White Fox",
+          buttonLink: "/shop?brand=White%20Fox",
+          imageSrc: "/images/header/h-1.jpeg",
+        },
+        {
+          kicker: "Best Sellers",
+          title: "Premium Brands",
+          buttonText: "Browse Brands",
+          buttonLink: "/shop",
+          imageSrc: "/images/header/h-2.jpeg",
+        },
+        {
+          kicker: "London Retail",
+          title: "Visit Our Stores",
+          buttonText: "Find Branches",
+          buttonLink: "#shops",
+          imageSrc: "/images/delivery/delivery.jpg",
+        },
+      ];
+
+  const distro = homepageContent?.distro || {};
+  const distroImages = distro.images && distro.images.length
+    ? distro.images
+    : [
+        { imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" },
+        { imageSrc: "/images/header/h-2.jpeg", alt: "SVG Distro Location Image 2" },
+        { imageSrc: "/images/delivery/delivery.jpg", alt: "SVG Distro Location Image 3" },
+      ];
+
   const social = homepageContent?.social || {};
   const slides = social.slides && social.slides.length
     ? social.slides
@@ -29,7 +65,7 @@
     <div>
       <span>Homepage</span>
       <h1>Homepage Content Controls</h1>
-      <p>Edit the social media iPhone showcase without changing code.</p>
+      <p>Edit hero banners, SVG Distro images, and social media content without changing code.</p>
     </div>
 
     <div class="admin-head-actions">
@@ -40,7 +76,132 @@
     </div>
   </div>
 
-  <form class="admin-panel admin-homepage-form" action="/admin/homepage/social" method="POST">
+  <form class="admin-panel admin-homepage-form" action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data">
+    <div class="admin-panel__head">
+      <h2>Hero Carousel</h2>
+      <span>Images, Text And Buttons</span>
+    </div>
+
+    <div class="admin-homepage-slides">
+      <% [0, 1, 2].forEach((index) => { %>
+        <% const slide = heroSlides[index] || {}; %>
+
+        <div class="admin-homepage-slide-card">
+          <div class="admin-homepage-slide-head">
+            <strong>Hero Slide <%= index + 1 %></strong>
+            <span>Main Homepage Carousel</span>
+          </div>
+
+          <label>
+            Current Image Path
+            <input name="heroImageSrc<%= index + 1 %>" value="<%= slide.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
+          </label>
+
+          <label>
+            Upload New Hero Image
+            <input type="file" name="heroImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
+          </label>
+
+          <label>
+            Small Text
+            <input name="heroKicker<%= index + 1 %>" value="<%= slide.kicker || '' %>">
+          </label>
+
+          <label>
+            Main Title
+            <input name="heroTitle<%= index + 1 %>" value="<%= slide.title || '' %>">
+          </label>
+
+          <label>
+            Button Text
+            <input name="heroButtonText<%= index + 1 %>" value="<%= slide.buttonText || '' %>">
+          </label>
+
+          <label>
+            Button Link
+            <input name="heroButtonLink<%= index + 1 %>" value="<%= slide.buttonLink || '' %>">
+          </label>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="admin-panel__head">
+      <h2>SVG Distro Section</h2>
+      <span>Text, Badges And Carousel Images</span>
+    </div>
+
+    <div class="admin-homepage-grid">
+      <label>
+        Kicker
+        <input name="distroKicker" value="<%= distro.kicker || 'Distribution Hub' %>">
+      </label>
+
+      <label>
+        Title
+        <input name="distroTitle" value="<%= distro.title || 'SVG Distro' %>">
+      </label>
+
+      <label>
+        Address
+        <input name="distroAddress" value="<%= distro.address || 'Snus Village Charles House, Southall' %>">
+      </label>
+
+      <label>
+        Button Text
+        <input name="distroButtonText" value="<%= distro.buttonText || 'Contact For Details' %>">
+      </label>
+
+      <label>
+        Button Link
+        <input name="distroButtonLink" value="<%= distro.buttonLink || '/contact' %>">
+      </label>
+
+      <label>
+        Badges
+        <input name="distroBadges" value="<%= (distro.badges || ['Stock Support', 'Trade Enquiries', 'Southall', '18+ Only']).join(', ') %>">
+      </label>
+
+      <label class="is-wide">
+        Description
+        <textarea name="distroDescription"><%= distro.description || 'Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders.' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-homepage-slides">
+      <% [0, 1, 2].forEach((index) => { %>
+        <% const image = distroImages[index] || {}; %>
+
+        <div class="admin-homepage-slide-card">
+          <div class="admin-homepage-slide-head">
+            <strong>Distro Image <%= index + 1 %></strong>
+            <span>Carousel Image</span>
+          </div>
+
+          <label>
+            Current Image Path
+            <input name="distroImageSrc<%= index + 1 %>" value="<%= image.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
+          </label>
+
+          <label>
+            Upload New Distro Image
+            <input type="file" name="distroImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
+          </label>
+
+          <label>
+            Alt Text
+            <input name="distroImageAlt<%= index + 1 %>" value="<%= image.alt || '' %>">
+          </label>
+        </div>
+      <% }) %>
+    </div>
+
+    <button class="admin-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Hero And Distro
+    </button>
+  </form>
+
+  <form class="admin-panel admin-homepage-form" action="/admin/homepage/social" method="POST" enctype="multipart/form-data">
     <div class="admin-panel__head">
       <h2>Social Media Section</h2>
       <span>iPhone Reel Showcase</span>
@@ -94,8 +255,13 @@
           </label>
 
           <label>
-            Poster Image Path
+            Current Poster Image Path
             <input name="posterSrc<%= index + 1 %>" value="<%= slide.posterSrc || '' %>" placeholder="/images/header/h-1.jpeg">
+          </label>
+
+          <label>
+            Upload New Poster Image
+            <input type="file" name="posterImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
           </label>
 
           <label>
@@ -112,15 +278,15 @@
     </div>
 
     <div class="admin-homepage-help">
+      <strong>Image Path Example:</strong>
+      <span>/images/header/h-1.jpeg</span>
       <strong>Video Path Example:</strong>
       <span>/videos/social/social-1.mp4</span>
-      <strong>Poster Path Example:</strong>
-      <span>/images/header/h-1.jpeg</span>
     </div>
 
     <button class="admin-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
-      Save Homepage Social Section
+      Save Social Section
     </button>
   </form>
 </section>

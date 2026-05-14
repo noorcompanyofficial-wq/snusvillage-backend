@@ -38,51 +38,62 @@
         
         
 
+        <%
+          const svHeroSlides = homepageContent?.hero?.slides?.length
+            ? homepageContent.hero.slides
+            : [
+                {
+                  kicker: "Featured Collection",
+                  title: "White Fox",
+                  buttonText: "Shop White Fox",
+                  buttonLink: "/shop?brand=White%20Fox",
+                  imageSrc: "/images/header/h-1.jpeg",
+                },
+                {
+                  kicker: "Best Sellers",
+                  title: "Premium Brands",
+                  buttonText: "Browse Brands",
+                  buttonLink: "/shop",
+                  imageSrc: "/images/header/h-2.jpeg",
+                },
+                {
+                  kicker: "London Retail",
+                  title: "Visit Our Stores",
+                  buttonText: "Find Branches",
+                  buttonLink: "#shops",
+                  imageSrc: "/images/delivery/delivery.jpg",
+                },
+              ];
+        %>
+
         <section class="sv-simple-carousel-hero">
           <div class="sv-hero-inner">
-
             <div class="sv-carousel-wrap">
               <div class="sv-carousel">
                 <div class="sv-slides">
-
-                  <div class="sv-slide sv-slide-one">
-                    <div class="sv-slide-brand">
-                      <small>Featured Collection</small>
-                      <h2>White Fox</h2>
-                      <a href="/shop?brand=White%20Fox">Shop White Fox</a>
+                  <% svHeroSlides.slice(0, 3).forEach((slide, index) => { %>
+                    <div
+                      class="sv-slide"
+                      style="background-image: linear-gradient(180deg, rgba(7,18,37,0.08), rgba(7,18,37,0.58)), url('<%= slide.imageSrc || '/images/header/h-1.jpeg' %>');"
+                    >
+                      <div class="sv-slide-brand">
+                        <small><%= slide.kicker || "Snus Village" %></small>
+                        <h2><%= slide.title || "Premium Brands" %></h2>
+                        <a href="<%= slide.buttonLink || '/shop' %>"><%= slide.buttonText || "Shop Now" %></a>
+                      </div>
                     </div>
-                  </div>
-
-                  <div class="sv-slide sv-slide-two">
-                    <div class="sv-slide-brand">
-                      <small>Best Sellers</small>
-                      <h2>Premium Brands</h2>
-                      <a href="/shop">Browse Brands</a>
-                    </div>
-                  </div>
-
-                  <div class="sv-slide sv-slide-three">
-                    <div class="sv-slide-brand">
-                      <small>London Retail</small>
-                      <h2>Visit Our Stores</h2>
-                      <a href="#shops">Find Branches</a>
-                    </div>
-                  </div>
-
+                  <% }) %>
                 </div>
 
                 <div class="sv-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+                  <% svHeroSlides.slice(0, 3).forEach(() => { %>
+                    <span></span>
+                  <% }) %>
                 </div>
               </div>
             </div>
-
           </div>
         </section>
-
-        
 
         <section class="sv-brand-strip" aria-label="Available brands">
           <div class="sv-brand-strip__track">
@@ -282,31 +293,49 @@
               </article>
             </div>
 
+            <%
+              const svDistro = homepageContent?.distro || {};
+              const svDistroImages = svDistro.images && svDistro.images.length
+                ? svDistro.images
+                : [
+                    { imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" },
+                    { imageSrc: "/images/header/h-2.jpeg", alt: "SVG Distro Location Image 2" },
+                    { imageSrc: "/images/delivery/delivery.jpg", alt: "SVG Distro Location Image 3" },
+                  ];
+              const svDistroBadges = svDistro.badges && svDistro.badges.length
+                ? svDistro.badges
+                : ["Stock Support", "Trade Enquiries", "Southall", "18+ Only"];
+            %>
+
             <article class="sv-distro-card">
               <div class="sv-distro-copy">
-                <span class="sv-distro-kicker">Distribution Hub</span>
-                <h3>SVG Distro</h3>
-                <p class="sv-distro-address">Snus Village Charles House, Southall</p>
+                <span class="sv-distro-kicker"><%= svDistro.kicker || "Distribution Hub" %></span>
+                <h3><%= svDistro.title || "SVG Distro" %></h3>
+                <p class="sv-distro-address"><%= svDistro.address || "Snus Village Charles House, Southall" %></p>
                 <p>
-                  Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders.
+                  <%= svDistro.description || "Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders." %>
                 </p>
 
                 <div class="sv-distro-badges">
-                  <span>Stock Support</span>
-                  <span>Trade Enquiries</span>
-                  <span>Southall</span>
-                  <span>18+ Only</span>
+                  <% svDistroBadges.forEach((badge) => { %>
+                    <span><%= badge %></span>
+                  <% }) %>
                 </div>
 
-                <a href="/contact" class="sv-ab-btn sv-ab-btn--primary">Contact For Details</a>
+                <a href="<%= svDistro.buttonLink || '/contact' %>" class="sv-ab-btn sv-ab-btn--primary">
+                  <%= svDistro.buttonText || "Contact For Details" %>
+                </a>
               </div>
 
               <div class="sv-distro-carousel" id="svgDistroCarousel">
-
                 <div class="sv-distro-track">
-                  <img src="/images/header/h-1.jpeg" alt="SVG Distro Southall Location Image 1" class="is-active" />
-                  <img src="/images/header/h-2.jpeg" alt="SVG Distro Southall Location Image 2" />
-                  <img src="/images/delivery/delivery.jpg" alt="SVG Distro Southall Location Image 3" />
+                  <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
+                    <img
+                      src="<%= image.imageSrc || '/images/header/h-1.jpeg' %>"
+                      alt="<%= image.alt || 'SVG Distro Location Image' %>"
+                      class="<%= index === 0 ? 'is-active' : '' %>"
+                    />
+                  <% }) %>
                 </div>
 
                 <div class="sv-distro-controls">
@@ -315,40 +344,14 @@
                 </div>
 
                 <div class="sv-distro-dots">
-                  <button type="button" class="is-active" aria-label="Show Location Image 1"></button>
-                  <button type="button" aria-label="Show Location Image 2"></button>
-                  <button type="button" aria-label="Show Location Image 3"></button>
+                  <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
+                    <button type="button" class="<%= index === 0 ? 'is-active' : '' %>" aria-label="Show Location Image <%= index + 1 %>"></button>
+                  <% }) %>
                 </div>
               </div>
             </article>
           </div>
         </section>
-
-        <%
-          const svSocial = homepageContent?.social || {};
-          const svSocialSlides = svSocial.slides && svSocial.slides.length
-            ? svSocial.slides
-            : [
-                {
-                  videoSrc: "/videos/social/social-1.mp4",
-                  posterSrc: "/images/header/h-1.jpeg",
-                  title: "New Stock Arrival",
-                  subtitle: "Latest Product Highlights From Snus Village",
-                },
-                {
-                  videoSrc: "/videos/social/social-2.mp4",
-                  posterSrc: "/images/header/h-2.jpeg",
-                  title: "In-Store Content",
-                  subtitle: "Store Moments, Promotions, And Customer Favourites",
-                },
-                {
-                  videoSrc: "/videos/social/social-3.mp4",
-                  posterSrc: "/images/delivery/delivery.jpg",
-                  title: "London Updates",
-                  subtitle: "See What Is Happening Across Our Locations",
-                },
-              ];
-        %>
 
         <section class="section sv-social-showcase" id="social-showcase">
           <div class="container">
