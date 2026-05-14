@@ -2784,3 +2784,141 @@ textarea:focus {
 }
 
 /* ===== ADMIN CARTS UPGRADE END ===== */
+
+/* ===== ADMIN INVENTORY PAGE START ===== */
+
+.admin-inventory-stats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.admin-inventory-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.admin-inventory-filters label {
+  display: grid;
+  gap: 7px;
+  color: #123b8a;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-inventory-filters select,
+.admin-stock-form input {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: #ffffff;
+  padding: 0 14px;
+  color: #061633;
+  font-weight: 800;
+}
+
+.admin-inventory-filters button,
+.admin-stock-form button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.admin-inventory-table-wrap {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.admin-inventory-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.admin-inventory-table th,
+.admin-inventory-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(9, 31, 77, 0.08);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-inventory-table th {
+  color: #123b8a;
+  background: #f8fafc;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-inventory-table td {
+  color: #061633;
+  font-weight: 750;
+}
+
+.admin-inventory-product {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.admin-inventory-product img,
+.admin-inventory-product > span {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #eef3ff;
+  display: grid;
+  place-items: center;
+  color: #64748b;
+  font-size: 10px;
+}
+
+.admin-inventory-product strong,
+.admin-inventory-product small {
+  display: block;
+}
+
+.admin-inventory-product small {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.admin-stock-form {
+  display: grid;
+  grid-template-columns: 90px auto;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+}
+
+@media (max-width: 1200px) {
+  .admin-inventory-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-inventory-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-inventory-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ADMIN INVENTORY PAGE END ===== */

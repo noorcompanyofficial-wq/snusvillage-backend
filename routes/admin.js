@@ -563,6 +563,110 @@ router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
   }
 });
 
+
+router.get("/inventory", isAdmin, async (req, res) => {
+  try {
+    const stock = String(req.query.stock || "all").toLowerCase();
+    const brand = String(req.query.brand || "").trim();
+
+    const filter = {};
+
+    if (brand) {
+      filter.brand = {
+        $regex: "^" + brand.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$",
+        $options: "i",
+      };
+    }
+
+    if (stock === "low") {
+      filter.stock = { $gt: 0, $lte: 5 };
+    }
+
+    if (stock === "out") {
+      filter.stock = 0;
+    }
+
+    if (stock === "in") {
+      filter.stock = { $gt: 0 };
+    }
+
+    const [
+      products,
+      totalProducts,
+      inStockProducts,
+      lowStockProducts,
+      outStockProducts,
+      stockUnitsAgg,
+      stockValueAgg,
+      brands,
+    ] = await Promise.all([
+      Product.find(filter).sort({ stock: 1, brand: 1, name: 1 }).lean(),
+      Product.countDocuments(),
+      Product.countDocuments({ stock: { $gt: 0 } }),
+      Product.countDocuments({ stock: { $gt: 0, $lte: 5 } }),
+      Product.countDocuments({ stock: 0 }),
+      Product.aggregate([{ $group: { _id: null, units: { $sum: "$stock" } } }]),
+      Product.aggregate([
+        {
+          $group: {
+            _id: null,
+            value: {
+              $sum: {
+                $multiply: [
+                  "$stock",
+                  {
+                    $cond: [
+                      { $gt: ["$discountPrice", 0] },
+                      "$discountPrice",
+                      "$price",
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ]),
+      Product.distinct("brand"),
+    ]);
+
+    res.render("admin/inventory", {
+      layout: "layouts/admin-layout",
+      products,
+      brands: brands.filter(Boolean).sort(),
+      query: req.query,
+      stats: {
+        totalProducts,
+        inStockProducts,
+        lowStockProducts,
+        outStockProducts,
+        totalStockUnits: stockUnitsAgg[0]?.units || 0,
+        estimatedStockValue: stockValueAgg[0]?.value || 0,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load inventory");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/inventory/:id/stock", isAdmin, async (req, res) => {
+  try {
+    const stock = Math.max(0, Number.parseInt(req.body.stock, 10) || 0);
+
+    await Product.findByIdAndUpdate(req.params.id, { stock });
+
+    req.flash("success", "Stock updated");
+    res.redirect(req.get("Referrer") || "/admin/inventory");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update stock");
+    res.redirect("/admin/inventory");
+  }
+});
+
+
 //  Add Product Page
 router.get("/products/add", isAdmin, (req, res) => {
   res.render("admin/add-product", {
