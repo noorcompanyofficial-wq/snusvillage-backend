@@ -107,6 +107,7 @@ app.use(async (req, res, next) => {
 // ====== Global Variables ======
 app.use((req, res, next) => {
   res.locals.user = req.session?.user || null;
+  res.locals.currentPath = req.path;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
   next();
