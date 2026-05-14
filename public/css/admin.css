@@ -3053,3 +3053,65 @@ textarea:focus {
 }
 
 /* ===== ADMIN SALES ANALYTICS PAGE END ===== */
+
+/* ===== ADMIN USER DETAIL PAGE START ===== */
+
+.admin-user-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-detail-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-detail-list div {
+  display: grid;
+  gap: 4px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.admin-detail-list span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-detail-list strong {
+  color: #061633;
+  overflow-wrap: anywhere;
+}
+
+.admin-table-action {
+  display: inline-flex !important;
+  width: fit-content;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  background: #061633;
+  text-decoration: none;
+  font-size: 12px !important;
+  font-weight: 950;
+}
+
+.admin-table-action:hover {
+  background: #b41232;
+}
+
+@media (max-width: 1000px) {
+  .admin-user-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ADMIN USER DETAIL PAGE END ===== */

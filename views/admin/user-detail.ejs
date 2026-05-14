@@ -1,0 +1,244 @@
+<section class="admin-page admin-user-detail-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Customer Profile</span>
+      <h1><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User Account" %></h1>
+      <p><%= account.email %></p>
+    </div>
+
+    <div class="admin-head-actions">
+      <a class="admin-secondary" href="/admin/users">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back To Users
+      </a>
+      <a class="admin-primary" href="mailto:<%= account.email %>">
+        <i class="fa-solid fa-envelope"></i>
+        Email Customer
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-analytics-grid">
+    <div class="admin-analytics-card admin-analytics-card--dark">
+      <i class="fa-solid fa-receipt"></i>
+      <span>Total Orders</span>
+      <strong><%= stats.totalOrders || 0 %></strong>
+      <small>All Orders Linked To This Customer</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Paid Orders</span>
+      <strong><%= stats.paidOrders || 0 %></strong>
+      <small>Completed Payments</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-sterling-sign"></i>
+      <span>Total Spend</span>
+      <strong>£<%= Number(stats.totalSpend || 0).toFixed(2) %></strong>
+      <small>Paid Orders Only</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-calendar"></i>
+      <span>Last Order</span>
+      <strong><%= stats.lastOrder ? new Date(stats.lastOrder.createdAt).toLocaleDateString("en-GB") : "None" %></strong>
+      <small><%= stats.lastOrder ? "Most Recent Order" : "No Orders Yet" %></small>
+    </div>
+  </div>
+
+  <div class="admin-user-detail-grid">
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Account Details</h2>
+      </div>
+
+      <div class="admin-detail-list">
+        <div>
+          <span>Name</span>
+          <strong><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "Not Provided" %></strong>
+        </div>
+
+        <div>
+          <span>Email</span>
+          <strong><%= account.email %></strong>
+        </div>
+
+        <div>
+          <span>Role</span>
+          <strong><%= account.role || "user" %></strong>
+        </div>
+
+        <div>
+          <span>Email Verified</span>
+          <strong><%= account.isVerified ? "Yes" : "No" %></strong>
+        </div>
+
+        <div>
+          <span>Age Verified</span>
+          <strong><%= account.isAgeVerified ? "Yes" : "No" %></strong>
+        </div>
+
+        <div>
+          <span>Didit Status</span>
+          <strong><%= account.didit?.status || account.diditStatus || "Not Started" %></strong>
+        </div>
+
+        <div>
+          <span>Trader Status</span>
+          <strong><%= account.traderStatus || "none" %></strong>
+        </div>
+
+        <div>
+          <span>Joined</span>
+          <strong><%= account.createdAt ? new Date(account.createdAt).toLocaleString("en-GB") : "N/A" %></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Security Details</h2>
+      </div>
+
+      <div class="admin-detail-list">
+        <div>
+          <span>Login Attempts</span>
+          <strong><%= account.loginAttempts || 0 %></strong>
+        </div>
+
+        <div>
+          <span>Locked Until</span>
+          <strong><%= account.lockUntil ? new Date(account.lockUntil).toLocaleString("en-GB") : "Not Locked" %></strong>
+        </div>
+
+        <div>
+          <span>Last IP</span>
+          <strong><%= account.ip || "N/A" %></strong>
+        </div>
+
+        <div>
+          <span>Device</span>
+          <strong><%= account.device || "N/A" %></strong>
+        </div>
+
+        <div>
+          <span>Suspicious IPs</span>
+          <strong><%= account.suspiciousIPs?.length || 0 %></strong>
+        </div>
+
+        <div>
+          <span>Blocked IPs</span>
+          <strong><%= account.blockedIPs?.length || 0 %></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Trader Record</h2>
+      </div>
+
+      <% if (trader) { %>
+        <div class="admin-detail-list">
+          <div>
+            <span>Business</span>
+            <strong><%= trader.businessName || "N/A" %></strong>
+          </div>
+
+          <div>
+            <span>Contact</span>
+            <strong><%= trader.contactName || "N/A" %></strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+            <strong><%= trader.status || "N/A" %></strong>
+          </div>
+
+          <div>
+            <span>Phone</span>
+            <strong><%= trader.phone || "N/A" %></strong>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="admin-empty-small">
+          <p>No trader record linked to this customer.</p>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Cart History</h2>
+        <a href="/admin/carts">View Carts</a>
+      </div>
+
+      <% if (carts && carts.length) { %>
+        <div class="admin-list admin-list--orders">
+          <% carts.forEach((cart) => { %>
+            <% const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0); %>
+            <a href="/admin/carts">
+              <span>
+                <strong><%= cart.items.length %> Item<%= cart.items.length === 1 ? "" : "s" %></strong>
+                <small>Updated <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></small>
+              </span>
+              <strong>£<%= Number(cartTotal || 0).toFixed(2) %></strong>
+            </a>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="admin-empty-small">
+          <p>No carts found for this customer.</p>
+        </div>
+      <% } %>
+    </section>
+  </div>
+
+  <section class="admin-panel">
+    <div class="admin-panel__head">
+      <h2>Order History</h2>
+      <a href="/admin/orders">View All Orders</a>
+    </div>
+
+    <% if (orders && orders.length) { %>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Date</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% orders.forEach((order) => { %>
+              <tr>
+                <td>#<%= order._id.toString().slice(-6).toUpperCase() %></td>
+                <td><%= new Date(order.createdAt).toLocaleString("en-GB") %></td>
+                <td>
+                  <span class="status-pill <%= order.paymentStatus === 'paid' ? 'order-completed' : order.paymentStatus === 'failed' ? 'payment-failed' : 'payment-pending' %>">
+                    <%= order.paymentStatus || "pending" %>
+                  </span>
+                </td>
+                <td><%= order.orderStatus || "new" %></td>
+                <td>£<%= Number(order.total || 0).toFixed(2) %></td>
+                <td><a class="admin-table-action" href="/admin/orders/<%= order._id %>">View</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="admin-empty-state">
+        <h2>No Orders Found</h2>
+        <p>This customer has not placed an order yet.</p>
+      </div>
+    <% } %>
+  </section>
+</section>

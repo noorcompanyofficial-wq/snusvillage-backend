@@ -522,6 +522,66 @@ router.get("/users", isAdmin, async (req, res) => {
   }
 });
 
+
+router.get("/users/:id", isAdmin, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      req.flash("error", "Database is not connected");
+      return res.redirect("/admin/users");
+    }
+
+    const user = await User.findById(req.params.id).lean();
+
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/admin/users");
+    }
+
+    const [orders, carts, trader] = await Promise.all([
+      Order.find({
+        $or: [
+          { user: user._id },
+          { "customer.email": user.email },
+        ],
+      })
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean(),
+
+      Cart.find({ user: user._id })
+        .populate("items.product")
+        .sort({ updatedAt: -1 })
+        .limit(10)
+        .lean(),
+
+      Trader.findOne({ email: user.email }).lean(),
+    ]);
+
+    const paidOrders = orders.filter((order) => order.paymentStatus === "paid");
+    const totalSpend = paidOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+    const lastOrder = orders[0] || null;
+
+    res.render("admin/user-detail", {
+      layout: "layouts/admin-layout",
+      account: user,
+      orders,
+      carts,
+      trader,
+      stats: {
+        totalOrders: orders.length,
+        paidOrders: paidOrders.length,
+        totalSpend,
+        lastOrder,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load user details");
+    res.redirect("/admin/users");
+  }
+});
+
+
 router.get("/security", isAdmin, async (req, res) => {
   try {
     const users =
