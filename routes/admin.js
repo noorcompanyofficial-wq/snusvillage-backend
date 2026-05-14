@@ -248,6 +248,7 @@ router.get("/email-test", isAdmin, (req, res) => {
   res.render("admin/email-test", {
     layout: "layouts/admin-layout",
     mailConfig: {
+      provider: mailConfig.provider || "smtp",
       emailUser: mailConfig.emailUser || "",
       emailFrom: mailConfig.emailFrom || "",
       smtpHost: mailConfig.smtpHost || "",
