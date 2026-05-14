@@ -698,7 +698,7 @@ router.get("/orders/export/csv", isAdmin, async (req, res) => {
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to export orders");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 
@@ -841,11 +841,11 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
 
     await Order.findByIdAndUpdate(req.params.id, update);
 
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to update order status");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 
@@ -1457,12 +1457,12 @@ router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
 
     if (!order) {
       req.flash("error", "Order not found");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     if (order.royalMail && order.royalMail.syncStatus === "sent") {
       req.flash("error", "This order has already been sent to Royal Mail");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     const { sendOrderToRoyalMail } = require("../utils/royalMail");
@@ -1509,11 +1509,11 @@ router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
 
     await order.save();
 
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to send order to Royal Mail");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 
@@ -1525,17 +1525,17 @@ router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
 
     if (!order) {
       req.flash("error", "Order not found");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     if (!order.royalMail || order.royalMail.syncStatus !== "sent") {
       req.flash("error", "Order must be sent to Royal Mail before generating a label");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     if (!order.royalMail.orderIdentifier) {
       req.flash("error", "Royal Mail order identifier is missing");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     const { getRoyalMailLabel } = require("../utils/royalMail");
@@ -1547,7 +1547,7 @@ router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
       await order.save();
 
       req.flash("error", order.royalMail.labelError);
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     const labelsDir = path.join(__dirname, "..", "private", "labels");
@@ -1568,11 +1568,11 @@ router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
 
     await order.save();
 
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to generate Royal Mail label");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 
@@ -1582,22 +1582,48 @@ router.get("/orders/:id/download-label", isAdmin, async (req, res) => {
 
     if (!order || !order.royalMail || !order.royalMail.labelPath) {
       req.flash("error", "Label not found");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     if (!fs.existsSync(order.royalMail.labelPath)) {
       req.flash("error", "Label file is missing");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     res.download(order.royalMail.labelPath, `royal-mail-label-${order._id}.pdf`);
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to download label");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 
+
+
+
+router.post("/orders/:id/admin-update", isAdmin, async (req, res) => {
+  try {
+    const checklist = {
+      paymentChecked: req.body.paymentChecked === "on",
+      stockChecked: req.body.stockChecked === "on",
+      packed: req.body.packed === "on",
+      labelReady: req.body.labelReady === "on",
+      customerNotified: req.body.customerNotified === "on",
+    };
+
+    await Order.findByIdAndUpdate(req.params.id, {
+      adminNotes: String(req.body.adminNotes || "").trim(),
+      fulfilmentChecklist: checklist,
+    });
+
+    req.flash("success", "Order admin notes updated");
+    res.redirect(`/admin/orders/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update order admin notes");
+    res.redirect(`/admin/orders/${req.params.id}`);
+  }
+});
 
 
 router.get("/orders/:id", isAdmin, async (req, res) => {
@@ -1606,7 +1632,7 @@ router.get("/orders/:id", isAdmin, async (req, res) => {
 
     if (!order) {
       req.flash("error", "Order not found");
-      return res.redirect("/admin/orders");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
     res.render("admin/order-detail", {
@@ -1616,7 +1642,7 @@ router.get("/orders/:id", isAdmin, async (req, res) => {
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to load order");
-    res.redirect("/admin/orders");
+    res.redirect(req.get("Referrer") || "/admin/orders");
   }
 });
 

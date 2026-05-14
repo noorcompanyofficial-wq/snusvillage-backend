@@ -140,6 +140,34 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
+    adminNotes: {
+      type: String,
+      default: "",
+    },
+
+    fulfilmentChecklist: {
+      paymentChecked: {
+        type: Boolean,
+        default: false,
+      },
+      stockChecked: {
+        type: Boolean,
+        default: false,
+      },
+      packed: {
+        type: Boolean,
+        default: false,
+      },
+      labelReady: {
+        type: Boolean,
+        default: false,
+      },
+      customerNotified: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
     royalMail: {
       synced: {
         type: Boolean,

@@ -3443,3 +3443,148 @@ textarea:focus {
 }
 
 /* ===== ADMIN DISCOUNTS PAGE END ===== */
+
+/* ===== ADMIN ORDER DETAIL UPGRADE START ===== */
+
+.admin-order-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-order-detail-page .admin-detail-card {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-status-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-status-stack p,
+.admin-total-card p {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  margin: 0;
+}
+
+.admin-status-stack strong,
+.admin-total-card strong {
+  color: #061633;
+}
+
+.admin-order-status-form,
+.admin-order-admin-form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-order-status-form label,
+.admin-note-label {
+  display: grid;
+  gap: 7px;
+  color: #123b8a;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-order-status-form select,
+.admin-note-label textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: #ffffff;
+  padding: 12px 14px;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-order-status-form select {
+  min-height: 44px;
+}
+
+.admin-note-label textarea {
+  min-height: 130px;
+  resize: vertical;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 700;
+}
+
+.admin-order-status-form button,
+.admin-order-admin-form button,
+.admin-order-action-row button,
+.admin-order-action-row a {
+  min-height: 42px;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #ffffff;
+  background: #061633;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 950;
+}
+
+.admin-order-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-checklist-grid label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  color: #061633;
+  font-weight: 900;
+}
+
+.admin-checklist-grid input {
+  width: 16px;
+  height: 16px;
+}
+
+.admin-discount-line span {
+  color: #15803d;
+  font-weight: 950;
+}
+
+@media (max-width: 1200px) {
+  .admin-order-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-order-overview-grid,
+  .admin-checklist-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ADMIN ORDER DETAIL UPGRADE END ===== */
