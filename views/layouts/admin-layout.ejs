@@ -4,10 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Snus Village Admin</title>
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
+
     <link rel="stylesheet" href="/css/admin.css" />
   </head>
 
@@ -15,52 +17,77 @@
     <div class="admin-shell">
       <aside class="admin-sidebar" id="sidebar">
         <a class="admin-brand" href="/admin/dashboard">
-          <span><i class="fa-solid fa-store"></i></span>
-          <strong>Snus Village</strong>
+          <span class="admin-brand__mark">
+            <img src="/images/logo/snusvillage-logo.png" alt="Snus Village">
+          </span>
+
+          <span class="admin-brand__text">
+            <strong>Snus Village</strong>
+            <small>Operations Panel</small>
+          </span>
         </a>
 
         <nav class="admin-nav" aria-label="Admin navigation">
-          <a href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i>Dashboard</a>
-          <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i>Products</a>
-          <a href="/admin/products/add"><i class="fa-solid fa-plus"></i>Add Product</a>
-          <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i>Wholesale</a>
-          <a href="/admin/users"><i class="fa-solid fa-users"></i>Users & Traders</a>
-          <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i>Security</a>
-          <a href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i>Email Test</a>
-          <a href="/admin/orders"><i class="fa-solid fa-receipt"></i>Orders</a>
+          <a href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+          <a href="/admin/orders"><i class="fa-solid fa-receipt"></i><span>Orders</span></a>
+          <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></a>
+          <a href="/admin/products/add"><i class="fa-solid fa-circle-plus"></i><span>Add Product</span></a>
+          <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span>Wholesale</span></a>
+          <a href="/admin/users"><i class="fa-solid fa-users"></i><span>Users & Traders</span></a>
+          <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
+          <a href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i><span>Email Test</span></a>
         </nav>
 
         <div class="admin-sidebar__bottom">
-          <a href="/shop"><i class="fa-solid fa-arrow-up-right-from-square"></i>View Shop</a>
-          <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+          <a href="/shop"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>View Shop</span></a>
+          <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
         </div>
       </aside>
 
       <div class="admin-main" id="main">
         <header class="admin-topbar">
-          <button class="admin-menu-btn" id="toggleBtn" type="button" aria-label="Toggle menu">
-            <i class="fa-solid fa-bars"></i>
-          </button>
-          <div>
-            <span>Operations Panel</span>
-            <strong><%= user?.firstName || "Admin" %></strong>
+          <div class="admin-topbar__left">
+            <button class="admin-menu-btn" id="toggleBtn" type="button" aria-label="Toggle menu">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div>
+              <span>Snus Village Admin</span>
+              <strong>Welcome, <%= user?.firstName || "Admin" %></strong>
+            </div>
           </div>
-          <a class="admin-topbar__action" href="/admin/products/add">
-            <i class="fa-solid fa-plus"></i>
-            Add Product
-          </a>
+
+          <div class="admin-topbar__actions">
+            <a class="admin-topbar__ghost" href="/shop">
+              <i class="fa-solid fa-store"></i>
+              Store
+            </a>
+
+            <a class="admin-topbar__action" href="/admin/products/add">
+              <i class="fa-solid fa-plus"></i>
+              Add Product
+            </a>
+          </div>
         </header>
 
         <% if (success && success.length) { %>
-          <div class="admin-flash admin-flash--success"><%= success[0] %></div>
+          <div class="admin-flash admin-flash--success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span><%= success[0] %></span>
+          </div>
         <% } %>
+
         <% if (error && error.length) { %>
-          <div class="admin-flash admin-flash--error"><%= error[0] %></div>
+          <div class="admin-flash admin-flash--error">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span><%= error[0] %></span>
+          </div>
         <% } %>
 
         <main class="admin-content"><%- body %></main>
       </div>
     </div>
+
     <script src="/js/admin.js"></script>
   </body>
 </html>
