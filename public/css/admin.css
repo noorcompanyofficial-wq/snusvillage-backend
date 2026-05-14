@@ -2922,3 +2922,134 @@ textarea:focus {
 }
 
 /* ===== ADMIN INVENTORY PAGE END ===== */
+
+/* ===== ADMIN SALES ANALYTICS PAGE START ===== */
+
+.admin-sales-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-revenue-bars {
+  min-height: 210px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+  padding-top: 16px;
+}
+
+.admin-revenue-day {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+
+.admin-revenue-bar-wrap {
+  width: 100%;
+  height: 130px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  overflow: hidden;
+}
+
+.admin-revenue-bar {
+  display: block;
+  width: 70%;
+  max-width: 40px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(180deg, #b41232, #123b8a);
+  box-shadow: 0 10px 26px rgba(18, 59, 138, 0.16);
+}
+
+.admin-revenue-day strong {
+  color: #061633;
+  font-size: 13px;
+}
+
+.admin-revenue-day small {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.admin-rank-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-rank-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+}
+
+.admin-rank-item--brand {
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+}
+
+.admin-rank-item > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  font-weight: 950;
+}
+
+.admin-rank-item strong,
+.admin-rank-item small {
+  display: block;
+}
+
+.admin-rank-item strong {
+  color: #061633;
+}
+
+.admin-rank-item small {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.admin-empty-small {
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px dashed rgba(9, 31, 77, 0.14);
+  border-radius: 18px;
+}
+
+@media (max-width: 1100px) {
+  .admin-sales-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rank-item {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-revenue-bars {
+    overflow-x: auto;
+    grid-template-columns: repeat(7, 80px);
+  }
+}
+
+/* ===== ADMIN SALES ANALYTICS PAGE END ===== */

@@ -153,6 +153,169 @@ router.get("/", isAdmin, (req, res) => {
   res.redirect("/admin/dashboard");
 });
 
+
+router.get("/analytics", isAdmin, async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.render("admin/analytics", {
+        layout: "layouts/admin-layout",
+        stats: {
+          totalRevenue: 0,
+          todayRevenue: 0,
+          totalOrders: 0,
+          paidOrders: 0,
+          failedPayments: 0,
+          averageOrderValue: 0,
+        },
+        revenueByDay: [],
+        bestProducts: [],
+        bestBrands: [],
+        recentPaidOrders: [],
+      });
+    }
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const [
+      totalOrders,
+      paidOrders,
+      failedPayments,
+      revenueAgg,
+      todayRevenueAgg,
+      revenueByDay,
+      bestProducts,
+      bestBrands,
+      recentPaidOrders,
+    ] = await Promise.all([
+      Order.countDocuments(),
+      Order.countDocuments({ paymentStatus: "paid" }),
+      Order.countDocuments({ paymentStatus: "failed" }),
+
+      Order.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$total" },
+            averageOrderValue: { $avg: "$total" },
+          },
+        },
+      ]),
+
+      Order.aggregate([
+        {
+          $match: {
+            paymentStatus: "paid",
+            createdAt: { $gte: todayStart },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$total" },
+          },
+        },
+      ]),
+
+      Order.aggregate([
+        {
+          $match: {
+            paymentStatus: "paid",
+            createdAt: { $gte: sevenDaysAgo },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$createdAt",
+              },
+            },
+            revenue: { $sum: "$total" },
+            orders: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+
+      Order.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: "$items.name",
+            brand: { $first: "$items.brand" },
+            quantity: { $sum: "$items.quantity" },
+            revenue: {
+              $sum: {
+                $multiply: ["$items.quantity", "$items.price"],
+              },
+            },
+          },
+        },
+        { $sort: { quantity: -1, revenue: -1 } },
+        { $limit: 10 },
+      ]),
+
+      Order.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $unwind: "$items" },
+        {
+          $group: {
+            _id: {
+              $ifNull: ["$items.brand", "Unknown Brand"],
+            },
+            quantity: { $sum: "$items.quantity" },
+            revenue: {
+              $sum: {
+                $multiply: ["$items.quantity", "$items.price"],
+              },
+            },
+          },
+        },
+        { $sort: { revenue: -1, quantity: -1 } },
+        { $limit: 10 },
+      ]),
+
+      Order.find({ paymentStatus: "paid" })
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean(),
+    ]);
+
+    const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
+    const averageOrderValue = revenueAgg[0]?.averageOrderValue || 0;
+    const todayRevenue = todayRevenueAgg[0]?.totalRevenue || 0;
+
+    res.render("admin/analytics", {
+      layout: "layouts/admin-layout",
+      stats: {
+        totalRevenue,
+        todayRevenue,
+        totalOrders,
+        paidOrders,
+        failedPayments,
+        averageOrderValue,
+      },
+      revenueByDay,
+      bestProducts,
+      bestBrands,
+      recentPaidOrders,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load analytics");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+
 router.get("/dashboard", isAdmin, async (req, res) => {
   const stats = await getAdminStats();
 
