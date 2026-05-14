@@ -7,6 +7,7 @@ const router = express.Router();
 const Product = require("../models/Products");
 const User = require("../models/User");
 const Order = require("../models/order");
+const Cart = require("../models/cart");
 const WholesaleApplication = require("../models/WholesaleApplication");
 const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
@@ -38,8 +39,21 @@ async function getAdminStats() {
       approvedTraders: 0,
       pendingWholesale: applications.filter((app) => app.status === "pending").length,
       unreadMessages: 0,
+      todayOrders: 0,
+      todayRevenue: 0,
+      totalRevenue: 0,
+      pendingOrders: 0,
+      failedPayments: 0,
+      activeCarts: 0,
+      abandonedCarts: 0,
+      abandonedCartValue: 0,
     };
   }
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
 
   const [
     totalProducts,
@@ -49,6 +63,14 @@ async function getAdminStats() {
     approvedTraders,
     pendingWholesale,
     unreadMessages,
+    todayOrders,
+    pendingOrders,
+    failedPayments,
+    activeCarts,
+    abandonedCarts,
+    todayRevenueAgg,
+    totalRevenueAgg,
+    abandonedCartValueAgg,
   ] = await Promise.all([
     Product.countDocuments(),
     Product.countDocuments({ stock: { $gt: 0 } }),
@@ -57,6 +79,55 @@ async function getAdminStats() {
     Trader.countDocuments({ status: "approved" }),
     WholesaleApplication.countDocuments({ status: "pending" }),
     Contact.countDocuments({ isRead: false }),
+
+    Order.countDocuments({ createdAt: { $gte: todayStart } }),
+    Order.countDocuments({ orderStatus: { $in: ["new", "processing", "packed"] } }),
+    Order.countDocuments({ paymentStatus: "failed" }),
+
+    Cart.countDocuments({
+      "items.0": { $exists: true },
+      updatedAt: { $gte: cartStaleCutoff },
+    }),
+
+    Cart.countDocuments({
+      "items.0": { $exists: true },
+      updatedAt: { $lt: cartStaleCutoff },
+    }),
+
+    Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: todayStart },
+          paymentStatus: "paid",
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$total" } } },
+    ]),
+
+    Order.aggregate([
+      { $match: { paymentStatus: "paid" } },
+      { $group: { _id: null, total: { $sum: "$total" } } },
+    ]),
+
+    Cart.aggregate([
+      {
+        $match: {
+          "items.0": { $exists: true },
+          updatedAt: { $lt: cartStaleCutoff },
+        },
+      },
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: {
+              $multiply: ["$items.quantity", "$items.priceAtTime"],
+            },
+          },
+        },
+      },
+    ]),
   ]);
 
   return {
@@ -67,6 +138,14 @@ async function getAdminStats() {
     approvedTraders,
     pendingWholesale,
     unreadMessages,
+    todayOrders,
+    todayRevenue: todayRevenueAgg[0]?.total || 0,
+    totalRevenue: totalRevenueAgg[0]?.total || 0,
+    pendingOrders,
+    failedPayments,
+    activeCarts,
+    abandonedCarts,
+    abandonedCartValue: abandonedCartValueAgg[0]?.total || 0,
   };
 }
 
@@ -76,16 +155,57 @@ router.get("/", isAdmin, (req, res) => {
 
 router.get("/dashboard", isAdmin, async (req, res) => {
   const stats = await getAdminStats();
-  const recentProducts =
+
+  const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
+
+  const [recentProducts, recentOrders, abandonedCarts] =
     mongoose.connection.readyState === 1
-      ? await Product.find().sort({ createdAt: -1 }).limit(5).lean()
-      : [];
+      ? await Promise.all([
+          Product.find().sort({ createdAt: -1 }).limit(5).lean(),
+          Order.find().sort({ createdAt: -1 }).limit(5).lean(),
+          Cart.find({
+            "items.0": { $exists: true },
+            updatedAt: { $lt: cartStaleCutoff },
+          })
+            .populate("items.product")
+            .sort({ updatedAt: -1 })
+            .limit(5)
+            .lean(),
+        ])
+      : [[], [], []];
 
   res.render("admin/dashboard", {
     layout: "layouts/admin-layout",
     stats,
     recentProducts,
+    recentOrders,
+    abandonedCarts,
   });
+});
+
+router.get("/carts", isAdmin, async (req, res) => {
+  try {
+    const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
+
+    const carts =
+      mongoose.connection.readyState === 1
+        ? await Cart.find({ "items.0": { $exists: true } })
+            .populate("items.product")
+            .sort({ updatedAt: -1 })
+            .limit(100)
+            .lean()
+        : [];
+
+    res.render("admin/carts", {
+      layout: "layouts/admin-layout",
+      carts,
+      cartStaleCutoff,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load carts");
+    res.redirect("/admin/dashboard");
+  }
 });
 
 router.get("/orders/export/csv", isAdmin, async (req, res) => {
