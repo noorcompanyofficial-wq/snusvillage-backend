@@ -1,0 +1,59 @@
+<section class="admin-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Email</span>
+      <h1>SMTP test</h1>
+      <p>Send a test email from this server to diagnose verification-code delivery.</p>
+    </div>
+  </div>
+
+  <section class="admin-panel">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Setting</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Email user</td>
+            <td>
+              <%= mailConfig.hasEmailUser ? "Configured" : "Missing" %>
+              <% if (mailConfig.emailUser) { %>
+                <span><%= mailConfig.emailUser %></span>
+              <% } %>
+            </td>
+          </tr>
+          <tr>
+            <td>Email password</td>
+            <td><%= mailConfig.hasEmailPass ? "Configured" : "Missing" %></td>
+          </tr>
+          <tr>
+            <td>Timeout</td>
+            <td><%= mailConfig.timeout %>ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-panel">
+    <form class="admin-email-test-form" method="POST" action="/admin/email-test">
+      <label>
+        Send test to
+        <input type="email" name="to" placeholder="customer@example.com" required />
+      </label>
+      <button type="submit">Send Test Email</button>
+    </form>
+  </section>
+
+  <% if (result) { %>
+    <% const parsed = JSON.parse(result); %>
+    <section class="admin-panel">
+      <h2>Email test result</h2>
+      <pre class="admin-email-test-result"><%= JSON.stringify(parsed, null, 2) %></pre>
+    </section>
+  <% } %>
+</section>

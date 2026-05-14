@@ -13,6 +13,7 @@ const Contact = require("../models/contact");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
+const transporter = require("../config/mailer");
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
@@ -238,6 +239,79 @@ router.get("/security", isAdmin, async (req, res) => {
     req.flash("error", "Unable to load security data");
     res.redirect("/admin/dashboard");
   }
+});
+
+router.get("/email-test", isAdmin, (req, res) => {
+  const mailConfig = transporter.snusMailConfig || {};
+
+  res.render("admin/email-test", {
+    layout: "layouts/admin-layout",
+    mailConfig: {
+      emailUser: mailConfig.emailUser || "",
+      hasEmailUser: Boolean(mailConfig.hasEmailUser),
+      hasEmailPass: Boolean(mailConfig.hasEmailPass),
+      timeout: Number(process.env.EMAIL_TIMEOUT_MS || 5000),
+    },
+    result: req.flash("emailTestResult")[0] || null,
+  });
+});
+
+router.post("/email-test", isAdmin, async (req, res) => {
+  const to = String(req.body.to || "").trim();
+  const mailConfig = transporter.snusMailConfig || {};
+  const fromEmail = mailConfig.emailUser || process.env.EMAIL_USER;
+
+  if (!to || !to.includes("@")) {
+    req.flash("error", "Enter a valid test email address.");
+    return res.redirect("/admin/email-test");
+  }
+
+  if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass) {
+    req.flash(
+      "emailTestResult",
+      JSON.stringify({
+        ok: false,
+        message: "Email username or password is missing on this server.",
+        hasEmailUser: Boolean(mailConfig.hasEmailUser),
+        hasEmailPass: Boolean(mailConfig.hasEmailPass),
+      })
+    );
+    return res.redirect("/admin/email-test");
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"Snus Village" <${fromEmail}>`,
+      replyTo: process.env.EMAIL_REPLY_TO || fromEmail,
+      to,
+      subject: "Snus Village email test",
+      text: "This is a test email from the Snus Village Render server.",
+    });
+
+    req.flash(
+      "emailTestResult",
+      JSON.stringify({
+        ok: true,
+        accepted: info.accepted,
+        rejected: info.rejected,
+        response: info.response,
+      })
+    );
+  } catch (err) {
+    console.log("Admin email test failed:", err.message);
+    req.flash(
+      "emailTestResult",
+      JSON.stringify({
+        ok: false,
+        code: err.code || err.name,
+        message: err.message,
+        command: err.command,
+        responseCode: err.responseCode,
+      })
+    );
+  }
+
+  res.redirect("/admin/email-test");
 });
 
 router.get("/wholesale", isAdmin, async (req, res) => {
