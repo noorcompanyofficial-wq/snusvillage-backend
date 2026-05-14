@@ -15,9 +15,11 @@ const SearchAnalytics = require("../models/SearchAnalytics");
 const HomepageContent = require("../models/HomepageContent");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
+const videoUpload = require("../middleware/videoUpload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
 const { storeProductImages } = require("../utils/productImages");
+const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
@@ -234,7 +236,10 @@ router.post("/homepage/hero-distro", isAdmin, async (req, res) => {
 router.post(
   "/homepage/social",
   isAdmin,
-  upload.fields([
+  videoUpload.fields([
+    { name: "socialVideo1", maxCount: 1 },
+    { name: "socialVideo2", maxCount: 1 },
+    { name: "socialVideo3", maxCount: 1 },
     { name: "posterImage1", maxCount: 1 },
     { name: "posterImage2", maxCount: 1 },
     { name: "posterImage3", maxCount: 1 },
@@ -248,13 +253,26 @@ router.post(
           return String(fallbackPath || "").trim();
         }
 
-        const [storedPath] = await storeProductImages([file]);
+        const storedPath = await storeHomepageImage(file);
         return storedPath || String(fallbackPath || "").trim();
+      }
+
+      function videoPath(fieldName, fallbackPath) {
+        const file = req.files?.[fieldName]?.[0];
+
+        if (!file) {
+          return String(fallbackPath || "").trim();
+        }
+
+        return storeHomepageVideo(file) || String(fallbackPath || "").trim();
       }
 
       const slides = await Promise.all(
         [1, 2, 3].map(async (number) => ({
-          videoSrc: String(req.body[`videoSrc${number}`] || "").trim(),
+          videoSrc: videoPath(
+            `socialVideo${number}`,
+            req.body[`videoSrc${number}`]
+          ),
           posterSrc: await imagePath(
             `posterImage${number}`,
             req.body[`posterSrc${number}`]

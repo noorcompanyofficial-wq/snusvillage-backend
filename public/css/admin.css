@@ -3261,3 +3261,12 @@ textarea:focus {
 }
 
 /* ===== ADMIN HOMEPAGE IMAGE UPLOADS END ===== */
+
+/* ===== ADMIN HOMEPAGE VIDEO UPLOADS START ===== */
+
+.admin-homepage-slide-card input[type="file"][accept*="video"] {
+  background: #fff7ed;
+  border-color: rgba(180, 18, 50, 0.28);
+}
+
+/* ===== ADMIN HOMEPAGE VIDEO UPLOADS END ===== */

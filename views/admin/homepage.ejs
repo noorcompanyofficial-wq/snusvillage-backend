@@ -250,8 +250,13 @@
           </div>
 
           <label>
-            Video Path
+            Current Video Path
             <input name="videoSrc<%= index + 1 %>" value="<%= slide.videoSrc || '' %>" placeholder="/videos/social/social-1.mp4">
+          </label>
+
+          <label>
+            Upload New Video
+            <input type="file" name="socialVideo<%= index + 1 %>" accept="video/mp4,video/webm,video/quicktime">
           </label>
 
           <label>
