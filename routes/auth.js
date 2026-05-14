@@ -14,7 +14,7 @@ const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 async function safeSendMail(mailOptions, label = "auth email") {
   try {
     const mailConfig = transporter.snusMailConfig || {};
-    const fromEmail = mailConfig.emailUser || process.env.EMAIL_USER;
+    const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
 
     if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass) {
       console.log(`${label} not configured:`, {

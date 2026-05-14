@@ -1,17 +1,20 @@
-const nodemailer = require("nodemailer");
+const transporter = require("../config/mailer");
 
 function getEmailTransporter() {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  const mailConfig = transporter.snusMailConfig || {};
+
+  if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass) {
     return null;
   }
 
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  return transporter;
+}
+
+function getFromAddress(label = "Snus Village") {
+  const mailConfig = transporter.snusMailConfig || {};
+  const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
+
+  return `"${label}" <${fromEmail}>`;
 }
 
 function formatMoney(value) {
@@ -126,7 +129,8 @@ Snus Village
   const adminEmails = getAdminEmails();
 
   await transporter.sendMail({
-    from: `"Snus Village" <${process.env.EMAIL_USER}>`,
+    from: getFromAddress("Snus Village"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
     to: order.customer.email,
     bcc: adminEmails.length ? adminEmails.join(",") : undefined,
     subject: clickCollect
@@ -200,7 +204,8 @@ Error: ${order.royalMail?.syncError || "N/A"}
 `.trim();
 
   await transporter.sendMail({
-    from: `"Snus Village Website" <${process.env.EMAIL_USER}>`,
+    from: getFromAddress("Snus Village Website"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
     to: adminEmails.join(","),
     subject: clickCollect
       ? `CLICK & COLLECT Order #${orderNumber}`

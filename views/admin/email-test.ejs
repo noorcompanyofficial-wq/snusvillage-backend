@@ -27,6 +27,18 @@
             </td>
           </tr>
           <tr>
+            <td>From address</td>
+            <td><%= mailConfig.emailFrom || "Not set" %></td>
+          </tr>
+          <tr>
+            <td>SMTP server</td>
+            <td><%= mailConfig.smtpHost %>:<%= mailConfig.smtpPort %></td>
+          </tr>
+          <tr>
+            <td>SMTP secure</td>
+            <td><%= mailConfig.smtpSecure ? "true" : "false" %></td>
+          </tr>
+          <tr>
             <td>Email password</td>
             <td><%= mailConfig.hasEmailPass ? "Configured" : "Missing" %></td>
           </tr>

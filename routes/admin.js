@@ -248,9 +248,13 @@ router.get("/email-test", isAdmin, (req, res) => {
     layout: "layouts/admin-layout",
     mailConfig: {
       emailUser: mailConfig.emailUser || "",
+      emailFrom: mailConfig.emailFrom || "",
+      smtpHost: mailConfig.smtpHost || "",
+      smtpPort: mailConfig.smtpPort || "",
+      smtpSecure: Boolean(mailConfig.smtpSecure),
       hasEmailUser: Boolean(mailConfig.hasEmailUser),
       hasEmailPass: Boolean(mailConfig.hasEmailPass),
-      timeout: Number(process.env.EMAIL_TIMEOUT_MS || 5000),
+      timeout: mailConfig.timeout || Number(process.env.EMAIL_TIMEOUT_MS || 10000),
     },
     result: req.flash("emailTestResult")[0] || null,
   });
@@ -259,7 +263,7 @@ router.get("/email-test", isAdmin, (req, res) => {
 router.post("/email-test", isAdmin, async (req, res) => {
   const to = String(req.body.to || "").trim();
   const mailConfig = transporter.snusMailConfig || {};
-  const fromEmail = mailConfig.emailUser || process.env.EMAIL_USER;
+  const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
 
   if (!to || !to.includes("@")) {
     req.flash("error", "Enter a valid test email address.");
