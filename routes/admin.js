@@ -13,6 +13,7 @@ const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
 const SearchAnalytics = require("../models/SearchAnalytics");
 const HomepageContent = require("../models/HomepageContent");
+const DiscountCode = require("../models/DiscountCode");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
@@ -700,6 +701,110 @@ router.get("/orders/export/csv", isAdmin, async (req, res) => {
     res.redirect("/admin/orders");
   }
 });
+
+
+router.get("/discounts", isAdmin, async (req, res) => {
+  try {
+    const discounts =
+      mongoose.connection.readyState === 1
+        ? await DiscountCode.find().sort({ createdAt: -1 }).lean()
+        : [];
+
+    res.render("admin/discounts", {
+      layout: "layouts/admin-layout",
+      discounts,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load discount codes");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/discounts", isAdmin, async (req, res) => {
+  try {
+    const code = String(req.body.code || "").trim().toUpperCase();
+
+    if (!code) {
+      req.flash("error", "Discount code is required");
+      return res.redirect("/admin/discounts");
+    }
+
+    const type = String(req.body.type || "percentage");
+
+    const value = Math.max(0, Number(req.body.value || 0));
+    const minimumSpend = Math.max(0, Number(req.body.minimumSpend || 0));
+    const usageLimit = Math.max(0, Number.parseInt(req.body.usageLimit || "0", 10));
+
+    if (type === "percentage" && value > 100) {
+      req.flash("error", "Percentage discount cannot be more than 100%");
+      return res.redirect("/admin/discounts");
+    }
+
+    const expiresAt = req.body.expiresAt ? new Date(req.body.expiresAt) : null;
+
+    await DiscountCode.create({
+      code,
+      description: String(req.body.description || "").trim(),
+      type,
+      value,
+      minimumSpend,
+      usageLimit,
+      appliesToBrand: String(req.body.appliesToBrand || "").trim(),
+      appliesToCategory: String(req.body.appliesToCategory || "").trim(),
+      expiresAt,
+      isActive: req.body.isActive === "on",
+    });
+
+    req.flash("success", "Discount code created");
+    res.redirect("/admin/discounts");
+  } catch (err) {
+    console.log(err);
+
+    if (err.code === 11000) {
+      req.flash("error", "That discount code already exists");
+    } else {
+      req.flash("error", "Unable to create discount code");
+    }
+
+    res.redirect("/admin/discounts");
+  }
+});
+
+router.post("/discounts/:id/toggle", isAdmin, async (req, res) => {
+  try {
+    const discount = await DiscountCode.findById(req.params.id);
+
+    if (!discount) {
+      req.flash("error", "Discount code not found");
+      return res.redirect("/admin/discounts");
+    }
+
+    discount.isActive = !discount.isActive;
+    await discount.save();
+
+    req.flash("success", `Discount code ${discount.isActive ? "enabled" : "disabled"}`);
+    res.redirect("/admin/discounts");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update discount code");
+    res.redirect("/admin/discounts");
+  }
+});
+
+router.post("/discounts/:id/delete", isAdmin, async (req, res) => {
+  try {
+    await DiscountCode.findByIdAndDelete(req.params.id);
+
+    req.flash("success", "Discount code deleted");
+    res.redirect("/admin/discounts");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to delete discount code");
+    res.redirect("/admin/discounts");
+  }
+});
+
 
 router.get("/orders", isAdmin, async (req, res) => {
   try {

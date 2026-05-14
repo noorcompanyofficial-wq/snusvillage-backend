@@ -3270,3 +3270,176 @@ textarea:focus {
 }
 
 /* ===== ADMIN HOMEPAGE VIDEO UPLOADS END ===== */
+
+/* ===== ADMIN DISCOUNTS PAGE START ===== */
+
+.admin-discount-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.admin-discount-form label {
+  display: grid;
+  gap: 7px;
+  color: #123b8a;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-discount-form input,
+.admin-discount-form select {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: #ffffff;
+  padding: 0 14px;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-checkbox-label {
+  display: flex !important;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px !important;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #eef3ff;
+}
+
+.admin-checkbox-label input {
+  width: auto;
+  min-height: auto;
+}
+
+.admin-discount-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-discount-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  box-shadow: 0 14px 38px rgba(9, 31, 77, 0.08);
+}
+
+.admin-discount-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-discount-card h3 {
+  margin: 12px 0 6px;
+  color: #061633;
+  font-size: 1.8rem;
+  letter-spacing: -0.05em;
+}
+
+.admin-discount-card p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.admin-discount-card__top > strong {
+  color: #b41232;
+  font-size: 2rem;
+  white-space: nowrap;
+}
+
+.admin-discount-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-discount-meta div {
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid rgba(9, 31, 77, 0.06);
+}
+
+.admin-discount-meta span {
+  display: block;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-discount-meta strong {
+  display: block;
+  margin-top: 5px;
+  color: #061633;
+  overflow-wrap: anywhere;
+}
+
+.admin-discount-warning {
+  padding: 11px 13px;
+  border-radius: 16px;
+  color: #991b1b;
+  background: #fee2e2;
+  font-weight: 950;
+}
+
+.admin-discount-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-discount-actions form {
+  margin: 0;
+}
+
+.admin-discount-actions button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 15px;
+  color: #ffffff;
+  background: #061633;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.admin-discount-actions button.is-danger {
+  background: #b41232;
+}
+
+@media (max-width: 1100px) {
+  .admin-discount-form,
+  .admin-discount-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-discount-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .admin-discount-card__top {
+    display: grid;
+  }
+
+  .admin-discount-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ADMIN DISCOUNTS PAGE END ===== */
