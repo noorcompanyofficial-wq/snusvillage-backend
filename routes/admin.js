@@ -186,10 +186,22 @@ router.get("/dashboard", isAdmin, async (req, res) => {
 router.get("/carts", isAdmin, async (req, res) => {
   try {
     const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
+    const status = String(req.query.status || "all").toLowerCase();
+
+    const filter = { "items.0": { $exists: true } };
+
+    if (status === "active") {
+      filter.updatedAt = { $gte: cartStaleCutoff };
+    }
+
+    if (status === "abandoned") {
+      filter.updatedAt = { $lt: cartStaleCutoff };
+    }
 
     const carts =
       mongoose.connection.readyState === 1
-        ? await Cart.find({ "items.0": { $exists: true } })
+        ? await Cart.find(filter)
+            .populate("user", "firstName lastName email phone")
             .populate("items.product")
             .sort({ updatedAt: -1 })
             .limit(100)
@@ -200,11 +212,24 @@ router.get("/carts", isAdmin, async (req, res) => {
       layout: "layouts/admin-layout",
       carts,
       cartStaleCutoff,
+      status,
     });
   } catch (err) {
     console.log(err);
     req.flash("error", "Unable to load carts");
     res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/carts/:id/delete", isAdmin, async (req, res) => {
+  try {
+    await Cart.findByIdAndDelete(req.params.id);
+    req.flash("success", "Cart removed");
+    res.redirect("/admin/carts");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to remove cart");
+    res.redirect("/admin/carts");
   }
 });
 

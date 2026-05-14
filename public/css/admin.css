@@ -2694,3 +2694,93 @@ textarea:focus {
 }
 
 /* ===== ADMIN ANALYTICS DASHBOARD END ===== */
+
+/* ===== ADMIN CARTS UPGRADE START ===== */
+
+.admin-cart-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-cart-filter-bar a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: #123b8a;
+  background: #eef3ff;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.admin-cart-filter-bar a.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+}
+
+.admin-carts-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 14px;
+}
+
+.admin-carts-summary div {
+  padding: 18px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  box-shadow: 0 14px 34px rgba(9, 31, 77, 0.08);
+}
+
+.admin-carts-summary strong {
+  display: block;
+  color: #061633;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.admin-carts-summary span {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-cart-card__top p strong {
+  color: #061633;
+}
+
+.admin-cart-card__footer form {
+  margin: 0;
+}
+
+.admin-cart-card__footer button {
+  border: 0;
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 0 14px;
+  color: #991b1b;
+  background: #fee2e2;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-cart-card__footer button:hover {
+  color: #ffffff;
+  background: #b41232;
+}
+
+@media (max-width: 680px) {
+  .admin-carts-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== ADMIN CARTS UPGRADE END ===== */
