@@ -12,6 +12,7 @@ const WholesaleApplication = require("../models/WholesaleApplication");
 const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
 const SearchAnalytics = require("../models/SearchAnalytics");
+const HomepageContent = require("../models/HomepageContent");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
@@ -154,6 +155,66 @@ router.get("/", isAdmin, (req, res) => {
   res.redirect("/admin/dashboard");
 });
 
+
+
+
+router.get("/homepage", isAdmin, async (req, res) => {
+  try {
+    let homepageContent = null;
+
+    if (mongoose.connection.readyState === 1) {
+      homepageContent = await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        { $setOnInsert: { key: "homepage" } },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      ).lean();
+    }
+
+    res.render("admin/homepage", {
+      layout: "layouts/admin-layout",
+      homepageContent,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load homepage controls");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/homepage/social", isAdmin, async (req, res) => {
+  try {
+    const slides = [1, 2, 3].map((number) => ({
+      videoSrc: String(req.body[`videoSrc${number}`] || "").trim(),
+      posterSrc: String(req.body[`posterSrc${number}`] || "").trim(),
+      title: String(req.body[`title${number}`] || "").trim(),
+      subtitle: String(req.body[`subtitle${number}`] || "").trim(),
+    }));
+
+    await HomepageContent.findOneAndUpdate(
+      { key: "homepage" },
+      {
+        key: "homepage",
+        social: {
+          eyebrow: String(req.body.eyebrow || "").trim(),
+          heading: String(req.body.heading || "").trim(),
+          description: String(req.body.description || "").trim(),
+          instagramUrl: String(req.body.instagramUrl || "").trim(),
+          cardTitle: String(req.body.cardTitle || "").trim(),
+          cardText: String(req.body.cardText || "").trim(),
+          slides,
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    req.flash("success", "Homepage social section updated");
+    res.redirect("/admin/homepage");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update homepage social section");
+    res.redirect("/admin/homepage");
+  }
+});
 
 
 router.get("/search-analytics", isAdmin, async (req, res) => {

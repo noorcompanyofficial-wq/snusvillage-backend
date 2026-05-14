@@ -1,0 +1,126 @@
+<%
+  const social = homepageContent?.social || {};
+  const slides = social.slides && social.slides.length
+    ? social.slides
+    : [
+        {
+          videoSrc: "/videos/social/social-1.mp4",
+          posterSrc: "/images/header/h-1.jpeg",
+          title: "New Stock Arrival",
+          subtitle: "Latest Product Highlights From Snus Village",
+        },
+        {
+          videoSrc: "/videos/social/social-2.mp4",
+          posterSrc: "/images/header/h-2.jpeg",
+          title: "In-Store Content",
+          subtitle: "Store Moments, Promotions, And Customer Favourites",
+        },
+        {
+          videoSrc: "/videos/social/social-3.mp4",
+          posterSrc: "/images/delivery/delivery.jpg",
+          title: "London Updates",
+          subtitle: "See What Is Happening Across Our Locations",
+        },
+      ];
+%>
+
+<section class="admin-page admin-homepage-controls">
+  <div class="admin-page-head">
+    <div>
+      <span>Homepage</span>
+      <h1>Homepage Content Controls</h1>
+      <p>Edit the social media iPhone showcase without changing code.</p>
+    </div>
+
+    <div class="admin-head-actions">
+      <a class="admin-primary" href="/" target="_blank" rel="noopener">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        Preview Homepage
+      </a>
+    </div>
+  </div>
+
+  <form class="admin-panel admin-homepage-form" action="/admin/homepage/social" method="POST">
+    <div class="admin-panel__head">
+      <h2>Social Media Section</h2>
+      <span>iPhone Reel Showcase</span>
+    </div>
+
+    <div class="admin-homepage-grid">
+      <label>
+        Eyebrow
+        <input name="eyebrow" value="<%= social.eyebrow || 'Social Media' %>">
+      </label>
+
+      <label>
+        Heading
+        <input name="heading" value="<%= social.heading || 'See Snus Village In Action' %>">
+      </label>
+
+      <label class="is-wide">
+        Description
+        <textarea name="description"><%= social.description || 'Follow Our Latest Product Drops, In-Store Moments, Promotions, And London Updates Through Our Social Content.' %></textarea>
+      </label>
+
+      <label>
+        Instagram URL
+        <input name="instagramUrl" value="<%= social.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">
+      </label>
+
+      <label>
+        Copy Card Title
+        <input name="cardTitle" value="<%= social.cardTitle || 'Follow Our Socials' %>">
+      </label>
+
+      <label class="is-wide">
+        Copy Card Text
+        <textarea name="cardText"><%= social.cardText || 'Discover New Stock, Best Sellers, Promotions, Branch Updates, And Behind-The-Scenes Clips From Snus Village.' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-homepage-slides">
+      <% [0, 1, 2].forEach((index) => { %>
+        <% const slide = slides[index] || {}; %>
+
+        <div class="admin-homepage-slide-card">
+          <div class="admin-homepage-slide-head">
+            <strong>Social Reel <%= index + 1 %></strong>
+            <span>Use paths from public folder</span>
+          </div>
+
+          <label>
+            Video Path
+            <input name="videoSrc<%= index + 1 %>" value="<%= slide.videoSrc || '' %>" placeholder="/videos/social/social-1.mp4">
+          </label>
+
+          <label>
+            Poster Image Path
+            <input name="posterSrc<%= index + 1 %>" value="<%= slide.posterSrc || '' %>" placeholder="/images/header/h-1.jpeg">
+          </label>
+
+          <label>
+            Title
+            <input name="title<%= index + 1 %>" value="<%= slide.title || '' %>">
+          </label>
+
+          <label>
+            Subtitle
+            <input name="subtitle<%= index + 1 %>" value="<%= slide.subtitle || '' %>">
+          </label>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="admin-homepage-help">
+      <strong>Video Path Example:</strong>
+      <span>/videos/social/social-1.mp4</span>
+      <strong>Poster Path Example:</strong>
+      <span>/images/header/h-1.jpeg</span>
+    </div>
+
+    <button class="admin-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Homepage Social Section
+    </button>
+  </form>
+</section>

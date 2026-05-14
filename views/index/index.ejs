@@ -324,18 +324,44 @@
           </div>
         </section>
 
+        <%
+          const svSocial = homepageContent?.social || {};
+          const svSocialSlides = svSocial.slides && svSocial.slides.length
+            ? svSocial.slides
+            : [
+                {
+                  videoSrc: "/videos/social/social-1.mp4",
+                  posterSrc: "/images/header/h-1.jpeg",
+                  title: "New Stock Arrival",
+                  subtitle: "Latest Product Highlights From Snus Village",
+                },
+                {
+                  videoSrc: "/videos/social/social-2.mp4",
+                  posterSrc: "/images/header/h-2.jpeg",
+                  title: "In-Store Content",
+                  subtitle: "Store Moments, Promotions, And Customer Favourites",
+                },
+                {
+                  videoSrc: "/videos/social/social-3.mp4",
+                  posterSrc: "/images/delivery/delivery.jpg",
+                  title: "London Updates",
+                  subtitle: "See What Is Happening Across Our Locations",
+                },
+              ];
+        %>
+
         <section class="section sv-social-showcase" id="social-showcase">
           <div class="container">
             <div class="section-head sv-section-head-pro">
               <div>
-                <span class="eyebrow dark">Social Media</span>
-                <h2>See Snus Village In Action</h2>
+                <span class="eyebrow dark"><%= svSocial.eyebrow || "Social Media" %></span>
+                <h2><%= svSocial.heading || "See Snus Village In Action" %></h2>
                 <p>
-                  Follow Our Latest Product Drops, In-Store Moments, Promotions, And London Updates Through Our Social Content.
+                  <%= svSocial.description || "Follow Our Latest Product Drops, In-Store Moments, Promotions, And London Updates Through Our Social Content." %>
                 </p>
               </div>
 
-              <a class="ghost-btn" href="https://www.instagram.com/snusvillage.uk/" target="_blank" rel="noopener noreferrer">
+              <a class="ghost-btn" href="<%= svSocial.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>" target="_blank" rel="noopener noreferrer">
                 Follow Instagram
               </a>
             </div>
@@ -343,9 +369,9 @@
             <div class="sv-social-iphone-grid">
               <div class="sv-social-copy-card">
                 <span class="pill">Snus Village UK</span>
-                <h3>Follow Our Socials</h3>
+                <h3><%= svSocial.cardTitle || "Follow Our Socials" %></h3>
                 <p>
-                  Discover New Stock, Best Sellers, Promotions, Branch Updates, And Behind-The-Scenes Clips From Snus Village.
+                  <%= svSocial.cardText || "Discover New Stock, Best Sellers, Promotions, Branch Updates, And Behind-The-Scenes Clips From Snus Village." %>
                 </p>
 
                 <div class="sv-social-points">
@@ -366,7 +392,7 @@
                 </div>
 
                 <div class="sv-social-links">
-                  <a href="https://www.instagram.com/snusvillage.uk/" target="_blank" rel="noopener noreferrer" class="sv-ab-btn sv-ab-btn--primary">
+                  <a href="<%= svSocial.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>" target="_blank" rel="noopener noreferrer" class="sv-ab-btn sv-ab-btn--primary">
                     Open Instagram
                   </a>
 
@@ -404,29 +430,22 @@
                     </div>
 
                     <div class="sv-social-reel" id="svSocialReel">
-                      <div class="sv-social-slide is-active">
-                        <video src="/videos/social/social-1.mp4" muted autoplay loop playsinline poster="/images/header/h-1.jpeg"></video>
-                        <div class="sv-social-caption">
-                          <strong>New Stock Arrival</strong>
-                          <span>Latest Product Highlights From Snus Village</span>
+                      <% svSocialSlides.slice(0, 3).forEach((slide, index) => { %>
+                        <div class="sv-social-slide <%= index === 0 ? 'is-active' : '' %>">
+                          <video
+                            src="<%= slide.videoSrc %>"
+                            muted
+                            <%= index === 0 ? 'autoplay' : '' %>
+                            loop
+                            playsinline
+                            poster="<%= slide.posterSrc || '/images/header/h-1.jpeg' %>"
+                          ></video>
+                          <div class="sv-social-caption">
+                            <strong><%= slide.title || 'Snus Village Update' %></strong>
+                            <span><%= slide.subtitle || 'Latest Content From Snus Village' %></span>
+                          </div>
                         </div>
-                      </div>
-
-                      <div class="sv-social-slide">
-                        <video src="/videos/social/social-2.mp4" muted loop playsinline poster="/images/header/h-2.jpeg"></video>
-                        <div class="sv-social-caption">
-                          <strong>In-Store Content</strong>
-                          <span>Store Moments, Promotions, And Customer Favourites</span>
-                        </div>
-                      </div>
-
-                      <div class="sv-social-slide">
-                        <video src="/videos/social/social-3.mp4" muted loop playsinline poster="/images/delivery/delivery.jpg"></video>
-                        <div class="sv-social-caption">
-                          <strong>London Updates</strong>
-                          <span>See What Is Happening Across Our Locations</span>
-                        </div>
-                      </div>
+                      <% }) %>
                     </div>
 
                     <div class="sv-social-controls">
@@ -544,7 +563,7 @@
             <a href="/#reviews">Reviews</a>
               <a href="mailto:info@snusvillage.co.uk">info@snusvillage.co.uk</a>
               <a href="tel:+447777222771">+44 7777 222771</a>
-              <a href="https://www.instagram.com/snusvillage.uk/">Instagram</a>
+              <a href="<%= svSocial.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">Instagram</a>
             </div>
           </div>
 
