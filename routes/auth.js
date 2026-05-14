@@ -105,9 +105,25 @@ function normalizeEmail(email) {
 }
 
 function getClientIp(req) {
-  return String(req.headers["x-forwarded-for"] || req.ip || "")
-    .split(",")[0]
-    .trim();
+  return getRequestIps(req)[0] || "";
+}
+
+function getRequestIps(req) {
+  const forwardedIps = String(req.headers["x-forwarded-for"] || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const directIp = String(req.ip || "").trim();
+  const ips = [...forwardedIps, directIp].filter(Boolean);
+
+  return [...new Set(ips)];
+}
+
+function hasBlockedIp(user, req) {
+  const blockedIps = new Set(user.blockedIPs || []);
+
+  return getRequestIps(req).some((ip) => blockedIps.has(ip));
 }
 
 function isTrustedLoginEmail(email) {
@@ -346,7 +362,7 @@ router.post("/login", authLimiter, async (req, res, next) => {
 
     const currentIP = getClientIp(req);
 
-    if (user.blockedIPs && user.blockedIPs.includes(currentIP)) {
+    if (user.role !== "admin" && hasBlockedIp(user, req)) {
       req.flash("error", "Your account needs a security review. Please contact support.");
       return res.redirect("/auth/login");
     }
