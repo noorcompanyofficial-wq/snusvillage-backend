@@ -2,16 +2,8 @@
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
-    <% if (verificationRequired) { %>
-      <div class="checkout-sumup-notice">
-        <strong>Age verification is required before checkout.</strong>
-        <span>Please complete verification before placing your order.</span>
-      </div>
+    <form action="/didit/start" method="POST" id="checkoutDiditForm"></form>
 
-      <form action="/didit/start" method="POST">
-        <button type="submit" class="pay-now-btn">Start Verification</button>
-      </form>
-    <% } else { %>
     <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
@@ -70,14 +62,28 @@
         <span>You Will Be Redirected To SumUp To Complete Your Card Payment Securely.</span>
       </div>
 
+      <% if (verificationRequired) { %>
+        <div class="checkout-verification-inline">
+          <div>
+            <strong>Age Verification Required</strong>
+            <span>Please complete age verification before paying with SumUp.</span>
+          </div>
+
+          <button type="submit" form="checkoutDiditForm">
+            Start Verification
+          </button>
+        </div>
+      <% } %>
+
       <label class="checkout-age-confirm">
         <input type="checkbox" name="ageConfirm" value="yes" required>
         <span>I confirm I am 18+ and understand age verification may be required before receiving my order.</span>
       </label>
 
-      <button type="submit" class="pay-now-btn">Pay Securely With SumUp</button>
+      <button type="submit" class="pay-now-btn" <%= verificationRequired ? "disabled" : "" %>>
+        <%= verificationRequired ? "Complete Verification First" : "Pay Securely With SumUp" %>
+      </button>
     </form>
-    <% } %>
   </section>
 
   <aside class="checkout-summary-panel">
@@ -103,6 +109,26 @@
       <% } %>
     <% }) %>
 
+    <div class="checkout-discount-box">
+      <% if (appliedDiscountCode) { %>
+        <div class="checkout-applied-discount">
+          <div>
+            <span>Discount Applied</span>
+            <strong><%= appliedDiscountCode %></strong>
+          </div>
+
+          <form action="/checkout/remove-discount" method="POST">
+            <button type="submit">Remove</button>
+          </form>
+        </div>
+      <% } else { %>
+        <form action="/checkout/apply-discount" method="POST" class="discount-row">
+          <input type="text" name="discountCode" placeholder="Discount Code">
+          <button type="submit">Apply</button>
+        </form>
+      <% } %>
+    </div>
+
     <div class="checkout-total-row">
       <span>Subtotal</span>
       <strong>£<%= subtotal.toFixed(2) %></strong>
@@ -112,6 +138,13 @@
       <span>Shipping</span>
       <strong><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
     </div>
+
+    <% if (discountAmount && discountAmount > 0) { %>
+      <div class="checkout-total-row checkout-discount-total">
+        <span>Discount</span>
+        <strong>-£<%= discountAmount.toFixed(2) %></strong>
+      </div>
+    <% } %>
 
     <div class="checkout-grand-total">
       <span>Total</span>

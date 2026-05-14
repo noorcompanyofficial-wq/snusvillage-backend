@@ -764,7 +764,7 @@ router.post("/discounts", isAdmin, async (req, res) => {
     if (err.code === 11000) {
       req.flash("error", "That discount code already exists");
     } else {
-      req.flash("error", "Unable to create discount code");
+      req.flash("error", "Unable to create discount code: " + err.message);
     }
 
     res.redirect("/admin/discounts");

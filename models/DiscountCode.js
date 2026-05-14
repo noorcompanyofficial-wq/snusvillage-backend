@@ -73,12 +73,10 @@ const discountCodeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-discountCodeSchema.pre("save", function (next) {
+discountCodeSchema.pre("save", function () {
   if (this.code) {
     this.code = String(this.code).trim().toUpperCase();
   }
-
-  next();
 });
 
 module.exports =

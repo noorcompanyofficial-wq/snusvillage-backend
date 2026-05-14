@@ -489,3 +489,115 @@ body {
 }
 
 /* ===== CLICK COLLECT HIDE FIX END ===== */
+
+/* ===== CHECKOUT DISCOUNT CODE START ===== */
+
+.checkout-discount-box {
+  margin: 26px 0;
+}
+
+.checkout-applied-discount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #eef3ff;
+  border: 1px solid rgba(18, 59, 138, 0.12);
+}
+
+.checkout-applied-discount span {
+  display: block;
+  color: #465a7a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.checkout-applied-discount strong {
+  display: block;
+  margin-top: 3px;
+  color: #061633;
+  letter-spacing: 0.08em;
+}
+
+.checkout-applied-discount form {
+  margin: 0;
+}
+
+.checkout-applied-discount button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #d71234;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.checkout-discount-total strong {
+  color: #15803d;
+}
+
+/* ===== CHECKOUT DISCOUNT CODE END ===== */
+
+/* ===== INLINE AGE VERIFICATION START ===== */
+
+.checkout-verification-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff7ed;
+  border: 1px solid rgba(215, 85, 0, 0.18);
+}
+
+.checkout-verification-inline strong,
+.checkout-verification-inline span {
+  display: block;
+}
+
+.checkout-verification-inline strong {
+  color: #9a3412;
+  font-size: 15px;
+}
+
+.checkout-verification-inline span {
+  margin-top: 4px;
+  color: #7c2d12;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.checkout-verification-inline button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #d71234);
+  font-weight: 950;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pay-now-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 620px) {
+  .checkout-verification-inline {
+    display: grid;
+  }
+
+  .checkout-verification-inline button {
+    width: 100%;
+  }
+}
+
+/* ===== INLINE AGE VERIFICATION END ===== */
