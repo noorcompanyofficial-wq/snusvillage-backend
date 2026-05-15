@@ -3588,3 +3588,62 @@ textarea:focus {
 }
 
 /* ===== ADMIN ORDER DETAIL UPGRADE END ===== */
+
+/* ===== ADMIN SETTINGS PAGE START ===== */
+
+.admin-settings-form {
+  display: grid;
+  gap: 22px;
+}
+
+.admin-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-settings-grid label {
+  display: grid;
+  gap: 7px;
+  color: #123b8a;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-settings-grid label.is-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-settings-grid input,
+.admin-settings-grid textarea {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 18px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: #ffffff;
+  padding: 11px 14px;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-settings-grid textarea {
+  min-height: 100px;
+  resize: vertical;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+@media (max-width: 760px) {
+  .admin-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings-grid label.is-wide {
+    grid-column: auto;
+  }
+}
+
+/* ===== ADMIN SETTINGS PAGE END ===== */

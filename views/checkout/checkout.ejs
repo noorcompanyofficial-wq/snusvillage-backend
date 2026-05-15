@@ -37,7 +37,7 @@
 
       <div class="checkout-collect-notice" id="clickCollectNotice" hidden>
         <strong>Collection Address</strong>
-        <span>SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX</span>
+        <span><%= checkoutSettings?.clickCollectAddress || "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" %></span>
         <small>Your order will not be sent to Royal Mail. Bring your order confirmation and valid ID when collecting.</small>
       </div>
 
@@ -59,7 +59,7 @@
       <h3>Payment</h3>
       <div class="checkout-sumup-notice">
         <strong>Secure SumUp Payment</strong>
-        <span>You Will Be Redirected To SumUp To Complete Your Card Payment Securely.</span>
+        <span><%= checkoutSettings?.checkoutNotice || "You Will Be Redirected To SumUp To Complete Your Card Payment Securely." %></span>
       </div>
 
       <% if (verificationRequired) { %>

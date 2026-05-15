@@ -6,9 +6,33 @@ const Order = require("../models/order");
 const Product = require("../models/Products");
 const User = require("../models/User");
 const DiscountCode = require("../models/DiscountCode");
+const StoreSettings = require("../models/StoreSettings");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
 const { sendOrderEmails } = require("../utils/orderEmails");
 const { createHostedCheckout, getCheckoutStatus } = require("../utils/sumup");
+
+const defaultCheckoutSettings = {
+  deliveryPrice: 0,
+  freeDeliveryThreshold: 0,
+  checkoutNotice: "You Will Be Redirected To SumUp To Complete Your Card Payment Securely.",
+  clickCollectBranch: "Edgware Road",
+  clickCollectAddress: "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX",
+  clickCollectCity: "London",
+  clickCollectPostcode: "W2 2HX",
+};
+
+async function getCheckoutStoreSettings() {
+  if (StoreSettings.db.readyState !== 1) {
+    return defaultCheckoutSettings;
+  }
+
+  const settings = await StoreSettings.findOne({ key: "store" }).lean();
+
+  return {
+    ...defaultCheckoutSettings,
+    ...(settings || {}),
+  };
+}
 
 function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
@@ -55,13 +79,22 @@ async function getCart(req) {
   }).populate("items.product");
 }
 
-function calculateCartTotals(cart) {
+function calculateCartTotals(cart, settings = defaultCheckoutSettings, fulfilmentMethod = "delivery") {
   const subtotal = cart.items.reduce((sum, item) => {
     const price = item.priceAtTime || item.product?.price || 0;
     return sum + price * item.quantity;
   }, 0);
 
-  const shipping = 0;
+  let shipping = Number(settings.deliveryPrice || 0);
+
+  if (fulfilmentMethod === "click_collect") {
+    shipping = 0;
+  }
+
+  if (Number(settings.freeDeliveryThreshold || 0) > 0 && subtotal >= Number(settings.freeDeliveryThreshold || 0)) {
+    shipping = 0;
+  }
+
   const total = subtotal + shipping;
 
   return { subtotal, shipping, total };
@@ -195,8 +228,9 @@ async function calculateDiscountForCart(cart, code) {
   };
 }
 
-async function calculateCheckoutTotals(req, cart) {
-  const { subtotal, shipping } = calculateCartTotals(cart);
+async function calculateCheckoutTotals(req, cart, fulfilmentMethod = "delivery") {
+  const settings = await getCheckoutStoreSettings();
+  const { subtotal, shipping } = calculateCartTotals(cart, settings, fulfilmentMethod);
   const discountResult = await calculateDiscountForCart(cart, req.session.checkoutDiscountCode);
 
   if (!discountResult.ok) {
@@ -394,8 +428,9 @@ router.get("/", async (req, res, next) => {
       return res.redirect("/cart");
     }
 
+    const settings = await getCheckoutStoreSettings();
     const { subtotal, shipping, discountAmount, total, discountResult } =
-      await calculateCheckoutTotals(req, cart);
+      await calculateCheckoutTotals(req, cart, "delivery");
 
     const verification = await checkoutVerificationRequired(req);
 
@@ -416,6 +451,7 @@ router.get("/", async (req, res, next) => {
       total,
       discountResult,
       appliedDiscountCode: req.session.checkoutDiscountCode || "",
+      checkoutSettings: settings,
       verificationRequired,
     });
   } catch (error) {
@@ -499,8 +535,9 @@ router.post("/place-order", async (req, res, next) => {
       }
     }
 
+    const settings = await getCheckoutStoreSettings();
     const { subtotal, shipping, discountAmount, total, discountResult } =
-      await calculateCheckoutTotals(req, cart);
+      await calculateCheckoutTotals(req, cart, "delivery");
 
     const fulfilmentMethod =
       req.body.fulfilmentMethod === "click_collect" ? "click_collect" : "delivery";
@@ -543,14 +580,14 @@ router.post("/place-order", async (req, res, next) => {
       },
       delivery: {
         country: "United Kingdom",
-        address: isClickCollect ? "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" : req.body.address,
-        city: isClickCollect ? "London" : req.body.city,
-        postcode: isClickCollect ? "W2 2HX" : req.body.postcode,
+        address: isClickCollect ? settings.clickCollectAddress : req.body.address,
+        city: isClickCollect ? settings.clickCollectCity : req.body.city,
+        postcode: isClickCollect ? settings.clickCollectPostcode : req.body.postcode,
       },
       fulfilment: {
         method: fulfilmentMethod,
-        collectionBranch: isClickCollect ? "Edgware Road" : "",
-        collectionAddress: isClickCollect ? "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" : "",
+        collectionBranch: isClickCollect ? settings.clickCollectBranch : "",
+        collectionAddress: isClickCollect ? settings.clickCollectAddress : "",
       },
       items: orderItems,
       subtotal,

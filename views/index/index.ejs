@@ -353,6 +353,32 @@
           </div>
         </section>
 
+        <%
+          const svSocial = homepageContent?.social || {};
+          const svSocialSlides = svSocial.slides && svSocial.slides.length
+            ? svSocial.slides
+            : [
+                {
+                  videoSrc: "/videos/social/social-1.mp4",
+                  posterSrc: "/images/header/h-1.jpeg",
+                  title: "New Stock Arrival",
+                  subtitle: "Latest Product Highlights From Snus Village",
+                },
+                {
+                  videoSrc: "/videos/social/social-2.mp4",
+                  posterSrc: "/images/header/h-2.jpeg",
+                  title: "In-Store Content",
+                  subtitle: "Store Moments, Promotions, And Customer Favourites",
+                },
+                {
+                  videoSrc: "/videos/social/social-3.mp4",
+                  posterSrc: "/images/delivery/delivery.jpg",
+                  title: "London Updates",
+                  subtitle: "See What Is Happening Across Our Locations",
+                },
+              ];
+        %>
+
         <section class="section sv-social-showcase" id="social-showcase">
           <div class="container">
             <div class="section-head sv-section-head-pro">

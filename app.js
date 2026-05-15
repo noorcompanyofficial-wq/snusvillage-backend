@@ -6,10 +6,62 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
+const StoreSettings = require("./models/StoreSettings");
 
 require("dotenv").config();
 
 const app = express();
+
+const defaultStoreSettings = {
+  storeName: "Snus Village",
+  storeEmail: "info@snusvillage.co.uk",
+  storePhone: "+44 7777 222771",
+  instagramUrl: "https://www.instagram.com/snusvillage.uk/",
+  deliveryPrice: 0,
+  freeDeliveryThreshold: 0,
+  checkoutNotice: "You Will Be Redirected To SumUp To Complete Your Card Payment Securely.",
+  ageGateMessage: "You Must Be 18+ To Enter This Website.",
+  clickCollectBranch: "Edgware Road",
+  clickCollectAddress: "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX",
+  clickCollectCity: "London",
+  clickCollectPostcode: "W2 2HX",
+  maintenanceMode: false,
+  maintenanceMessage: "Snus Village is currently updating the website. Please check back soon.",
+};
+
+let cachedStoreSettings = defaultStoreSettings;
+let cachedStoreSettingsAt = 0;
+
+async function getCachedStoreSettings() {
+  const cacheAge = Date.now() - cachedStoreSettingsAt;
+
+  if (cacheAge < 60 * 1000) {
+    return cachedStoreSettings;
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    cachedStoreSettings = defaultStoreSettings;
+    cachedStoreSettingsAt = Date.now();
+    return cachedStoreSettings;
+  }
+
+  try {
+    const settings = await StoreSettings.findOneAndUpdate(
+      { key: "store" },
+      { $setOnInsert: { key: "store", ...defaultStoreSettings } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+
+    cachedStoreSettings = settings || defaultStoreSettings;
+    cachedStoreSettingsAt = Date.now();
+    return cachedStoreSettings;
+  } catch (err) {
+    console.log("Store settings load failed:", err.message);
+    return cachedStoreSettings || defaultStoreSettings;
+  }
+}
+
+
 
 // ====== Security Headers ======
 app.use(
@@ -105,11 +157,12 @@ app.use(async (req, res, next) => {
 });
 
 // ====== Global Variables ======
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.user = req.session?.user || null;
   res.locals.currentPath = req.path;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
+  res.locals.storeSettings = await getCachedStoreSettings();
   next();
 });
 

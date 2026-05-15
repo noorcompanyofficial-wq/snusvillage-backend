@@ -1,0 +1,125 @@
+<%
+  const s = settings || {};
+%>
+
+<section class="admin-page admin-settings-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Settings</span>
+      <h1>Website Settings</h1>
+      <p>Control store contact details, delivery pricing, checkout notices, and click & collect information.</p>
+    </div>
+
+    <div class="admin-head-actions">
+      <a class="admin-primary" href="/" target="_blank" rel="noopener">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        Preview Website
+      </a>
+    </div>
+  </div>
+
+  <form class="admin-panel admin-settings-form" action="/admin/settings" method="POST">
+    <div class="admin-panel__head">
+      <h2>Store Details</h2>
+      <span>Public Contact Information</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label>
+        Store Name
+        <input name="storeName" value="<%= s.storeName || 'Snus Village' %>">
+      </label>
+
+      <label>
+        Store Email
+        <input name="storeEmail" value="<%= s.storeEmail || 'info@snusvillage.co.uk' %>">
+      </label>
+
+      <label>
+        Store Phone
+        <input name="storePhone" value="<%= s.storePhone || '+44 7777 222771' %>">
+      </label>
+
+      <label>
+        Instagram URL
+        <input name="instagramUrl" value="<%= s.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">
+      </label>
+    </div>
+
+    <div class="admin-panel__head">
+      <h2>Checkout Settings</h2>
+      <span>Delivery And Payment Messages</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label>
+        Delivery Price
+        <input type="number" step="0.01" min="0" name="deliveryPrice" value="<%= Number(s.deliveryPrice || 0).toFixed(2) %>">
+      </label>
+
+      <label>
+        Free Delivery Threshold
+        <input type="number" step="0.01" min="0" name="freeDeliveryThreshold" value="<%= Number(s.freeDeliveryThreshold || 0).toFixed(2) %>">
+      </label>
+
+      <label class="is-wide">
+        Checkout Notice
+        <textarea name="checkoutNotice"><%= s.checkoutNotice || 'You Will Be Redirected To SumUp To Complete Your Card Payment Securely.' %></textarea>
+      </label>
+
+      <label class="is-wide">
+        Age Gate Message
+        <textarea name="ageGateMessage"><%= s.ageGateMessage || 'You Must Be 18+ To Enter This Website.' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-panel__head">
+      <h2>Click & Collect</h2>
+      <span>Collection Branch Details</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label>
+        Branch Name
+        <input name="clickCollectBranch" value="<%= s.clickCollectBranch || 'Edgware Road' %>">
+      </label>
+
+      <label>
+        City
+        <input name="clickCollectCity" value="<%= s.clickCollectCity || 'London' %>">
+      </label>
+
+      <label>
+        Postcode
+        <input name="clickCollectPostcode" value="<%= s.clickCollectPostcode || 'W2 2HX' %>">
+      </label>
+
+      <label class="is-wide">
+        Collection Address
+        <textarea name="clickCollectAddress"><%= s.clickCollectAddress || 'SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-panel__head">
+      <h2>Maintenance Mode</h2>
+      <span>Emergency Website Notice</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label class="admin-checkbox-label">
+        <input type="checkbox" name="maintenanceMode" <%= s.maintenanceMode ? "checked" : "" %>>
+        Maintenance Mode Enabled
+      </label>
+
+      <label class="is-wide">
+        Maintenance Message
+        <textarea name="maintenanceMessage"><%= s.maintenanceMessage || 'Snus Village is currently updating the website. Please check back soon.' %></textarea>
+      </label>
+    </div>
+
+    <button class="admin-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Settings
+    </button>
+  </form>
+</section>

@@ -14,6 +14,7 @@ const Contact = require("../models/contact");
 const SearchAnalytics = require("../models/SearchAnalytics");
 const HomepageContent = require("../models/HomepageContent");
 const DiscountCode = require("../models/DiscountCode");
+const StoreSettings = require("../models/StoreSettings");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
@@ -699,6 +700,63 @@ router.get("/orders/export/csv", isAdmin, async (req, res) => {
     console.log(err);
     req.flash("error", "Unable to export orders");
     res.redirect(req.get("Referrer") || "/admin/orders");
+  }
+});
+
+
+
+router.get("/settings", isAdmin, async (req, res) => {
+  try {
+    const settings =
+      mongoose.connection.readyState === 1
+        ? await StoreSettings.findOneAndUpdate(
+            { key: "store" },
+            { $setOnInsert: { key: "store" } },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+          ).lean()
+        : null;
+
+    res.render("admin/settings", {
+      layout: "layouts/admin-layout",
+      settings,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load store settings");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.post("/settings", isAdmin, async (req, res) => {
+  try {
+    await StoreSettings.findOneAndUpdate(
+      { key: "store" },
+      {
+        key: "store",
+        storeName: String(req.body.storeName || "").trim(),
+        storeEmail: String(req.body.storeEmail || "").trim(),
+        storePhone: String(req.body.storePhone || "").trim(),
+        instagramUrl: String(req.body.instagramUrl || "").trim(),
+        deliveryPrice: Math.max(0, Number(req.body.deliveryPrice || 0)),
+        freeDeliveryThreshold: Math.max(0, Number(req.body.freeDeliveryThreshold || 0)),
+        checkoutNotice: String(req.body.checkoutNotice || "").trim(),
+        ageGateMessage: String(req.body.ageGateMessage || "").trim(),
+        clickCollectBranch: String(req.body.clickCollectBranch || "").trim(),
+        clickCollectAddress: String(req.body.clickCollectAddress || "").trim(),
+        clickCollectCity: String(req.body.clickCollectCity || "").trim(),
+        clickCollectPostcode: String(req.body.clickCollectPostcode || "").trim(),
+        maintenanceMode: req.body.maintenanceMode === "on",
+        maintenanceMessage: String(req.body.maintenanceMessage || "").trim(),
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    req.flash("success", "Store settings updated");
+    res.redirect("/admin/settings");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update store settings");
+    res.redirect("/admin/settings");
   }
 });
 
