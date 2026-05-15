@@ -4,86 +4,55 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 
-<div class="admin-add-wrapper">
-  <!-- BACK -->
+<section class="admin-product-editor-page">
+  <div class="admin-product-editor-head">
+    <div>
+      <span>Catalogue</span>
+      <h1>Add Product</h1>
+      <p>Create a new product with images, stock, display controls, and SEO fields.</p>
+    </div>
 
-  <!-- FORM CARD -->
-  <div class="admin-add-card">
-    <a href="/admin/products" class="admin-add-back">
-      <i class="fa-solid fa-arrow-left"></i> Back
+    <a href="/admin/products" class="admin-editor-back">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back To Products
     </a>
+  </div>
 
-    <h2 class="admin-add-title">Add Product</h2>
-    <form
-      action="/admin/products/add"
-      method="POST"
-      enctype="multipart/form-data"
-      class="admin-add-form"
-    >
-      <!-- GRID -->
-      <div class="admin-add-grid">
-        <div class="input-box">
-          <i class="fa-solid fa-box"></i>
-          <input type="text" name="name" placeholder="Product Name" required />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-solid fa-pound-sign"></i>
-          <input
-            type="number"
-            name="price"
-            step="0.01"
-            min="0"
-            placeholder="Price"
-            required
-          />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-solid fa-tag"></i>
-          <input
-            type="number"
-            name="discountPrice"
-            step="0.01"
-            min="0"
-            placeholder="Discount Price"
-            required
-          />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-solid fa-layer-group"></i>
-          <input type="text" name="category" placeholder="Category" />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-brands fa-font-awesome"></i>
-          <input type="text" name="brand" placeholder="Brand" />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-solid fa-leaf"></i>
-          <input type="text" name="flavour" placeholder="Flavour" />
-        </div>
-
-        <div class="input-box">
-          <i class="fa-solid fa-warehouse"></i>
-          <input type="number" name="stock" placeholder="Stock" />
-        </div>
-        <div class="input-box">
-          <i class="fa-solid fa-circle-dot"></i>
-          <input
-            type="text"
-            name="nicotine"
-            placeholder="Amount of Nicotine (mg)"
-          />
-        </div>
+  <form
+    action="/admin/products/add"
+    method="POST"
+    enctype="multipart/form-data"
+    class="admin-product-editor-card"
+  >
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Product Details</h2>
+        <span>Main catalogue information</span>
       </div>
 
-      <div class="admin-select-group">
-        <div class="admin-select-box">
-          <i class="fa-solid fa-bolt"></i>
+      <div class="admin-editor-grid">
+        <label>
+          Product Name
+          <input type="text" name="name" placeholder="White Fox Mint" required>
+        </label>
 
+        <label>
+          Brand
+          <input list="brandOptions" type="text" name="brand" placeholder="WHITE FOX" required>
+        </label>
+
+        <label>
+          Category
+          <input list="categoryOptions" type="text" name="category" placeholder="Nicotine Pouches">
+        </label>
+
+        <label>
+          Flavour
+          <input type="text" name="flavour" placeholder="Mint">
+        </label>
+
+        <label>
+          Strength
           <select name="strength" required>
             <option value="">Select strength</option>
             <option value="LOW">LOW</option>
@@ -92,30 +61,172 @@
             <option value="X-STRONG">X-STRONG</option>
             <option value="EXTREME">EXTREME</option>
           </select>
-        </div>
-      </div>
-
-      <!-- TEXTAREA -->
-      <div class="textarea-box">
-        <textarea
-          name="description"
-          placeholder="Product Description"
-        ></textarea>
-      </div>
-
-      <!-- IMAGE UPLOAD -->
-      <div class="file-box">
-        <label>
-          <i class="fa-solid fa-image"></i>
-          Upload Images
         </label>
-        <input type="file" name="images" multiple />
+
+        <label>
+          Nicotine
+          <input type="text" name="nicotine" placeholder="16mg">
+        </label>
       </div>
 
-      <!-- BUTTON -->
-      <button type="submit" class="admin-add-btn">
-        <i class="fa-solid fa-floppy-disk"></i> Save Product
-      </button>
-    </form>
-  </div>
-</div>
+      <label class="admin-editor-full">
+        Description
+        <textarea name="description" placeholder="Write the product description..." required></textarea>
+      </label>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Pricing & Stock</h2>
+        <span>Control price, sale price and stock level</span>
+      </div>
+
+      <div class="admin-editor-grid">
+        <label>
+          Price
+          <input type="number" name="price" step="0.01" min="0" placeholder="5.99" required>
+        </label>
+
+        <label>
+          Discount Price
+          <input type="number" name="discountPrice" step="0.01" min="0" placeholder="0.00">
+        </label>
+
+        <label>
+          Stock
+          <input type="number" name="stock" min="0" placeholder="20">
+        </label>
+      </div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Display Controls</h2>
+        <span>Choose how this product appears on the website</span>
+      </div>
+
+      <div class="admin-toggle-grid">
+        <label>
+          <input type="checkbox" name="isActive" checked>
+          <span>
+            <strong>Active Product</strong>
+            <small>Show this product on the website.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="isFeatured">
+          <span>
+            <strong>Featured</strong>
+            <small>Use later for featured homepage sections.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="isBestSeller">
+          <span>
+            <strong>Best Seller</strong>
+            <small>Mark this as a best-selling product.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="showSaleBadge">
+          <span>
+            <strong>Sale Badge</strong>
+            <small>Show sale badge when discount price is active.</small>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Product Images</h2>
+        <span>Upload up to 5 images</span>
+      </div>
+
+      <div class="admin-upload-box">
+        <input id="productImages" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple>
+        <label for="productImages">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <strong>Upload Product Images</strong>
+          <span>JPG, PNG, WEBP or AVIF</span>
+        </label>
+      </div>
+
+      <div class="admin-image-preview-grid" id="imagePreviewGrid"></div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>SEO</h2>
+        <span>Optional Google search fields</span>
+      </div>
+
+      <div class="admin-editor-grid">
+        <label>
+          SEO Title
+          <input type="text" name="seoTitle" placeholder="White Fox Mint Nicotine Pouches">
+        </label>
+
+        <label class="admin-editor-full">
+          SEO Description
+          <textarea name="seoDescription" placeholder="Short SEO description for this product..."></textarea>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="admin-editor-submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Product
+    </button>
+  </form>
+</section>
+
+<datalist id="brandOptions">
+  <option value="WHITE FOX">
+  <option value="SIBERIA">
+  <option value="VELO">
+  <option value="KILLA">
+  <option value="PABLO">
+  <option value="GARANT">
+  <option value="ICEBERG">
+  <option value="CUBA">
+  <option value="LOOP">
+  <option value="CAFERO">
+  <option value="HIT">
+  <option value="ODEN'S">
+</datalist>
+
+<datalist id="categoryOptions">
+  <option value="Nicotine Pouches">
+  <option value="Snus">
+  <option value="Vape">
+  <option value="Accessories">
+</datalist>
+
+<script>
+  const input = document.getElementById("productImages");
+  const previewGrid = document.getElementById("imagePreviewGrid");
+
+  input?.addEventListener("change", () => {
+    previewGrid.innerHTML = "";
+
+    Array.from(input.files || []).forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const card = document.createElement("div");
+        card.className = "admin-preview-card";
+        card.innerHTML = `
+          <img src="${event.target.result}" alt="">
+          <span>${file.name}</span>
+        `;
+        previewGrid.appendChild(card);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  });
+</script>

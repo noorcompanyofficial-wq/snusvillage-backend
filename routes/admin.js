@@ -1690,6 +1690,8 @@ router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res
       flavour,
       category,
       stock,
+      seoTitle,
+      seoDescription,
     } = req.body;
 
     const parsedPrice = parseFloat(price);
@@ -1715,6 +1717,12 @@ router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res
       category,
       stock,
       images,
+      isActive: req.body.isActive === "on",
+      isFeatured: req.body.isFeatured === "on",
+      isBestSeller: req.body.isBestSeller === "on",
+      showSaleBadge: req.body.showSaleBadge === "on",
+      seoTitle: String(seoTitle || "").trim(),
+      seoDescription: String(seoDescription || "").trim(),
     });
 
     req.flash("success", "Product added successfully!");
@@ -1751,8 +1759,20 @@ router.get("/products/edit/:id", isAdmin, async (req, res) => {
 
 router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req, res) => {
   try {
-    const { name, price, discountPrice, description, strength, nicotine, category, stock } =
-      req.body;
+    const {
+      name,
+      price,
+      discountPrice,
+      description,
+      strength,
+      nicotine,
+      brand,
+      flavour,
+      category,
+      stock,
+      seoTitle,
+      seoDescription,
+    } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -1763,8 +1783,16 @@ router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req
       description,
       strength,
       nicotine,
+      brand,
+      flavour,
       category,
       stock,
+      isActive: req.body.isActive === "on",
+      isFeatured: req.body.isFeatured === "on",
+      isBestSeller: req.body.isBestSeller === "on",
+      showSaleBadge: req.body.showSaleBadge === "on",
+      seoTitle: String(seoTitle || "").trim(),
+      seoDescription: String(seoDescription || "").trim(),
     };
 
     let images = product.images || [];

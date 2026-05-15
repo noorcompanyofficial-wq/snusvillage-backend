@@ -64,6 +64,33 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+
+    isBestSeller: {
+      type: Boolean,
+      default: false,
+    },
+
+    showSaleBadge: {
+      type: Boolean,
+      default: false,
+    },
+
+    seoTitle: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    seoDescription: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   { timestamps: true }
 );
