@@ -1070,12 +1070,96 @@ router.post("/discounts/:id/delete", isAdmin, async (req, res) => {
 
 router.get("/orders", isAdmin, async (req, res) => {
   try {
-    const orders =
-      mongoose.connection.readyState === 1 ? await Order.find().sort({ createdAt: -1 }).lean() : [];
+    const page = Math.max(1, Number.parseInt(req.query.page || "1", 10));
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    const search = String(req.query.search || "").trim();
+    const paymentStatus = String(req.query.paymentStatus || "").trim();
+    const orderStatus = String(req.query.orderStatus || "").trim();
+    const fulfilmentMethod = String(req.query.fulfilmentMethod || "").trim();
+    const royalMailStatus = String(req.query.royalMailStatus || "").trim();
+    const sort = String(req.query.sort || "newest").trim();
+
+    const filter = {};
+
+    if (search) {
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(safeSearch, "i");
+
+      filter.$or = [
+        { "customer.email": searchRegex },
+        { "customer.firstName": searchRegex },
+        { "customer.lastName": searchRegex },
+        { "customer.phone": searchRegex },
+        { "sumup.checkoutReference": searchRegex },
+      ];
+
+      if (mongoose.Types.ObjectId.isValid(search)) {
+        filter.$or.push({ _id: search });
+      }
+    }
+
+    if (["pending", "paid", "failed"].includes(paymentStatus)) {
+      filter.paymentStatus = paymentStatus;
+    }
+
+    if (["new", "processing", "packed", "shipped", "completed", "cancelled"].includes(orderStatus)) {
+      filter.orderStatus = orderStatus;
+    }
+
+    if (["delivery", "click_collect"].includes(fulfilmentMethod)) {
+      filter["fulfilment.method"] = fulfilmentMethod;
+    }
+
+    if (["not_sent", "sent", "failed"].includes(royalMailStatus)) {
+      filter["royalMail.syncStatus"] = royalMailStatus;
+    }
+
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    if (sort === "total-high") sortOption = { total: -1 };
+    if (sort === "total-low") sortOption = { total: 1 };
+
+    const [orders, totalOrders, stats] =
+      mongoose.connection.readyState === 1
+        ? await Promise.all([
+            Order.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
+            Order.countDocuments(filter),
+            Promise.all([
+              Order.countDocuments(),
+              Order.countDocuments({ paymentStatus: "paid" }),
+              Order.countDocuments({ paymentStatus: "pending" }),
+              Order.countDocuments({ orderStatus: { $in: ["new", "processing", "packed"] } }),
+              Order.countDocuments({ "fulfilment.method": "click_collect" }),
+              Order.countDocuments({ "royalMail.syncStatus": "failed" }),
+            ]),
+          ])
+        : [[], 0, [0, 0, 0, 0, 0, 0]];
+
+    const totalPages = Math.max(1, Math.ceil(totalOrders / limit));
 
     res.render("admin/orders", {
       layout: "layouts/admin-layout",
       orders,
+      query: req.query,
+      pagination: {
+        page,
+        limit,
+        totalOrders,
+        totalPages,
+        hasPrev: page > 1,
+        hasNext: page < totalPages,
+      },
+      stats: {
+        total: stats[0],
+        paid: stats[1],
+        pending: stats[2],
+        active: stats[3],
+        clickCollect: stats[4],
+        royalMailFailed: stats[5],
+      },
     });
   } catch (err) {
     console.log(err);
