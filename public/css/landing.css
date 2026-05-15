@@ -7645,3 +7645,17 @@ body {
 }
 
 /* ===== DYNAMIC FEATURED / BEST SELLER PRODUCTS END ===== */
+
+/* ===== TIGHTEN HEADER TO HERO GAP START ===== */
+
+.sv-simple-carousel-hero {
+  padding-top: 6px !important;
+}
+
+@media (max-width: 700px) {
+  .sv-simple-carousel-hero {
+    padding-top: 4px !important;
+  }
+}
+
+/* ===== TIGHTEN HEADER TO HERO GAP END ===== */
