@@ -741,6 +741,174 @@ router.get("/orders/export/csv", isAdmin, async (req, res) => {
 
 
 
+
+router.get("/messages", isAdmin, async (req, res) => {
+  try {
+    const filter = {};
+
+    if (req.query.status === "unread") {
+      filter.isRead = false;
+    }
+
+    if (req.query.status === "read") {
+      filter.isRead = true;
+    }
+
+    const messages =
+      mongoose.connection.readyState === 1
+        ? await Contact.find(filter).sort({ createdAt: -1 }).lean()
+        : [];
+
+    const [totalMessages, unreadMessages, readMessages] =
+      mongoose.connection.readyState === 1
+        ? await Promise.all([
+            Contact.countDocuments(),
+            Contact.countDocuments({ isRead: false }),
+            Contact.countDocuments({ isRead: true }),
+          ])
+        : [0, 0, 0];
+
+    res.render("admin/messages", {
+      layout: "layouts/admin-layout",
+      messages,
+      totalMessages,
+      unreadMessages,
+      readMessages,
+      query: req.query,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load messages");
+    res.redirect("/admin/dashboard");
+  }
+});
+
+router.get("/messages/:id", isAdmin, async (req, res) => {
+  try {
+    const message = await Contact.findById(req.params.id).lean();
+
+    if (!message) {
+      req.flash("error", "Message not found");
+      return res.redirect("/admin/messages");
+    }
+
+    if (!message.isRead) {
+      await Contact.findByIdAndUpdate(req.params.id, { isRead: true });
+      message.isRead = true;
+    }
+
+    res.render("admin/message-detail", {
+      layout: "layouts/admin-layout",
+      message,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load message");
+    res.redirect("/admin/messages");
+  }
+});
+
+
+router.post("/messages/:id/reply", isAdmin, async (req, res) => {
+  try {
+    const replyBody = String(req.body.replyBody || "").trim();
+
+    if (!replyBody) {
+      req.flash("error", "Reply message cannot be empty");
+      return res.redirect(`/admin/messages/${req.params.id}`);
+    }
+
+    const message = await Contact.findById(req.params.id);
+
+    if (!message) {
+      req.flash("error", "Message not found");
+      return res.redirect("/admin/messages");
+    }
+
+    const mailConfig = transporter.snusMailConfig || {};
+    const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
+
+    if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass || !fromEmail) {
+      req.flash("error", "Email sending is not configured on this server");
+      return res.redirect(`/admin/messages/${req.params.id}`);
+    }
+
+    await transporter.sendMail({
+      from: `"Snus Village" <${fromEmail}>`,
+      replyTo: process.env.EMAIL_REPLY_TO || fromEmail,
+      to: message.email,
+      subject: `Re: ${message.subject}`,
+      text: replyBody,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #111827; line-height: 1.6;">
+          <p>${replyBody.replace(/\n/g, "<br>")}</p>
+          <hr style="border:0;border-top:1px solid #e5e7eb;margin:24px 0;">
+          <p style="color:#64748b;font-size:13px;">
+            Original enquiry from ${message.name}:<br>
+            ${message.message.replace(/\n/g, "<br>")}
+          </p>
+        </div>
+      `,
+    });
+
+    message.isRead = true;
+    message.isReplied = true;
+    message.repliedAt = new Date();
+    message.replies.push({
+      body: replyBody,
+      sentAt: new Date(),
+      sentBy: req.session?.user?._id || null,
+    });
+
+    await message.save();
+
+    req.flash("success", "Reply sent to customer");
+    res.redirect(`/admin/messages/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to send reply: " + err.message);
+    res.redirect(`/admin/messages/${req.params.id}`);
+  }
+});
+
+
+router.post("/messages/:id/read", isAdmin, async (req, res) => {
+  try {
+    await Contact.findByIdAndUpdate(req.params.id, { isRead: true });
+    req.flash("success", "Message marked as read");
+    res.redirect(req.get("Referrer") || "/admin/messages");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update message");
+    res.redirect("/admin/messages");
+  }
+});
+
+router.post("/messages/:id/unread", isAdmin, async (req, res) => {
+  try {
+    await Contact.findByIdAndUpdate(req.params.id, { isRead: false });
+    req.flash("success", "Message marked as unread");
+    res.redirect(req.get("Referrer") || "/admin/messages");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update message");
+    res.redirect("/admin/messages");
+  }
+});
+
+router.post("/messages/:id/delete", isAdmin, async (req, res) => {
+  try {
+    await Contact.findByIdAndDelete(req.params.id);
+    req.flash("success", "Message deleted");
+    res.redirect("/admin/messages");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to delete message");
+    res.redirect("/admin/messages");
+  }
+});
+
+
 router.get("/settings", isAdmin, async (req, res) => {
   try {
     const settings =

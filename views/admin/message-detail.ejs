@@ -1,0 +1,124 @@
+<section class="admin-page admin-message-detail-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Customer Message</span>
+      <h1><%= message.subject %></h1>
+      <p>Submitted by <%= message.name %> on <%= new Date(message.createdAt).toLocaleString("en-GB") %>.</p>
+    </div>
+
+    <div class="admin-head-actions">
+      <a class="admin-secondary" href="/admin/messages">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back To Messages
+      </a>
+
+      <a class="admin-primary" href="mailto:<%= message.email %>?subject=Re: <%= encodeURIComponent(message.subject) %>">
+        <i class="fa-solid fa-reply"></i>
+        Reply By Email
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-order-detail-grid">
+    <section class="admin-detail-card">
+      <div class="admin-panel__head">
+        <h2>Sender</h2>
+        <span class="status-pill <%= message.isRead ? 'order-completed' : 'payment-pending' %>">
+          <%= message.isRead ? "Read" : "Unread" %>
+        </span>
+      </div>
+
+      <div class="admin-detail-list">
+        <div>
+          <span>Name</span>
+          <strong><%= message.name %></strong>
+        </div>
+
+        <div>
+          <span>Email</span>
+          <strong><%= message.email %></strong>
+        </div>
+
+        <div>
+          <span>Phone</span>
+          <strong><%= message.phone || "No phone" %></strong>
+        </div>
+
+        <div>
+          <span>Date</span>
+          <strong><%= new Date(message.createdAt).toLocaleString("en-GB") %></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="admin-detail-card">
+      <div class="admin-panel__head">
+        <h2>Actions</h2>
+      </div>
+
+      <div class="admin-message-detail-actions">
+        <% if (message.isRead) { %>
+          <form action="/admin/messages/<%= message._id %>/unread" method="POST">
+            <button type="submit">Mark As Unread</button>
+          </form>
+        <% } else { %>
+          <form action="/admin/messages/<%= message._id %>/read" method="POST">
+            <button type="submit">Mark As Read</button>
+          </form>
+        <% } %>
+
+        <form action="/admin/messages/<%= message._id %>/delete" method="POST" onsubmit="return confirm('Delete this message?');">
+          <button type="submit" class="is-danger">Delete Message</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+
+  <section class="admin-detail-card admin-reply-card" id="adminReplyBox">
+    <div class="admin-panel__head">
+      <h2>Reply To Customer</h2>
+      <span>Sent Through Website Email</span>
+    </div>
+
+    <form class="admin-reply-form" action="/admin/messages/<%= message._id %>/reply" method="POST">
+      <label>
+        Reply Message
+        <textarea name="replyBody" placeholder="Write your reply to <%= message.name %>..." required></textarea>
+      </label>
+
+      <button type="submit">
+        <i class="fa-solid fa-paper-plane"></i>
+        Send Reply
+      </button>
+    </form>
+  </section>
+
+  <% if (message.replies && message.replies.length) { %>
+    <section class="admin-detail-card admin-reply-history-card">
+      <div class="admin-panel__head">
+        <h2>Reply History</h2>
+        <span><%= message.replies.length %> Sent</span>
+      </div>
+
+      <div class="admin-reply-history">
+        <% message.replies.slice().reverse().forEach((reply) => { %>
+          <article>
+            <span><%= new Date(reply.sentAt).toLocaleString("en-GB") %></span>
+            <p><%= reply.body %></p>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <section class="admin-detail-card admin-message-body-card">
+    <div class="admin-panel__head">
+      <h2>Message</h2>
+    </div>
+
+    <div class="admin-message-body">
+      <p><%= message.message %></p>
+    </div>
+  </section>
+</section>

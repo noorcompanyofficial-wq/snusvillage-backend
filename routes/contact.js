@@ -30,7 +30,7 @@ router.get("/", (req, res) => {
 });
 
 // POST
-router.post("/contact", contactLimiter, async (req, res) => {
+router.post("/", contactLimiter, async (req, res) => {
   try {
     // validation
     const { error } = schema.validate(req.body);
