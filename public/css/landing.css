@@ -7547,3 +7547,34 @@ body {
 }
 
 /* ===== CENTERED HEADER REDESIGN END ===== */
+
+/* ===== HERO IMAGE FIT FIX START ===== */
+
+.sv-simple-carousel-hero .sv-slide {
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-color: #061633;
+}
+
+/* ===== HERO IMAGE FIT FIX END ===== */
+
+/* ===== HERO IMAGE FULL FIT FIX START ===== */
+
+.sv-simple-carousel-hero .sv-slide {
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* ===== HERO IMAGE FULL FIT FIX END ===== */
+
+/* ===== HERO IMAGE NATURAL COVER FIX START ===== */
+
+.sv-simple-carousel-hero .sv-slide {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* ===== HERO IMAGE NATURAL COVER FIX END ===== */
