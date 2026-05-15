@@ -186,53 +186,89 @@ router.get("/homepage", isAdmin, async (req, res) => {
 });
 
 
-router.post("/homepage/hero-distro", isAdmin, async (req, res) => {
-  try {
-    const heroSlides = [1, 2, 3].map((number) => ({
-      kicker: String(req.body[`heroKicker${number}`] || "").trim(),
-      title: String(req.body[`heroTitle${number}`] || "").trim(),
-      buttonText: String(req.body[`heroButtonText${number}`] || "").trim(),
-      buttonLink: String(req.body[`heroButtonLink${number}`] || "").trim(),
-      imageSrc: String(req.body[`heroImageSrc${number}`] || "").trim(),
-    }));
+router.post(
+  "/homepage/hero-distro",
+  isAdmin,
+  upload.fields([
+    { name: "heroImage1", maxCount: 1 },
+    { name: "heroImage2", maxCount: 1 },
+    { name: "heroImage3", maxCount: 1 },
+    { name: "distroImage1", maxCount: 1 },
+    { name: "distroImage2", maxCount: 1 },
+    { name: "distroImage3", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const body = req.body || {};
+      const files = req.files || {};
 
-    const distroImages = [1, 2, 3].map((number) => ({
-      imageSrc: String(req.body[`distroImageSrc${number}`] || "").trim(),
-      alt: String(req.body[`distroImageAlt${number}`] || "").trim(),
-    }));
+      async function imagePath(fieldName, fallbackPath) {
+        const file = files?.[fieldName]?.[0];
 
-    const badges = String(req.body.distroBadges || "")
-      .split(",")
-      .map((badge) => badge.trim())
-      .filter(Boolean);
+        if (!file) {
+          return String(fallbackPath || "").trim();
+        }
 
-    await HomepageContent.findOneAndUpdate(
-      { key: "homepage" },
-      {
-        $set: {
-          key: "homepage",
-          "hero.slides": heroSlides,
-          "distro.kicker": String(req.body.distroKicker || "").trim(),
-          "distro.title": String(req.body.distroTitle || "").trim(),
-          "distro.address": String(req.body.distroAddress || "").trim(),
-          "distro.description": String(req.body.distroDescription || "").trim(),
-          "distro.buttonText": String(req.body.distroButtonText || "").trim(),
-          "distro.buttonLink": String(req.body.distroButtonLink || "").trim(),
-          "distro.badges": badges,
-          "distro.images": distroImages,
+        const [storedPath] = await storeProductImages([file]);
+        return storedPath || String(fallbackPath || "").trim();
+      }
+
+      const heroSlides = await Promise.all(
+        [1, 2, 3].map(async (number) => ({
+          kicker: String(body[`heroKicker${number}`] || "").trim(),
+          title: String(body[`heroTitle${number}`] || "").trim(),
+          buttonText: String(body[`heroButtonText${number}`] || "").trim(),
+          buttonLink: String(body[`heroButtonLink${number}`] || "").trim(),
+          imageSrc: await imagePath(
+            `heroImage${number}`,
+            body[`heroImageSrc${number}`]
+          ),
+        }))
+      );
+
+      const distroImages = await Promise.all(
+        [1, 2, 3].map(async (number) => ({
+          imageSrc: await imagePath(
+            `distroImage${number}`,
+            body[`distroImageSrc${number}`]
+          ),
+          alt: String(body[`distroImageAlt${number}`] || "").trim(),
+        }))
+      );
+
+      const badges = String(body.distroBadges || "")
+        .split(",")
+        .map((badge) => badge.trim())
+        .filter(Boolean);
+
+      await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        {
+          $set: {
+            key: "homepage",
+            "hero.slides": heroSlides,
+            "distro.kicker": String(body.distroKicker || "").trim(),
+            "distro.title": String(body.distroTitle || "").trim(),
+            "distro.address": String(body.distroAddress || "").trim(),
+            "distro.description": String(body.distroDescription || "").trim(),
+            "distro.buttonText": String(body.distroButtonText || "").trim(),
+            "distro.buttonLink": String(body.distroButtonLink || "").trim(),
+            "distro.badges": badges,
+            "distro.images": distroImages,
+          },
         },
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
 
-    req.flash("success", "Homepage hero and SVG Distro section updated");
-    res.redirect("/admin/homepage");
-  } catch (err) {
-    console.log(err);
-    req.flash("error", "Unable to update homepage hero and distro section");
-    res.redirect("/admin/homepage");
+      req.flash("success", "Homepage hero and SVG Distro section updated");
+      res.redirect("/admin/homepage");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to update homepage hero and distro section: " + err.message);
+      res.redirect("/admin/homepage");
+    }
   }
-});
+);
 
 
 router.post(
