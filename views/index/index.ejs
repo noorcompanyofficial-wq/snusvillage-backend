@@ -205,50 +205,125 @@
               <div>
                 <span class="eyebrow dark">Best Sellers</span>
                 <h2>Customer Favourites</h2>
-                <p>A Focused Selection Of The Products And Brands That Move Fastest In Store And Online.</p>
+                <p>A Focused Selection Of Products Marked As Best Sellers In Your Admin Panel.</p>
               </div>
               <a class="ghost-btn" href="/shop">View All Products</a>
             </div>
 
-            <div class="product-grid sv-product-grid-pro">
-              <article class="product-card sv-product-card-pro">
-                <div class="product-card__media"><img src="/images/shop/wf-1.png" alt="White Fox product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">White Fox</span><span class="product-card__tag">Strong</span></div>
-                <h3>White Fox Range</h3>
-                <p>Popular Mint-Led Cans With A Clean Profile And Strong Customer Demand.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span></div>
-                <div class="product-card__price"><strong>From The Shop</strong><a class="sv-product-card-btn" href="/shop">View Range</a></div>
-              </article>
+            <% if (bestSellerProducts && bestSellerProducts.length) { %>
+              <div class="product-grid sv-product-grid-pro">
+                <% bestSellerProducts.forEach((p) => { %>
+                  <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
 
-              <article class="product-card sv-product-card-pro">
-                <div class="product-card__media"><img src="/images/shop/pablo-1.png" alt="Pablo product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Pablo</span><span class="product-card__tag">Extreme</span></div>
-                <h3>Pablo Range</h3>
-                <p>High Strength Cans With Bold Flavours For Experienced Adult Users.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span></div>
-                <div class="product-card__price"><strong>From The Shop</strong><a class="sv-product-card-btn" href="/shop">View Range</a></div>
-              </article>
+                  <article class="product-card sv-product-card-pro">
+                    <% if (p.showSaleBadge && p.discountPrice && p.discountPrice > 0) { %>
+                      <span class="sv-product-sale-badge">Sale</span>
+                    <% } %>
 
-              <article class="product-card sv-product-card-pro">
-                <div class="product-card__media"><img src="/images/shop/velo-1.webp" alt="Velo product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Velo</span><span class="product-card__tag">Smooth</span></div>
-                <h3>Velo Range</h3>
-                <p>Everyday Pouches With Familiar Flavours And Balanced Strength Options.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span><span></span></div>
-                <div class="product-card__price"><strong>From The Shop</strong><a class="sv-product-card-btn" href="/shop">View Range</a></div>
-              </article>
+                    <div class="product-card__media">
+                      <% if (p.images && p.images.length) { %>
+                        <img src="<%= p.images[0] %>" alt="<%= p.name %>" />
+                      <% } else { %>
+                        <span>No Image</span>
+                      <% } %>
+                    </div>
 
-              <article class="product-card sv-product-card-pro">
-                <div class="product-card__media"><img src="/images/shop/loop-1.webp" alt="Loop product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Loop</span><span class="product-card__tag">Flavour</span></div>
-                <h3>Loop Range</h3>
-                <p>Modern Pouch Flavours With Clean Packaging And Reliable Popularity.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span></span><span></span><span></span></div>
-                <div class="product-card__price"><strong>From The Shop</strong><a class="sv-product-card-btn" href="/shop">View Range</a></div>
-              </article>
-            </div>
+                    <div class="product-card__top">
+                      <span class="product-card__tag"><%= p.brand || "Snus Village" %></span>
+                      <span class="product-card__tag"><%= p.strength || "Strength" %></span>
+                    </div>
+
+                    <h3><%= p.name %></h3>
+
+                    <p>
+                      <%= p.description ? p.description.substring(0, 92) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 92 ? "..." : "" %>
+                    </p>
+
+                    <div class="strength">
+                      <span class="<%= ['LOW','MEDIUM','STRONG','X-STRONG','EXTREME'].indexOf(p.strength) >= 0 ? 'is-on' : '' %>"></span>
+                      <span class="<%= ['MEDIUM','STRONG','X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
+                      <span class="<%= ['STRONG','X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
+                      <span class="<%= ['X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
+                      <span class="<%= p.strength === 'EXTREME' ? 'is-on' : '' %>"></span>
+                    </div>
+
+                    <div class="product-card__price">
+                      <strong>
+                        <% if (p.discountPrice && p.discountPrice > 0) { %>
+                          <small>£<%= Number(p.price || 0).toFixed(2) %></small>
+                        <% } %>
+                        £<%= Number(finalPrice || 0).toFixed(2) %>
+                      </strong>
+                      <a class="sv-product-card-btn" href="/products/<%= p._id %>">View Product</a>
+                    </div>
+                  </article>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <div class="sv-dynamic-empty">
+                <h3>No best sellers selected yet</h3>
+                <p>Go to Admin → Products → Edit Product, then tick Best Seller.</p>
+                <a href="/shop">View Shop</a>
+              </div>
+            <% } %>
           </div>
         </section>
+
+        <% if (featuredProducts && featuredProducts.length) { %>
+          <section class="section sv-featured-products-redesign" id="featured-products">
+            <div class="container">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow dark">Featured Products</span>
+                  <h2>Featured From Admin</h2>
+                  <p>Products selected from the admin panel for extra homepage visibility.</p>
+                </div>
+                <a class="ghost-btn" href="/shop">Shop Featured</a>
+              </div>
+
+              <div class="product-grid sv-product-grid-pro">
+                <% featuredProducts.forEach((p) => { %>
+                  <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
+
+                  <article class="product-card sv-product-card-pro">
+                    <% if (p.showSaleBadge && p.discountPrice && p.discountPrice > 0) { %>
+                      <span class="sv-product-sale-badge">Sale</span>
+                    <% } %>
+
+                    <div class="product-card__media">
+                      <% if (p.images && p.images.length) { %>
+                        <img src="<%= p.images[0] %>" alt="<%= p.name %>" />
+                      <% } else { %>
+                        <span>No Image</span>
+                      <% } %>
+                    </div>
+
+                    <div class="product-card__top">
+                      <span class="product-card__tag"><%= p.brand || "Snus Village" %></span>
+                      <span class="product-card__tag"><%= p.strength || "Strength" %></span>
+                    </div>
+
+                    <h3><%= p.name %></h3>
+
+                    <p>
+                      <%= p.description ? p.description.substring(0, 92) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 92 ? "..." : "" %>
+                    </p>
+
+                    <div class="product-card__price">
+                      <strong>
+                        <% if (p.discountPrice && p.discountPrice > 0) { %>
+                          <small>£<%= Number(p.price || 0).toFixed(2) %></small>
+                        <% } %>
+                        £<%= Number(finalPrice || 0).toFixed(2) %>
+                      </strong>
+                      <a class="sv-product-card-btn" href="/products/<%= p._id %>">View Product</a>
+                    </div>
+                  </article>
+                <% }) %>
+              </div>
+            </div>
+          </section>
+        <% } %>
 
         <section class="section sv-locations-redesign" id="shops">
           <div class="container">

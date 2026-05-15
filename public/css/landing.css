@@ -7578,3 +7578,70 @@ body {
 }
 
 /* ===== HERO IMAGE NATURAL COVER FIX END ===== */
+
+/* ===== DYNAMIC FEATURED / BEST SELLER PRODUCTS START ===== */
+
+.sv-product-card-pro {
+  position: relative;
+}
+
+.sv-product-sale-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #d71234, #123b8a);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 24px rgba(215, 18, 52, 0.24);
+}
+
+.product-card__price strong small {
+  display: inline-block;
+  margin-right: 6px;
+  color: #64748b;
+  font-size: 13px;
+  text-decoration: line-through;
+}
+
+.sv-dynamic-empty {
+  padding: 28px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  box-shadow: 0 18px 44px rgba(9, 31, 77, 0.08);
+}
+
+.sv-dynamic-empty h3 {
+  margin: 0 0 8px;
+  color: #061633;
+  font-size: 24px;
+}
+
+.sv-dynamic-empty p {
+  margin: 0 0 16px;
+  color: #64748b;
+}
+
+.sv-dynamic-empty a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #d71234);
+  text-decoration: none;
+  font-weight: 950;
+}
+
+/* ===== DYNAMIC FEATURED / BEST SELLER PRODUCTS END ===== */

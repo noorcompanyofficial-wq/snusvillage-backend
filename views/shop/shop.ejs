@@ -101,6 +101,18 @@
               <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
 
               <article class="shop-product-card">
+                <div class="shop-product-badges">
+                  <% if (p.showSaleBadge && p.discountPrice && p.discountPrice > 0) { %>
+                    <span class="shop-product-badge sale">Sale</span>
+                  <% } %>
+                  <% if (p.isBestSeller) { %>
+                    <span class="shop-product-badge best">Best Seller</span>
+                  <% } %>
+                  <% if (p.isFeatured) { %>
+                    <span class="shop-product-badge featured">Featured</span>
+                  <% } %>
+                </div>
+
                 <a href="/products/<%= p._id %>" class="shop-product-image">
                   <% if (p.images && p.images.length > 0) { %>
                     <img src="<%= p.images[0] %>" alt="<%= p.name %>">
