@@ -1221,18 +1221,64 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
 
 router.get("/users", isAdmin, async (req, res) => {
   try {
-    const [users, traders] =
-      mongoose.connection.readyState === 1
-        ? await Promise.all([
-            User.find().sort({ createdAt: -1 }).limit(50).lean(),
-            Trader.find().sort({ updatedAt: -1 }).limit(50).lean(),
+    let users = [];
+    let traders = [];
+    let userOrderStats = {};
+
+    if (mongoose.connection.readyState === 1) {
+      [users, traders] = await Promise.all([
+        User.find().sort({ createdAt: -1 }).limit(50).lean(),
+        Trader.find().sort({ updatedAt: -1 }).limit(50).lean(),
+      ]);
+
+      const userEmails = users
+        .map((user) => String(user.email || "").trim().toLowerCase())
+        .filter(Boolean);
+
+      const orderStats = userEmails.length
+        ? await Order.aggregate([
+            {
+              $match: {
+                "customer.email": { $in: userEmails },
+              },
+            },
+            {
+              $group: {
+                _id: { $toLower: "$customer.email" },
+                totalOrders: { $sum: 1 },
+                paidOrders: {
+                  $sum: {
+                    $cond: [{ $eq: ["$paymentStatus", "paid"] }, 1, 0],
+                  },
+                },
+                totalSpend: {
+                  $sum: {
+                    $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$total", 0],
+                  },
+                },
+                lastOrderAt: { $max: "$createdAt" },
+              },
+            },
           ])
-        : [[], []];
+        : [];
+
+      userOrderStats = orderStats.reduce((acc, item) => {
+        acc[item._id] = {
+          totalOrders: item.totalOrders || 0,
+          paidOrders: item.paidOrders || 0,
+          totalSpend: item.totalSpend || 0,
+          lastOrderAt: item.lastOrderAt || null,
+        };
+
+        return acc;
+      }, {});
+    }
 
     res.render("admin/users", {
       layout: "layouts/admin-layout",
       users,
       traders,
+      userOrderStats,
     });
   } catch (err) {
     console.log(err);
