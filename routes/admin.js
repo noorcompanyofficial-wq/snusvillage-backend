@@ -1825,6 +1825,92 @@ router.post("/inventory/:id/stock", isAdmin, requireAdminRole(PERMISSIONS.produc
 });
 
 
+
+router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
+  try {
+    const products =
+      mongoose.connection.readyState === 1
+        ? await Product.find().sort({ brand: 1, name: 1 }).lean()
+        : [];
+
+    const headers = [
+      "ID",
+      "Name",
+      "Slug",
+      "SKU",
+      "Barcode",
+      "Brand",
+      "Flavour",
+      "Category",
+      "Strength",
+      "Nicotine",
+      "Price",
+      "Discount Price",
+      "Cost Price",
+      "Stock",
+      "Supplier",
+      "Supplier Code",
+      "Active",
+      "Featured",
+      "Best Seller",
+      "Sale Badge",
+      "SEO Title",
+      "SEO Description",
+      "Description",
+      "Images",
+      "Created At",
+      "Updated At",
+    ];
+
+    const rows = products.map((product) => [
+      product._id,
+      product.name || "",
+      product.slug || "",
+      product.sku || "",
+      product.barcode || "",
+      product.brand || "",
+      product.flavour || "",
+      product.category || "",
+      product.strength || "",
+      product.nicotine || "",
+      Number(product.price || 0).toFixed(2),
+      Number(product.discountPrice || 0).toFixed(2),
+      Number(product.costPrice || 0).toFixed(2),
+      product.stock || 0,
+      product.supplier || "",
+      product.supplierCode || "",
+      product.isActive === false ? "no" : "yes",
+      product.isFeatured ? "yes" : "no",
+      product.isBestSeller ? "yes" : "no",
+      product.showSaleBadge ? "yes" : "no",
+      product.seoTitle || "",
+      product.seoDescription || "",
+      product.description || "",
+      Array.isArray(product.images) ? product.images.join(" | ") : "",
+      product.createdAt ? new Date(product.createdAt).toISOString() : "",
+      product.updatedAt ? new Date(product.updatedAt).toISOString() : "",
+    ]);
+
+    const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+
+    await logAdminAction(req, "PRODUCTS_EXPORTED_CSV", {
+      targetType: "Product",
+      summary: `Exported ${products.length} products to CSV`,
+      meta: {
+        productCount: products.length,
+      },
+    });
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", "attachment; filename=snus-village-products.csv");
+    res.send(csv);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to export products");
+    res.redirect("/admin/products");
+  }
+});
+
 //  Add Product Page
 router.get("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
   res.render("admin/add-product", {
