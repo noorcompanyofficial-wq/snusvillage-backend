@@ -2840,7 +2840,7 @@ textarea:focus {
 
 .admin-inventory-table {
   width: 100%;
-  min-width: 980px;
+  min-width: 1280px;
   border-collapse: collapse;
 }
 
