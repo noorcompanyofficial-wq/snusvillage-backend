@@ -553,3 +553,32 @@
 }
 
 /* ===== ADMIN PRODUCTS LIST UPGRADE END ===== */
+
+/* ===== ADMIN PRODUCT EXTRA TAGS START ===== */
+
+.admin-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-tag--featured {
+  background: #123b8a;
+}
+
+.admin-tag--best {
+  background: #061633;
+}
+
+.admin-tag--hidden {
+  background: #b91c1c;
+}
+
+/* ===== ADMIN PRODUCT EXTRA TAGS END ===== */

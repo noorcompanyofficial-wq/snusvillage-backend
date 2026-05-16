@@ -222,6 +222,18 @@
             <div class="admin-product-tags">
               <span><%= p.brand || "Brand N/A" %></span>
               <span><%= p.strength || "Strength N/A" %></span>
+
+              <% if (p.isFeatured) { %>
+                <span class="admin-tag admin-tag--featured">Featured</span>
+              <% } %>
+
+              <% if (p.isBestSeller) { %>
+                <span class="admin-tag admin-tag--best">Best Seller</span>
+              <% } %>
+
+              <% if (p.isActive === false) { %>
+                <span class="admin-tag admin-tag--hidden">Hidden</span>
+              <% } %>
             </div>
 
             <h2><%= p.name %></h2>
