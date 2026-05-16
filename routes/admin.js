@@ -603,7 +603,17 @@ router.get("/dashboard", isAdmin, async (req, res) => {
 
   const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
 
-  const [recentProducts, recentOrders, abandonedCarts] =
+  const [
+    recentProducts,
+    recentOrders,
+    abandonedCarts,
+    lowStockProducts,
+    outOfStockProducts,
+    failedPaymentOrders,
+    royalMailFailedOrders,
+    unreadContactMessages,
+    pendingWholesaleApplications,
+  ] =
     mongoose.connection.readyState === 1
       ? await Promise.all([
           Product.find().sort({ createdAt: -1 }).limit(5).lean(),
@@ -616,8 +626,14 @@ router.get("/dashboard", isAdmin, async (req, res) => {
             .sort({ updatedAt: -1 })
             .limit(5)
             .lean(),
+          Product.find({ stock: { $gt: 0, $lte: 5 } }).sort({ stock: 1 }).limit(5).lean(),
+          Product.find({ stock: 0 }).sort({ updatedAt: -1 }).limit(5).lean(),
+          Order.find({ paymentStatus: "failed" }).sort({ updatedAt: -1 }).limit(5).lean(),
+          Order.find({ "royalMail.syncStatus": "failed" }).sort({ updatedAt: -1 }).limit(5).lean(),
+          Contact.find({ isRead: false }).sort({ createdAt: -1 }).limit(5).lean(),
+          WholesaleApplication.find({ status: "pending" }).sort({ createdAt: -1 }).limit(5).lean(),
         ])
-      : [[], [], []];
+      : [[], [], [], [], [], [], [], [], []];
 
   res.render("admin/dashboard", {
     layout: "layouts/admin-layout",
@@ -625,6 +641,14 @@ router.get("/dashboard", isAdmin, async (req, res) => {
     recentProducts,
     recentOrders,
     abandonedCarts,
+    dashboardAlerts: {
+      lowStockProducts,
+      outOfStockProducts,
+      failedPaymentOrders,
+      royalMailFailedOrders,
+      unreadContactMessages,
+      pendingWholesaleApplications,
+    },
   });
 });
 

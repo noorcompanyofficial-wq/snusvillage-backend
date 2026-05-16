@@ -76,6 +76,57 @@
     </a>
   </div>
 
+  <section class="admin-panel admin-dashboard-alerts-panel">
+    <div class="admin-panel__head">
+      <h2>Dashboard Alerts</h2>
+      <a href="/admin/orders">Review Operations</a>
+    </div>
+
+    <div class="admin-dashboard-alerts-grid">
+      <a href="/admin/products?stock=low" class="admin-dashboard-alert-card">
+        <i class="fa-solid fa-arrow-trend-down"></i>
+        <span>Low Stock</span>
+        <strong><%= dashboardAlerts.lowStockProducts.length %></strong>
+        <small>Products with 5 or less remaining</small>
+      </a>
+
+      <a href="/admin/products?stock=out" class="admin-dashboard-alert-card danger">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Out Of Stock</span>
+        <strong><%= dashboardAlerts.outOfStockProducts.length %></strong>
+        <small>Products currently unavailable</small>
+      </a>
+
+      <a href="/admin/orders" class="admin-dashboard-alert-card danger">
+        <i class="fa-solid fa-credit-card"></i>
+        <span>Failed Payments</span>
+        <strong><%= dashboardAlerts.failedPaymentOrders.length %></strong>
+        <small>Orders needing payment review</small>
+      </a>
+
+      <a href="/admin/orders" class="admin-dashboard-alert-card warning">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Royal Mail Failed</span>
+        <strong><%= dashboardAlerts.royalMailFailedOrders.length %></strong>
+        <small>Fulfilment needs attention</small>
+      </a>
+
+      <a href="/admin/messages?status=unread" class="admin-dashboard-alert-card">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Unread Messages</span>
+        <strong><%= dashboardAlerts.unreadContactMessages.length %></strong>
+        <small>Customer contact messages</small>
+      </a>
+
+      <a href="/admin/wholesale" class="admin-dashboard-alert-card warning">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Pending Wholesale</span>
+        <strong><%= dashboardAlerts.pendingWholesaleApplications.length %></strong>
+        <small>Trader applications waiting</small>
+      </a>
+    </div>
+  </section>
+
   <div class="admin-dashboard-grid admin-dashboard-grid--analytics">
     <section class="admin-panel">
       <div class="admin-panel__head">
