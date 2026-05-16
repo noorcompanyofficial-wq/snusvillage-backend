@@ -4262,3 +4262,25 @@ textarea:focus {
 }
 
 /* ===== CUSTOMER ADMIN NOTES END ===== */
+
+/* ===== STAFF ROLE CONTROL START ===== */
+
+.admin-notes-form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(9, 31, 77, 0.14);
+  background: #ffffff;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
+
+.admin-notes-form select:focus {
+  border-color: #123b8a;
+  box-shadow: 0 0 0 4px rgba(18, 59, 138, 0.08);
+}
+
+/* ===== STAFF ROLE CONTROL END ===== */

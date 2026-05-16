@@ -97,6 +97,40 @@
       </div>
     </section>
 
+    <% if (["owner", "admin"].includes(user?.role || "")) { %>
+      <section class="admin-panel">
+        <div class="admin-panel__head">
+          <h2>Staff Role Control</h2>
+        </div>
+
+        <% if (String(user?._id || "") === String(account._id || "")) { %>
+          <div class="admin-empty-small">
+            <p>You cannot change your own role from this page.</p>
+          </div>
+        <% } else { %>
+          <form action="/admin/users/<%= account._id %>/role" method="POST" class="admin-notes-form">
+            <label>
+              Account Role
+              <select name="role">
+                <option value="user" <%= account.role === "user" ? "selected" : "" %>>User</option>
+                <option value="owner" <%= account.role === "owner" ? "selected" : "" %>>Owner</option>
+                <option value="admin" <%= account.role === "admin" ? "selected" : "" %>>Admin</option>
+                <option value="manager" <%= account.role === "manager" ? "selected" : "" %>>Manager</option>
+                <option value="fulfilment" <%= account.role === "fulfilment" ? "selected" : "" %>>Fulfilment</option>
+                <option value="support" <%= account.role === "support" ? "selected" : "" %>>Support</option>
+                <option value="product_manager" <%= account.role === "product_manager" ? "selected" : "" %>>Product Manager</option>
+              </select>
+            </label>
+
+            <button type="submit" class="admin-primary">
+              <i class="fa-solid fa-user-shield"></i>
+              Update Role
+            </button>
+          </form>
+        <% } %>
+      </section>
+    <% } %>
+
     <section class="admin-panel">
       <div class="admin-panel__head">
         <h2>Private Admin Notes</h2>

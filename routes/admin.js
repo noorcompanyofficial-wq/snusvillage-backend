@@ -1348,6 +1348,49 @@ router.get("/users/:id", isAdmin, async (req, res) => {
 
 
 
+
+router.post("/users/:id/role", isAdmin, async (req, res) => {
+  try {
+    const currentAdmin = req.session?.user;
+
+    if (!currentAdmin || !["owner", "admin"].includes(currentAdmin.role)) {
+      req.flash("error", "Only admin users can update staff roles");
+      return res.redirect(`/admin/users/${req.params.id}`);
+    }
+
+    if (String(currentAdmin._id) === String(req.params.id)) {
+      req.flash("error", "You cannot change your own role from here");
+      return res.redirect(`/admin/users/${req.params.id}`);
+    }
+
+    const allowedRoles = [
+      "user",
+      "owner",
+      "admin",
+      "manager",
+      "fulfilment",
+      "support",
+      "product_manager",
+    ];
+
+    const role = String(req.body.role || "user").trim();
+
+    if (!allowedRoles.includes(role)) {
+      req.flash("error", "Invalid role selected");
+      return res.redirect(`/admin/users/${req.params.id}`);
+    }
+
+    await User.findByIdAndUpdate(req.params.id, { role });
+
+    req.flash("success", "User role updated");
+    res.redirect(`/admin/users/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update user role");
+    res.redirect(`/admin/users/${req.params.id}`);
+  }
+});
+
 router.post("/users/:id/notes", isAdmin, async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, {
