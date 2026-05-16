@@ -242,10 +242,32 @@
               <%= p.description ? p.description.substring(0, 92) : "No Description Added." %><%= p.description && p.description.length > 92 ? "..." : "" %>
             </p>
 
+            <%
+              const cost = Number(p.costPrice || 0);
+              const sale = Number(activePrice || 0);
+              const profit = sale - cost;
+              const margin = cost > 0 ? ((profit / cost) * 100).toFixed(0) : 0;
+            %>
+
             <div class="admin-product-meta">
               <div>
                 <small>Price</small>
-                <strong>£<%= Number(activePrice || 0).toFixed(2) %></strong>
+                <strong>£<%= sale.toFixed(2) %></strong>
+              </div>
+
+              <div>
+                <small>Cost</small>
+                <strong>£<%= cost.toFixed(2) %></strong>
+              </div>
+
+              <div>
+                <small>Profit</small>
+                <strong>£<%= profit.toFixed(2) %></strong>
+              </div>
+
+              <div>
+                <small>Margin</small>
+                <strong><%= margin %>%</strong>
               </div>
 
               <div>
@@ -254,8 +276,8 @@
               </div>
 
               <div>
-                <small>Nicotine</small>
-                <strong><%= p.nicotine || "N/A" %></strong>
+                <small>SKU</small>
+                <strong><%= p.sku || "N/A" %></strong>
               </div>
             </div>
 
@@ -416,8 +438,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="admin-product-meta">
               <div><small>Price</small><strong>£${Number(activePrice || 0).toFixed(2)}</strong></div>
+              <div><small>Cost</small><strong>£${Number(p.costPrice || 0).toFixed(2)}</strong></div>
+              <div><small>Profit</small><strong>£${(Number(activePrice || 0) - Number(p.costPrice || 0)).toFixed(2)}</strong></div>
+              <div><small>Margin</small><strong>${Number(p.costPrice || 0) > 0 ? (((Number(activePrice || 0) - Number(p.costPrice || 0)) / Number(p.costPrice || 0)) * 100).toFixed(0) : 0}%</strong></div>
               <div><small>Stock</small><strong>${p.stock || 0}</strong></div>
-              <div><small>Nicotine</small><strong>${p.nicotine || "N/A"}</strong></div>
+              <div><small>SKU</small><strong>${p.sku || "N/A"}</strong></div>
             </div>
 
             <div class="admin-product-actions">

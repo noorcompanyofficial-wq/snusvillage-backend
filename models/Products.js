@@ -55,6 +55,36 @@ const productSchema = new mongoose.Schema(
       default: "general",
     },
 
+    sku: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+
+    barcode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    supplier: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    supplierCode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    costPrice: {
+      type: Number,
+      default: 0,
+    },
+
     stock: {
       type: Number,
       default: 0,
