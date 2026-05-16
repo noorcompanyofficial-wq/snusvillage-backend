@@ -15,6 +15,7 @@ const SearchAnalytics = require("../models/SearchAnalytics");
 const HomepageContent = require("../models/HomepageContent");
 const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
+const AdminAuditLog = require("../models/AdminAuditLog");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
@@ -44,6 +45,30 @@ const PERMISSIONS = {
   orders: ["owner", "admin", "manager", "fulfilment"],
   products: ["owner", "admin", "manager", "product_manager"],
 };
+
+async function logAdminAction(req, action, options = {}) {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return;
+    }
+
+    const admin = req.session?.user || {};
+
+    await AdminAuditLog.create({
+      admin: admin._id || null,
+      adminEmail: admin.email || "",
+      adminRole: admin.role || "",
+      action,
+      targetType: options.targetType || "",
+      targetId: options.targetId ? String(options.targetId) : "",
+      summary: options.summary || "",
+      meta: options.meta || {},
+      ip: req.ip || req.headers["x-forwarded-for"] || "",
+    });
+  } catch (err) {
+    console.log("Audit log failed:", err.message);
+  }
+}
 
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
@@ -1233,7 +1258,22 @@ router.post("/orders/:id/status", isAdmin, requireAdminRole(PERMISSIONS.orders),
       update.paymentStatus = paymentStatus;
     }
 
+    const oldOrder = await Order.findById(req.params.id).lean();
+
     await Order.findByIdAndUpdate(req.params.id, update);
+
+    await logAdminAction(req, "ORDER_STATUS_UPDATED", {
+      targetType: "Order",
+      targetId: req.params.id,
+      summary: `Updated order status/payment status for order ${String(req.params.id).slice(-6).toUpperCase()}`,
+      meta: {
+        previousOrderStatus: oldOrder?.orderStatus || "",
+        newOrderStatus: update.orderStatus || oldOrder?.orderStatus || "",
+        previousPaymentStatus: oldOrder?.paymentStatus || "",
+        newPaymentStatus: update.paymentStatus || oldOrder?.paymentStatus || "",
+        update,
+      },
+    });
 
     res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {
@@ -1404,7 +1444,21 @@ router.post("/users/:id/role", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin)
       return res.redirect(`/admin/users/${req.params.id}`);
     }
 
+    const targetUser = await User.findById(req.params.id).lean();
+    const oldRole = targetUser?.role || "user";
+
     await User.findByIdAndUpdate(req.params.id, { role });
+
+    await logAdminAction(req, "USER_ROLE_UPDATED", {
+      targetType: "User",
+      targetId: req.params.id,
+      summary: `Changed user role from ${oldRole} to ${role}`,
+      meta: {
+        oldRole,
+        newRole: role,
+        targetEmail: targetUser?.email || "",
+      },
+    });
 
     req.flash("success", "User role updated");
     res.redirect(`/admin/users/${req.params.id}`);
@@ -1427,6 +1481,25 @@ router.post("/users/:id/notes", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin
     console.log(err);
     req.flash("error", "Unable to save admin notes");
     res.redirect(`/admin/users/${req.params.id}`);
+  }
+});
+
+
+router.get("/audit-logs", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
+  try {
+    const logs =
+      mongoose.connection.readyState === 1
+        ? await AdminAuditLog.find().sort({ createdAt: -1 }).limit(200).lean()
+        : [];
+
+    res.render("admin/audit-logs", {
+      layout: "layouts/admin-layout",
+      logs,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load audit logs");
+    res.redirect("/admin/dashboard");
   }
 });
 
@@ -1725,8 +1798,22 @@ router.get("/inventory", isAdmin, requireAdminRole(PERMISSIONS.products), async 
 router.post("/inventory/:id/stock", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const stock = Math.max(0, Number.parseInt(req.body.stock, 10) || 0);
+    const product = await Product.findById(req.params.id).lean();
+    const oldStock = Number(product?.stock || 0);
 
     await Product.findByIdAndUpdate(req.params.id, { stock });
+
+    await logAdminAction(req, "PRODUCT_STOCK_UPDATED", {
+      targetType: "Product",
+      targetId: req.params.id,
+      summary: `Updated stock for ${product?.name || "product"} from ${oldStock} to ${stock}`,
+      meta: {
+        productName: product?.name || "",
+        sku: product?.sku || "",
+        oldStock,
+        newStock: stock,
+      },
+    });
 
     req.flash("success", "Stock updated");
     res.redirect(req.get("Referrer") || "/admin/inventory");
@@ -1968,7 +2055,22 @@ router.post("/products/:id/toggle-active", isAdmin, requireAdminRole(PERMISSIONS
 // Delete Product
 router.post("/products/delete/:id", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
+    const product = await Product.findById(req.params.id).lean();
+
     await Product.findByIdAndDelete(req.params.id);
+
+    await logAdminAction(req, "PRODUCT_DELETED", {
+      targetType: "Product",
+      targetId: req.params.id,
+      summary: `Deleted product ${product?.name || String(req.params.id)}`,
+      meta: {
+        productName: product?.name || "",
+        sku: product?.sku || "",
+        brand: product?.brand || "",
+        price: product?.price || 0,
+        stock: product?.stock || 0,
+      },
+    });
 
     req.flash("success", "Product deleted!");
     res.redirect("/admin/products");
@@ -2226,9 +2328,23 @@ router.post("/orders/:id/admin-update", isAdmin, requireAdminRole(PERMISSIONS.or
       customerNotified: req.body.customerNotified === "on",
     };
 
+    const oldOrder = await Order.findById(req.params.id).lean();
+
     await Order.findByIdAndUpdate(req.params.id, {
       adminNotes: String(req.body.adminNotes || "").trim(),
       fulfilmentChecklist: checklist,
+    });
+
+    await logAdminAction(req, "ORDER_ADMIN_UPDATED", {
+      targetType: "Order",
+      targetId: req.params.id,
+      summary: `Updated admin notes/checklist for order ${String(req.params.id).slice(-6).toUpperCase()}`,
+      meta: {
+        previousNotes: oldOrder?.adminNotes || "",
+        newNotes: String(req.body.adminNotes || "").trim(),
+        previousChecklist: oldOrder?.fulfilmentChecklist || {},
+        newChecklist: checklist,
+      },
     });
 
     req.flash("success", "Order admin notes updated");
