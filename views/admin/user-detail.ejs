@@ -99,6 +99,24 @@
 
     <section class="admin-panel">
       <div class="admin-panel__head">
+        <h2>Private Admin Notes</h2>
+      </div>
+
+      <form action="/admin/users/<%= account._id %>/notes" method="POST" class="admin-notes-form">
+        <label>
+          Notes
+          <textarea name="adminNotes" placeholder="Add private notes about this customer..."><%= account.adminNotes || "" %></textarea>
+        </label>
+
+        <button type="submit" class="admin-primary">
+          <i class="fa-solid fa-floppy-disk"></i>
+          Save Notes
+        </button>
+      </form>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
         <h2>Security Details</h2>
       </div>
 

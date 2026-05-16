@@ -1347,6 +1347,22 @@ router.get("/users/:id", isAdmin, async (req, res) => {
 });
 
 
+
+router.post("/users/:id/notes", isAdmin, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, {
+      adminNotes: String(req.body.adminNotes || "").trim(),
+    });
+
+    req.flash("success", "Admin notes saved");
+    res.redirect(`/admin/users/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to save admin notes");
+    res.redirect(`/admin/users/${req.params.id}`);
+  }
+});
+
 router.get("/security", isAdmin, async (req, res) => {
   try {
     const users =

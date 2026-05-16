@@ -4228,3 +4228,37 @@ textarea:focus {
 }
 
 /* ===== DASHBOARD ALERTS END ===== */
+
+/* ===== CUSTOMER ADMIN NOTES START ===== */
+
+.admin-notes-form {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-notes-form label {
+  display: grid;
+  gap: 8px;
+  color: #061633;
+  font-weight: 900;
+}
+
+.admin-notes-form textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(9, 31, 77, 0.14);
+  background: #ffffff;
+  color: #061633;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.admin-notes-form textarea:focus {
+  border-color: #123b8a;
+  box-shadow: 0 0 0 4px rgba(18, 59, 138, 0.08);
+}
+
+/* ===== CUSTOMER ADMIN NOTES END ===== */

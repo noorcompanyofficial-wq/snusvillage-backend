@@ -84,6 +84,12 @@ const userSchema = new mongoose.Schema({
   suspiciousIPs: [String],
   blockedIPs: [String],
   lastResend: Date,
+
+  // ADMIN NOTES
+  adminNotes: {
+    type: String,
+    default: "",
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
