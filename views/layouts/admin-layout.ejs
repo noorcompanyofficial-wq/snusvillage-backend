@@ -27,23 +27,51 @@
           </span>
         </a>
 
+        <%
+          const adminRole = user?.role || "user";
+          const isOwnerAdmin = ["owner", "admin"].includes(adminRole);
+          const canManageProducts = ["owner", "admin", "manager", "product_manager"].includes(adminRole);
+          const canManageOrders = ["owner", "admin", "manager", "fulfilment"].includes(adminRole);
+          const canSupportCustomers = ["owner", "admin", "manager", "support"].includes(adminRole);
+          const canManageWebsite = ["owner", "admin", "manager"].includes(adminRole);
+          const canViewAnalytics = ["owner", "admin", "manager"].includes(adminRole);
+        %>
+
         <nav class="admin-nav" aria-label="Admin navigation">
           <a href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
-          <a href="/admin/analytics"><i class="fa-solid fa-chart-pie"></i><span>Analytics</span></a>
-          <a href="/admin/search-analytics"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Search Data</span></a>
-          <a href="/admin/homepage"><i class="fa-solid fa-house-chimney-window"></i><span>Homepage</span></a>
-          <a href="/admin/discounts"><i class="fa-solid fa-ticket"></i><span>Discounts</span></a>
-          <a href="/admin/settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
-          <a href="/admin/messages"><i class="fa-solid fa-inbox"></i><span>Messages</span></a>
-          <a href="/admin/orders"><i class="fa-solid fa-receipt"></i><span>Orders</span></a>
-          <a href="/admin/carts"><i class="fa-solid fa-cart-shopping"></i><span>Carts</span></a>
-          <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></a>
-          <a href="/admin/inventory"><i class="fa-solid fa-warehouse"></i><span>Inventory</span></a>
-          <a href="/admin/products/add"><i class="fa-solid fa-circle-plus"></i><span>Add Product</span></a>
-          <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span>Wholesale</span></a>
-          <a href="/admin/users"><i class="fa-solid fa-users"></i><span>Users & Traders</span></a>
-          <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
-          <a href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i><span>Email Test</span></a>
+
+          <% if (canViewAnalytics) { %>
+            <a href="/admin/analytics"><i class="fa-solid fa-chart-pie"></i><span>Analytics</span></a>
+            <a href="/admin/search-analytics"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Search Data</span></a>
+          <% } %>
+
+          <% if (canManageWebsite) { %>
+            <a href="/admin/homepage"><i class="fa-solid fa-house-chimney-window"></i><span>Homepage</span></a>
+            <a href="/admin/discounts"><i class="fa-solid fa-ticket"></i><span>Discounts</span></a>
+            <a href="/admin/settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+          <% } %>
+
+          <% if (canSupportCustomers) { %>
+            <a href="/admin/messages"><i class="fa-solid fa-inbox"></i><span>Messages</span></a>
+          <% } %>
+
+          <% if (canManageOrders) { %>
+            <a href="/admin/orders"><i class="fa-solid fa-receipt"></i><span>Orders</span></a>
+            <a href="/admin/carts"><i class="fa-solid fa-cart-shopping"></i><span>Carts</span></a>
+          <% } %>
+
+          <% if (canManageProducts) { %>
+            <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></a>
+            <a href="/admin/inventory"><i class="fa-solid fa-warehouse"></i><span>Inventory</span></a>
+            <a href="/admin/products/add"><i class="fa-solid fa-circle-plus"></i><span>Add Product</span></a>
+          <% } %>
+
+          <% if (isOwnerAdmin) { %>
+            <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span>Wholesale</span></a>
+            <a href="/admin/users"><i class="fa-solid fa-users"></i><span>Users & Traders</span></a>
+            <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
+            <a href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i><span>Email Test</span></a>
+          <% } %>
         </nav>
 
         <div class="admin-sidebar__bottom">
