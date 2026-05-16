@@ -397,6 +397,135 @@ router.post(
 );
 
 
+
+router.get("/seo", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
+  try {
+    const issue = String(req.query.issue || "").trim();
+    const search = String(req.query.search || "").trim();
+
+    const filter = {};
+
+    if (issue === "missingTitle") {
+      filter.$or = [{ seoTitle: { $exists: false } }, { seoTitle: "" }];
+    }
+
+    if (issue === "missingDescription") {
+      filter.$or = [{ seoDescription: { $exists: false } }, { seoDescription: "" }];
+    }
+
+    if (issue === "shortDescription") {
+      filter.$expr = { $lt: [{ $strLenCP: { $ifNull: ["$description", ""] } }, 80] };
+    }
+
+    if (issue === "noImage") {
+      filter.$or = [{ images: { $exists: false } }, { images: { $size: 0 } }];
+    }
+
+    if (issue === "hidden") {
+      filter.isActive = false;
+    }
+
+    if (search) {
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(safeSearch, "i");
+
+      filter.$and = filter.$and || [];
+      filter.$and.push({
+        $or: [
+          { name: searchRegex },
+          { brand: searchRegex },
+          { sku: searchRegex },
+          { slug: searchRegex },
+        ],
+      });
+    }
+
+    const allProducts =
+      mongoose.connection.readyState === 1
+        ? await Product.find().lean()
+        : [];
+
+    const productsRaw =
+      mongoose.connection.readyState === 1
+        ? await Product.find(filter).sort({ updatedAt: -1 }).limit(150).lean()
+        : [];
+
+    function analyseProduct(product) {
+      const issues = [];
+      let score = 100;
+
+      const seoTitle = String(product.seoTitle || "").trim();
+      const seoDescription = String(product.seoDescription || "").trim();
+      const description = String(product.description || "").trim();
+
+      if (!seoTitle) {
+        issues.push("Missing SEO Title");
+        score -= 25;
+      } else if (seoTitle.length < 35 || seoTitle.length > 70) {
+        issues.push("SEO Title Length");
+        score -= 10;
+      }
+
+      if (!seoDescription) {
+        issues.push("Missing SEO Description");
+        score -= 25;
+      } else if (seoDescription.length < 80 || seoDescription.length > 170) {
+        issues.push("SEO Description Length");
+        score -= 10;
+      }
+
+      if (description.length < 80) {
+        issues.push("Short Product Description");
+        score -= 15;
+      }
+
+      if (!product.images || product.images.length === 0) {
+        issues.push("No Image");
+        score -= 15;
+      }
+
+      if (!product.slug) {
+        issues.push("Missing Slug");
+        score -= 10;
+      }
+
+      if (product.isActive === false) {
+        issues.push("Hidden");
+        score -= 5;
+      }
+
+      return {
+        ...product,
+        seoScore: Math.max(0, score),
+        issues,
+        seoTitleLength: seoTitle.length,
+        seoDescriptionLength: seoDescription.length,
+      };
+    }
+
+    const analysedAll = allProducts.map(analyseProduct);
+    const products = productsRaw.map(analyseProduct);
+
+    res.render("admin/seo", {
+      layout: "layouts/admin-layout",
+      products,
+      query: req.query,
+      stats: {
+        totalProducts: analysedAll.length,
+        missingSeoTitle: analysedAll.filter((p) => !String(p.seoTitle || "").trim()).length,
+        missingSeoDescription: analysedAll.filter((p) => !String(p.seoDescription || "").trim()).length,
+        shortDescription: analysedAll.filter((p) => String(p.description || "").trim().length < 80).length,
+        noImage: analysedAll.filter((p) => !p.images || p.images.length === 0).length,
+        hiddenProducts: analysedAll.filter((p) => p.isActive === false).length,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load SEO dashboard");
+    res.redirect("/admin/dashboard");
+  }
+});
+
 router.get("/search-analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
