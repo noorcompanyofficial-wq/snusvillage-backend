@@ -40,10 +40,22 @@
       <strong><%= outStock %></strong>
     </a>
 
-    <a href="/admin/products/add" class="admin-products-stat admin-products-stat--action">
-      <i class="fa-solid fa-plus"></i>
-      <span>Quick Action</span>
-      <strong>Add</strong>
+    <a href="/admin/products?visibility=hidden" class="admin-products-stat admin-products-stat--danger">
+      <i class="fa-solid fa-eye-slash"></i>
+      <span>Hidden</span>
+      <strong><%= hiddenProducts %></strong>
+    </a>
+
+    <a href="/admin/products?featured=yes" class="admin-products-stat">
+      <i class="fa-solid fa-star"></i>
+      <span>Featured</span>
+      <strong><%= featuredProducts %></strong>
+    </a>
+
+    <a href="/admin/products?bestSeller=yes" class="admin-products-stat admin-products-stat--action">
+      <i class="fa-solid fa-fire"></i>
+      <span>Best Sellers</span>
+      <strong><%= bestSellerProducts %></strong>
     </a>
   </div>
 
@@ -57,7 +69,18 @@
       <a href="/admin/products">Reset Filters</a>
     </div>
 
-    <div class="admin-products-filters">
+    <div class="admin-products-filters admin-products-filters--extended">
+      <label class="admin-products-search-label">
+        Search
+        <input
+          id="searchFilter"
+          type="text"
+          value="<%= query.search || '' %>"
+          placeholder="Search name, brand, flavour, nicotine..."
+          onkeydown="if(event.key === 'Enter') applyFilter()"
+        >
+      </label>
+
       <label>
         Brand
         <select onchange="applyFilter()" id="brandFilter">
@@ -106,6 +129,39 @@
           <option value="out" <%= query.stock === "out" ? "selected" : "" %>>Out Of Stock</option>
         </select>
       </label>
+
+      <label>
+        Visibility
+        <select onchange="applyFilter()" id="visibilityFilter">
+          <option value="" <%= !query.visibility ? "selected" : "" %>>All</option>
+          <option value="active" <%= query.visibility === "active" ? "selected" : "" %>>Active</option>
+          <option value="hidden" <%= query.visibility === "hidden" ? "selected" : "" %>>Hidden</option>
+        </select>
+      </label>
+
+      <label>
+        Featured
+        <select onchange="applyFilter()" id="featuredFilter">
+          <option value="" <%= !query.featured ? "selected" : "" %>>All</option>
+          <option value="yes" <%= query.featured === "yes" ? "selected" : "" %>>Featured Only</option>
+        </select>
+      </label>
+
+      <label>
+        Best Seller
+        <select onchange="applyFilter()" id="bestSellerFilter">
+          <option value="" <%= !query.bestSeller ? "selected" : "" %>>All</option>
+          <option value="yes" <%= query.bestSeller === "yes" ? "selected" : "" %>>Best Sellers Only</option>
+        </select>
+      </label>
+
+      <label>
+        Sale Badge
+        <select onchange="applyFilter()" id="saleBadgeFilter">
+          <option value="" <%= !query.saleBadge ? "selected" : "" %>>All</option>
+          <option value="yes" <%= query.saleBadge === "yes" ? "selected" : "" %>>Sale Badge Only</option>
+        </select>
+      </label>
     </div>
   </section>
 
@@ -142,6 +198,24 @@
             <span class="admin-product-stock <%= p.stock > 0 ? 'is-in' : 'is-out' %>">
               <%= p.stock > 0 ? "In Stock" : "Out Of Stock" %>
             </span>
+
+            <div class="admin-product-card-badges">
+              <span class="<%= p.isActive === false ? 'is-hidden' : 'is-active' %>">
+                <%= p.isActive === false ? "Hidden" : "Active" %>
+              </span>
+
+              <% if (p.isFeatured) { %>
+                <span>Featured</span>
+              <% } %>
+
+              <% if (p.isBestSeller) { %>
+                <span>Best Seller</span>
+              <% } %>
+
+              <% if (p.showSaleBadge) { %>
+                <span>Sale Badge</span>
+              <% } %>
+            </div>
           </div>
 
           <div class="admin-product-card__body">
@@ -179,6 +253,13 @@
                 Edit
               </a>
 
+              <form action="/admin/products/<%= p._id %>/toggle-active" method="POST" class="admin-product-inline-form">
+                <button type="submit" class="admin-product-visibility">
+                  <i class="fa-solid <%= p.isActive === false ? 'fa-eye' : 'fa-eye-slash' %>"></i>
+                  <%= p.isActive === false ? "Activate" : "Hide" %>
+                </button>
+              </form>
+
               <button type="button" class="admin-product-delete delete-btn" data-id="<%= p._id %>">
                 <i class="fa-solid fa-trash"></i>
                 Delete
@@ -211,17 +292,27 @@
 
 <script>
 function applyFilter() {
+  const search = document.getElementById("searchFilter")?.value || "";
   const brand = document.getElementById("brandFilter").value;
   const strength = document.getElementById("strengthFilter").value;
   const sort = document.getElementById("sortFilter").value;
   const stock = document.getElementById("stockFilter").value;
+  const visibility = document.getElementById("visibilityFilter")?.value || "";
+  const featured = document.getElementById("featuredFilter")?.value || "";
+  const bestSeller = document.getElementById("bestSellerFilter")?.value || "";
+  const saleBadge = document.getElementById("saleBadgeFilter")?.value || "";
 
   const params = new URLSearchParams();
 
+  if (search) params.append("search", search);
   if (brand) params.append("brand", brand);
   if (strength) params.append("strength", strength);
   if (sort) params.append("sort", sort);
   if (stock) params.append("stock", stock);
+  if (visibility) params.append("visibility", visibility);
+  if (featured) params.append("featured", featured);
+  if (bestSeller) params.append("bestSeller", bestSeller);
+  if (saleBadge) params.append("saleBadge", saleBadge);
 
   window.location.href = "/admin/products" + (params.toString() ? "?" + params.toString() : "");
 }
@@ -280,6 +371,17 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `<img src="${p.images[0]}" alt="${p.name}">`
         : `<span>No Image</span>`;
 
+      const badges = `
+        <div class="admin-product-card-badges">
+          <span class="${p.isActive === false ? "is-hidden" : "is-active"}">
+            ${p.isActive === false ? "Hidden" : "Active"}
+          </span>
+          ${p.isFeatured ? "<span>Featured</span>" : ""}
+          ${p.isBestSeller ? "<span>Best Seller</span>" : ""}
+          ${p.showSaleBadge ? "<span>Sale Badge</span>" : ""}
+        </div>
+      `;
+
       const card = `
         <article class="admin-product-card">
           <div class="admin-product-card__media">
@@ -287,6 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="admin-product-stock ${p.stock > 0 ? "is-in" : "is-out"}">
               ${p.stock > 0 ? "In Stock" : "Out Of Stock"}
             </span>
+            ${badges}
           </div>
 
           <div class="admin-product-card__body">
@@ -310,6 +413,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 <i class="fa-solid fa-pen"></i>
                 Edit
               </a>
+
+              <form action="/admin/products/${p._id}/toggle-active" method="POST" class="admin-product-inline-form">
+                <button type="submit" class="admin-product-visibility">
+                  <i class="fa-solid ${p.isActive === false ? "fa-eye" : "fa-eye-slash"}"></i>
+                  ${p.isActive === false ? "Activate" : "Hide"}
+                </button>
+              </form>
 
               <button type="button" class="admin-product-delete delete-btn" data-id="${p._id}">
                 <i class="fa-solid fa-trash"></i>

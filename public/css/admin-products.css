@@ -452,3 +452,104 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== ADMIN PRODUCTS LIST UPGRADE START ===== */
+
+.admin-products-filters--extended {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-products-search-label {
+  grid-column: span 2;
+}
+
+.admin-products-filters input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 0 13px;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-product-card__media {
+  position: relative;
+}
+
+.admin-product-card-badges {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-product-card-badges span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #123b8a;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 8px 18px rgba(9, 31, 77, 0.16);
+}
+
+.admin-product-card-badges span.is-active {
+  background: #15803d;
+}
+
+.admin-product-card-badges span.is-hidden {
+  background: #b91c1c;
+}
+
+.admin-product-inline-form {
+  margin: 0;
+  display: inline-flex;
+}
+
+.admin-product-visibility {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 13px;
+  color: #ffffff;
+  background: #061633;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+@media (max-width: 1000px) {
+  .admin-products-filters--extended {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-products-search-label {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-products-filters--extended {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-products-search-label {
+    grid-column: auto;
+  }
+}
+
+/* ===== ADMIN PRODUCTS LIST UPGRADE END ===== */

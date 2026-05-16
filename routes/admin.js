@@ -1599,11 +1599,26 @@ router.get("/products", isAdmin, async (req, res) => {
     const limit = 8;
 
     // ===== FILTERS =====
-    let filter = {};
+    const filter = {};
+    const search = String(req.query.search || "").trim();
 
-    // BRAND FILTER (SUPER FIXED)
+    if (search) {
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(safeSearch, "i");
+
+      filter.$or = [
+        { name: searchRegex },
+        { brand: searchRegex },
+        { flavour: searchRegex },
+        { nicotine: searchRegex },
+        { category: searchRegex },
+        { description: searchRegex },
+      ];
+    }
+
+    // BRAND FILTER
     if (req.query.brand && req.query.brand !== "") {
-      const cleanBrand = req.query.brand.toLowerCase().replace(/\s+/g, "");
+      const cleanBrand = String(req.query.brand).toLowerCase().replace(/\s+/g, "");
 
       filter.$expr = {
         $regexMatch: {
@@ -1631,6 +1646,26 @@ router.get("/products", isAdmin, async (req, res) => {
       filter.stock = 0;
     }
 
+    if (req.query.visibility === "active") {
+      filter.isActive = { $ne: false };
+    }
+
+    if (req.query.visibility === "hidden") {
+      filter.isActive = false;
+    }
+
+    if (req.query.featured === "yes") {
+      filter.isFeatured = true;
+    }
+
+    if (req.query.bestSeller === "yes") {
+      filter.isBestSeller = true;
+    }
+
+    if (req.query.saleBadge === "yes") {
+      filter.showSaleBadge = true;
+    }
+
     let sort = { createdAt: -1 };
 
     if (req.query.sort === "price-low") sort = { price: 1 };
@@ -1649,6 +1684,9 @@ router.get("/products", isAdmin, async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const inStock = await Product.countDocuments({ stock: { $gt: 0 } });
     const outStock = await Product.countDocuments({ stock: 0 });
+    const hiddenProducts = await Product.countDocuments({ isActive: false });
+    const featuredProducts = await Product.countDocuments({ isFeatured: true });
+    const bestSellerProducts = await Product.countDocuments({ isBestSeller: true });
 
     if (req.xhr || req.headers.accept?.includes("application/json")) {
       return res.json({
@@ -1666,6 +1704,9 @@ router.get("/products", isAdmin, async (req, res) => {
       totalProducts,
       inStock,
       outStock,
+      hiddenProducts,
+      featuredProducts,
+      bestSellerProducts,
 
       query: req.query,
     });
@@ -1733,6 +1774,29 @@ router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res
     res.redirect("/admin/products/add");
   }
 });
+
+
+router.post("/products/:id/toggle-active", isAdmin, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      req.flash("error", "Product not found");
+      return res.redirect("/admin/products");
+    }
+
+    product.isActive = product.isActive === false;
+    await product.save();
+
+    req.flash("success", product.isActive ? "Product is now active" : "Product is now hidden");
+    res.redirect(req.get("Referrer") || "/admin/products");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update product visibility");
+    res.redirect("/admin/products");
+  }
+});
+
 
 // Delete Product
 router.post("/products/delete/:id", isAdmin, async (req, res) => {
