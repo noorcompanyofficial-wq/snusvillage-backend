@@ -23,6 +23,28 @@ const transporter = require("../config/mailer");
 const { storeProductImages } = require("../utils/productImages");
 const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
+function requireAdminRole(allowedRoles = []) {
+  return function (req, res, next) {
+    const role = req.session?.user?.role || res.locals.user?.role || "user";
+
+    if (!allowedRoles.includes(role)) {
+      req.flash("error", "You do not have permission to access that admin area.");
+      return res.redirect("/admin/dashboard");
+    }
+
+    next();
+  };
+}
+
+const PERMISSIONS = {
+  ownerAdmin: ["owner", "admin"],
+  analytics: ["owner", "admin", "manager"],
+  website: ["owner", "admin", "manager"],
+  support: ["owner", "admin", "manager", "support"],
+  orders: ["owner", "admin", "manager", "fulfilment"],
+  products: ["owner", "admin", "manager", "product_manager"],
+};
+
 function csvCell(value) {
   const text = value === undefined || value === null ? "" : String(value);
   return '"' + text.replace(/"/g, '""') + '"';
@@ -162,7 +184,7 @@ router.get("/", isAdmin, (req, res) => {
 
 
 
-router.get("/homepage", isAdmin, async (req, res) => {
+router.get("/homepage", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     let homepageContent = null;
 
@@ -189,6 +211,7 @@ router.get("/homepage", isAdmin, async (req, res) => {
 router.post(
   "/homepage/hero-distro",
   isAdmin,
+  requireAdminRole(PERMISSIONS.website),
   upload.fields([
     { name: "heroImage1", maxCount: 1 },
     { name: "heroImage2", maxCount: 1 },
@@ -274,6 +297,7 @@ router.post(
 router.post(
   "/homepage/social",
   isAdmin,
+  requireAdminRole(PERMISSIONS.website),
   videoUpload.fields([
     { name: "socialVideo1", maxCount: 1 },
     { name: "socialVideo2", maxCount: 1 },
@@ -348,7 +372,7 @@ router.post(
 );
 
 
-router.get("/search-analytics", isAdmin, async (req, res) => {
+router.get("/search-analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.render("admin/search-analytics", {
@@ -436,7 +460,7 @@ router.get("/search-analytics", isAdmin, async (req, res) => {
 });
 
 
-router.get("/analytics", isAdmin, async (req, res) => {
+router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.render("admin/analytics", {
@@ -652,7 +676,7 @@ router.get("/dashboard", isAdmin, async (req, res) => {
   });
 });
 
-router.get("/carts", isAdmin, async (req, res) => {
+router.get("/carts", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const cartStaleCutoff = new Date(Date.now() - 60 * 60 * 1000);
     const status = String(req.query.status || "all").toLowerCase();
@@ -690,7 +714,7 @@ router.get("/carts", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/carts/:id/delete", isAdmin, async (req, res) => {
+router.post("/carts/:id/delete", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     await Cart.findByIdAndDelete(req.params.id);
     req.flash("success", "Cart removed");
@@ -702,7 +726,7 @@ router.post("/carts/:id/delete", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/orders/export/csv", isAdmin, async (req, res) => {
+router.get("/orders/export/csv", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const orders =
       mongoose.connection.readyState === 1 ? await Order.find().sort({ createdAt: -1 }).lean() : [];
@@ -766,7 +790,7 @@ router.get("/orders/export/csv", isAdmin, async (req, res) => {
 
 
 
-router.get("/messages", isAdmin, async (req, res) => {
+router.get("/messages", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     const filter = {};
 
@@ -807,7 +831,7 @@ router.get("/messages", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/messages/:id", isAdmin, async (req, res) => {
+router.get("/messages/:id", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     const message = await Contact.findById(req.params.id).lean();
 
@@ -833,7 +857,7 @@ router.get("/messages/:id", isAdmin, async (req, res) => {
 });
 
 
-router.post("/messages/:id/reply", isAdmin, async (req, res) => {
+router.post("/messages/:id/reply", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     const replyBody = String(req.body.replyBody || "").trim();
 
@@ -896,7 +920,7 @@ router.post("/messages/:id/reply", isAdmin, async (req, res) => {
 });
 
 
-router.post("/messages/:id/read", isAdmin, async (req, res) => {
+router.post("/messages/:id/read", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     await Contact.findByIdAndUpdate(req.params.id, { isRead: true });
     req.flash("success", "Message marked as read");
@@ -908,7 +932,7 @@ router.post("/messages/:id/read", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/messages/:id/unread", isAdmin, async (req, res) => {
+router.post("/messages/:id/unread", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     await Contact.findByIdAndUpdate(req.params.id, { isRead: false });
     req.flash("success", "Message marked as unread");
@@ -920,7 +944,7 @@ router.post("/messages/:id/unread", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/messages/:id/delete", isAdmin, async (req, res) => {
+router.post("/messages/:id/delete", isAdmin, requireAdminRole(PERMISSIONS.support), async (req, res) => {
   try {
     await Contact.findByIdAndDelete(req.params.id);
     req.flash("success", "Message deleted");
@@ -933,7 +957,7 @@ router.post("/messages/:id/delete", isAdmin, async (req, res) => {
 });
 
 
-router.get("/settings", isAdmin, async (req, res) => {
+router.get("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     const settings =
       mongoose.connection.readyState === 1
@@ -955,7 +979,7 @@ router.get("/settings", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/settings", isAdmin, async (req, res) => {
+router.post("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     await StoreSettings.findOneAndUpdate(
       { key: "store" },
@@ -989,7 +1013,7 @@ router.post("/settings", isAdmin, async (req, res) => {
 });
 
 
-router.get("/discounts", isAdmin, async (req, res) => {
+router.get("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     const discounts =
       mongoose.connection.readyState === 1
@@ -1007,7 +1031,7 @@ router.get("/discounts", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/discounts", isAdmin, async (req, res) => {
+router.post("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     const code = String(req.body.code || "").trim().toUpperCase();
 
@@ -1057,7 +1081,7 @@ router.post("/discounts", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/discounts/:id/toggle", isAdmin, async (req, res) => {
+router.post("/discounts/:id/toggle", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     const discount = await DiscountCode.findById(req.params.id);
 
@@ -1078,7 +1102,7 @@ router.post("/discounts/:id/toggle", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/discounts/:id/delete", isAdmin, async (req, res) => {
+router.post("/discounts/:id/delete", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
   try {
     await DiscountCode.findByIdAndDelete(req.params.id);
 
@@ -1092,7 +1116,7 @@ router.post("/discounts/:id/delete", isAdmin, async (req, res) => {
 });
 
 
-router.get("/orders", isAdmin, async (req, res) => {
+router.get("/orders", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const page = Math.max(1, Number.parseInt(req.query.page || "1", 10));
     const limit = 20;
@@ -1192,7 +1216,7 @@ router.get("/orders", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/orders/:id/status", isAdmin, async (req, res) => {
+router.post("/orders/:id/status", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const { orderStatus, paymentStatus } = req.body;
 
@@ -1219,7 +1243,7 @@ router.post("/orders/:id/status", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/users", isAdmin, async (req, res) => {
+router.get("/users", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     let users = [];
     let traders = [];
@@ -1288,7 +1312,7 @@ router.get("/users", isAdmin, async (req, res) => {
 });
 
 
-router.get("/users/:id", isAdmin, async (req, res) => {
+router.get("/users/:id", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       req.flash("error", "Database is not connected");
@@ -1349,7 +1373,7 @@ router.get("/users/:id", isAdmin, async (req, res) => {
 
 
 
-router.post("/users/:id/role", isAdmin, async (req, res) => {
+router.post("/users/:id/role", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const currentAdmin = req.session?.user;
 
@@ -1391,7 +1415,7 @@ router.post("/users/:id/role", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/users/:id/notes", isAdmin, async (req, res) => {
+router.post("/users/:id/notes", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, {
       adminNotes: String(req.body.adminNotes || "").trim(),
@@ -1406,7 +1430,7 @@ router.post("/users/:id/notes", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/security", isAdmin, async (req, res) => {
+router.get("/security", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const users =
       mongoose.connection.readyState === 1
@@ -1434,7 +1458,7 @@ router.get("/security", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/email-test", isAdmin, (req, res) => {
+router.get("/email-test", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), (req, res) => {
   const mailConfig = transporter.snusMailConfig || {};
 
   res.render("admin/email-test", {
@@ -1454,7 +1478,7 @@ router.get("/email-test", isAdmin, (req, res) => {
   });
 });
 
-router.post("/email-test", isAdmin, async (req, res) => {
+router.post("/email-test", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   const to = String(req.body.to || "").trim();
   const mailConfig = transporter.snusMailConfig || {};
   const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
@@ -1512,7 +1536,7 @@ router.post("/email-test", isAdmin, async (req, res) => {
   res.redirect("/admin/email-test");
 });
 
-router.get("/wholesale", isAdmin, async (req, res) => {
+router.get("/wholesale", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const applications =
       mongoose.connection.readyState === 1
@@ -1530,7 +1554,7 @@ router.get("/wholesale", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/wholesale/:id/approve", isAdmin, async (req, res) => {
+router.post("/wholesale/:id/approve", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const application =
       mongoose.connection.readyState === 1
@@ -1574,7 +1598,7 @@ router.post("/wholesale/:id/approve", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
+router.post("/wholesale/:id/reject", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const application =
       mongoose.connection.readyState === 1
@@ -1611,7 +1635,7 @@ router.post("/wholesale/:id/reject", isAdmin, async (req, res) => {
 });
 
 
-router.get("/inventory", isAdmin, async (req, res) => {
+router.get("/inventory", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const stock = String(req.query.stock || "all").toLowerCase();
     const brand = String(req.query.brand || "").trim();
@@ -1698,7 +1722,7 @@ router.get("/inventory", isAdmin, async (req, res) => {
   }
 });
 
-router.post("/inventory/:id/stock", isAdmin, async (req, res) => {
+router.post("/inventory/:id/stock", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const stock = Math.max(0, Number.parseInt(req.body.stock, 10) || 0);
 
@@ -1715,14 +1739,14 @@ router.post("/inventory/:id/stock", isAdmin, async (req, res) => {
 
 
 //  Add Product Page
-router.get("/products/add", isAdmin, (req, res) => {
+router.get("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
   res.render("admin/add-product", {
     layout: "layouts/admin-layout",
   });
 });
 
 // Get All products
-router.get("/products", isAdmin, async (req, res) => {
+router.get("/products", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 8;
@@ -1851,7 +1875,7 @@ router.get("/products", isAdmin, async (req, res) => {
 
 //  Create Product
 
-router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res) => {
+router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), async (req, res) => {
   try {
     const {
       name,
@@ -1919,7 +1943,7 @@ router.post("/products/add", isAdmin, upload.array("images", 5), async (req, res
 });
 
 
-router.post("/products/:id/toggle-active", isAdmin, async (req, res) => {
+router.post("/products/:id/toggle-active", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -1942,7 +1966,7 @@ router.post("/products/:id/toggle-active", isAdmin, async (req, res) => {
 
 
 // Delete Product
-router.post("/products/delete/:id", isAdmin, async (req, res) => {
+router.post("/products/delete/:id", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
 
@@ -1955,7 +1979,7 @@ router.post("/products/delete/:id", isAdmin, async (req, res) => {
 });
 
 /* Edit Product */
-router.get("/products/edit/:id", isAdmin, async (req, res) => {
+router.get("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   res.render("admin/edit-product", {
@@ -1964,7 +1988,7 @@ router.get("/products/edit/:id", isAdmin, async (req, res) => {
   });
 });
 
-router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req, res) => {
+router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), async (req, res) => {
   try {
     const {
       name,
@@ -2042,7 +2066,7 @@ router.post("/products/edit/:id", isAdmin, upload.array("images", 5), async (req
 });
 
 
-router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
+router.post("/orders/:id/send-royal-mail", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -2110,7 +2134,7 @@ router.post("/orders/:id/send-royal-mail", isAdmin, async (req, res) => {
 
 
 
-router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
+router.post("/orders/:id/generate-label", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -2167,7 +2191,7 @@ router.post("/orders/:id/generate-label", isAdmin, async (req, res) => {
   }
 });
 
-router.get("/orders/:id/download-label", isAdmin, async (req, res) => {
+router.get("/orders/:id/download-label", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -2192,7 +2216,7 @@ router.get("/orders/:id/download-label", isAdmin, async (req, res) => {
 
 
 
-router.post("/orders/:id/admin-update", isAdmin, async (req, res) => {
+router.post("/orders/:id/admin-update", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const checklist = {
       paymentChecked: req.body.paymentChecked === "on",
@@ -2217,7 +2241,7 @@ router.post("/orders/:id/admin-update", isAdmin, async (req, res) => {
 });
 
 
-router.get("/orders/:id", isAdmin, async (req, res) => {
+router.get("/orders/:id", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).lean();
 
