@@ -1,16 +1,32 @@
-<section class="product-detail-page">
+<%
+  const activePrice = Number(product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price || 0);
+  const originalPrice = Number(product.price || 0);
+  const hasSalePrice = product.discountPrice && product.discountPrice > 0;
+  const inStock = Number(product.stock || 0) > 0;
+  const productImage = product.images && product.images.length > 0 ? product.images[0] : "";
+%>
+
+<section class="product-detail-page product-detail-redesign">
+  <nav class="product-breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <span>/</span>
+    <a href="/shop">Shop</a>
+    <span>/</span>
+    <strong><%= product.name %></strong>
+  </nav>
+
   <div class="product-detail-card">
     <div class="product-gallery">
       <div class="product-main-image">
-        <% if (product.images && product.images.length > 0) { %>
-          <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+        <% if (productImage) { %>
+          <img src="<%= productImage %>" alt="<%= product.name %>">
         <% } else { %>
           <div class="product-image-placeholder">No image</div>
         <% } %>
       </div>
 
       <% if (product.images && product.images.length > 1) { %>
-        <div class="product-thumbnails">
+        <div class="product-thumbnails" aria-label="Product images">
           <% product.images.forEach((img, i) => { %>
             <img src="<%= img %>" alt="<%= product.name %> image <%= i + 1 %>">
           <% }) %>
@@ -19,98 +35,121 @@
     </div>
 
     <div class="product-info-panel">
-      <span class="product-brand"><%= product.brand || "Snus Village" %></span>
+      <div class="product-kicker-row">
+        <span class="product-brand"><%= product.brand || "Snus Village" %></span>
+        <span class="<%= inStock ? 'stock-pill in-stock' : 'stock-pill out-stock' %>">
+          <%= inStock ? "In stock" : "Out of stock" %>
+        </span>
+      </div>
 
       <h1><%= product.name %></h1>
-
-      <div class="product-rating">
-        <span>★★★★☆</span>
-        <small>(4.0)</small>
-      </div>
 
       <p class="product-description">
         <%= product.description || "Premium nicotine pouch available from Snus Village." %>
       </p>
 
-      <div class="product-meta-grid">
+      <dl class="product-spec-list">
         <div>
-          <span>Brand</span>
-          <strong><%= product.brand || "N/A" %></strong>
+          <dt>Brand</dt>
+          <dd><%= product.brand || "Snus Village" %></dd>
         </div>
-
         <div>
-          <span>Strength</span>
-          <strong><%= product.strength || "N/A" %></strong>
+          <dt>Strength</dt>
+          <dd><%= product.strength || "N/A" %></dd>
         </div>
-
         <div>
-          <span>Nicotine</span>
-          <strong><%= product.nicotine ? product.nicotine + "mg" : "N/A" %></strong>
+          <dt>Nicotine</dt>
+          <dd><%= product.nicotine ? product.nicotine + "mg" : "N/A" %></dd>
         </div>
-
         <div>
-          <span>Flavour</span>
-          <strong><%= product.flavour || "N/A" %></strong>
+          <dt>Flavour</dt>
+          <dd><%= product.flavour || "N/A" %></dd>
         </div>
-      </div>
+        <% if (product.category) { %>
+          <div>
+            <dt>Category</dt>
+            <dd><%= product.category %></dd>
+          </div>
+        <% } %>
+        <% if (product.sku) { %>
+          <div>
+            <dt>SKU</dt>
+            <dd><%= product.sku %></dd>
+          </div>
+        <% } %>
+      </dl>
 
       <div class="product-buy-box">
         <div class="product-price-row">
           <div>
-            <% if(product.discountPrice && product.discountPrice > 0){ %>
-              <span class="product-price">£<%= product.discountPrice.toFixed(2) %></span>
-              <span class="product-old-price">£<%= product.price.toFixed(2) %></span>
-            <% } else { %>
-              <span class="product-price">£<%= product.price.toFixed(2) %></span>
+            <span class="product-price">£<%= activePrice.toFixed(2) %></span>
+            <% if (hasSalePrice) { %>
+              <span class="product-old-price">£<%= originalPrice.toFixed(2) %></span>
             <% } %>
           </div>
-
-          <span class="<%= product.stock > 0 ? 'stock-pill in-stock' : 'stock-pill out-stock' %>">
-            <%= product.stock > 0 ? "In Stock" : "Out of Stock" %>
-          </span>
+          <small><%= inStock ? product.stock + " available" : "Restock coming soon" %></small>
         </div>
 
-        <% if (product.stock > 0) { %>
+        <% if (inStock) { %>
           <form action="/cart/add/<%= product._id %>" method="POST" class="add-cart-form">
             <label>
               Quantity
               <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
             </label>
 
-            <button type="submit">Add to Cart</button>
+            <button type="submit">
+              <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+              Add to cart
+            </button>
           </form>
         <% } else { %>
-          <button class="disabled-cart-btn" disabled>Out of Stock</button>
+          <button class="disabled-cart-btn" disabled>Out of stock</button>
         <% } %>
       </div>
 
-      <div class="product-trust-row">
+      <div class="product-service-grid">
         <div>
+          <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
           <strong>Fast UK delivery</strong>
-          <span>Available on eligible orders.</span>
+          <span>Dispatch and delivery options are shown clearly at checkout.</span>
         </div>
-
         <div>
+          <i class="fa-solid fa-id-card" aria-hidden="true"></i>
           <strong>18+ only</strong>
-          <span>Age restricted product.</span>
+          <span>Age-restricted products are only available to adult customers.</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="product-extra-section">
-    <div>
+  <div class="product-extra-section product-detail-sections">
+    <section>
       <h2>Product details</h2>
-      <p>
-        <%= product.description || "Full product details will be added soon." %>
-      </p>
-    </div>
+      <ul class="product-organised-list">
+        <li><strong>Product type:</strong> <%= product.category || "Nicotine pouch" %></li>
+        <li><strong>Flavour profile:</strong> <%= product.flavour || "See product description" %></li>
+        <li><strong>Strength level:</strong> <%= product.strength || "N/A" %></li>
+        <li><strong>Nicotine:</strong> <%= product.nicotine ? product.nicotine + "mg" : "N/A" %></li>
+      </ul>
+    </section>
 
-    <div>
-      <h2>Delivery & collection</h2>
-      <p>
-        Order online or visit one of our London branches. Availability may vary by store.
-      </p>
-    </div>
+    <section>
+      <h2>Delivery & checkout</h2>
+      <ul class="product-organised-list">
+        <li>Fast UK delivery options are available for eligible orders.</li>
+        <li>Order confirmation is sent by email after successful checkout.</li>
+        <li>All orders are reviewed before fulfilment for customer safety.</li>
+        <li>Age verification may be required before checkout is completed.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Support</h2>
+      <ul class="product-organised-list">
+        <li>Need help choosing a strength or flavour? Contact Snus Village support.</li>
+        <li>Stock can vary between online availability and London locations.</li>
+        <li>Wholesale customers can apply for trader access from the wholesale page.</li>
+      </ul>
+    </section>
   </div>
 </section>
