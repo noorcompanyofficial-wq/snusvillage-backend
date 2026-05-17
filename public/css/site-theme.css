@@ -880,3 +880,38 @@ main {
 }
 
 /* ===== LEFT LOGO / CENTER NAV HEADER END ===== */
+
+/* ===== HEADER LOGO SIZE TUNE START ===== */
+
+.header .logo img,
+.navbar .logo img,
+.logo img {
+  width: 108px !important;
+  max-width: 108px !important;
+  height: 108px !important;
+  max-height: 108px !important;
+}
+
+@media (max-width: 1180px) {
+  .header .logo img,
+  .navbar .logo img,
+  .logo img {
+    width: 86px !important;
+    max-width: 86px !important;
+    height: 86px !important;
+    max-height: 86px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .header .logo img,
+  .navbar .logo img,
+  .logo img {
+    width: 68px !important;
+    max-width: 68px !important;
+    height: 68px !important;
+    max-height: 68px !important;
+  }
+}
+
+/* ===== HEADER LOGO SIZE TUNE END ===== */
