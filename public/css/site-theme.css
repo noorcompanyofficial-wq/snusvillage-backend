@@ -915,3 +915,49 @@ main {
 }
 
 /* ===== HEADER LOGO SIZE TUNE END ===== */
+
+/* ===== COMPACT STANDARD FOOTER START ===== */
+
+.footer {
+  padding: 44px 20px 20px !important;
+  background: #f7f9ff !important;
+  color: var(--sv-text) !important;
+  border-top: 1px solid var(--sv-line) !important;
+}
+
+.footer-container {
+  max-width: 1120px !important;
+  gap: 28px !important;
+}
+
+.footer-logo {
+  width: 74px !important;
+  margin-bottom: 10px !important;
+}
+
+.footer-col h4 {
+  margin-bottom: 10px !important;
+  color: var(--sv-blue) !important;
+  font-size: 13px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.footer-col p,
+.footer-col a {
+  color: var(--sv-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.footer-col a {
+  margin-bottom: 6px !important;
+}
+
+.footer-bottom {
+  margin-top: 28px !important;
+  padding-top: 14px !important;
+  color: var(--sv-muted) !important;
+}
+
+/* ===== COMPACT STANDARD FOOTER END ===== */

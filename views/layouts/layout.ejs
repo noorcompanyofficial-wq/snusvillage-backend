@@ -71,11 +71,11 @@
 
     <main><%- body %></main>
 
-    <%- include('../partials/footer') %> <% if (typeof currentPath === "undefined" || currentPath !== "/cart") { %>
-  <% if (typeof currentPath === "undefined" || currentPath !== "/cart") { %>
-  <%- include("../partials/cart") %>
-<% } %>
-<% } %>
+    <%- include('../partials/footer') %>
+
+    <% if (typeof currentPath === "undefined" || currentPath !== "/cart") { %>
+      <%- include("../partials/cart") %>
+    <% } %>
 
     <script src="/js/main.js" defer></script>
     <script src="/js/shop.js" defer></script>
