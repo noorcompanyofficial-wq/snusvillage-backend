@@ -850,3 +850,33 @@ main {
     padding: 0 !important;
   }
 }
+
+/* ===== LEFT LOGO / CENTER NAV HEADER START ===== */
+
+@media (min-width: 1181px) {
+  .header .nav-container,
+  .nav-container {
+    grid-template-columns: minmax(250px, auto) minmax(0, 1fr) minmax(360px, auto) !important;
+  }
+
+  .header .logo {
+    order: 1 !important;
+    grid-column: 1 !important;
+    justify-self: start !important;
+  }
+
+  .header .nav-links {
+    order: 2 !important;
+    grid-column: 2 !important;
+    justify-self: center !important;
+    justify-content: center !important;
+  }
+
+  .header .header-tools {
+    order: 3 !important;
+    grid-column: 3 !important;
+    justify-self: end !important;
+  }
+}
+
+/* ===== LEFT LOGO / CENTER NAV HEADER END ===== */
