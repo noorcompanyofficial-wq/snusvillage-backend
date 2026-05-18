@@ -10,11 +10,12 @@ const exitBtn = document.getElementById("exitSite");
 
 if (new URLSearchParams(window.location.search).get("age") === "reset") {
   localStorage.removeItem("ageVerified");
+  sessionStorage.removeItem("ageVerified");
 }
 
 // check if already accepted
 if (ageModal) {
-  const isAgeVerified = localStorage.getItem("ageVerified") === "true";
+  const isAgeVerified = sessionStorage.getItem("ageVerified") === "true";
   ageModal.classList.toggle("is-visible", !isAgeVerified);
   ageModal.setAttribute("aria-hidden", isAgeVerified ? "true" : "false");
   document.body.classList.toggle("age-modal-open", !isAgeVerified);
@@ -22,7 +23,7 @@ if (ageModal) {
 
 // ENTER
 enterBtn?.addEventListener("click", () => {
-  localStorage.setItem("ageVerified", "true");
+  sessionStorage.setItem("ageVerified", "true");
   if (ageModal) {
     ageModal.classList.remove("is-visible");
     ageModal.setAttribute("aria-hidden", "true");
