@@ -48,14 +48,21 @@
     <!-- Web title -->
   </head>
   <body>
-    <div class="age-modal" id="ageModal">
-      <div class="age-box">
-        <h2>Age Verification</h2>
-        <p>You must be 18+ to enter this website</p>
+    <div class="age-modal" id="ageModal" aria-hidden="true">
+      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
+        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+        <span class="age-pill">18+ age restricted store</span>
+        <h2 id="ageModalTitle">Confirm your age</h2>
+        <p>Snus Village sells age-restricted products. Please confirm you are 18 or over to continue.</p>
+
+        <div class="age-points">
+          <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Adult customers only</span>
+          <span><i class="fa-solid fa-truck-fast" aria-hidden="true"></i> UK delivery support</span>
+        </div>
 
         <div class="age-buttons">
-          <button id="enterSite">I am over 18</button>
-          <button id="exitSite">I am under 18</button>
+          <button id="enterSite" type="button">I am 18 or over</button>
+          <button id="exitSite" type="button">I am under 18</button>
         </div>
       </div>
     </div>

@@ -259,14 +259,12 @@ main {
   color: var(--sv-text);
 }
 
-.age-box,
 .cookie-banner {
   border: 1px solid var(--sv-line);
   border-radius: 18px;
   box-shadow: var(--sv-shadow);
 }
 
-#enterSite,
 #acceptCookies {
   background: var(--sv-red);
 }

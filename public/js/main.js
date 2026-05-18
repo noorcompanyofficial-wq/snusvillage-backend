@@ -13,14 +13,21 @@ if (new URLSearchParams(window.location.search).get("age") === "reset") {
 }
 
 // check if already accepted
-if (ageModal && localStorage.getItem("ageVerified") === "true") {
-  ageModal.style.display = "none";
+if (ageModal) {
+  const isAgeVerified = localStorage.getItem("ageVerified") === "true";
+  ageModal.classList.toggle("is-visible", !isAgeVerified);
+  ageModal.setAttribute("aria-hidden", isAgeVerified ? "true" : "false");
+  document.body.classList.toggle("age-modal-open", !isAgeVerified);
 }
 
 // ENTER
 enterBtn?.addEventListener("click", () => {
   localStorage.setItem("ageVerified", "true");
-  if (ageModal) ageModal.style.display = "none";
+  if (ageModal) {
+    ageModal.classList.remove("is-visible");
+    ageModal.setAttribute("aria-hidden", "true");
+  }
+  document.body.classList.remove("age-modal-open");
 });
 
 const slides = document.querySelectorAll(".slide");
