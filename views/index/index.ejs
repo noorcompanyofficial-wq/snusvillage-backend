@@ -11,8 +11,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
     <link rel="stylesheet" href="/css/landing.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
   </head>
   <body>
     <div class="landing-age-modal" id="landingAgeModal">
@@ -675,63 +680,9 @@
         </section>
       </main>
 
-      <footer class="sv-natural-footer" id="footer">
-        <div class="container">
-          <div class="sv-natural-footer__top">
-            <div class="sv-natural-footer__brand">
-              <div class="brand">
-                <img class="brand__logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
-                <span class="brand__text">
-                  <strong>Snus Village</strong>
-                  <span>London's Premium Snus Store</span>
-                </span>
-              </div>
+    </div>
 
-              <p>
-                Premium Nicotine Pouch, Snus, And Vape Specialist With Trusted Brands, London Locations, Wholesale Support, And Fast UK Delivery.
-              </p>
-
-
-            </div>
-
-            <div class="sv-natural-footer__links">
-              <h4>Shop</h4>
-              <a href="/shop">All Products</a>
-              <a href="#bestsellers">Best Sellers</a>
-              <a href="#collections">Collections</a>
-              <a href="/wholesale">Wholesale</a>
-            </div>
-
-            <div class="sv-natural-footer__links">
-              <h4>Locations</h4>
-              <a href="#shops">Camden Town</a>
-              <a href="#shops">Oxford Street</a>
-              <a href="#shops">Edgware Road</a>
-              <a href="#shops">SVG Distro</a>
-            </div>
-
-            <div class="sv-natural-footer__links">
-              <h4>Contact</h4>
-              <a href="/shop?flavour=mint">Flavours</a>
-            <a href="/#reviews">Reviews</a>
-              <a href="mailto:hello@snusvillage.com">hello@snusvillage.com</a>
-              <a href="/terms-and-conditions">Terms & Conditions</a>
-              <a href="/privacy-policy">Privacy Policy</a>
-              <a href="/shipping-policy">Shipping Policy</a>
-              <a href="<%= svSocial.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">Instagram</a>
-            </div>
-          </div>
-
-          <div class="sv-natural-footer__warning">
-            Products On This Website Are Age Restricted And Intended Only For Customers Aged 18 Or Over.
-          </div>
-
-          <div class="sv-natural-footer__bottom">
-            <span>© 2026 Snus Village. All Rights Reserved.</span>
-            <span>Premium Brands • London Locations • Fast UK Delivery</span>
-          </div>
-        </div>
-      </footer>
+    <%- include("../partials/footer") %>
 
     <script src="/js/landing.js"></script>
   </body>
