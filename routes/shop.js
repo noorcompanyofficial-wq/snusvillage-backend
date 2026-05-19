@@ -59,6 +59,7 @@ router.get("/", async (req, res) => {
 
     const filter = {
       isActive: { $ne: false },
+      category: { $not: /^vapes?$/i },
     };
 
     if (brand) filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
