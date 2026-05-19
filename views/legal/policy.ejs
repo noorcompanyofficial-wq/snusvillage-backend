@@ -1,0 +1,67 @@
+<section class="legal-page">
+  <div class="legal-hero">
+    <span>Snus Village Legal</span>
+    <h1><%= page.title %></h1>
+    <p><%= page.intro %></p>
+  </div>
+
+  <div class="legal-shell">
+    <aside class="legal-summary">
+      <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+      <dl>
+        <div>
+          <dt>Business</dt>
+          <dd><%= company.businessName %></dd>
+        </div>
+        <div>
+          <dt>Legal company</dt>
+          <dd><%= company.legalName %></dd>
+        </div>
+        <div>
+          <dt>Company number</dt>
+          <dd><%= company.companyNumber %></dd>
+        </div>
+        <div>
+          <dt>Registered office</dt>
+          <dd><%= company.registeredOffice %></dd>
+        </div>
+        <div>
+          <dt>Customer service</dt>
+          <dd><a href="mailto:<%= company.email %>"><%= company.email %></a></dd>
+        </div>
+        <div>
+          <dt>Effective date</dt>
+          <dd><%= company.effectiveDate %></dd>
+        </div>
+      </dl>
+    </aside>
+
+    <article class="legal-content">
+      <% page.sections.forEach((section) => { %>
+        <section class="legal-section">
+          <h2><%= section.heading %></h2>
+
+          <% if (section.body) { %>
+            <% section.body.forEach((paragraph) => { %>
+              <p><%= paragraph %></p>
+            <% }) %>
+          <% } %>
+
+          <% if (section.list) { %>
+            <ul>
+              <% section.list.forEach((item) => { %>
+                <li><%= item %></li>
+              <% }) %>
+            </ul>
+          <% } %>
+
+          <% if (section.after) { %>
+            <% section.after.forEach((paragraph) => { %>
+              <p><%= paragraph %></p>
+            <% }) %>
+          <% } %>
+        </section>
+      <% }) %>
+    </article>
+  </div>
+</section>

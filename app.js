@@ -89,6 +89,7 @@ const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
 const verificationRoutes = require("./routes/verification");
 const diditRoutes = require("./routes/didit");
+const legalRoutes = require("./routes/legal");
 
 const wholesaleRoutes = require("./routes/wholesale");
 
@@ -212,6 +213,7 @@ app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api", verificationRoutes);
 app.use("/didit", diditRoutes);
+app.use("/", legalRoutes);
 
 app.use("/cart", cartRoutes);
 
