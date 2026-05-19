@@ -97,6 +97,41 @@ const distroImageSchema = new mongoose.Schema(
   { _id: false }
 );
 
+
+const locationCardSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,
+      default: "London Branch",
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    mapUrl: {
+      type: String,
+      default: "",
+    },
+    mapTitle: {
+      type: String,
+      default: "",
+    },
+    buttonText: {
+      type: String,
+      default: "Ask About Stock",
+    },
+    buttonLink: {
+      type: String,
+      default: "/contact",
+    },
+  },
+  { _id: false }
+);
+
 const homepageContentSchema = new mongoose.Schema(
   {
     key: {
@@ -244,6 +279,65 @@ const homepageContentSchema = new mongoose.Schema(
             linkUrl: "/collections/vapes",
             imageSrc: "",
             darkCard: true,
+          },
+        ],
+      },
+    },
+
+    locations: {
+      eyebrow: {
+        type: String,
+        default: "Location",
+      },
+      heading: {
+        type: String,
+        default: "Find Snus Village In London",
+      },
+      description: {
+        type: String,
+        default:
+          "Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions.",
+      },
+      buttonText: {
+        type: String,
+        default: "Contact Us",
+      },
+      buttonLink: {
+        type: String,
+        default: "/contact",
+      },
+      cards: {
+        type: [locationCardSchema],
+        default: [
+          {
+            label: "London Branch",
+            title: "Camden Town",
+            description:
+              "Central North London Access With A Strong Range Of Best-Selling Products.",
+            mapUrl: "https://www.google.com/maps?q=Camden+Town+London&output=embed",
+            mapTitle: "Camden Town",
+            buttonText: "Ask About Stock",
+            buttonLink: "/contact",
+          },
+          {
+            label: "London Branch",
+            title: "Oxford Street",
+            description:
+              "Easy Access For Shoppers Near One Of London’s Busiest Retail Destinations.",
+            mapUrl: "https://www.google.com/maps?q=Oxford+Street+London&output=embed",
+            mapTitle: "Oxford Street",
+            buttonText: "Ask About Stock",
+            buttonLink: "/contact",
+          },
+          {
+            label: "London Branch",
+            title: "Edgware Road",
+            description:
+              "Convenient West London Area For Quick Visits And Product Enquiries.",
+            mapUrl: "https://www.google.com/maps?q=Edgware+Road+London&output=embed",
+            mapTitle: "Edgware Road",
+            buttonText: "Ask About Stock",
+            buttonLink: "/contact",
           },
         ],
       },

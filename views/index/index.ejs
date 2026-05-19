@@ -351,47 +351,70 @@
           </section>
         <% } %>
 
+        <%
+          const svLocations = homepageContent?.locations || {};
+          const svLocationCards = svLocations.cards && svLocations.cards.length
+            ? svLocations.cards
+            : [
+                {
+                  label: "London Branch",
+                  title: "Camden Town",
+                  description: "Central North London Access With A Strong Range Of Best-Selling Products.",
+                  mapUrl: "https://www.google.com/maps?q=Camden+Town+London&output=embed",
+                  mapTitle: "Camden Town",
+                  buttonText: "Ask About Stock",
+                  buttonLink: "/contact",
+                },
+                {
+                  label: "London Branch",
+                  title: "Oxford Street",
+                  description: "Easy Access For Shoppers Near One Of London’s Busiest Retail Destinations.",
+                  mapUrl: "https://www.google.com/maps?q=Oxford+Street+London&output=embed",
+                  mapTitle: "Oxford Street",
+                  buttonText: "Ask About Stock",
+                  buttonLink: "/contact",
+                },
+                {
+                  label: "London Branch",
+                  title: "Edgware Road",
+                  description: "Convenient West London Area For Quick Visits And Product Enquiries.",
+                  mapUrl: "https://www.google.com/maps?q=Edgware+Road+London&output=embed",
+                  mapTitle: "Edgware Road",
+                  buttonText: "Ask About Stock",
+                  buttonLink: "/contact",
+                },
+              ];
+        %>
+
         <section class="section sv-locations-redesign" id="shops">
           <div class="container">
             <div class="section-head sv-section-head-pro">
               <div>
-                <span class="eyebrow dark">Location</span>
-                <h2>Find Snus Village In London</h2>
-                <p>Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions.</p>
+                <span class="eyebrow dark"><%= svLocations.eyebrow || "Location" %></span>
+                <h2><%= svLocations.heading || "Find Snus Village In London" %></h2>
+                <p><%= svLocations.description || "Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions." %></p>
               </div>
-              <a class="ghost-btn" href="/contact">Contact Us</a>
+              <a class="ghost-btn" href="<%= svLocations.buttonLink || '/contact' %>"><%= svLocations.buttonText || "Contact Us" %></a>
             </div>
 
             <div class="sv-location-grid">
-              <article class="sv-location-card">
-                <iframe class="sv-location-map" loading="lazy" src="https://www.google.com/maps?q=Camden+Town+London&output=embed" title="Camden Town"></iframe>
-                <div class="sv-location-body">
-                  <span>London Branch</span>
-                  <h3>Camden Town</h3>
-                  <p>Central North London Access With A Strong Range Of Best-Selling Products.</p>
-                  <a href="/contact">Ask About Stock</a>
-                </div>
-              </article>
+              <% svLocationCards.slice(0, 3).forEach((location) => { %>
+                <article class="sv-location-card">
+                  <iframe
+                    class="sv-location-map"
+                    loading="lazy"
+                    src="<%= location.mapUrl || 'https://www.google.com/maps?q=London&output=embed' %>"
+                    title="<%= location.mapTitle || location.title || 'Snus Village Location' %>"
+                  ></iframe>
 
-              <article class="sv-location-card">
-                <iframe class="sv-location-map" loading="lazy" src="https://www.google.com/maps?q=Oxford+Street+London&output=embed" title="Oxford Street"></iframe>
-                <div class="sv-location-body">
-                  <span>London Branch</span>
-                  <h3>Oxford Street</h3>
-                  <p>Easy Access For Shoppers Near One Of London’s Busiest Retail Destinations.</p>
-                  <a href="/contact">Ask About Stock</a>
-                </div>
-              </article>
-
-              <article class="sv-location-card">
-                <iframe class="sv-location-map" loading="lazy" src="https://www.google.com/maps?q=Edgware+Road+London&output=embed" title="Edgware Road"></iframe>
-                <div class="sv-location-body">
-                  <span>London Branch</span>
-                  <h3>Edgware Road</h3>
-                  <p>Convenient West London Area For Quick Visits And Product Enquiries.</p>
-                  <a href="/contact">Ask About Stock</a>
-                </div>
-              </article>
+                  <div class="sv-location-body">
+                    <span><%= location.label || "London Branch" %></span>
+                    <h3><%= location.title || "Snus Village" %></h3>
+                    <p><%= location.description || "" %></p>
+                    <a href="<%= location.buttonLink || '/contact' %>"><%= location.buttonText || "Ask About Stock" %></a>
+                  </div>
+                </article>
+              <% }) %>
             </div>
 
             <%

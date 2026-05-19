@@ -77,6 +77,39 @@
         },
       ];
 
+  const locations = homepageContent?.locations || {};
+  const locationCards = locations.cards && locations.cards.length
+    ? locations.cards
+    : [
+        {
+          label: "London Branch",
+          title: "Camden Town",
+          description: "Central North London Access With A Strong Range Of Best-Selling Products.",
+          mapUrl: "https://www.google.com/maps?q=Camden+Town+London&output=embed",
+          mapTitle: "Camden Town",
+          buttonText: "Ask About Stock",
+          buttonLink: "/contact",
+        },
+        {
+          label: "London Branch",
+          title: "Oxford Street",
+          description: "Easy Access For Shoppers Near One Of London’s Busiest Retail Destinations.",
+          mapUrl: "https://www.google.com/maps?q=Oxford+Street+London&output=embed",
+          mapTitle: "Oxford Street",
+          buttonText: "Ask About Stock",
+          buttonLink: "/contact",
+        },
+        {
+          label: "London Branch",
+          title: "Edgware Road",
+          description: "Convenient West London Area For Quick Visits And Product Enquiries.",
+          mapUrl: "https://www.google.com/maps?q=Edgware+Road+London&output=embed",
+          mapTitle: "Edgware Road",
+          buttonText: "Ask About Stock",
+          buttonLink: "/contact",
+        },
+      ];
+
   const social = homepageContent?.social || {};
   const slides = social.slides && social.slides.length
     ? social.slides
@@ -333,6 +366,99 @@
     <button class="admin-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
       Save Collections Section
+    </button>
+  </form>
+
+
+  <form class="admin-panel admin-homepage-form" action="/admin/homepage/locations" method="POST">
+    <div class="admin-panel__head">
+      <h2>Locations Section</h2>
+      <span>Homepage Branch Cards</span>
+    </div>
+
+    <div class="admin-homepage-grid">
+      <label>
+        Eyebrow
+        <input name="locationsEyebrow" value="<%= locations.eyebrow || 'Location' %>">
+      </label>
+
+      <label>
+        Heading
+        <input name="locationsHeading" value="<%= locations.heading || 'Find Snus Village In London' %>">
+      </label>
+
+      <label>
+        Button Text
+        <input name="locationsButtonText" value="<%= locations.buttonText || 'Contact Us' %>">
+      </label>
+
+      <label>
+        Button Link
+        <input name="locationsButtonLink" value="<%= locations.buttonLink || '/contact' %>">
+      </label>
+
+      <label class="is-wide">
+        Description
+        <textarea name="locationsDescription"><%= locations.description || 'Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions.' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-homepage-slides">
+      <% [0, 1, 2].forEach((index) => { %>
+        <% const location = locationCards[index] || {}; %>
+
+        <div class="admin-homepage-slide-card">
+          <div class="admin-homepage-slide-head">
+            <strong>Location Card <%= index + 1 %></strong>
+            <span>Homepage Branch Tile</span>
+          </div>
+
+          <label>
+            Label
+            <input name="locationLabel<%= index + 1 %>" value="<%= location.label || 'London Branch' %>">
+          </label>
+
+          <label>
+            Title
+            <input name="locationTitle<%= index + 1 %>" value="<%= location.title || '' %>">
+          </label>
+
+          <label class="is-wide">
+            Description
+            <textarea name="locationDescription<%= index + 1 %>"><%= location.description || '' %></textarea>
+          </label>
+
+          <label class="is-wide">
+            Google Map Embed URL
+            <input name="locationMapUrl<%= index + 1 %>" value="<%= location.mapUrl || '' %>" placeholder="https://www.google.com/maps?q=Camden+Town+London&output=embed">
+          </label>
+
+          <label>
+            Map Title
+            <input name="locationMapTitle<%= index + 1 %>" value="<%= location.mapTitle || location.title || '' %>">
+          </label>
+
+          <label>
+            Button Text
+            <input name="locationButtonText<%= index + 1 %>" value="<%= location.buttonText || 'Ask About Stock' %>">
+          </label>
+
+          <label>
+            Button Link
+            <input name="locationButtonLink<%= index + 1 %>" value="<%= location.buttonLink || '/contact' %>">
+          </label>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="admin-homepage-help">
+      <strong>Map URL Example:</strong>
+      <span>https://www.google.com/maps?q=Camden+Town+London&output=embed</span>
+    </div>
+
+    <button class="admin-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Locations Section
     </button>
   </form>
 

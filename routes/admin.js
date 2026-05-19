@@ -388,6 +388,52 @@ router.post(
 );
 
 
+
+router.post(
+  "/homepage/locations",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  async (req, res) => {
+    try {
+      const body = req.body || {};
+
+      const cards = [1, 2, 3].map((number) => ({
+        label: String(body[`locationLabel${number}`] || "").trim(),
+        title: String(body[`locationTitle${number}`] || "").trim(),
+        description: String(body[`locationDescription${number}`] || "").trim(),
+        mapUrl: String(body[`locationMapUrl${number}`] || "").trim(),
+        mapTitle: String(body[`locationMapTitle${number}`] || "").trim(),
+        buttonText: String(body[`locationButtonText${number}`] || "").trim(),
+        buttonLink: String(body[`locationButtonLink${number}`] || "").trim(),
+      }));
+
+      await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        {
+          $set: {
+            key: "homepage",
+            "locations.eyebrow": String(body.locationsEyebrow || "").trim(),
+            "locations.heading": String(body.locationsHeading || "").trim(),
+            "locations.description": String(body.locationsDescription || "").trim(),
+            "locations.buttonText": String(body.locationsButtonText || "").trim(),
+            "locations.buttonLink": String(body.locationsButtonLink || "").trim(),
+            "locations.cards": cards,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      req.flash("success", "Homepage locations section updated");
+      res.redirect("/admin/homepage");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to update homepage locations section: " + err.message);
+      res.redirect("/admin/homepage");
+    }
+  }
+);
+
+
 router.post(
   "/homepage/social",
   isAdmin,
