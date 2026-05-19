@@ -144,57 +144,83 @@
           </div>
         </section>
 
-<section class="section sv-collections-redesign" id="collections">
+<%
+          const svCollections = homepageContent?.collections || {};
+          const svCollectionCards = svCollections.cards && svCollections.cards.length
+            ? svCollections.cards
+            : [
+                {
+                  number: "01",
+                  title: "Mint Favourites",
+                  text: "Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.",
+                  linkText: "Shop Mint",
+                  linkUrl: "/shop?flavour=mint",
+                  imageSrc: "/images/social/s-1.jpeg",
+                  darkCard: false,
+                },
+                {
+                  number: "02",
+                  title: "Strong Selections",
+                  text: "Higher Strength Products For Adult Customers Who Know Exactly What They Want.",
+                  linkText: "Shop Strong",
+                  linkUrl: "/shop?strength=STRONG",
+                  imageSrc: "/images/social/s-6.jpeg",
+                  darkCard: false,
+                },
+                {
+                  number: "03",
+                  title: "Fruity Flavours",
+                  text: "Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.",
+                  linkText: "Shop Flavours",
+                  linkUrl: "/shop",
+                  imageSrc: "/images/social/s-10.jpeg",
+                  darkCard: false,
+                },
+                {
+                  number: "04",
+                  title: "Vape Range",
+                  text: "Explore Vape Products, New Arrivals, And Fast-Moving Stock From Snus Village.",
+                  linkText: "Shop Vape",
+                  linkUrl: "/collections/vapes",
+                  imageSrc: "",
+                  darkCard: true,
+                },
+              ];
+        %>
+
+        <section class="section sv-collections-redesign" id="collections">
           <div class="container">
             <div class="section-head sv-section-head-pro">
               <div>
-                <span class="eyebrow dark">Collections</span>
-                <h2>Shop By Strength, Flavour, And Brand</h2>
-                <p>Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference.</p>
+                <span class="eyebrow dark"><%= svCollections.eyebrow || "Collections" %></span>
+                <h2><%= svCollections.heading || "Shop By Strength, Flavour, And Brand" %></h2>
+                <p><%= svCollections.description || "Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference." %></p>
               </div>
-              <a class="ghost-btn" href="/shop">Open Shop</a>
+              <a class="ghost-btn" href="<%= svCollections.buttonLink || '/shop' %>"><%= svCollections.buttonText || "Open Shop" %></a>
             </div>
 
             <div class="sv-collection-grid-pro">
-              <article class="sv-collection-card-pro sv-collection-card-pro--large" style="--bg-image:url('/images/social/s-1.jpeg');">
-                <div class="sv-collection-card-pro__shade"></div>
-                <div class="sv-collection-card-pro__content">
-                  <span class="sv-collection-number">01</span>
-                  <h3>Mint Favourites</h3>
-                  <p>Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.</p>
-                  <a class="sv-collection-link" href="/shop">Shop Mint</a>
-                </div>
-              </article>
+              <% svCollectionCards.slice(0, 4).forEach((card, index) => { %>
+                <article
+                  class="sv-collection-card-pro <%= index === 0 ? 'sv-collection-card-pro--large' : '' %> <%= card.darkCard ? 'sv-collection-card-pro--dark' : '' %>"
+                  <% if (!card.darkCard) { %>
+                    style="--bg-image:url('<%= card.imageSrc || '/images/social/s-1.jpeg' %>');"
+                  <% } %>
+                >
+                  <% if (card.darkCard) { %>
+                    <div class="sv-collection-card-pro__glow"></div>
+                  <% } else { %>
+                    <div class="sv-collection-card-pro__shade"></div>
+                  <% } %>
 
-              <article class="sv-collection-card-pro" style="--bg-image:url('/images/social/s-6.jpeg');">
-                <div class="sv-collection-card-pro__shade"></div>
-                <div class="sv-collection-card-pro__content">
-                  <span class="sv-collection-number">02</span>
-                  <h3>Strong Selections</h3>
-                  <p>Higher Strength Products For Adult Customers Who Know Exactly What They Want.</p>
-                  <a class="sv-collection-link" href="/shop">Shop Strong</a>
-                </div>
-              </article>
-
-              <article class="sv-collection-card-pro" style="--bg-image:url('/images/social/s-10.jpeg');">
-                <div class="sv-collection-card-pro__shade"></div>
-                <div class="sv-collection-card-pro__content">
-                  <span class="sv-collection-number">03</span>
-                  <h3>Fruity Flavours</h3>
-                  <p>Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.</p>
-                  <a class="sv-collection-link" href="/shop">Shop Flavours</a>
-                </div>
-              </article>
-
-              <article class="sv-collection-card-pro sv-collection-card-pro--dark">
-                <div class="sv-collection-card-pro__glow"></div>
-                <div class="sv-collection-card-pro__content">
-                  <span class="sv-collection-number">04</span>
-                  <h3>Vape Range</h3>
-                  <p>Explore Vape Products, New Arrivals, And Fast-Moving Stock From Snus Village.</p>
-                  <a class="sv-collection-link" href="/shop">Shop Vape</a>
-                </div>
-              </article>
+                  <div class="sv-collection-card-pro__content">
+                    <span class="sv-collection-number"><%= card.number || ('0' + (index + 1)) %></span>
+                    <h3><%= card.title || 'Collection' %></h3>
+                    <p><%= card.text || '' %></p>
+                    <a class="sv-collection-link" href="<%= card.linkUrl || '/shop' %>"><%= card.linkText || 'Open' %></a>
+                  </div>
+                </article>
+              <% }) %>
             </div>
           </div>
         </section>

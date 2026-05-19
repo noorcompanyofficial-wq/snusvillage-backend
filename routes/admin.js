@@ -319,6 +319,75 @@ router.post(
 );
 
 
+
+router.post(
+  "/homepage/collections",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  upload.fields([
+    { name: "collectionImage1", maxCount: 1 },
+    { name: "collectionImage2", maxCount: 1 },
+    { name: "collectionImage3", maxCount: 1 },
+    { name: "collectionImage4", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      const body = req.body || {};
+      const files = req.files || {};
+
+      async function imagePath(fieldName, fallbackPath) {
+        const file = files?.[fieldName]?.[0];
+
+        if (!file) {
+          return String(fallbackPath || "").trim();
+        }
+
+        const [storedPath] = await storeProductImages([file]);
+        return storedPath || String(fallbackPath || "").trim();
+      }
+
+      const cards = await Promise.all(
+        [1, 2, 3, 4].map(async (number) => ({
+          number: String(body[`collectionNumber${number}`] || "").trim(),
+          title: String(body[`collectionTitle${number}`] || "").trim(),
+          text: String(body[`collectionText${number}`] || "").trim(),
+          linkText: String(body[`collectionLinkText${number}`] || "").trim(),
+          linkUrl: String(body[`collectionLinkUrl${number}`] || "").trim(),
+          imageSrc: await imagePath(
+            `collectionImage${number}`,
+            body[`collectionImageSrc${number}`]
+          ),
+          darkCard: body[`collectionDarkCard${number}`] === "on",
+        }))
+      );
+
+      await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        {
+          $set: {
+            key: "homepage",
+            "collections.eyebrow": String(body.collectionsEyebrow || "").trim(),
+            "collections.heading": String(body.collectionsHeading || "").trim(),
+            "collections.description": String(body.collectionsDescription || "").trim(),
+            "collections.buttonText": String(body.collectionsButtonText || "").trim(),
+            "collections.buttonLink": String(body.collectionsButtonLink || "").trim(),
+            "collections.cards": cards,
+          },
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      req.flash("success", "Homepage collections section updated");
+      res.redirect("/admin/homepage");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to update homepage collections section: " + err.message);
+      res.redirect("/admin/homepage");
+    }
+  }
+);
+
+
 router.post(
   "/homepage/social",
   isAdmin,

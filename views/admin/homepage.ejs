@@ -35,6 +35,48 @@
         { imageSrc: "/images/delivery/delivery.jpg", alt: "SVG Distro Location Image 3" },
       ];
 
+  const collections = homepageContent?.collections || {};
+  const collectionCards = collections.cards && collections.cards.length
+    ? collections.cards
+    : [
+        {
+          number: "01",
+          title: "Mint Favourites",
+          text: "Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.",
+          linkText: "Shop Mint",
+          linkUrl: "/shop?flavour=mint",
+          imageSrc: "/images/social/s-1.jpeg",
+          darkCard: false,
+        },
+        {
+          number: "02",
+          title: "Strong Selections",
+          text: "Higher Strength Products For Adult Customers Who Know Exactly What They Want.",
+          linkText: "Shop Strong",
+          linkUrl: "/shop?strength=STRONG",
+          imageSrc: "/images/social/s-6.jpeg",
+          darkCard: false,
+        },
+        {
+          number: "03",
+          title: "Fruity Flavours",
+          text: "Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.",
+          linkText: "Shop Flavours",
+          linkUrl: "/shop",
+          imageSrc: "/images/social/s-10.jpeg",
+          darkCard: false,
+        },
+        {
+          number: "04",
+          title: "Vape Range",
+          text: "Explore Vape Products, New Arrivals, And Fast-Moving Stock From Snus Village.",
+          linkText: "Shop Vape",
+          linkUrl: "/collections/vapes",
+          imageSrc: "",
+          darkCard: true,
+        },
+      ];
+
   const social = homepageContent?.social || {};
   const slides = social.slides && social.slides.length
     ? social.slides
@@ -198,6 +240,99 @@
     <button class="admin-primary" type="submit">
       <i class="fa-solid fa-floppy-disk"></i>
       Save Hero And Distro
+    </button>
+  </form>
+
+
+  <form class="admin-panel admin-homepage-form" action="/admin/homepage/collections" method="POST" enctype="multipart/form-data">
+    <div class="admin-panel__head">
+      <h2>Collections Section</h2>
+      <span>Homepage Collection Cards</span>
+    </div>
+
+    <div class="admin-homepage-grid">
+      <label>
+        Eyebrow
+        <input name="collectionsEyebrow" value="<%= collections.eyebrow || 'Collections' %>">
+      </label>
+
+      <label>
+        Heading
+        <input name="collectionsHeading" value="<%= collections.heading || 'Shop By Strength, Flavour, And Brand' %>">
+      </label>
+
+      <label>
+        Button Text
+        <input name="collectionsButtonText" value="<%= collections.buttonText || 'Open Shop' %>">
+      </label>
+
+      <label>
+        Button Link
+        <input name="collectionsButtonLink" value="<%= collections.buttonLink || '/shop' %>">
+      </label>
+
+      <label class="is-wide">
+        Description
+        <textarea name="collectionsDescription"><%= collections.description || 'Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference.' %></textarea>
+      </label>
+    </div>
+
+    <div class="admin-homepage-slides">
+      <% [0, 1, 2, 3].forEach((index) => { %>
+        <% const card = collectionCards[index] || {}; %>
+
+        <div class="admin-homepage-slide-card">
+          <div class="admin-homepage-slide-head">
+            <strong>Collection Card <%= index + 1 %></strong>
+            <span>Homepage Collection Tile</span>
+          </div>
+
+          <label>
+            Number
+            <input name="collectionNumber<%= index + 1 %>" value="<%= card.number || ('0' + (index + 1)) %>">
+          </label>
+
+          <label>
+            Title
+            <input name="collectionTitle<%= index + 1 %>" value="<%= card.title || '' %>">
+          </label>
+
+          <label class="is-wide">
+            Text
+            <textarea name="collectionText<%= index + 1 %>"><%= card.text || '' %></textarea>
+          </label>
+
+          <label>
+            Link Text
+            <input name="collectionLinkText<%= index + 1 %>" value="<%= card.linkText || '' %>">
+          </label>
+
+          <label>
+            Link URL
+            <input name="collectionLinkUrl<%= index + 1 %>" value="<%= card.linkUrl || '' %>">
+          </label>
+
+          <label>
+            Current Image Path
+            <input name="collectionImageSrc<%= index + 1 %>" value="<%= card.imageSrc || '' %>" placeholder="/images/social/s-1.jpeg">
+          </label>
+
+          <label>
+            Upload New Image
+            <input type="file" name="collectionImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
+          </label>
+
+          <label>
+            Dark Card Style
+            <input type="checkbox" name="collectionDarkCard<%= index + 1 %>" <%= card.darkCard ? "checked" : "" %>>
+          </label>
+        </div>
+      <% }) %>
+    </div>
+
+    <button class="admin-primary" type="submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Save Collections Section
     </button>
   </form>
 

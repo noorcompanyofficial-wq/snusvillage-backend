@@ -26,6 +26,41 @@ const heroSlideSchema = new mongoose.Schema(
   { _id: false }
 );
 
+
+const collectionCardSchema = new mongoose.Schema(
+  {
+    number: {
+      type: String,
+      default: "",
+    },
+    title: {
+      type: String,
+      default: "",
+    },
+    text: {
+      type: String,
+      default: "",
+    },
+    linkText: {
+      type: String,
+      default: "",
+    },
+    linkUrl: {
+      type: String,
+      default: "",
+    },
+    imageSrc: {
+      type: String,
+      default: "",
+    },
+    darkCard: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
+);
+
 const socialSlideSchema = new mongoose.Schema(
   {
     videoSrc: {
@@ -144,6 +179,71 @@ const homepageContentSchema = new mongoose.Schema(
           {
             imageSrc: "/images/delivery/delivery.jpg",
             alt: "SVG Distro Location Image 3",
+          },
+        ],
+      },
+    },
+
+    collections: {
+      eyebrow: {
+        type: String,
+        default: "Collections",
+      },
+      heading: {
+        type: String,
+        default: "Shop By Strength, Flavour, And Brand",
+      },
+      description: {
+        type: String,
+        default:
+          "Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference.",
+      },
+      buttonText: {
+        type: String,
+        default: "Open Shop",
+      },
+      buttonLink: {
+        type: String,
+        default: "/shop",
+      },
+      cards: {
+        type: [collectionCardSchema],
+        default: [
+          {
+            number: "01",
+            title: "Mint Favourites",
+            text: "Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.",
+            linkText: "Shop Mint",
+            linkUrl: "/shop?flavour=mint",
+            imageSrc: "/images/social/s-1.jpeg",
+            darkCard: false,
+          },
+          {
+            number: "02",
+            title: "Strong Selections",
+            text: "Higher Strength Products For Adult Customers Who Know Exactly What They Want.",
+            linkText: "Shop Strong",
+            linkUrl: "/shop?strength=STRONG",
+            imageSrc: "/images/social/s-6.jpeg",
+            darkCard: false,
+          },
+          {
+            number: "03",
+            title: "Fruity Flavours",
+            text: "Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.",
+            linkText: "Shop Flavours",
+            linkUrl: "/shop",
+            imageSrc: "/images/social/s-10.jpeg",
+            darkCard: false,
+          },
+          {
+            number: "04",
+            title: "Vape Range",
+            text: "Explore Vape Products, New Arrivals, And Fast-Moving Stock From Snus Village.",
+            linkText: "Shop Vape",
+            linkUrl: "/collections/vapes",
+            imageSrc: "",
+            darkCard: true,
           },
         ],
       },
