@@ -5,13 +5,19 @@
     <p><%= page.intro %></p>
 
     <div class="customer-service-actions">
-      <a href="mailto:<%= page.email %>">
-        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-        <span><%= page.email %></span>
-      </a>
-      <a href="/contact">
+      <a href="/contact" class="customer-service-action customer-service-action--primary">
         <i class="fa-solid fa-message" aria-hidden="true"></i>
-        <span>Contact Form</span>
+        <span>
+          <small>Send a message</small>
+          <strong>Contact Form</strong>
+        </span>
+      </a>
+      <a href="mailto:<%= page.email %>" class="customer-service-action">
+        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+        <span>
+          <small>Email us</small>
+          <strong><%= page.email %></strong>
+        </span>
       </a>
     </div>
   </div>
