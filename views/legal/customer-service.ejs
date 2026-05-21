@@ -1,0 +1,55 @@
+<section class="customer-service-page">
+  <div class="customer-service-hero">
+    <span>Customer Service</span>
+    <h1>How can we help?</h1>
+    <p><%= page.intro %></p>
+
+    <div class="customer-service-actions">
+      <a href="mailto:<%= page.email %>">
+        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+        <span><%= page.email %></span>
+      </a>
+      <a href="/contact">
+        <i class="fa-solid fa-message" aria-hidden="true"></i>
+        <span>Contact form</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="customer-service-cards">
+    <% page.cards.forEach((card) => { %>
+      <a href="<%= card.href %>" class="customer-service-card">
+        <i class="fa-solid <%= card.icon %>" aria-hidden="true"></i>
+        <strong><%= card.title %></strong>
+        <span><%= card.text %></span>
+      </a>
+    <% }) %>
+  </div>
+
+  <div class="customer-service-layout">
+    <aside class="customer-service-nav">
+      <strong>FAQ Categories</strong>
+      <% page.sections.forEach((section) => { %>
+        <a href="#<%= section.id %>"><%= section.title %></a>
+      <% }) %>
+    </aside>
+
+    <div class="customer-service-faq">
+      <% page.sections.forEach((section) => { %>
+        <section id="<%= section.id %>" class="faq-group">
+          <h2><%= section.title %></h2>
+
+          <% section.items.forEach((item, index) => { %>
+            <details class="faq-item" <%= index === 0 ? "open" : "" %>>
+              <summary>
+                <span><%= item.question %></span>
+                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+              </summary>
+              <p><%= item.answer %></p>
+            </details>
+          <% }) %>
+        </section>
+      <% }) %>
+    </div>
+  </div>
+</section>

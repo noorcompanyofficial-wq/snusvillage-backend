@@ -418,6 +418,153 @@ const pages = {
   },
 };
 
+const customerServiceFaq = {
+  title: "Customer Service",
+  intro:
+    "Find quick answers about orders, delivery, age verification, returns and support for Snus Village customers.",
+  email: company.email,
+  cards: [
+    {
+      icon: "fa-box-open",
+      title: "Orders",
+      text: "Order confirmations, changes and missing order emails.",
+      href: "#orders",
+    },
+    {
+      icon: "fa-truck-fast",
+      title: "Delivery",
+      text: "Royal Mail tracking, missed delivery and delivery address help.",
+      href: "#delivery",
+    },
+    {
+      icon: "fa-id-card",
+      title: "Age Checks",
+      text: "18+ verification and checkout approval support.",
+      href: "#age-verification",
+    },
+    {
+      icon: "fa-rotate-left",
+      title: "Returns",
+      text: "Damaged, incorrect or return request guidance.",
+      href: "#returns",
+    },
+  ],
+  sections: [
+    {
+      id: "orders",
+      title: "Orders & Payments",
+      items: [
+        {
+          question: "Where is my order confirmation?",
+          answer:
+            "Order confirmations are sent to the email address used at checkout. Check your spam or junk folder first. If it still has not arrived, email hello@snusvillage.com with your name, order email and approximate order time.",
+        },
+        {
+          question: "Can I change or cancel my order?",
+          answer:
+            "Email us as soon as possible. We process orders quickly, so changes are not guaranteed once an order has been packed, dispatched or handed to Royal Mail.",
+        },
+        {
+          question: "Why did my payment fail?",
+          answer:
+            "Payments are handled through SumUp. A payment may fail because of bank checks, incorrect card details, insufficient funds or fraud-prevention review. If money appears reserved, your bank or payment provider normally releases it automatically if the payment was not completed.",
+        },
+      ],
+    },
+    {
+      id: "delivery",
+      title: "Delivery & Tracking",
+      items: [
+        {
+          question: "How do I track my parcel?",
+          answer:
+            "Where tracking is available, tracking details are sent by email or shown in your account/order updates. Follow Royal Mail instructions for redelivery, collection or delivery changes.",
+        },
+        {
+          question: "What if my parcel is late?",
+          answer:
+            "Delivery estimates can be affected by Royal Mail delays, bank holidays, weather, strikes, address issues, payment review or age verification. If tracking has not updated for a while, contact us with your order number and tracking reference.",
+        },
+        {
+          question: "I entered the wrong delivery address. What should I do?",
+          answer:
+            "Email hello@snusvillage.com immediately. If the parcel has already been dispatched, we may not be able to change the address. Returned parcels may have delivery, return or handling costs deducted where permitted.",
+        },
+      ],
+    },
+    {
+      id: "age-verification",
+      title: "Age Verification",
+      items: [
+        {
+          question: "Why do I need to verify my age?",
+          answer:
+            "Snus Village sells age-restricted products for adult customers only. We may use Didit to confirm that customers are aged 18 or over before checkout, dispatch or delivery.",
+        },
+        {
+          question: "What happens if verification fails?",
+          answer:
+            "If verification is incomplete or fails, we may refuse access, pause checkout, cancel an order, request further information or refund eligible payment to the original payment method.",
+        },
+        {
+          question: "Do you store my full ID document?",
+          answer:
+            "We aim to store only the verification outcome and limited audit information needed for compliance, fraud prevention and legal record-keeping. Didit may process verification information directly as part of its verification flow.",
+        },
+      ],
+    },
+    {
+      id: "returns",
+      title: "Returns, Damaged & Incorrect Items",
+      items: [
+        {
+          question: "Can I return a product?",
+          answer:
+            "Some returns may be limited because nicotine products can be sealed, consumable, hygiene-sensitive or age-restricted. Email us before returning anything. Products should be unopened, unused, sealed where applicable and in resaleable condition unless faulty or incorrect.",
+        },
+        {
+          question: "My item arrived damaged. What should I send?",
+          answer:
+            "Email hello@snusvillage.com with your order number, photos of the outer packaging, photos of the damaged product and a short description. Please keep the packaging until we confirm the next step.",
+        },
+        {
+          question: "I received the wrong item. What now?",
+          answer:
+            "Contact us as soon as possible with your order number, photos of the item received and details of what you ordered. If the error is confirmed, we may offer a replacement, refund or another appropriate solution.",
+        },
+      ],
+    },
+    {
+      id: "account",
+      title: "Account & Support",
+      items: [
+        {
+          question: "I cannot log in to my account.",
+          answer:
+            "Use the login page to reset your password if available. If you still cannot access your account, email hello@snusvillage.com from the email address linked to the account.",
+        },
+        {
+          question: "How do I contact customer service?",
+          answer:
+            "Email hello@snusvillage.com or use the contact form. Include your order number, account email and any screenshots or photos that help explain the issue.",
+        },
+      ],
+    },
+  ],
+};
+
+router.get("/customer-service", (req, res) => {
+  res.render("legal/customer-service", {
+    title: "Customer Service",
+    page: customerServiceFaq,
+    company,
+  });
+});
+
+router.get("/faq", (req, res) => {
+  res.redirect("/customer-service");
+});
+
 Object.entries(pages).forEach(([path, page]) => {
   router.get(path, (req, res) => {
     res.render("legal/policy", {
