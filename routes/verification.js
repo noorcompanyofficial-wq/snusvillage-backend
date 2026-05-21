@@ -73,7 +73,7 @@ async function applyDiditDecision(event) {
     return null;
   }
 
-  return User.findByIdAndUpdate(event.vendor_data, { $set: update }, { new: true });
+  return User.findByIdAndUpdate(event.vendor_data, { $set: update }, { returnDocument: "after" });
 }
 
 router.post("/session", isAuth, async (req, res, next) => {

@@ -217,7 +217,7 @@ router.get("/homepage", isAdmin, requireAdminRole(PERMISSIONS.website), async (r
       homepageContent = await HomepageContent.findOneAndUpdate(
         { key: "homepage" },
         { $setOnInsert: { key: "homepage" } },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       ).lean();
     }
 
@@ -305,7 +305,7 @@ router.post(
             "distro.images": distroImages,
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       );
 
       req.flash("success", "Homepage hero and SVG Distro section updated");
@@ -374,7 +374,7 @@ router.post(
             "collections.cards": cards,
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       );
 
       req.flash("success", "Homepage collections section updated");
@@ -420,7 +420,7 @@ router.post(
             "locations.cards": cards,
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       );
 
       req.flash("success", "Homepage locations section updated");
@@ -498,7 +498,7 @@ router.post(
             slides,
           },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       );
 
       req.flash("success", "Homepage social section updated");
@@ -1233,7 +1233,7 @@ router.get("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (r
         ? await StoreSettings.findOneAndUpdate(
             { key: "store" },
             { $setOnInsert: { key: "store" } },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
+            { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
           ).lean()
         : null;
 
@@ -1269,7 +1269,7 @@ router.post("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (
         maintenanceMode: req.body.maintenanceMode === "on",
         maintenanceMessage: String(req.body.maintenanceMessage || "").trim(),
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     );
 
     req.flash("success", "Store settings updated");

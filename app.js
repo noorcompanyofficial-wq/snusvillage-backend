@@ -49,7 +49,7 @@ async function getCachedStoreSettings() {
     const settings = await StoreSettings.findOneAndUpdate(
       { key: "store" },
       { $setOnInsert: { key: "store", ...defaultStoreSettings } },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     ).lean();
 
     cachedStoreSettings = settings || defaultStoreSettings;

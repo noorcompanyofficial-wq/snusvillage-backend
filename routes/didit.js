@@ -70,7 +70,7 @@ async function markLoggedInUserFromDecision(req, decision) {
     update["didit.declinedAt"] = new Date();
   }
 
-  const user = await User.findByIdAndUpdate(userId, { $set: update }, { new: true });
+  const user = await User.findByIdAndUpdate(userId, { $set: update }, { returnDocument: "after" });
   if (user) req.session.user = user;
   return user;
 }
