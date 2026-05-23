@@ -170,6 +170,70 @@
     </div>
   </section>
 
+  <section class="admin-bulk-price-panel">
+    <div class="admin-products-filter-head">
+      <div>
+        <h2>Quick Price Change</h2>
+        <p>
+          Update prices for every product matching the current filters.
+          This will affect <strong><%= filteredTotal || 0 %></strong>
+          product<%= Number(filteredTotal || 0) === 1 ? "" : "s" %>.
+        </p>
+      </div>
+    </div>
+
+    <form class="admin-bulk-price-form" action="/admin/products/bulk-prices" method="POST">
+      <input type="hidden" name="search" value="<%= query.search || '' %>">
+      <input type="hidden" name="brand" value="<%= query.brand || '' %>">
+      <input type="hidden" name="strength" value="<%= query.strength || '' %>">
+      <input type="hidden" name="sort" value="<%= query.sort || '' %>">
+      <input type="hidden" name="stock" value="<%= query.stock || '' %>">
+      <input type="hidden" name="visibility" value="<%= query.visibility || '' %>">
+      <input type="hidden" name="featured" value="<%= query.featured || '' %>">
+      <input type="hidden" name="bestSeller" value="<%= query.bestSeller || '' %>">
+      <input type="hidden" name="saleBadge" value="<%= query.saleBadge || '' %>">
+
+      <label>
+        Field
+        <select name="priceField">
+          <option value="price">Main Price</option>
+          <option value="discountPrice">Discount Price</option>
+        </select>
+      </label>
+
+      <label>
+        Action
+        <select name="updateMode">
+          <option value="set">Set to exact amount</option>
+          <option value="increase-percent">Increase by %</option>
+          <option value="decrease-percent">Decrease by %</option>
+          <option value="increase-fixed">Increase by £</option>
+          <option value="decrease-fixed">Decrease by £</option>
+          <option value="clear-discount">Clear discount price</option>
+        </select>
+      </label>
+
+      <label>
+        Value
+        <input type="number" name="updateValue" min="0" step="0.01" placeholder="3.99 or 10">
+      </label>
+
+      <label>
+        Confirm
+        <input type="text" name="confirmText" placeholder="Type UPDATE">
+      </label>
+
+      <button type="submit">
+        <i class="fa-solid fa-bolt"></i>
+        Apply Price Change
+      </button>
+    </form>
+
+    <p class="admin-bulk-price-note">
+      Tip: filter by brand, strength, stock or best seller first. The update applies to all matching products, not only the products visible on this page.
+    </p>
+  </section>
+
   <% if (!products || products.length === 0) { %>
     <div class="admin-empty-state">
       <h2>No Products Found</h2>

@@ -582,3 +582,86 @@
 }
 
 /* ===== ADMIN PRODUCT EXTRA TAGS END ===== */
+
+/* ===== ADMIN BULK PRICE TOOL START ===== */
+.admin-bulk-price-panel {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(180, 18, 50, 0.16);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(180, 18, 50, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff, #f8fafc);
+  box-shadow: 0 14px 38px rgba(9, 31, 77, 0.08);
+}
+
+.admin-bulk-price-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 14px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+.admin-bulk-price-form label {
+  display: grid;
+  gap: 7px;
+  color: #123b8a;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-bulk-price-form select,
+.admin-bulk-price-form input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 0 13px;
+  color: #061633;
+  font: inherit;
+  font-weight: 800;
+}
+
+.admin-bulk-price-form button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 18px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123b8a, #b41232);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.admin-bulk-price-note {
+  margin: 14px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1180px) {
+  .admin-bulk-price-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-bulk-price-form button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .admin-bulk-price-form {
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== ADMIN BULK PRICE TOOL END ===== */

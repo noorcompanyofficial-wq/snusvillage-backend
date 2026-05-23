@@ -75,6 +75,87 @@ function csvCell(value) {
   return '"' + text.replace(/"/g, '""') + '"';
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildAdminProductFilter(source = {}) {
+  const filter = {};
+  const search = String(source.search || "").trim();
+
+  if (search) {
+    const searchRegex = new RegExp(escapeRegExp(search), "i");
+
+    filter.$or = [
+      { name: searchRegex },
+      { brand: searchRegex },
+      { flavour: searchRegex },
+      { nicotine: searchRegex },
+      { category: searchRegex },
+      { sku: searchRegex },
+      { barcode: searchRegex },
+      { supplier: searchRegex },
+      { supplierCode: searchRegex },
+      { description: searchRegex },
+    ];
+  }
+
+  if (source.brand && source.brand !== "") {
+    const cleanBrand = String(source.brand).toLowerCase().replace(/\s+/g, "");
+
+    filter.$expr = {
+      $regexMatch: {
+        input: {
+          $replaceAll: {
+            input: { $toLower: "$brand" },
+            find: " ",
+            replacement: "",
+          },
+        },
+        regex: cleanBrand,
+      },
+    };
+  }
+
+  if (source.strength && source.strength !== "") {
+    filter.strength = source.strength;
+  }
+
+  if (source.stock === "in") {
+    filter.stock = { $gt: 0 };
+  }
+
+  if (source.stock === "out") {
+    filter.stock = 0;
+  }
+
+  if (source.visibility === "active") {
+    filter.isActive = { $ne: false };
+  }
+
+  if (source.visibility === "hidden") {
+    filter.isActive = false;
+  }
+
+  if (source.featured === "yes") {
+    filter.isFeatured = true;
+  }
+
+  if (source.bestSeller === "yes") {
+    filter.isBestSeller = true;
+  }
+
+  if (source.saleBadge === "yes") {
+    filter.showSaleBadge = true;
+  }
+
+  return filter;
+}
+
+function roundMoney(value) {
+  return Math.round(Number(value || 0) * 100) / 100;
+}
+
 function orderItemsText(order) {
   return (order.items || [])
     .map((item) => `${item.quantity} x ${item.name} (£${Number(item.price || 0).toFixed(2)})`)
@@ -2169,76 +2250,7 @@ router.get("/products", isAdmin, requireAdminRole(PERMISSIONS.products), async (
     const limit = 8;
 
     // ===== FILTERS =====
-    const filter = {};
-    const search = String(req.query.search || "").trim();
-
-    if (search) {
-      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const searchRegex = new RegExp(safeSearch, "i");
-
-      filter.$or = [
-        { name: searchRegex },
-        { brand: searchRegex },
-        { flavour: searchRegex },
-        { nicotine: searchRegex },
-        { category: searchRegex },
-        { sku: searchRegex },
-        { barcode: searchRegex },
-        { supplier: searchRegex },
-        { supplierCode: searchRegex },
-        { description: searchRegex },
-      ];
-    }
-
-    // BRAND FILTER
-    if (req.query.brand && req.query.brand !== "") {
-      const cleanBrand = String(req.query.brand).toLowerCase().replace(/\s+/g, "");
-
-      filter.$expr = {
-        $regexMatch: {
-          input: {
-            $replaceAll: {
-              input: { $toLower: "$brand" },
-              find: " ",
-              replacement: "",
-            },
-          },
-          regex: cleanBrand,
-        },
-      };
-    }
-
-    if (req.query.strength && req.query.strength !== "") {
-      filter.strength = req.query.strength;
-    }
-
-    if (req.query.stock === "in") {
-      filter.stock = { $gt: 0 };
-    }
-
-    if (req.query.stock === "out") {
-      filter.stock = 0;
-    }
-
-    if (req.query.visibility === "active") {
-      filter.isActive = { $ne: false };
-    }
-
-    if (req.query.visibility === "hidden") {
-      filter.isActive = false;
-    }
-
-    if (req.query.featured === "yes") {
-      filter.isFeatured = true;
-    }
-
-    if (req.query.bestSeller === "yes") {
-      filter.isBestSeller = true;
-    }
-
-    if (req.query.saleBadge === "yes") {
-      filter.showSaleBadge = true;
-    }
+    const filter = buildAdminProductFilter(req.query);
 
     let sort = { createdAt: -1 };
 
@@ -2281,12 +2293,125 @@ router.get("/products", isAdmin, requireAdminRole(PERMISSIONS.products), async (
       hiddenProducts,
       featuredProducts,
       bestSellerProducts,
+      filteredTotal: total,
 
       query: req.query,
     });
   } catch (err) {
     console.log(err);
     res.send("Error loading products");
+  }
+});
+
+router.post("/products/bulk-prices", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
+  const backToProducts = () => {
+    const params = new URLSearchParams();
+    [
+      "search",
+      "brand",
+      "strength",
+      "sort",
+      "stock",
+      "visibility",
+      "featured",
+      "bestSeller",
+      "saleBadge",
+    ].forEach((key) => {
+      if (req.body[key]) params.set(key, req.body[key]);
+    });
+
+    return "/admin/products" + (params.toString() ? "?" + params.toString() : "");
+  };
+
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      req.flash("error", "Database is not connected. Bulk price update was not applied.");
+      return res.redirect(backToProducts());
+    }
+
+    const confirmText = String(req.body.confirmText || "").trim().toUpperCase();
+    if (confirmText !== "UPDATE") {
+      req.flash("error", "Type UPDATE to confirm the bulk price change.");
+      return res.redirect(backToProducts());
+    }
+
+    const priceField = req.body.priceField === "discountPrice" ? "discountPrice" : "price";
+    const updateMode = String(req.body.updateMode || "");
+    const updateValue = Number(req.body.updateValue);
+
+    if (!["set", "increase-percent", "decrease-percent", "increase-fixed", "decrease-fixed", "clear-discount"].includes(updateMode)) {
+      req.flash("error", "Choose a valid bulk price action.");
+      return res.redirect(backToProducts());
+    }
+
+    if (updateMode !== "clear-discount" && (!Number.isFinite(updateValue) || updateValue < 0)) {
+      req.flash("error", "Enter a valid positive price value.");
+      return res.redirect(backToProducts());
+    }
+
+    if (updateMode === "clear-discount" && priceField !== "discountPrice") {
+      req.flash("error", "Clear discount can only be used with Discount Price.");
+      return res.redirect(backToProducts());
+    }
+
+    const filter = buildAdminProductFilter(req.body);
+    const products = await Product.find(filter).select("_id name brand price discountPrice").lean();
+
+    if (!products.length) {
+      req.flash("error", "No matching products found for bulk price update.");
+      return res.redirect(backToProducts());
+    }
+
+    const operations = products.map((product) => {
+      const current = Number(product[priceField] || 0);
+      let nextValue = current;
+
+      if (updateMode === "set") nextValue = updateValue;
+      if (updateMode === "increase-percent") nextValue = current * (1 + updateValue / 100);
+      if (updateMode === "decrease-percent") nextValue = current * (1 - updateValue / 100);
+      if (updateMode === "increase-fixed") nextValue = current + updateValue;
+      if (updateMode === "decrease-fixed") nextValue = current - updateValue;
+      if (updateMode === "clear-discount") nextValue = 0;
+
+      nextValue = Math.max(0, roundMoney(nextValue));
+
+      return {
+        updateOne: {
+          filter: { _id: product._id },
+          update: { $set: { [priceField]: nextValue } },
+        },
+      };
+    });
+
+    await Product.bulkWrite(operations);
+
+    await logAdminAction(req, "PRODUCT_BULK_PRICE_UPDATED", {
+      targetType: "Product",
+      summary: `Bulk updated ${products.length} product ${priceField}`,
+      meta: {
+        productCount: products.length,
+        priceField,
+        updateMode,
+        updateValue: Number.isFinite(updateValue) ? updateValue : null,
+        filters: {
+          search: req.body.search || "",
+          brand: req.body.brand || "",
+          strength: req.body.strength || "",
+          stock: req.body.stock || "",
+          visibility: req.body.visibility || "",
+          featured: req.body.featured || "",
+          bestSeller: req.body.bestSeller || "",
+          saleBadge: req.body.saleBadge || "",
+        },
+      },
+    });
+
+    req.flash("success", `Updated ${products.length} product${products.length === 1 ? "" : "s"}.`);
+    res.redirect(backToProducts());
+  } catch (err) {
+    console.log("Bulk price update failed:", err);
+    req.flash("error", "Unable to apply bulk price update.");
+    res.redirect(backToProducts());
   }
 });
 
