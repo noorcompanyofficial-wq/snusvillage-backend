@@ -1,4 +1,11 @@
-<div class="checkout-page">
+<div
+  class="checkout-page"
+  data-subtotal="<%= subtotal.toFixed(2) %>"
+  data-shipping="<%= shipping.toFixed(2) %>"
+  data-total="<%= total.toFixed(2) %>"
+  data-free-shipping-threshold="<%= typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10 %>"
+  data-standard-shipping-fee="<%= typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99 %>"
+>
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
@@ -136,8 +143,18 @@
 
     <div class="checkout-total-row">
       <span>Shipping</span>
-      <strong><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
+      <strong id="checkoutShippingAmount"><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
     </div>
+
+    <% if (typeof freeShippingThreshold !== "undefined") { %>
+      <div class="checkout-free-shipping-note">
+        <% if (subtotal >= freeShippingThreshold) { %>
+          You qualify for free delivery.
+        <% } else { %>
+          Spend £<%= (freeShippingThreshold - subtotal).toFixed(2) %> more to get free delivery.
+        <% } %>
+      </div>
+    <% } %>
 
     <% if (discountAmount && discountAmount > 0) { %>
       <div class="checkout-total-row checkout-discount-total">
@@ -146,20 +163,66 @@
       </div>
     <% } %>
 
+    <div class="checkout-free-shipping-note" id="checkoutShippingNote">
+      <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
+        You qualify for free delivery.
+      <% } else { %>
+        Spend £<%= ((typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10) - subtotal).toFixed(2) %> more to get free delivery.
+      <% } %>
+    </div>
+
     <div class="checkout-grand-total">
       <span>Total</span>
-      <strong>£<%= total.toFixed(2) %></strong>
+      <strong id="checkoutGrandTotal">£<%= total.toFixed(2) %></strong>
     </div>
   </aside>
 </div>
 
 <script>
   (function () {
+    const checkoutPage = document.querySelector(".checkout-page");
     const deliveryFields = document.getElementById("deliveryFields");
     const collectNotice = document.getElementById("clickCollectNotice");
     const radios = document.querySelectorAll('input[name="fulfilmentMethod"]');
     const cards = document.querySelectorAll("[data-fulfilment-card]");
     const deliveryInputs = deliveryFields ? deliveryFields.querySelectorAll("input, select") : [];
+
+    const shippingAmount = document.getElementById("checkoutShippingAmount");
+    const grandTotal = document.getElementById("checkoutGrandTotal");
+    const shippingNote = document.getElementById("checkoutShippingNote");
+
+    const subtotal = Number(checkoutPage?.dataset.subtotal || 0);
+    const freeShippingThreshold = Number(checkoutPage?.dataset.freeShippingThreshold || 10);
+    const standardShippingFee = Number(checkoutPage?.dataset.standardShippingFee || 1.99);
+
+    function formatMoney(value) {
+      return "£" + Number(value || 0).toFixed(2);
+    }
+
+    function updateShipping(selected) {
+      const isCollect = selected === "click_collect";
+      const shipping = isCollect || subtotal >= freeShippingThreshold ? 0 : standardShippingFee;
+      const total = subtotal + shipping;
+
+      if (shippingAmount) {
+        shippingAmount.textContent = shipping === 0 ? "Free" : formatMoney(shipping);
+      }
+
+      if (grandTotal) {
+        grandTotal.textContent = formatMoney(total);
+      }
+
+      if (shippingNote) {
+        if (isCollect) {
+          shippingNote.textContent = "Click & Collect is free.";
+        } else if (subtotal >= freeShippingThreshold) {
+          shippingNote.textContent = "You qualify for free delivery.";
+        } else {
+          shippingNote.textContent =
+            "Spend " + formatMoney(freeShippingThreshold - subtotal) + " more to get free delivery.";
+        }
+      }
+    }
 
     function updateFulfilment() {
       const selected = document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery";
@@ -184,6 +247,8 @@
       cards.forEach((card) => {
         card.classList.toggle("is-active", card.dataset.fulfilmentCard === selected);
       });
+
+      updateShipping(selected);
     }
 
     radios.forEach((radio) => {

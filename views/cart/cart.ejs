@@ -72,7 +72,15 @@
 
         <div class="summary-row">
           <span>Delivery</span>
-          <strong>Calculated at checkout</strong>
+          <strong><%= subtotal >= 10 ? "Free" : "£1.99 under £10" %></strong>
+        </div>
+
+        <div class="cart-free-shipping-note">
+          <% if (subtotal >= 10) { %>
+            You qualify for free delivery.
+          <% } else { %>
+            Spend £<%= (10 - subtotal).toFixed(2) %> more to get free delivery.
+          <% } %>
         </div>
 
         <div class="summary-total">

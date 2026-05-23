@@ -79,25 +79,37 @@ async function getCart(req) {
   }).populate("items.product");
 }
 
-function calculateCartTotals(cart, settings = defaultCheckoutSettings, fulfilmentMethod = "delivery") {
+function getFreeShippingThreshold() {
+  return Number(process.env.FREE_SHIPPING_THRESHOLD || 10);
+}
+
+function getStandardShippingFee() {
+  return Number(process.env.STANDARD_SHIPPING_FEE || 1.99);
+}
+
+function calculateCartTotals(cart, fulfilmentMethod = "delivery") {
   const subtotal = cart.items.reduce((sum, item) => {
     const price = item.priceAtTime || item.product?.price || 0;
     return sum + price * item.quantity;
   }, 0);
 
-  let shipping = Number(settings.deliveryPrice || 0);
+  const freeShippingThreshold = getFreeShippingThreshold();
+  const standardShippingFee = getStandardShippingFee();
 
-  if (fulfilmentMethod === "click_collect") {
-    shipping = 0;
-  }
-
-  if (Number(settings.freeDeliveryThreshold || 0) > 0 && subtotal >= Number(settings.freeDeliveryThreshold || 0)) {
-    shipping = 0;
-  }
+  const shipping =
+    fulfilmentMethod === "click_collect" || subtotal >= freeShippingThreshold
+      ? 0
+      : standardShippingFee;
 
   const total = subtotal + shipping;
 
-  return { subtotal, shipping, total };
+  return {
+    subtotal,
+    shipping,
+    total,
+    freeShippingThreshold,
+    standardShippingFee,
+  };
 }
 
 function productMatchesDiscount(item, discount) {
