@@ -416,6 +416,152 @@ const pages = {
       },
     ],
   },
+  "/cookies-policy": {
+    title: "Cookies Policy",
+    effectiveDate: "23 May 2026",
+    intro:
+      "This Cookies Policy explains how Snus Village uses cookies and similar technologies on its website.",
+    sections: [
+      {
+        heading: "1. About this Cookies Policy",
+        body: [
+          "This Cookies Policy explains what cookies are, which types of cookies we may use, why we use them, how third parties may use cookies through our website, and how customers can manage their cookie preferences.",
+          "For the purposes of this policy, we, us and our refer to X London Group Ltd, trading as Snus Village. You and your refer to the person visiting or using our website.",
+          "Cookies and similar technologies may include cookies, pixels, tags, scripts, local storage, session storage, device identifiers and similar technologies that store information on, or access information from, your device.",
+        ],
+      },
+      {
+        heading: "2. What are cookies?",
+        body: [
+          "A cookie is a small text file placed on your computer, smartphone, tablet or other device when you visit a website. Cookies allow a website to recognise a device, remember actions or preferences, support security, operate shopping baskets and understand how the website is used.",
+          "Cookies can be session cookies, which usually expire when you close your browser, or persistent cookies, which remain on your device for a set period unless deleted earlier.",
+          "Cookies can also be first-party cookies, set by the website you are visiting, or third-party cookies, set by other organisations whose services are used on the website.",
+        ],
+      },
+      {
+        heading: "3. Why we use cookies",
+        body: [
+          "We may use cookies and similar technologies to operate our website, keep the website secure, support account login, maintain basket and checkout functionality, remember age-gate and cookie choices, process payments, support age verification, analyse website performance, improve customer experience and, where permitted, support marketing or advertising.",
+          "Because Snus Village sells age-restricted nicotine products, some cookies or similar technologies may be used to help support age-gating, age-verification journeys, fraud prevention and compliance controls.",
+        ],
+      },
+      {
+        heading: "4. Types of cookies we may use",
+        list: [
+          "Strictly necessary cookies are required for the website to work properly. They may be used for security, fraud prevention, basket functionality, checkout, account login, payment processing, age-gate functionality, cookie preference storage and other essential services requested by the user.",
+          "Functional cookies help us remember choices you make, such as region, age-gate status, preferred settings or other website preferences.",
+          "Analytics and performance cookies help us understand how visitors use our website, such as which pages are visited, how users move around the site, which products are viewed, and whether errors occur.",
+          "Marketing and advertising cookies may be used to measure marketing performance, understand campaign effectiveness, show relevant content or help us improve our communications.",
+        ],
+        after: [
+          "Where required by law, we will ask for your consent before setting non-essential analytics, marketing, advertising or functional cookies.",
+        ],
+      },
+      {
+        heading: "5. Third-party services",
+        body: [
+          "We use trusted third-party service providers to help operate our website and services. These providers may set or use cookies or similar technologies where necessary for their services.",
+        ],
+        list: [
+          "Didit is used for age verification and compliance checks.",
+          "SumUp is used as a payment gateway and to support secure payment processing.",
+          "Royal Mail is used as a delivery service and to support order fulfilment, delivery updates and tracking where applicable.",
+        ],
+        after: [
+          "Third-party providers may process information in accordance with their own privacy notices, cookie policies and legal obligations. We recommend reviewing their policies where relevant.",
+        ],
+      },
+      {
+        heading: "6. Age verification cookies and similar technologies",
+        body: [
+          "We use Didit as our age verification provider. When you use our website, Didit or related verification tools may use cookies, scripts, redirects, local storage or similar technologies to support age verification, security, fraud prevention, identity checks and compliance records.",
+          "Age verification is important because our products are intended only for adults aged 18 or over. If age verification technologies are blocked, disabled or unavailable, you may not be able to access certain parts of the website or complete an order.",
+        ],
+      },
+      {
+        heading: "7. Payment and checkout cookies",
+        body: [
+          "We use SumUp as our payment gateway. SumUp and related checkout technologies may use cookies or similar technologies to process payments securely, detect fraud, prevent misuse, maintain transaction security and complete the checkout process.",
+          "Payment and security cookies may be strictly necessary for completing a purchase and protecting customers and our business.",
+        ],
+      },
+      {
+        heading: "8. Delivery and tracking technologies",
+        body: [
+          "We use Royal Mail as our delivery service. Where tracking links, delivery updates or fulfilment tools are used, cookies or similar technologies may be used by Royal Mail or related delivery systems when you access their websites, tracking pages or services.",
+          "Royal Mail may apply its own privacy and cookie terms when you use its tracking or delivery services.",
+        ],
+      },
+      {
+        heading: "9. Cookie consent",
+        body: [
+          "Under UK cookie rules, we must tell users when cookies or similar technologies are used, clearly explain what they do and why, and obtain consent for non-essential cookies unless an exemption applies.",
+          "We do not require consent for cookies that are strictly necessary to provide the website or service requested by you, such as basket, checkout, security, payment, age-gate or cookie preference cookies.",
+          "For non-essential cookies, such as certain analytics, functional, marketing or advertising cookies, we will seek consent where required. Consent should be given by a clear positive action, such as selecting preferences or clicking an acceptance button.",
+        ],
+      },
+      {
+        heading: "10. Managing your cookie preferences",
+        body: [
+          "You can manage your cookie preferences through the cookie banner or cookie settings tool on our website where available.",
+          "You may also control cookies through your browser settings. Most browsers allow you to block cookies, delete cookies, or receive alerts before cookies are stored.",
+          "If you block or delete cookies, some parts of our website may not work properly. For example, your basket, checkout, account login, age-gate, payment process or cookie choices may not be remembered.",
+        ],
+      },
+      {
+        heading: "11. Withdrawing or changing consent",
+        body: [
+          "Where we rely on consent for non-essential cookies, you can withdraw or change your consent at any time using the cookie preference tool on our website, if available, or by adjusting your browser settings.",
+          "Withdrawing consent does not affect the lawfulness of cookies used before consent was withdrawn.",
+        ],
+      },
+      {
+        heading: "12. Cookie duration",
+        body: [
+          "The duration of cookies varies. Some cookies are deleted when you close your browser, while others remain for a defined period unless you delete them earlier.",
+          "Where possible, we aim to keep cookies for no longer than necessary for the relevant purpose. Specific cookie durations may be listed in the cookie banner, preference centre or cookie table on our website.",
+        ],
+      },
+      {
+        heading: "13. Cookie table",
+        list: [
+          "Strictly necessary cookies: website security, age-gate, account login, shopping basket, checkout, payment flow, fraud prevention and cookie preference storage. These are usually session cookies or retained for up to 12 months depending on function, and consent is not normally required where strictly necessary.",
+          "Age verification cookies: Didit age verification, identity checks, age assurance, compliance and anti-fraud controls. Duration is determined by Didit and our compliance settings.",
+          "Payment cookies: SumUp checkout, payment security, transaction processing, fraud prevention and payment authentication. Duration is determined by SumUp and payment/security settings.",
+          "Delivery or tracking cookies: Royal Mail delivery tools, tracking pages and fulfilment-related services. Duration is determined by Royal Mail or related tools.",
+          "Functional cookies: remembering preferences and improving website usability. Consent may be required where they are not strictly necessary.",
+          "Analytics or performance cookies: understanding website visits, page performance, errors, popular products and customer journeys. Consent is required unless a valid exemption applies.",
+          "Marketing or advertising cookies: campaign measurement, advertising performance, retargeting or personalised marketing where used. Consent is required.",
+        ],
+      },
+      {
+        heading: "14. Similar technologies",
+        body: [
+          "In addition to cookies, we may use similar technologies such as pixels, tags, scripts, local storage, session storage, server logs and device identifiers. These technologies can perform similar functions to cookies, including security, fraud prevention, analytics, age verification, payment support and marketing measurement.",
+          "Where UK cookie rules apply to these technologies, we will treat them in the same way as cookies.",
+        ],
+      },
+      {
+        heading: "15. Do Not Track and browser controls",
+        body: [
+          "Some browsers offer Do Not Track or similar settings. There is not always a consistent industry standard for how websites should respond to these signals. We will honour legally required consent choices made through our cookie tools, browser settings or other supported controls where technically possible.",
+        ],
+      },
+      {
+        heading: "16. Updates to this Cookies Policy",
+        body: [
+          "We may update this Cookies Policy from time to time to reflect changes to our website, cookies, service providers, technology, legal requirements or business operations.",
+          "The latest version will be published on our website with the effective date shown at the top.",
+        ],
+      },
+      {
+        heading: "17. Contact us",
+        body: [
+          "If you have questions about this Cookies Policy or how we use cookies and similar technologies, contact us at hello@snusvillage.com.",
+        ],
+      },
+    ],
+  },
 };
 
 const customerServiceFaq = {
