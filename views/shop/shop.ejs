@@ -52,6 +52,17 @@
         >
       </div>
 
+      <div class="shop-filter-box">
+        <label for="shopFlavour">Flavour</label>
+        <input
+          id="shopFlavour"
+          type="text"
+          name="flavour"
+          value="<%= query?.flavour || '' %>"
+          placeholder="Mint, Pineapple, Berry..."
+        >
+      </div>
+
       <div class="shop-filter-actions">
         <button type="submit">Filter</button>
         <a href="/shop">Reset</a>

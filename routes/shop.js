@@ -7,6 +7,64 @@ function escapeRegex(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const flavourKeywordGroups = {
+  berry: ["berry", "berries", "blueberry", "raspberry", "strawberry", "blackberry", "blackcurrant"],
+  berries: ["berry", "berries", "blueberry", "raspberry", "strawberry", "blackberry", "blackcurrant"],
+  fruit: [
+    "apple",
+    "banana",
+    "berry",
+    "berries",
+    "blackcurrant",
+    "blueberry",
+    "cherry",
+    "grape",
+    "kiwi",
+    "lemon",
+    "lime",
+    "mango",
+    "melon",
+    "orange",
+    "peach",
+    "pineapple",
+    "raspberry",
+    "strawberry",
+    "watermelon",
+  ],
+  tropical: ["banana", "kiwi", "mango", "melon", "peach", "pineapple", "watermelon"],
+  mint: ["mint", "menthol", "peppermint", "spearmint", "cool", "ice", "icy", "frost"],
+  "ice mint": ["ice", "icy", "mint", "menthol", "cool", "frost"],
+};
+
+function getFlavourKeywords(value) {
+  const normalised = String(value || "").trim().toLowerCase();
+  if (!normalised) return [];
+
+  return Array.from(
+    new Set([
+      normalised,
+      normalised.replace(/s$/, ""),
+      ...(flavourKeywordGroups[normalised] || []),
+    ].filter(Boolean))
+  );
+}
+
+function buildFlavourFilter(value) {
+  const keywords = getFlavourKeywords(value);
+
+  if (!keywords.length) return null;
+
+  return {
+    $or: keywords.flatMap((keyword) => {
+      const regex = { $regex: escapeRegex(keyword), $options: "i" };
+      return [
+        { flavour: regex },
+        { name: regex },
+      ];
+    }),
+  };
+}
+
 function toTitleCase(value) {
   return String(value || "Other")
     .trim()
@@ -62,17 +120,27 @@ router.get("/", async (req, res) => {
       category: { $not: /^vapes?$/i },
     };
 
+    const advancedFilters = [];
+
     if (brand) filter.brand = { $regex: `^${escapeRegex(brand)}$`, $options: "i" };
     if (strength) filter.strength = { $regex: `^${escapeRegex(strength)}$`, $options: "i" };
-    if (flavour) filter.flavour = { $regex: `^${escapeRegex(flavour)}$`, $options: "i" };
+    if (flavour) {
+      advancedFilters.push(buildFlavourFilter(flavour));
+    }
 
     if (search) {
-      filter.$or = [
-        { name: { $regex: escapeRegex(search), $options: "i" } },
-        { brand: { $regex: escapeRegex(search), $options: "i" } },
-        { flavour: { $regex: escapeRegex(search), $options: "i" } },
-        { description: { $regex: escapeRegex(search), $options: "i" } },
-      ];
+      advancedFilters.push({
+        $or: [
+          { name: { $regex: escapeRegex(search), $options: "i" } },
+          { brand: { $regex: escapeRegex(search), $options: "i" } },
+          { flavour: { $regex: escapeRegex(search), $options: "i" } },
+          { description: { $regex: escapeRegex(search), $options: "i" } },
+        ],
+      });
+    }
+
+    if (advancedFilters.length) {
+      filter.$and = advancedFilters;
     }
 
     const products = await Product.find(filter).sort({
