@@ -2,8 +2,8 @@
   <div class="admin-page-head">
     <div>
       <span>Analytics</span>
-      <h1>Sales Analytics</h1>
-      <p>Track revenue, orders, best-selling products, best-selling brands, and recent paid order performance.</p>
+      <h1>Sales & Website Analytics</h1>
+      <p>Track revenue, orders, website viewership, popular pages, and recent paid order performance.</p>
     </div>
 
     <div class="admin-head-actions">
@@ -60,6 +60,34 @@
       <strong>£<%= Number(stats.averageOrderValue || 0).toFixed(2) %></strong>
       <small>Average Paid Order Value</small>
     </a>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-eye"></i>
+      <span>Today's Views</span>
+      <strong><%= stats.todayPageViews || 0 %></strong>
+      <small>Public Website Page Views</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-users-viewfinder"></i>
+      <span>7-Day Visitors</span>
+      <strong><%= stats.sevenDayUniqueVisitors || 0 %></strong>
+      <small>Unique Website Visitors</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-chart-simple"></i>
+      <span>7-Day Views</span>
+      <strong><%= stats.sevenDayPageViews || 0 %></strong>
+      <small>Total Public Page Views</small>
+    </div>
+
+    <div class="admin-analytics-card">
+      <i class="fa-solid fa-user-clock"></i>
+      <span>Today's Visitors</span>
+      <strong><%= stats.todayUniqueVisitors || 0 %></strong>
+      <small>Unique Visitors Today</small>
+    </div>
   </div>
 
   <div class="admin-sales-grid">
@@ -113,6 +141,66 @@
           <p>No paid orders found yet.</p>
         <% } %>
       </div>
+    </section>
+  </div>
+
+  <div class="admin-sales-grid">
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Website Views Last 7 Days</h2>
+        <span>Public Pages Only</span>
+      </div>
+
+      <% if (pageViewsByDay && pageViewsByDay.length) { %>
+        <div class="admin-revenue-bars admin-view-bars">
+          <% const maxViews = Math.max(...pageViewsByDay.map(day => Number(day.views || 0)), 1); %>
+
+          <% pageViewsByDay.forEach((day) => { %>
+            <% const barHeight = Math.max(8, Math.round((Number(day.views || 0) / maxViews) * 120)); %>
+
+            <div class="admin-revenue-day">
+              <div class="admin-revenue-bar-wrap">
+                <span class="admin-revenue-bar" style="height:<%= barHeight %>px"></span>
+              </div>
+              <strong><%= Number(day.views || 0) %></strong>
+              <small><%= day._id.slice(5) %></small>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="admin-empty-small">
+          <p>No website view data yet.</p>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Popular Pages</h2>
+        <span>Last 7 Days</span>
+      </div>
+
+      <% if (popularPages && popularPages.length) { %>
+        <div class="admin-rank-list">
+          <% popularPages.forEach((page, index) => { %>
+            <div class="admin-rank-item admin-rank-item--brand">
+              <span><%= index + 1 %></span>
+              <div>
+                <strong><%= page._id || "/" %></strong>
+                <small><%= page.uniqueVisitors || 0 %> Unique Visitor<%= Number(page.uniqueVisitors || 0) === 1 ? "" : "s" %></small>
+              </div>
+              <div>
+                <strong><%= page.views || 0 %></strong>
+                <small>Views</small>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="admin-empty-small">
+          <p>No popular page data yet.</p>
+        </div>
+      <% } %>
     </section>
   </div>
 

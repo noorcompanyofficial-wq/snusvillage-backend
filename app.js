@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const StoreSettings = require("./models/StoreSettings");
+const pageViewTracker = require("./middleware/pageViewTracker");
 
 require("dotenv").config();
 
@@ -135,6 +136,9 @@ app.use(cartSession);
 
 // ====== Flash ======
 app.use(flash());
+
+// ====== Website View Analytics ======
+app.use(pageViewTracker);
 
 // ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {

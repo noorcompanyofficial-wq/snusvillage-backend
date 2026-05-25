@@ -12,6 +12,7 @@ const WholesaleApplication = require("../models/WholesaleApplication");
 const Trader = require("../models/Trader");
 const Contact = require("../models/contact");
 const SearchAnalytics = require("../models/SearchAnalytics");
+const PageView = require("../models/PageView");
 const HomepageContent = require("../models/HomepageContent");
 const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
@@ -822,11 +823,18 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
           paidOrders: 0,
           failedPayments: 0,
           averageOrderValue: 0,
+          todayPageViews: 0,
+          sevenDayPageViews: 0,
+          todayUniqueVisitors: 0,
+          sevenDayUniqueVisitors: 0,
         },
         revenueByDay: [],
+        pageViewsByDay: [],
         bestProducts: [],
         bestBrands: [],
         recentPaidOrders: [],
+        popularPages: [],
+        recentPageViews: [],
       });
     }
 
@@ -844,6 +852,13 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
       revenueAgg,
       todayRevenueAgg,
       revenueByDay,
+      pageViewsByDay,
+      popularPages,
+      recentPageViews,
+      todayPageViews,
+      sevenDayPageViews,
+      todayUniqueVisitors,
+      sevenDayUniqueVisitors,
       bestProducts,
       bestBrands,
       recentPaidOrders,
@@ -899,6 +914,75 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
         },
         { $sort: { _id: 1 } },
       ]),
+
+      PageView.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: sevenDaysAgo },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$createdAt",
+              },
+            },
+            views: { $sum: 1 },
+            visitors: { $addToSet: "$visitorId" },
+          },
+        },
+        {
+          $project: {
+            views: 1,
+            uniqueVisitors: { $size: "$visitors" },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+
+      PageView.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: sevenDaysAgo },
+          },
+        },
+        {
+          $group: {
+            _id: "$path",
+            views: { $sum: 1 },
+            uniqueVisitors: { $addToSet: "$visitorId" },
+            lastViewedAt: { $max: "$createdAt" },
+          },
+        },
+        {
+          $project: {
+            views: 1,
+            uniqueVisitors: { $size: "$uniqueVisitors" },
+            lastViewedAt: 1,
+          },
+        },
+        { $sort: { views: -1, uniqueVisitors: -1 } },
+        { $limit: 10 },
+      ]),
+
+      PageView.find()
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean(),
+
+      PageView.countDocuments({ createdAt: { $gte: todayStart } }),
+
+      PageView.countDocuments({ createdAt: { $gte: sevenDaysAgo } }),
+
+      PageView.distinct("visitorId", {
+        createdAt: { $gte: todayStart },
+      }).then((visitors) => visitors.filter(Boolean).length),
+
+      PageView.distinct("visitorId", {
+        createdAt: { $gte: sevenDaysAgo },
+      }).then((visitors) => visitors.filter(Boolean).length),
 
       Order.aggregate([
         { $match: { paymentStatus: "paid" } },
@@ -958,8 +1042,15 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
         paidOrders,
         failedPayments,
         averageOrderValue,
+        todayPageViews,
+        sevenDayPageViews,
+        todayUniqueVisitors,
+        sevenDayUniqueVisitors,
       },
       revenueByDay,
+      pageViewsByDay,
+      popularPages,
+      recentPageViews,
       bestProducts,
       bestBrands,
       recentPaidOrders,
