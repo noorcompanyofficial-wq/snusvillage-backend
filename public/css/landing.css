@@ -2706,6 +2706,54 @@ input {
 
 /* ===== COLLECTION SECTION BALANCE FIX END ===== */
 
+/* ===== MOBILE COLLECTION CAROUSEL START ===== */
+@media (max-width: 760px) {
+  .sv-collections-redesign {
+    overflow: hidden !important;
+  }
+
+  .sv-collection-grid-pro {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 14px !important;
+    margin-right: calc(50% - 50vw) !important;
+    margin-left: calc(50% - 50vw) !important;
+    padding: 2px 18px 18px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-padding-left: 18px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .sv-collection-grid-pro::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sv-collection-card-pro,
+  .sv-collection-card-pro--large {
+    flex: 0 0 min(86vw, 390px) !important;
+    width: min(86vw, 390px) !important;
+    min-height: 355px !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    scroll-snap-align: start !important;
+  }
+
+  .sv-collection-card-pro__content {
+    right: 18px !important;
+    bottom: 20px !important;
+    left: 18px !important;
+  }
+
+  .sv-collection-card-pro h3,
+  .sv-collection-card-pro--large h3 {
+    font-size: clamp(2rem, 10vw, 3rem) !important;
+  }
+}
+/* ===== MOBILE COLLECTION CAROUSEL END ===== */
+
 
 /* ===== SNUS VILLAGE BESTSELLERS REDESIGN START ===== */
 
@@ -3208,6 +3256,47 @@ input {
     min-height: 260px;
   }
 }
+
+/* ===== MOBILE LOCATION CAROUSEL START ===== */
+@media (max-width: 760px) {
+  .sv-locations-redesign {
+    overflow: hidden !important;
+  }
+
+  .sv-location-grid {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 14px !important;
+    margin-right: calc(50% - 50vw) !important;
+    margin-left: calc(50% - 50vw) !important;
+    padding: 2px 18px 18px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-padding-left: 18px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .sv-location-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sv-location-card {
+    flex: 0 0 min(86vw, 390px) !important;
+    width: min(86vw, 390px) !important;
+    scroll-snap-align: start !important;
+  }
+
+  .sv-location-map {
+    height: 215px !important;
+  }
+
+  .sv-location-body {
+    padding: 18px !important;
+  }
+}
+/* ===== MOBILE LOCATION CAROUSEL END ===== */
 
 /* ===== SNUS VILLAGE LOCATIONS REDESIGN END ===== */
 
