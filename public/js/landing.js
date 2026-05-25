@@ -83,13 +83,37 @@ mobileToggle?.addEventListener("click", () => {
   navLinks?.classList.toggle("is-open");
   navLinks?.classList.toggle("active");
   mobileToggle.classList.toggle("open");
+  document.body.classList.toggle("mobile-nav-open", navLinks?.classList.contains("active"));
+});
+
+document.querySelectorAll(".nav-mega-item").forEach((item) => {
+  const link = item.querySelector(":scope > a");
+
+  link?.addEventListener("click", (event) => {
+    if (window.innerWidth > 900) return;
+
+    const isOpen = item.classList.contains("is-open");
+
+    if (!isOpen) {
+      event.preventDefault();
+      document.querySelectorAll(".nav-mega-item.is-open").forEach((openItem) => {
+        if (openItem !== item) openItem.classList.remove("is-open");
+      });
+      item.classList.add("is-open");
+    }
+  });
 });
 
 document.querySelectorAll("#navLinks a").forEach((link) => {
   link.addEventListener("click", () => {
+    if (window.innerWidth <= 900 && link.parentElement?.classList.contains("nav-mega-item")) {
+      return;
+    }
+
     navLinks?.classList.remove("is-open");
     navLinks?.classList.remove("active");
     mobileToggle?.classList.remove("open");
+    document.body.classList.remove("mobile-nav-open");
   });
 });
 
