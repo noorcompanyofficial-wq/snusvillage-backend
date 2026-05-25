@@ -2971,7 +2971,28 @@ input {
 
 @media (max-width: 640px) {
   .sv-product-grid-pro {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 14px !important;
+    margin-right: calc(50% - 50vw) !important;
+    margin-left: calc(50% - 50vw) !important;
+    padding: 2px 18px 18px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-padding-left: 18px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .sv-product-grid-pro::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .sv-product-card-pro {
+    flex: 0 0 min(84vw, 360px) !important;
+    width: min(84vw, 360px) !important;
+    scroll-snap-align: start !important;
   }
 
   .sv-product-card-pro .product-card__media {
