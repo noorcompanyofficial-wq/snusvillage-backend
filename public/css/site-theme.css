@@ -2023,3 +2023,31 @@ main {
   }
 }
 /* ===== MOBILE LAYOUT POLISH END ===== */
+
+/* ===== MOBILE CART VISIBILITY FIX START ===== */
+@media (max-width: 900px) {
+  .header .header-cart {
+    min-width: 44px !important;
+    min-height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 11px !important;
+    border-radius: 999px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--sv-blue), var(--sv-red)) !important;
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.05em !important;
+    text-decoration: none !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .header .header-cart {
+    padding: 0 9px !important;
+  }
+}
+/* ===== MOBILE CART VISIBILITY FIX END ===== */
