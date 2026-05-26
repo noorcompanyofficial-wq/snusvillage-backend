@@ -146,16 +146,6 @@
       <strong id="checkoutShippingAmount"><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
     </div>
 
-    <% if (typeof freeShippingThreshold !== "undefined") { %>
-      <div class="checkout-free-shipping-note">
-        <% if (subtotal >= freeShippingThreshold) { %>
-          You qualify for free delivery.
-        <% } else { %>
-          Spend £<%= (freeShippingThreshold - subtotal).toFixed(2) %> more to get free delivery.
-        <% } %>
-      </div>
-    <% } %>
-
     <% if (discountAmount && discountAmount > 0) { %>
       <div class="checkout-total-row checkout-discount-total">
         <span>Discount</span>
