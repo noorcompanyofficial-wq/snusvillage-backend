@@ -83,7 +83,11 @@
                     >
                       <div class="sv-slide-brand">
                         <small><%= slide.kicker || "Snus Village" %></small>
-                        <h2><%= slide.title || "Premium Brands" %></h2>
+                        <% if (index === 0) { %>
+                          <h1><%= slide.title || "Premium Brands" %></h1>
+                        <% } else { %>
+                          <h2><%= slide.title || "Premium Brands" %></h2>
+                        <% } %>
                         <a href="<%= slide.buttonLink || '/shop' %>"><%= slide.buttonText || "Shop Now" %></a>
                       </div>
                     </div>
