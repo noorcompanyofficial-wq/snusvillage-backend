@@ -80,7 +80,7 @@ function getBrandKey(product) {
   return getBrandName(product).toLowerCase();
 }
 
-function groupProductsByBrand(products) {
+function groupProductsByBrand(products, limitPerBrand = 12) {
   const groups = new Map();
 
   products.forEach((product) => {
@@ -95,8 +95,12 @@ function groupProductsByBrand(products) {
       });
     }
 
-    groups.get(key).products.push(product);
-    groups.get(key).count += 1;
+    const group = groups.get(key);
+    group.count += 1;
+
+    if (group.products.length < limitPerBrand) {
+      group.products.push(product);
+    }
   });
 
   return Array.from(groups.values()).sort((a, b) => a.brand.localeCompare(b.brand));
@@ -151,7 +155,7 @@ router.get("/", async (req, res) => {
       })
       .lean();
 
-    const brandSections = groupProductsByBrand(products);
+    const brandSections = groupProductsByBrand(products, 12);
 
     if (search && String(search).trim().length >= 2) {
       SearchAnalytics.create({
