@@ -60,11 +60,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
-    />
-
     <!-- Core CSS Files -->
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/header.css" />
@@ -81,6 +76,13 @@
       const isAboutPage = pathNow.startsWith("/about");
       const isWholesalePage = pathNow.startsWith("/wholesale");
     %>
+
+    <% if (isShopPage || isCollectionPage || isProductPage) { %>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
+      />
+    <% } %>
 
     <% if (isShopPage || isCollectionPage) { %>
       <link rel="stylesheet" href="/css/shop.css" />
