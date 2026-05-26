@@ -416,8 +416,22 @@ async function finalisePaidOrder(order) {
   try {
     const emailResults = await sendOrderEmails(order);
     console.log("Order email results:", JSON.stringify(emailResults, null, 2));
+
+    order.emailNotifications = {
+      ...order.emailNotifications,
+      orderConfirmationSent: Boolean(emailResults.customer?.ok),
+      orderConfirmationSentAt: emailResults.customer?.ok ? new Date() : order.emailNotifications?.orderConfirmationSentAt || null,
+      lastOrderEmailError: emailResults.customer?.ok ? "" : emailResults.customer?.message || "",
+    };
+
+    await order.save();
   } catch (emailError) {
     console.log("Order email error:", emailError.message);
+    order.emailNotifications = {
+      ...order.emailNotifications,
+      lastOrderEmailError: emailError.message,
+    };
+    await order.save();
   }
 
   await clearCartForPaidOrder(order);

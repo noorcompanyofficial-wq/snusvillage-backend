@@ -168,6 +168,21 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
+    emailNotifications: {
+      orderConfirmationSent: {
+        type: Boolean,
+        default: false,
+      },
+      orderConfirmationSentAt: {
+        type: Date,
+        default: null,
+      },
+      lastOrderEmailError: {
+        type: String,
+        default: "",
+      },
+    },
+
     royalMail: {
       synced: {
         type: Boolean,

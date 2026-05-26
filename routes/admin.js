@@ -22,6 +22,7 @@ const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
+const { sendOrderEmails } = require("../utils/orderEmails");
 const { storeProductImages } = require("../utils/productImages");
 const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
@@ -1676,7 +1677,41 @@ router.post("/orders/:id/status", isAdmin, requireAdminRole(PERMISSIONS.orders),
 
     const oldOrder = await Order.findById(req.params.id).lean();
 
-    await Order.findByIdAndUpdate(req.params.id, update);
+    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+    });
+
+    const paymentChangedToPaid =
+      oldOrder?.paymentStatus !== "paid" &&
+      update.paymentStatus === "paid" &&
+      updatedOrder &&
+      !updatedOrder.emailNotifications?.orderConfirmationSent;
+
+    if (paymentChangedToPaid) {
+      try {
+        const emailResults = await sendOrderEmails(updatedOrder);
+
+        updatedOrder.emailNotifications = {
+          ...updatedOrder.emailNotifications,
+          orderConfirmationSent: Boolean(emailResults.customer?.ok),
+          orderConfirmationSentAt: emailResults.customer?.ok
+            ? new Date()
+            : updatedOrder.emailNotifications?.orderConfirmationSentAt || null,
+          lastOrderEmailError: emailResults.customer?.ok ? "" : emailResults.customer?.message || "",
+        };
+
+        await updatedOrder.save();
+        console.log("Admin order email results:", JSON.stringify(emailResults, null, 2));
+      } catch (emailError) {
+        updatedOrder.emailNotifications = {
+          ...updatedOrder.emailNotifications,
+          lastOrderEmailError: emailError.message,
+        };
+
+        await updatedOrder.save();
+        console.log("Admin order email error:", emailError.message);
+      }
+    }
 
     await logAdminAction(req, "ORDER_STATUS_UPDATED", {
       targetType: "Order",
