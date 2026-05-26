@@ -216,6 +216,55 @@ Error: ${order.royalMail?.syncError || "N/A"}
   return { ok: true };
 }
 
+async function sendCustomerShippingEmail(order) {
+  const transporter = getEmailTransporter();
+
+  if (!transporter || !order.customer?.email) {
+    return { ok: false, skipped: true, message: "Email credentials or customer email missing" };
+  }
+
+  const orderNumber = getOrderNumber(order);
+  const trackingNumber = order.royalMail?.trackingNumber || "";
+  const royalMailReference = order.royalMail?.orderReference || "";
+
+  const trackingText = trackingNumber
+    ? `Tracking number: ${trackingNumber}`
+    : royalMailReference
+      ? `Royal Mail reference: ${royalMailReference}`
+      : "Tracking information is not available yet. If tracking is added later, we will update you where possible.";
+
+  const text = `
+Hi ${order.customer.firstName || "Customer"},
+
+Your Snus Village order has been shipped.
+
+Order #${orderNumber}
+
+${trackingText}
+
+Delivery address:
+${order.delivery?.address || ""}
+${order.delivery?.city || ""}
+${order.delivery?.postcode || ""}
+${order.delivery?.country || ""}
+
+Items:
+${buildItemsText(order)}
+
+Thank you for shopping with Snus Village.
+`.trim();
+
+  await transporter.sendMail({
+    from: getFromAddress("Snus Village"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
+    to: order.customer.email,
+    subject: `Your Snus Village order has shipped #${orderNumber}`,
+    text,
+  });
+
+  return { ok: true };
+}
+
 async function sendOrderEmails(order) {
   const results = {
     customer: null,
@@ -240,5 +289,6 @@ async function sendOrderEmails(order) {
 module.exports = {
   sendCustomerOrderEmail,
   sendAdminOrderEmail,
+  sendCustomerShippingEmail,
   sendOrderEmails,
 };

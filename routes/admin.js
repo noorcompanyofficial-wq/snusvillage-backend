@@ -22,7 +22,7 @@ const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
-const { sendOrderEmails } = require("../utils/orderEmails");
+const { sendOrderEmails, sendCustomerShippingEmail } = require("../utils/orderEmails");
 const { storeProductImages } = require("../utils/productImages");
 const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
@@ -1710,6 +1710,38 @@ router.post("/orders/:id/status", isAdmin, requireAdminRole(PERMISSIONS.orders),
 
         await updatedOrder.save();
         console.log("Admin order email error:", emailError.message);
+      }
+    }
+
+    const orderChangedToShipped =
+      oldOrder?.orderStatus !== "shipped" &&
+      update.orderStatus === "shipped" &&
+      updatedOrder &&
+      !updatedOrder.emailNotifications?.shippingEmailSent;
+
+    if (orderChangedToShipped) {
+      try {
+        const shippingEmailResult = await sendCustomerShippingEmail(updatedOrder);
+
+        updatedOrder.emailNotifications = {
+          ...updatedOrder.emailNotifications,
+          shippingEmailSent: Boolean(shippingEmailResult.ok),
+          shippingEmailSentAt: shippingEmailResult.ok
+            ? new Date()
+            : updatedOrder.emailNotifications?.shippingEmailSentAt || null,
+          lastShippingEmailError: shippingEmailResult.ok ? "" : shippingEmailResult.message || "",
+        };
+
+        await updatedOrder.save();
+        console.log("Admin shipping email result:", JSON.stringify(shippingEmailResult, null, 2));
+      } catch (emailError) {
+        updatedOrder.emailNotifications = {
+          ...updatedOrder.emailNotifications,
+          lastShippingEmailError: emailError.message,
+        };
+
+        await updatedOrder.save();
+        console.log("Admin shipping email error:", emailError.message);
       }
     }
 

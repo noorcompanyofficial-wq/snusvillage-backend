@@ -177,7 +177,19 @@ const orderSchema = new mongoose.Schema(
         type: Date,
         default: null,
       },
+      shippingEmailSent: {
+        type: Boolean,
+        default: false,
+      },
+      shippingEmailSentAt: {
+        type: Date,
+        default: null,
+      },
       lastOrderEmailError: {
+        type: String,
+        default: "",
+      },
+      lastShippingEmailError: {
         type: String,
         default: "",
       },
