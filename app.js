@@ -1,5 +1,6 @@
 const express = require("express");
 const helmet = require("helmet");
+const compression = require("compression");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const session = require("express-session");
@@ -101,6 +102,9 @@ const wholesaleRoutes = require("./routes/wholesale");
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
+
+// ====== Compression ======
+app.use(compression());
 
 // ====== Basic Middleware ======
 app.use(
