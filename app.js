@@ -235,12 +235,41 @@ app.use(async (req, res, next) => {
   next();
 });
 
+
+function optimiseImageUrl(url, options = {}) {
+  const imageUrl = String(url || "").trim();
+
+  if (!imageUrl) return "";
+
+  const width = Number(options.width || 600);
+  const quality = options.quality || "auto";
+  const crop = options.crop || "c_limit";
+
+  if (imageUrl.includes("res.cloudinary.com") && imageUrl.includes("/image/upload/")) {
+    if (
+      imageUrl.includes("/f_auto,") ||
+      imageUrl.includes("/q_auto,") ||
+      imageUrl.includes("/w_")
+    ) {
+      return imageUrl;
+    }
+
+    return imageUrl.replace(
+      "/image/upload/",
+      `/image/upload/f_auto,q_${quality},w_${width},${crop}/`
+    );
+  }
+
+  return imageUrl;
+}
+
 // ====== Global Variables ======
 app.use(async (req, res, next) => {
   res.locals.user = req.session?.user || null;
   res.locals.currentPath = req.path;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
+  res.locals.optimiseImageUrl = optimiseImageUrl;
   res.locals.storeSettings = await getCachedStoreSettings();
   next();
 });
