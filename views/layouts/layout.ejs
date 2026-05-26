@@ -65,26 +65,52 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
     />
 
-    <!-- CSS Files -->
+    <!-- Core CSS Files -->
     <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/css/about.css" />
-
-    <link rel="stylesheet" href="/css/shop.css" />
-    <link rel="stylesheet" href="/css/products.css" />
-    <link rel="stylesheet" href="/css/checkout.css" />
-    <link rel="stylesheet" href="/css/cart.css" />
-    <link rel="stylesheet" href="/css/auth.css" />
-    <link rel="stylesheet" href="/css/wholesale.css" />
-    <link rel="stylesheet" href="/css/collections.css" />
     <link rel="stylesheet" href="/css/header.css" />
-    <link rel="stylesheet" href="/css/trust.css" />
-    <link rel="stylesheet" href="/css/brands.css" />
-    <link rel="stylesheet" href="/css/best-sellers.css" />
-    <link rel="stylesheet" href="/css/branches.css" />
-    <link rel="stylesheet" href="/css/delivery.css" />
-    <link rel="stylesheet" href="/css/social.css" />
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/site-theme.css" />
+
+    <% 
+      const pathNow = typeof currentPath !== "undefined" ? currentPath : "";
+      const isShopPage = pathNow.startsWith("/shop");
+      const isProductPage = pathNow.startsWith("/products");
+      const isCollectionPage = pathNow.startsWith("/collections");
+      const isCartPage = pathNow.startsWith("/cart");
+      const isAuthPage = pathNow.startsWith("/auth");
+      const isAboutPage = pathNow.startsWith("/about");
+      const isWholesalePage = pathNow.startsWith("/wholesale");
+    %>
+
+    <% if (isShopPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/shop.css" />
+      <link rel="stylesheet" href="/css/brands.css" />
+      <link rel="stylesheet" href="/css/collections.css" />
+      <link rel="stylesheet" href="/css/best-sellers.css" />
+    <% } %>
+
+    <% if (isProductPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/products.css" />
+    <% } %>
+
+    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/cart.css" />
+    <% } %>
+
+    <% if (isAuthPage) { %>
+      <link rel="stylesheet" href="/css/auth.css" />
+    <% } %>
+
+    <% if (isAboutPage) { %>
+      <link rel="stylesheet" href="/css/about.css" />
+      <link rel="stylesheet" href="/css/trust.css" />
+      <link rel="stylesheet" href="/css/branches.css" />
+      <link rel="stylesheet" href="/css/social.css" />
+    <% } %>
+
+    <% if (isWholesalePage) { %>
+      <link rel="stylesheet" href="/css/wholesale.css" />
+    <% } %>
 
     <!-- Web Icon -->
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
@@ -129,13 +155,30 @@
     <% } %>
 
     <script src="/js/main.js" defer></script>
-    <script src="/js/shop.js" defer></script>
-    <script src="/js/products.js" defer></script>
-    <script src="/js/cart.js" defer></script>
-    <script src="/js/auth.js" defer></script>
-    <script src="/js/about.js" defer></script>
-    <script src="/js/social.js" defer></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
+    <% if (isShopPage || isCollectionPage) { %>
+      <script src="/js/shop.js" defer></script>
+    <% } %>
+
+    <% if (isProductPage || isCollectionPage) { %>
+      <script src="/js/products.js" defer></script>
+    <% } %>
+
+    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage) { %>
+      <script src="/js/cart.js" defer></script>
+    <% } %>
+
+    <% if (isAuthPage) { %>
+      <script src="/js/auth.js" defer></script>
+    <% } %>
+
+    <% if (isAboutPage) { %>
+      <script src="/js/about.js" defer></script>
+      <script src="/js/social.js" defer></script>
+    <% } %>
+
+    <% if (isShopPage || isCollectionPage || isProductPage) { %>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
+    <% } %>
   </body>
 </html>
