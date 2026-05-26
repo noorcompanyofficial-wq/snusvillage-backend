@@ -158,7 +158,7 @@
 
                   <a href="/products/<%= p.slug || p._id %>" class="shop-product-image">
                     <% if (p.images && p.images.length > 0) { %>
-                      <img src="<%= p.images[0] %>" alt="<%= p.name %>" loading="lazy" decoding="async">
+                      <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async">
                     <% } else { %>
                       <span>No Image</span>
                     <% } %>
