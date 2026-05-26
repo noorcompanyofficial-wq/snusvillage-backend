@@ -1,24 +1,3 @@
-const landingAgeModal = document.getElementById("landingAgeModal");
-const landingEnterSite = document.getElementById("landingEnterSite");
-const landingExitSite = document.getElementById("landingExitSite");
-
-if (new URLSearchParams(window.location.search).get("age") === "reset") {
-  localStorage.removeItem("ageVerified");
-}
-
-if (localStorage.getItem("ageVerified") === "true") {
-  landingAgeModal?.remove();
-}
-
-landingEnterSite?.addEventListener("click", () => {
-  localStorage.setItem("ageVerified", "true");
-  landingAgeModal?.remove();
-});
-
-landingExitSite?.addEventListener("click", () => {
-  window.location.href = "https://www.google.com";
-});
-
 const slides = Array.from(document.querySelectorAll(".hero__slide"));
 let currentSlide = 0;
 let timer = null;

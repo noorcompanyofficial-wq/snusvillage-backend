@@ -52,61 +52,6 @@ input {
   font: inherit;
 }
 
-.landing-age-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.86);
-}
-
-.landing-age-box {
-  width: min(420px, 100%);
-  padding: 34px;
-  border-radius: 18px;
-  background: #fff;
-  color: var(--text);
-  text-align: center;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
-}
-
-.landing-age-box h2 {
-  margin: 0 0 12px;
-  font-size: 28px;
-}
-
-.landing-age-box p {
-  margin: 0 0 24px;
-  color: var(--muted);
-}
-
-.landing-age-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.landing-age-buttons button {
-  min-height: 46px;
-  border: 0;
-  border-radius: 8px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-#landingEnterSite {
-  background: var(--red);
-  color: #fff;
-}
-
-#landingExitSite {
-  background: #e5e7eb;
-  color: var(--text);
-}
-
 .page-shell {
   position: relative;
   width: min(calc(100% - 24px), 1480px);
