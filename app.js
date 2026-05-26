@@ -90,6 +90,7 @@ const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
 const verificationRoutes = require("./routes/verification");
 const diditRoutes = require("./routes/didit");
+const Product = require("./models/Products");
 const legalRoutes = require("./routes/legal");
 
 const wholesaleRoutes = require("./routes/wholesale");
@@ -112,6 +113,75 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+
+function escapeXml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const baseUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
+
+    const staticUrls = [
+      { loc: "/", priority: "1.0" },
+      { loc: "/shop", priority: "0.9" },
+      { loc: "/about", priority: "0.6" },
+      { loc: "/contact", priority: "0.6" },
+      { loc: "/wholesale", priority: "0.7" },
+      { loc: "/terms-and-conditions", priority: "0.4" },
+      { loc: "/privacy-policy", priority: "0.4" },
+      { loc: "/shipping-policy", priority: "0.4" },
+      { loc: "/cookies-policy", priority: "0.4" },
+    ];
+
+    const products = await Product.find({ isActive: true })
+      .select("_id slug updatedAt createdAt")
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    const urls = [
+      ...staticUrls.map((page) => ({
+        loc: `${baseUrl}${page.loc}`,
+        lastmod: new Date().toISOString(),
+        changefreq: page.loc === "/" || page.loc === "/shop" ? "daily" : "monthly",
+        priority: page.priority,
+      })),
+      ...products.map((product) => ({
+        loc: `${baseUrl}/products/${product._id}`,
+        lastmod: new Date(product.updatedAt || product.createdAt || Date.now()).toISOString(),
+        changefreq: "weekly",
+        priority: "0.8",
+      })),
+    ];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (url) => `  <url>
+    <loc>${escapeXml(url.loc)}</loc>
+    <lastmod>${escapeXml(url.lastmod)}</lastmod>
+    <changefreq>${escapeXml(url.changefreq)}</changefreq>
+    <priority>${escapeXml(url.priority)}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
+
+    res.type("application/xml");
+    return res.send(xml);
+  } catch (error) {
+    console.log("Sitemap error:", error.message);
+    res.type("application/xml");
+    return res.status(500).send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`);
+  }
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser());
