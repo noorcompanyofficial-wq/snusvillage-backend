@@ -143,10 +143,13 @@ router.get("/", async (req, res) => {
       filter.$and = advancedFilters;
     }
 
-    const products = await Product.find(filter).sort({
-      brand: 1,
-      createdAt: -1,
-    });
+    const products = await Product.find(filter)
+      .select("name slug description strength nicotine price discountPrice images brand flavour category stock isActive isFeatured isBestSeller showSaleBadge createdAt updatedAt")
+      .sort({
+        brand: 1,
+        createdAt: -1,
+      })
+      .lean();
 
     const brandSections = groupProductsByBrand(products);
 
