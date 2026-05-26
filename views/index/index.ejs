@@ -68,7 +68,7 @@
                   <% svHeroSlides.slice(0, 3).forEach((slide, index) => { %>
                     <div
                       class="sv-slide"
-                      style="background-image: linear-gradient(180deg, rgba(7,18,37,0.08), rgba(7,18,37,0.58)), url('<%= slide.imageSrc || '/images/header/h-1.jpeg' %>');"
+                      style="background-image: linear-gradient(180deg, rgba(7,18,37,0.08), rgba(7,18,37,0.58)), url('<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 1600 }) %>');"
                     >
                       <div class="sv-slide-brand">
                         <small><%= slide.kicker || "Snus Village" %></small>
@@ -202,7 +202,7 @@
                 <article
                   class="sv-collection-card-pro <%= index === 0 ? 'sv-collection-card-pro--large' : '' %> <%= card.darkCard ? 'sv-collection-card-pro--dark' : '' %>"
                   <% if (!card.darkCard) { %>
-                    style="--bg-image:url('<%= card.imageSrc || '/images/social/s-1.jpeg' %>');"
+                    style="--bg-image:url('<%= optimiseImageUrl(card.imageSrc || '/images/social/s-1.jpeg', { width: 900 }) %>');"
                   <% } %>
                 >
                   <% if (card.darkCard) { %>
@@ -246,7 +246,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= p.images[0] %>" alt="<%= p.name %>" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -316,7 +316,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= p.images[0] %>" alt="<%= p.name %>" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -453,9 +453,11 @@
                 <div class="sv-distro-track">
                   <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
                     <img
-                      src="<%= image.imageSrc || '/images/header/h-1.jpeg' %>"
+                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 900 }) %>"
                       alt="<%= image.alt || 'SVG Distro Location Image' %>"
                       class="<%= index === 0 ? 'is-active' : '' %>"
+                      loading="lazy"
+                      decoding="async"
                     />
                   <% }) %>
                 </div>
@@ -589,7 +591,7 @@
                             <%= index === 0 ? 'autoplay' : '' %>
                             loop
                             playsinline
-                            poster="<%= slide.posterSrc || '/images/header/h-1.jpeg' %>"
+                            poster="<%= optimiseImageUrl(slide.posterSrc || '/images/header/h-1.jpeg', { width: 700 }) %>"
                           ></video>
                           <div class="sv-social-caption">
                             <strong><%= slide.title || 'Snus Village Update' %></strong>
