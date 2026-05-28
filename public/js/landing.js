@@ -133,122 +133,131 @@ document.querySelectorAll("#navLinks a").forEach((link) => {
 // ===== SNUS VILLAGE AB STYLE HERO END =====
 
 
-// ===== SNUS VILLAGE DISTRO CAROUSEL START =====
-(function () {
-  const carousel = document.getElementById("svgDistroCarousel");
-  if (!carousel) return;
+function runNonCriticalHomepageScripts() {
+  // ===== SNUS VILLAGE DISTRO CAROUSEL START =====
+  (function () {
+    const carousel = document.getElementById("svgDistroCarousel");
+    if (!carousel) return;
 
-  const slides = Array.from(carousel.querySelectorAll(".sv-distro-track img"));
-  const dots = Array.from(carousel.querySelectorAll(".sv-distro-dots button"));
-  const prev = carousel.querySelector(".sv-distro-prev");
-  const next = carousel.querySelector(".sv-distro-next");
+    const slides = Array.from(carousel.querySelectorAll(".sv-distro-track img"));
+    const dots = Array.from(carousel.querySelectorAll(".sv-distro-dots button"));
+    const prev = carousel.querySelector(".sv-distro-prev");
+    const next = carousel.querySelector(".sv-distro-next");
 
-  if (!slides.length) return;
+    if (!slides.length) return;
 
-  let index = 0;
+    let index = 0;
 
-  function showSlide(nextIndex) {
-    index = (nextIndex + slides.length) % slides.length;
+    function showSlide(nextIndex) {
+      index = (nextIndex + slides.length) % slides.length;
 
-    slides.forEach((slide, slideIndex) => {
-      slide.classList.toggle("is-active", slideIndex === index);
-    });
+      slides.forEach((slide, slideIndex) => {
+        slide.classList.toggle("is-active", slideIndex === index);
+      });
+
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle("is-active", dotIndex === index);
+      });
+    }
+
+    prev?.addEventListener("click", () => showSlide(index - 1));
+    next?.addEventListener("click", () => showSlide(index + 1));
 
     dots.forEach((dot, dotIndex) => {
-      dot.classList.toggle("is-active", dotIndex === index);
+      dot.addEventListener("click", () => showSlide(dotIndex));
     });
-  }
 
-  prev?.addEventListener("click", () => showSlide(index - 1));
-  next?.addEventListener("click", () => showSlide(index + 1));
-
-  dots.forEach((dot, dotIndex) => {
-    dot.addEventListener("click", () => showSlide(dotIndex));
-  });
-
-  window.setInterval(() => {
-    showSlide(index + 1);
-  }, 4500);
-})();
-// ===== SNUS VILLAGE DISTRO CAROUSEL END =====
+    window.setInterval(() => {
+      showSlide(index + 1);
+    }, 4500);
+  })();
+  // ===== SNUS VILLAGE DISTRO CAROUSEL END =====
 
 
-// ===== SNUS VILLAGE SOCIAL IPHONE START =====
-(function () {
-  const reel = document.getElementById("svSocialReel");
-  if (!reel) return;
+  // ===== SNUS VILLAGE SOCIAL IPHONE START =====
+  (function () {
+    const reel = document.getElementById("svSocialReel");
+    if (!reel) return;
 
-  const slides = Array.from(reel.querySelectorAll(".sv-social-slide"));
-  const dots = Array.from(document.querySelectorAll(".sv-social-dots button"));
-  const prevBtn = document.querySelector(".sv-social-prev");
-  const nextBtn = document.querySelector(".sv-social-next");
+    const slides = Array.from(reel.querySelectorAll(".sv-social-slide"));
+    const dots = Array.from(document.querySelectorAll(".sv-social-dots button"));
+    const prevBtn = document.querySelector(".sv-social-prev");
+    const nextBtn = document.querySelector(".sv-social-next");
 
-  let current = 0;
-  let autoRotate;
+    let current = 0;
+    let autoRotate;
 
-  function pauseAllVideos() {
-    slides.forEach((slide) => {
-      const video = slide.querySelector("video");
-      if (video) {
-        video.pause();
-        video.currentTime = 0;
-      }
-    });
-  }
-
-  function playCurrentVideo() {
-    const activeVideo = slides[current]?.querySelector("video");
-    if (activeVideo) {
-      activeVideo.play().catch(() => {});
+    function pauseAllVideos() {
+      slides.forEach((slide) => {
+        const video = slide.querySelector("video");
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
     }
-  }
 
-  function showSlide(index) {
-    current = (index + slides.length) % slides.length;
+    function playCurrentVideo() {
+      const activeVideo = slides[current]?.querySelector("video");
+      if (activeVideo) {
+        activeVideo.play().catch(() => {});
+      }
+    }
 
-    slides.forEach((slide, i) => {
-      slide.classList.toggle("is-active", i === current);
-    });
+    function showSlide(index) {
+      current = (index + slides.length) % slides.length;
 
-    dots.forEach((dot, i) => {
-      dot.classList.toggle("is-active", i === current);
-    });
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("is-active", i === current);
+      });
 
-    pauseAllVideos();
-    playCurrentVideo();
-  }
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("is-active", i === current);
+      });
 
-  function nextSlide() {
-    showSlide(current + 1);
-  }
+      pauseAllVideos();
+      playCurrentVideo();
+    }
 
-  function prevSlide() {
-    showSlide(current - 1);
-  }
+    function nextSlide() {
+      showSlide(current + 1);
+    }
 
-  function startAutoRotate() {
-    clearInterval(autoRotate);
-    autoRotate = setInterval(nextSlide, 5000);
-  }
+    function prevSlide() {
+      showSlide(current - 1);
+    }
 
-  prevBtn?.addEventListener("click", () => {
-    prevSlide();
-    startAutoRotate();
-  });
+    function startAutoRotate() {
+      clearInterval(autoRotate);
+      autoRotate = setInterval(nextSlide, 5000);
+    }
 
-  nextBtn?.addEventListener("click", () => {
-    nextSlide();
-    startAutoRotate();
-  });
-
-  dots.forEach((dot, index) => {
-    dot.addEventListener("click", () => {
-      showSlide(index);
+    prevBtn?.addEventListener("click", () => {
+      prevSlide();
       startAutoRotate();
     });
-  });
 
-  showSlide(0);
-  startAutoRotate();
-})();
-// ===== SNUS VILLAGE SOCIAL IPHONE END =====
+    nextBtn?.addEventListener("click", () => {
+      nextSlide();
+      startAutoRotate();
+    });
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        showSlide(index);
+        startAutoRotate();
+      });
+    });
+
+    showSlide(0);
+    startAutoRotate();
+  })();
+  // ===== SNUS VILLAGE SOCIAL IPHONE END =====
+}
+
+if ("requestIdleCallback" in window) {
+  requestIdleCallback(runNonCriticalHomepageScripts, { timeout: 2500 });
+} else {
+  window.setTimeout(runNonCriticalHomepageScripts, 1200);
+}
+
