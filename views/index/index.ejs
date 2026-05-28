@@ -461,7 +461,7 @@
                 <div class="sv-distro-track">
                   <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
                     <img
-                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 900 }) %>"
+                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 700 }) %>"
                       alt="<%= image.alt || 'SVG Distro Location Image' %>"
                       class="<%= index === 0 ? 'is-active' : '' %>"
                       loading="lazy"
