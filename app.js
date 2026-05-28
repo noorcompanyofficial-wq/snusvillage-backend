@@ -251,6 +251,15 @@ function optimiseImageUrl(url, options = {}) {
   const quality = options.quality || "auto";
   const crop = options.crop || "c_limit";
 
+  const localWebpMap = {
+    "/images/delivery/delivery.jpg": "/images/delivery/delivery.webp",
+    "/images/header/h-2.jpeg": "/images/header/h-2.webp",
+  };
+
+  if (localWebpMap[imageUrl]) {
+    return localWebpMap[imageUrl];
+  }
+
   if (imageUrl.includes("res.cloudinary.com") && imageUrl.includes("/image/upload/")) {
     if (
       imageUrl.includes("/f_auto,") ||
