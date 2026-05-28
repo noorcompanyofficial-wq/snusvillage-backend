@@ -254,7 +254,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 300 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -324,7 +324,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 300 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -461,7 +461,7 @@
                 <div class="sv-distro-track">
                   <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
                     <img
-                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 700 }) %>"
+                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 420 }) %>"
                       alt="<%= image.alt || 'SVG Distro Location Image' %>"
                       class="<%= index === 0 ? 'is-active' : '' %>"
                       loading="lazy"
