@@ -8248,3 +8248,33 @@ body {
   position: relative;
   z-index: 2;
 }
+
+/* LCP optimisation: real hero image instead of CSS background */
+.sv-slide {
+  position: relative;
+  overflow: hidden;
+  background: #071225;
+}
+
+.sv-slide__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.sv-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7,18,37,0.08), rgba(7,18,37,0.58));
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sv-slide-brand {
+  position: relative;
+  z-index: 2;
+}
