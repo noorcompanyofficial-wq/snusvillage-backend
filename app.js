@@ -186,7 +186,13 @@ ${urls
   }
 });
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: process.env.NODE_ENV === "production" ? "30d" : 0,
+    etag: true,
+    lastModified: true,
+  })
+);
 
 app.use(cookieParser());
 
