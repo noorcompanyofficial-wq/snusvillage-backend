@@ -25,7 +25,13 @@
     </noscript>
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
     <link rel="stylesheet" href="/css/landing.css" />
-    <link rel="stylesheet" href="/css/footer.css" />
+    <link
+      rel="preload"
+      href="/css/footer.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="/css/footer.css" /></noscript>
   </head>
   <body>
     <%- include("../partials/header") %>
