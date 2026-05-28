@@ -35,6 +35,16 @@
       />
     </noscript>
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
+    <%
+      const svPreloadHeroImage =
+        homepageContent?.hero?.slides?.[0]?.imageSrc || "/images/header/h-1.jpeg";
+    %>
+    <link
+      rel="preload"
+      as="image"
+      href="<%= optimiseImageUrl(svPreloadHeroImage, { width: 900 }) %>"
+      fetchpriority="high"
+    />
     <link rel="stylesheet" href="/css/landing.css" />
     <link
       rel="preload"
