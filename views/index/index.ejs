@@ -91,10 +91,15 @@
               <div class="sv-carousel">
                 <div class="sv-slides">
                   <% svHeroSlides.slice(0, 3).forEach((slide, index) => { %>
-                    <div
-                      class="sv-slide"
-                      style="background-image: linear-gradient(180deg, rgba(7,18,37,0.08), rgba(7,18,37,0.58)), url('<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 900 }) %>');"
-                    >
+                    <div class="sv-slide">
+                      <img
+                        class="sv-slide__image"
+                        src="<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 900 }) %>"
+                        alt="<%= slide.title || 'Snus Village hero image' %>"
+                        loading="<%= index === 0 ? 'eager' : 'lazy' %>"
+                        decoding="async"
+                        fetchpriority="<%= index === 0 ? 'high' : 'auto' %>"
+                      >
                       <div class="sv-slide-brand">
                         <small><%= slide.kicker || "Snus Village" %></small>
                         <% if (index === 0) { %>
