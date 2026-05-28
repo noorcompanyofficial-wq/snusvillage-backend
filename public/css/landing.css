@@ -8278,3 +8278,30 @@ body {
   position: relative;
   z-index: 2;
 }
+
+/* Performance: reduce layout/reflow work on heavy below-fold sections */
+.sv-collections-redesign,
+.sv-bestsellers-redesign,
+.sv-featured-products-redesign,
+.sv-locations-redesign,
+.sv-distro-card,
+.sv-social-showcase {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
+}
+
+.sv-slides,
+.sv-distro-track,
+.sv-social-reel,
+.product-grid,
+.sv-collection-grid-pro {
+  contain: layout paint;
+}
+
+.sv-slide,
+.sv-distro-track img,
+.sv-social-slide,
+.product-card,
+.sv-collection-card-pro {
+  will-change: transform;
+}
