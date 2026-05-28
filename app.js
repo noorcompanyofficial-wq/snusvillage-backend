@@ -188,7 +188,7 @@ ${urls
 
 app.use(
   express.static(path.join(__dirname, "public"), {
-    maxAge: process.env.NODE_ENV === "production" ? "30d" : 0,
+    maxAge: "30d",
     etag: true,
     lastModified: true,
   })
