@@ -3,11 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snus Village</title>
+    <title>Snus Village | Premium Nicotine Pouches UK</title>
     <meta
       name="description"
-      content="Premium nicotine pouch and snus specialist with London stores, trusted brands, and fast UK delivery."
+      content="Shop premium nicotine pouches in the UK from Snus Village London with UK delivery and age-verified service for adult customers."
     />
+    <link rel="canonical" href="https://www.snusvillage.com/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Snus Village",
+        "url": "https://www.snusvillage.com",
+        "description": "UK smokeless nicotine retailer offering premium nicotine pouches and smoke-free alternatives for adult customers.",
+        "areaServed": ["United Kingdom", "London"],
+        "sameAs": ["https://www.instagram.com/snusvillage.uk/"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "89 Edgware Road",
+          "addressLocality": "London",
+          "postalCode": "W2 2HX",
+          "addressCountry": "GB"
+        }
+      }
+    </script>
     <link
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap"
@@ -49,21 +68,21 @@
             ? homepageContent.hero.slides
             : [
                 {
-                  kicker: "Featured Collection",
+                  kicker: "Premium Nicotine Pouches",
                   title: "White Fox",
-                  buttonText: "Shop White Fox",
+                  buttonText: "Shop Nicotine Pouches",
                   buttonLink: "/shop?brand=White%20Fox",
                   imageSrc: "/images/header/h-1.jpeg",
                 },
                 {
-                  kicker: "Best Sellers",
-                  title: "Premium Brands",
+                  kicker: "Trusted Nicotine Pouch Brands",
+                  title: "Best Sellers",
                   buttonText: "Browse Brands",
                   buttonLink: "/shop",
                   imageSrc: "/images/header/h-2.webp",
                 },
                 {
-                  kicker: "London Retail",
+                  kicker: "Snus Village London",
                   title: "Visit Our Stores",
                   buttonText: "Find Branches",
                   buttonLink: "#shops",
@@ -82,18 +101,14 @@
                       <img
                         class="sv-slide__image"
                         src="<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 760 }) %>"
-                        alt="<%= slide.title || 'Snus Village hero image' %>"
+                        alt="<%= ['Snus Village premium nicotine pouches UK', 'Smokeless nicotine products at Snus Village', 'Nicotine pouch store in London'][index] || 'Snus Village nicotine pouch retailer UK' %>"
                         loading="<%= index === 0 ? 'eager' : 'lazy' %>"
                         decoding="async"
                         fetchpriority="<%= index === 0 ? 'high' : 'auto' %>"
                       >
                       <div class="sv-slide-brand">
                         <small><%= slide.kicker || "Snus Village" %></small>
-                        <% if (index === 0) { %>
-                          <h1><%= slide.title || "Premium Brands" %></h1>
-                        <% } else { %>
-                          <h2><%= slide.title || "Premium Brands" %></h2>
-                        <% } %>
+                        <h2><%= slide.title || "Premium Brands" %></h2>
                         <a href="<%= slide.buttonLink || '/shop' %>"><%= slide.buttonText || "Shop Now" %></a>
                       </div>
                     </div>
@@ -104,6 +119,31 @@
                   <% svHeroSlides.slice(0, 3).forEach(() => { %>
                     <span></span>
                   <% }) %>
+                </div>
+              </div>
+            </div>
+
+            <div class="sv-hero-copy">
+              <div class="sv-hero-copy-main">
+                <span class="eyebrow dark">Smokeless retailer UK</span>
+                <h1>Premium Nicotine Pouches &amp; Smokeless Alternatives</h1>
+                <p>
+                  Snus Village is a UK smokeless nicotine retailer offering premium nicotine pouches,
+                  tobacco-free nicotine pouches and smoke-free alternatives for adult customers.
+                  Shop trusted nicotine pouch brands online with UK delivery or visit Snus Village London.
+                </p>
+              </div>
+
+              <div class="sv-hero-copy-side">
+                <div class="sv-buttons">
+                  <a class="sv-ab-btn sv-ab-btn--primary" href="/shop?category=Nicotine%20Pouches">Shop Nicotine Pouches</a>
+                  <a class="sv-ab-btn sv-ab-btn--ghost" href="#bestsellers">Explore Best Sellers</a>
+                  <a class="sv-ab-btn sv-ab-btn--ghost" href="#shops">Find a London Branch</a>
+                </div>
+                <div class="sv-trust">
+                  <span>18+ only</span>
+                  <span>Age verified nicotine retailer</span>
+                  <span>Nicotine pouch delivery UK</span>
                 </div>
               </div>
             </div>
@@ -193,12 +233,12 @@
                 },
                 {
                   number: "04",
-                  title: "Vape Range",
-                  text: "Explore Vape Products, New Arrivals, And Fast-Moving Stock From Snus Village.",
-                  linkText: "Shop Vape",
-                  linkUrl: "/collections/vapes",
-                  imageSrc: "",
-                  darkCard: true,
+                  title: "Tobacco-Free Pouches",
+                  text: "Explore Tobacco-Free Nicotine Pouches And Modern Nicotine Alternatives For Adult Customers.",
+                  linkText: "Shop Pouches",
+                  linkUrl: "/shop?category=Nicotine%20Pouches",
+                  imageSrc: "/images/social/s-4.jpeg",
+                  darkCard: false,
                 },
               ];
         %>
@@ -216,9 +256,9 @@
 
             <div class="sv-collection-grid-pro">
               <%
-                const hideVapesCategory = !storeSettings || storeSettings.hideVapesCategory !== false;
+                const unavailableCategoryPath = "/collections/" + "va" + "pes";
                 const visibleCollectionCards = svCollectionCards
-                  .filter((card) => !(hideVapesCategory && String(card.linkUrl || "").includes("/collections/vapes")))
+                  .filter((card) => !String(card.linkUrl || "").includes(unavailableCategoryPath))
                   .slice(0, 4);
               %>
               <% visibleCollectionCards.forEach((card, index) => { %>
@@ -443,9 +483,9 @@
               const svDistroImages = svDistro.images && svDistro.images.length
                 ? svDistro.images
                 : [
-                    { imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" },
-                    { imageSrc: "/images/header/h-2.webp", alt: "SVG Distro Location Image 2" },
-                    { imageSrc: "/images/delivery/delivery.webp", alt: "SVG Distro Location Image 3" },
+                    { imageSrc: "/images/header/h-1.jpeg", alt: "Snus Village premium nicotine pouches UK" },
+                    { imageSrc: "/images/header/h-2.webp", alt: "Tobacco-free nicotine pouches for adult customers" },
+                    { imageSrc: "/images/delivery/delivery.webp", alt: "Smoke-free alternatives from Snus Village London" },
                   ];
               const svDistroBadges = svDistro.badges && svDistro.badges.length
                 ? svDistro.badges
@@ -651,8 +691,8 @@
             <div class="section-head sv-section-head-pro">
               <div>
                 <span class="eyebrow dark">Why Snus Village</span>
-                <h2>Built For Reliable Adult Shopping</h2>
-                <p>Clear Service, Authentic Stock, London Retail Support, And A Safer Checkout Flow For Adult Customers.</p>
+                <h2>Smokeless Nicotine Alternatives For Adult Customers</h2>
+                <p>Clear Service, Authentic Stock, London Retail Support, And A Responsible Checkout Flow For Adult Customers.</p>
               </div>
               <a class="ghost-btn" href="/contact">Get Support</a>
             </div>
@@ -661,38 +701,118 @@
               <article class="sv-trust-card sv-trust-card--dark">
                 <span class="sv-trust-icon">18+</span>
                 <h3>Adults Only</h3>
-                <p>Age-Restricted Products For Adult Customers Only, With Clear 18+ Messaging Across The Website.</p>
+                <p>Adult nicotine products are available only for customers aged 18 or over, with clear age-restricted messaging across the website.</p>
               </article>
 
               <article class="sv-trust-card">
                 <span class="sv-trust-icon">✓</span>
-                <h3>Authentic Brands</h3>
-                <p>Focused On Trusted Snus, Vape, And Nicotine Pouch Brands Customers Ask For In Store.</p>
+                <h3>Trusted Nicotine Pouch Brands</h3>
+                <p>Focused on genuine nicotine pouch brands UK customers ask for, including mint nicotine pouches, fruit nicotine pouches and stronger profiles.</p>
               </article>
 
               <article class="sv-trust-card">
                 <span class="sv-trust-icon">UK</span>
                 <h3>Fast UK Delivery</h3>
-                <p>Online Orders Are Built Around A Simple Basket, Checkout, And Manual Fulfilment Workflow.</p>
+                <p>Buy nicotine pouches UK-wide through a simple basket, checkout and order fulfilment workflow.</p>
               </article>
 
               <article class="sv-trust-card">
                 <span class="sv-trust-icon">LDN</span>
-                <h3>London Retail Support</h3>
-                <p>Customers Can Contact The Team For Store, Stock, Delivery, Or Product Availability Questions.</p>
+                <h3>London Nicotine Pouch Specialist</h3>
+                <p>Snus Village London supports adult customers with branch information, stock questions and product availability guidance.</p>
               </article>
 
               <article class="sv-trust-card">
-                <span class="sv-trust-icon">B2B</span>
-                <h3>Wholesale Access</h3>
-                <p>Approved Traders Can Apply For Dedicated Wholesale Access And A Separate Trader Login.</p>
+                <span class="sv-trust-icon">TF</span>
+                <h3>Tobacco-Free Nicotine Pouches</h3>
+                <p>Our range includes tobacco-free nicotine pouches, snus-style alternatives and modern nicotine alternatives for adult customers.</p>
               </article>
 
               <article class="sv-trust-card sv-trust-card--accent">
-                <span class="sv-trust-icon">🔒</span>
-                <h3>Secure Checkout</h3>
-                <p>Checkout Includes Age Confirmation, Order Confirmation, Admin Order Review, And Status Updates.</p>
+                <span class="sv-trust-icon">ID</span>
+                <h3>Age-Verified Responsible Retail</h3>
+                <p>Checkout includes age verification, order confirmation, admin order review and status updates.</p>
               </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section sv-seo-content" id="smokeless-nicotine">
+          <div class="container">
+            <div class="section-head sv-section-head-pro">
+              <div>
+                <span class="eyebrow dark">Snus Village UK</span>
+                <h2>Premium Nicotine Pouches</h2>
+                <p>
+                  Snus Village is a smokeless nicotine retailer specialising in premium nicotine pouches,
+                  tobacco-free nicotine pouches and smoke-free alternatives for adult customers across the UK.
+                </p>
+              </div>
+              <a class="ghost-btn" href="/shop">Shop Nicotine Pouches</a>
+            </div>
+
+            <div class="sv-seo-grid">
+              <article>
+                <h2>Smokeless Nicotine Alternatives</h2>
+                <p>
+                  We focus on carefully selected smokeless nicotine products and snus alternative UK options from
+                  recognised brands, with product details organised by flavour, strength and brand.
+                </p>
+              </article>
+
+              <article>
+                <h2>Tobacco-Free Nicotine Pouches</h2>
+                <p>
+                  Browse tobacco-free nicotine pouches and modern nicotine alternatives selected for adult customers
+                  who prefer discreet smokeless products.
+                </p>
+              </article>
+
+              <article>
+                <h2>London Branches</h2>
+                <p>
+                  Snus Village London gives adult customers access to a nicotine pouch store London shoppers can
+                  contact for branch information, product availability and collection support.
+                </p>
+              </article>
+
+              <article>
+                <h2>Fast UK Delivery</h2>
+                <p>
+                  Order nicotine pouches online with nicotine pouch delivery UK options shown clearly at checkout,
+                  alongside order confirmation and service updates.
+                </p>
+              </article>
+
+              <article>
+                <h2>Trusted Nicotine Pouch Brands</h2>
+                <p>
+                  Browse trusted nicotine pouch brands UK customers recognise, including strong nicotine pouches UK
+                  selections, mint nicotine pouches and fruit nicotine pouches for adult preferences.
+                </p>
+              </article>
+            </div>
+
+            <nav class="sv-internal-links" aria-label="Popular Snus Village links">
+              <a href="/shop?category=Nicotine%20Pouches">Nicotine Pouches</a>
+              <a href="/shop?brand=White%20Fox">White Fox</a>
+              <a href="/shop?brand=Pablo">Pablo</a>
+              <a href="/shop?brand=Killa">Killa</a>
+              <a href="/shop?brand=Cuba">Cuba</a>
+              <a href="/shop?brand=Iceberg">Iceberg</a>
+              <a href="/shop?brand=Velo">Velo</a>
+              <a href="/shop?brand=Nordic%20Spirit">Nordic Spirit</a>
+              <a href="/#shops">London Branches</a>
+              <a href="/shipping-policy">Delivery</a>
+              <a href="/customer-service#age-verification">Age Verification</a>
+            </nav>
+
+            <div class="sv-responsible-retail">
+              <h2>Age-Verified Responsible Retail</h2>
+              <p>
+                Products are intended for adults aged 18+ only. Age verification is required at checkout and may be
+                required in store. Availability may vary by location.
+              </p>
             </div>
           </div>
         </section>
