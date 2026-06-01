@@ -28,6 +28,7 @@ const defaultStoreSettings = {
   clickCollectCity: "London",
   clickCollectPostcode: "W2 2HX",
   maintenanceMode: false,
+  hideVapesCategory: true,
   maintenanceMessage: "Snus Village is currently updating the website. Please check back soon.",
 };
 

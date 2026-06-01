@@ -44,6 +44,11 @@ function productImage(value) {
 
 router.get("/vapes", async (req, res) => {
   try {
+    if (!res.locals.storeSettings || res.locals.storeSettings.hideVapesCategory !== false) {
+      req.flash("error", "Vapes are not available yet.");
+      return res.redirect("/shop");
+    }
+
     const { brand, flavour, search, sort } = req.query;
 
     function safeRegex(value) {

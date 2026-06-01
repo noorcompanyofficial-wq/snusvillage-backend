@@ -215,7 +215,13 @@
             </div>
 
             <div class="sv-collection-grid-pro">
-              <% svCollectionCards.slice(0, 4).forEach((card, index) => { %>
+              <%
+                const hideVapesCategory = !storeSettings || storeSettings.hideVapesCategory !== false;
+                const visibleCollectionCards = svCollectionCards
+                  .filter((card) => !(hideVapesCategory && String(card.linkUrl || "").includes("/collections/vapes")))
+                  .slice(0, 4);
+              %>
+              <% visibleCollectionCards.forEach((card, index) => { %>
                 <article
                   class="sv-collection-card-pro <%= index === 0 ? 'sv-collection-card-pro--large' : '' %> <%= card.darkCard ? 'sv-collection-card-pro--dark' : '' %>"
                   <% if (!card.darkCard) { %>
@@ -699,4 +705,3 @@
     <script src="/js/landing.js" defer></script>
   </body>
 </html>
-

@@ -76,6 +76,11 @@ const storeSettingsSchema = new mongoose.Schema(
       default: false,
     },
 
+    hideVapesCategory: {
+      type: Boolean,
+      default: true,
+    },
+
     maintenanceMessage: {
       type: String,
       default: "Snus Village is currently updating the website. Please check back soon.",

@@ -101,6 +101,18 @@
     </div>
 
     <div class="admin-panel__head">
+      <h2>Category Visibility</h2>
+      <span>Temporarily hide categories that are not ready to list</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label class="admin-checkbox-label">
+        <input type="checkbox" name="hideVapesCategory" <%= s.hideVapesCategory !== false ? "checked" : "" %>>
+        Hide Vapes Category
+      </label>
+    </div>
+
+    <div class="admin-panel__head">
       <h2>Maintenance Mode</h2>
       <span>Emergency Website Notice</span>
     </div>

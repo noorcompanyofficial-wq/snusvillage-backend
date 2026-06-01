@@ -1440,6 +1440,7 @@ router.post("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (
         clickCollectCity: String(req.body.clickCollectCity || "").trim(),
         clickCollectPostcode: String(req.body.clickCollectPostcode || "").trim(),
         maintenanceMode: req.body.maintenanceMode === "on",
+        hideVapesCategory: req.body.hideVapesCategory === "on",
         maintenanceMessage: String(req.body.maintenanceMessage || "").trim(),
       },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
