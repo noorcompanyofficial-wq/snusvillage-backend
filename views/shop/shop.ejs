@@ -124,7 +124,7 @@
                   <% } %>
                 </div>
 
-                <a href="/products/<%= p._id %>" class="shop-product-image">
+                <a href="/products/<%= p.slug || p._id %>" class="shop-product-image">
                   <% if (p.images && p.images.length > 0) { %>
                     <img src="<%= optimiseImageUrl(p.images[0], { width: 420 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async">
                   <% } else { %>
@@ -141,7 +141,7 @@
                   </div>
 
                   <h2>
-                    <a href="/products/<%= p._id %>"><%= p.name %></a>
+                    <a href="/products/<%= p.slug || p._id %>"><%= p.name %></a>
                   </h2>
 
                   <p>
@@ -167,7 +167,7 @@
                         <button type="submit">Add To Cart</button>
                       </form>
                     <% } else { %>
-                      <a class="shop-view-btn" href="/products/<%= p._id %>">View Product</a>
+                      <a class="shop-view-btn" href="/products/<%= p.slug || p._id %>">View Product</a>
                     <% } %>
                   </div>
                 </div>

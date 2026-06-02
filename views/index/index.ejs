@@ -341,7 +341,7 @@
                         <% } %>
                         £<%= Number(finalPrice || 0).toFixed(2) %>
                       </strong>
-                      <a class="sv-product-card-btn" href="/products/<%= p._id %>">View Product</a>
+                      <a class="sv-product-card-btn" href="/products/<%= p.slug || p._id %>">View Product</a>
                     </div>
                   </article>
                 <% }) %>
@@ -403,7 +403,7 @@
                         <% } %>
                         £<%= Number(finalPrice || 0).toFixed(2) %>
                       </strong>
-                      <a class="sv-product-card-btn" href="/products/<%= p._id %>">View Product</a>
+                      <a class="sv-product-card-btn" href="/products/<%= p.slug || p._id %>">View Product</a>
                     </div>
                   </article>
                 <% }) %>

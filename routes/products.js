@@ -67,6 +67,11 @@ router.get("/:id", async (req, res) => {
       return res.status(404).send("Product not found");
     }
 
+    const preferredPath = productUrl(product);
+    if (product.slug && req.path !== preferredPath) {
+      return res.redirect(301, preferredPath);
+    }
+
     const related = await Product.find({
       brand: product.brand,
       _id: { $ne: product._id },
