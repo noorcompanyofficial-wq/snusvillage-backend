@@ -23,6 +23,10 @@ const schema = Joi.object({
 // GET
 router.get("/", (req, res) => {
   res.render("contact/contact", {
+    title: "Contact Snus Village | Customer Service London",
+    description:
+      "Contact Snus Village customer service for nicotine pouch order support, delivery questions, age verification and London store enquiries.",
+    canonical: "https://www.snusvillage.com/contact",
     query: req.query,
     siteKey: process.env.RECAPTCHA_SITE || "",
     captchaEnabled: captchaEnabled(),

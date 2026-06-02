@@ -112,6 +112,10 @@ router.get("/", async (req, res) => {
 
     if (Product.db.readyState !== 1) {
       return res.render("shop/shop", {
+        title: "Shop Nicotine Pouches UK | Snus Village",
+        description:
+          "Shop premium nicotine pouches in the UK from Snus Village. Browse trusted brands, mint and fruit flavours, strengths and UK delivery options.",
+        canonical: "https://www.snusvillage.com/shop",
         products: [],
         brandSections: [],
         totalProducts: 0,
@@ -185,6 +189,10 @@ router.get("/", async (req, res) => {
     }
 
     res.render("shop/shop", {
+      title: "Shop Nicotine Pouches UK | Snus Village",
+      description:
+        "Shop premium nicotine pouches in the UK from Snus Village. Browse trusted brands, mint and fruit flavours, strengths and UK delivery options.",
+      canonical: "https://www.snusvillage.com/shop",
       products,
       brandSections,
       totalProducts: products.length,

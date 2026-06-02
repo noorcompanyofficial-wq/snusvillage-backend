@@ -13,6 +13,9 @@ const company = {
 const pages = {
   "/terms-and-conditions": {
     title: "Terms and Conditions",
+    metaTitle: "Terms & Conditions | Snus Village",
+    description:
+      "Read the Snus Village terms and conditions for adult nicotine product orders, age verification, delivery and account use.",
     intro:
       "These Terms and Conditions apply to the Snus Village website and online store operated by X London Group Ltd.",
     sections: [
@@ -170,6 +173,9 @@ const pages = {
   },
   "/privacy-policy": {
     title: "Privacy Policy",
+    metaTitle: "Privacy Policy | Snus Village",
+    description:
+      "Read how Snus Village handles customer data, orders, age verification, payments, delivery and website privacy.",
     intro:
       "This Privacy Policy explains how X London Group Ltd, trading as Snus Village, collects, uses, stores, shares and protects personal information.",
     sections: [
@@ -308,6 +314,9 @@ const pages = {
   },
   "/shipping-policy": {
     title: "Shipping Policy",
+    metaTitle: "Shipping Policy | Snus Village",
+    description:
+      "Read the Snus Village shipping policy for UK delivery, dispatch, tracking, age-restricted delivery and order support.",
     intro:
       "This Shipping Policy explains how Snus Village handles dispatch, delivery, tracking, failed deliveries, international orders and delivery-related issues.",
     sections: [
@@ -418,6 +427,9 @@ const pages = {
   },
   "/cookies-policy": {
     title: "Cookies Policy",
+    metaTitle: "Cookies Policy | Snus Village",
+    description:
+      "Read the Snus Village cookies policy for essential cookies, analytics, age verification, payments and delivery tools.",
     effectiveDate: "23 May 2026",
     intro:
       "This Cookies Policy explains how Snus Village uses cookies and similar technologies on its website.",
@@ -701,7 +713,10 @@ const customerServiceFaq = {
 
 router.get("/customer-service", (req, res) => {
   res.render("legal/customer-service", {
-    title: "Customer Service",
+    title: "Customer Service | Snus Village",
+    description:
+      "Find Snus Village customer service answers for orders, delivery, age verification, returns and account support.",
+    canonical: "https://www.snusvillage.com/customer-service",
     page: customerServiceFaq,
     company,
   });
@@ -714,7 +729,9 @@ router.get("/faq", (req, res) => {
 Object.entries(pages).forEach(([path, page]) => {
   router.get(path, (req, res) => {
     res.render("legal/policy", {
-      title: page.title,
+      title: page.metaTitle || `${page.title} | Snus Village`,
+      description: page.description || page.intro,
+      canonical: `https://www.snusvillage.com${path}`,
       page,
       company,
     });

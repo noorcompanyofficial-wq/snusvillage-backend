@@ -157,7 +157,7 @@ app.get("/sitemap.xml", async (req, res) => {
         priority: page.priority,
       })),
       ...products.map((product) => ({
-        loc: `${baseUrl}/products/${product._id}`,
+        loc: `${baseUrl}/products/${product.slug || product._id}`,
         lastmod: new Date(product.updatedAt || product.createdAt || Date.now()).toISOString(),
         changefreq: "weekly",
         priority: "0.8",

@@ -1,11 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Products");
+const mongoose = require("mongoose");
 
 function cleanText(value) {
   return String(value || "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function productUrl(product) {
+  return `/products/${product.slug || product._id}`;
+}
+
+function truncateSentence(value, maxLength = 155) {
+  const text = cleanText(value);
+  if (text.length <= maxLength) return text;
+
+  const clipped = text.slice(0, maxLength - 1);
+  const lastStop = Math.max(clipped.lastIndexOf("."), clipped.lastIndexOf("!"), clipped.lastIndexOf("?"));
+
+  if (lastStop > 80) {
+    return clipped.slice(0, lastStop + 1);
+  }
+
+  return clipped.replace(/\s+\S*$/, "") + ".";
 }
 
 function buildProductSeo(product) {
@@ -16,7 +35,7 @@ function buildProductSeo(product) {
   const nicotine = cleanText(product.nicotine);
   const category = cleanText(product.category || "nicotine pouch");
 
-  const title = `${name} | ${brand} | Snus Village`;
+  const title = cleanText(product.seoTitle) || `${name} | ${brand} | Snus Village`;
 
   const details = [
     brand && `brand ${brand}`,
@@ -25,11 +44,12 @@ function buildProductSeo(product) {
     nicotine && `${nicotine}mg nicotine`,
   ].filter(Boolean);
 
-  const description = cleanText(
-    `Shop ${name} from Snus Village. ${details.length ? "Features " + details.join(", ") + "." : ""} Premium ${category} for adult customers with age verification and UK delivery options.`
-  ).slice(0, 158);
+  const fallbackDescription =
+    `Shop ${name} from Snus Village. ${details.length ? "Features " + details.join(", ") + ". " : ""}` +
+    `Premium ${category} for adult customers with age verification and UK delivery options.`;
 
-  const canonical = `https://www.snusvillage.com/products/${product._id}`;
+  const description = truncateSentence(product.seoDescription || fallbackDescription);
+  const canonical = `https://www.snusvillage.com${productUrl(product)}`;
 
   return { title, description, canonical };
 }
@@ -37,7 +57,11 @@ function buildProductSeo(product) {
 // PRODUCT DETAILS PAGE
 router.get("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const lookup = mongoose.Types.ObjectId.isValid(req.params.id)
+      ? { $or: [{ _id: req.params.id }, { slug: req.params.id }] }
+      : { slug: req.params.id };
+
+    const product = await Product.findOne(lookup);
 
     if (!product) {
       return res.status(404).send("Product not found");
