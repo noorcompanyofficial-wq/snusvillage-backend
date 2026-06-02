@@ -7,6 +7,25 @@ const navLinks = document.getElementById("navLinks");
 const ageModal = document.getElementById("ageModal");
 const enterBtn = document.getElementById("enterSite");
 const exitBtn = document.getElementById("exitSite");
+const ageDob = document.getElementById("ageDob");
+const ageError = document.getElementById("ageError");
+
+function isAdultFromDob(value) {
+  if (!value) return false;
+
+  const dob = new Date(value + "T00:00:00");
+  if (Number.isNaN(dob.getTime())) return false;
+
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDelta = today.getMonth() - dob.getMonth();
+
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < dob.getDate())) {
+    age -= 1;
+  }
+
+  return age >= 18;
+}
 
 if (new URLSearchParams(window.location.search).get("age") === "reset") {
   localStorage.removeItem("ageVerified");
@@ -23,12 +42,22 @@ if (ageModal) {
 
 // ENTER
 enterBtn?.addEventListener("click", () => {
+  if (!isAdultFromDob(ageDob?.value)) {
+    if (ageError) ageError.hidden = false;
+    ageDob?.focus();
+    return;
+  }
+
   sessionStorage.setItem("ageVerified", "true");
   if (ageModal) {
     ageModal.classList.remove("is-visible");
     ageModal.setAttribute("aria-hidden", "true");
   }
   document.body.classList.remove("age-modal-open");
+});
+
+ageDob?.addEventListener("input", () => {
+  if (ageError) ageError.hidden = true;
 });
 
 const slides = document.querySelectorAll(".slide");

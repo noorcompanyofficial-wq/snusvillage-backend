@@ -130,6 +130,45 @@ body.age-modal-open {
   color: #fff;
 }
 
+.age-dob-field {
+  display: grid;
+  gap: 8px;
+  margin: 0 auto 14px;
+  max-width: 310px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.age-dob-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.age-dob-field input:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 2px;
+}
+
+.age-error {
+  margin: -4px auto 14px;
+  max-width: 310px;
+  color: #ffd7dc;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
 .age-buttons {
   display: grid;
   grid-template-columns: 1fr;

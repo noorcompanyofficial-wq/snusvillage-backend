@@ -1549,6 +1549,31 @@ main {
   border: 1px solid rgba(35, 63, 140, 0.12);
 }
 
+.product-nicotine-warning {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(180, 18, 50, 0.22);
+  border-radius: 16px;
+  color: #6f1020;
+  background: rgba(180, 18, 50, 0.07);
+}
+
+.product-nicotine-warning strong {
+  color: #071225;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.product-nicotine-warning span {
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
 .product-detail-redesign .add-cart-form {
   display: flex;
   gap: 10px;
