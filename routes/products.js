@@ -13,6 +13,15 @@ function productUrl(product) {
   return `/products/${product.slug || product._id}`;
 }
 
+function buildProductSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function truncateSentence(value, maxLength = 155) {
   const text = cleanText(value);
   if (text.length <= maxLength) return text;
@@ -57,9 +66,10 @@ function buildProductSeo(product) {
 // PRODUCT DETAILS PAGE
 router.get("/:id", async (req, res) => {
   try {
+    const normalisedSlug = buildProductSlug(req.params.id);
     const lookup = mongoose.Types.ObjectId.isValid(req.params.id)
       ? { $or: [{ _id: req.params.id }, { slug: req.params.id }] }
-      : { slug: req.params.id };
+      : { $or: [{ slug: req.params.id }, { slug: normalisedSlug }] };
 
     const product = await Product.findOne(lookup);
 

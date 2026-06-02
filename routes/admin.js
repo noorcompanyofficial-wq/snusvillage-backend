@@ -26,6 +26,15 @@ const { sendOrderEmails, sendCustomerShippingEmail } = require("../utils/orderEm
 const { storeProductImages } = require("../utils/productImages");
 const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
+function buildProductSlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function requireAdminRole(allowedRoles = []) {
   return function (req, res, next) {
     const role = req.session?.user?.role || res.locals.user?.role || "user";
@@ -2601,10 +2610,7 @@ router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), up
     const parsedPrice = parseFloat(price);
     const parsedDiscount = discountPrice ? parseFloat(discountPrice) : 0;
 
-    const slug = name
-      .toLowerCase()
-      .replace(/ /g, "-")
-      .replace(/[^\w-]+/g, "");
+    const slug = buildProductSlug(name);
 
     const images = await storeProductImages(req.files);
 
@@ -2730,6 +2736,7 @@ router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products
 
     const updatedData = {
       name,
+      slug: buildProductSlug(name),
       price: parseFloat(price),
       discountPrice: discountPrice ? parseFloat(discountPrice) : 0,
       description,
