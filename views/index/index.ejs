@@ -100,7 +100,7 @@
                     <div class="sv-slide">
                       <img
                         class="sv-slide__image"
-                        src="<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 760 }) %>"
+                        src="<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 1600, quality: 'auto:best' }) %>"
                         alt="<%= ['Snus Village premium nicotine pouches UK', 'Smokeless nicotine products at Snus Village', 'Nicotine pouch store in London'][index] || 'Snus Village nicotine pouch retailer UK' %>"
                         loading="<%= index === 0 ? 'eager' : 'lazy' %>"
                         decoding="async"
@@ -265,7 +265,7 @@
                 <article
                   class="sv-collection-card-pro <%= index === 0 ? 'sv-collection-card-pro--large' : '' %> <%= card.darkCard ? 'sv-collection-card-pro--dark' : '' %>"
                   <% if (!card.darkCard) { %>
-                    style="--bg-image:url('<%= optimiseImageUrl(card.imageSrc || '/images/social/s-1.jpeg', { width: 900 }) %>');"
+                    style="--bg-image:url('<%= optimiseImageUrl(card.imageSrc || '/images/social/s-1.jpeg', { width: 1200 }) %>');"
                   <% } %>
                 >
                   <% if (card.darkCard) { %>
@@ -309,7 +309,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= optimiseImageUrl(p.images[0], { width: 300 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 560 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -379,7 +379,7 @@
 
                     <div class="product-card__media">
                       <% if (p.images && p.images.length) { %>
-                        <img src="<%= optimiseImageUrl(p.images[0], { width: 300 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                        <img src="<%= optimiseImageUrl(p.images[0], { width: 560 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
                       <% } else { %>
                         <span>No Image</span>
                       <% } %>
@@ -516,7 +516,7 @@
                 <div class="sv-distro-track">
                   <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
                     <img
-                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 360 }) %>"
+                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 640 }) %>"
                       alt="<%= image.alt || 'SVG Distro Location Image' %>"
                       class="<%= index === 0 ? 'is-active' : '' %>"
                       loading="lazy"
@@ -654,7 +654,7 @@
                             <%= index === 0 ? 'autoplay' : '' %>
                             loop
                             playsinline
-                            poster="<%= optimiseImageUrl(slide.posterSrc || '/images/header/h-1.jpeg', { width: 700 }) %>"
+                            poster="<%= optimiseImageUrl(slide.posterSrc || '/images/header/h-1.jpeg', { width: 900 }) %>"
                           ></video>
                           <div class="sv-social-caption">
                             <strong><%= slide.title || 'Snus Village Update' %></strong>

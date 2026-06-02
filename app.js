@@ -249,7 +249,7 @@ function optimiseImageUrl(url, options = {}) {
   if (!imageUrl) return "";
 
   const width = Number(options.width || 600);
-  const quality = options.quality || "auto";
+  const quality = options.quality || "auto:good";
   const crop = options.crop || "c_limit";
 
   const localWebpMap = {

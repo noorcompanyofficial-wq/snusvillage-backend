@@ -19,7 +19,7 @@
     <div class="product-gallery">
       <div class="product-main-image">
         <% if (productImage) { %>
-          <img src="<%= optimiseImageUrl(productImage, { width: 900 }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
+          <img src="<%= optimiseImageUrl(productImage, { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
         <% } else { %>
           <div class="product-image-placeholder">No image</div>
         <% } %>
@@ -28,7 +28,7 @@
       <% if (product.images && product.images.length > 1) { %>
         <div class="product-thumbnails" aria-label="Product images">
           <% product.images.forEach((img, i) => { %>
-            <img src="<%= optimiseImageUrl(img, { width: 180 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
+            <img src="<%= optimiseImageUrl(img, { width: 260 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
           <% }) %>
         </div>
       <% } %>
