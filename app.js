@@ -281,8 +281,12 @@ function optimiseImageUrl(url, options = {}) {
 
 // ====== Global Variables ======
 app.use(async (req, res, next) => {
+  const siteUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
+  const cleanPath = req.path === "/" ? "" : req.path;
+
   res.locals.user = req.session?.user || null;
   res.locals.currentPath = req.path;
+  res.locals.canonical = `${siteUrl}${cleanPath}`;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
   res.locals.optimiseImageUrl = optimiseImageUrl;
