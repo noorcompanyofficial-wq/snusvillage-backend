@@ -750,16 +750,32 @@
           return age >= 18;
         }
 
+        function unlockPageScroll() {
+          document.body.classList.remove("age-modal-open");
+          document.documentElement.style.overflow = "";
+          document.body.style.overflow = "";
+          document.body.style.position = "";
+          document.body.style.height = "";
+          document.body.style.touchAction = "";
+        }
+
+        function lockPageScroll() {
+          document.body.classList.add("age-modal-open");
+          document.documentElement.style.overflow = "hidden";
+          document.body.style.overflow = "hidden";
+          document.body.style.touchAction = "none";
+        }
+
         function hideAgeGate() {
           ageModal.classList.remove("is-visible");
           ageModal.setAttribute("aria-hidden", "true");
-          document.body.classList.remove("age-modal-open");
+          unlockPageScroll();
         }
 
         function showAgeGate() {
           ageModal.classList.add("is-visible");
           ageModal.setAttribute("aria-hidden", "false");
-          document.body.classList.add("age-modal-open");
+          lockPageScroll();
         }
 
         if (sessionStorage.getItem("ageVerified") === "true") {
