@@ -41,6 +41,7 @@
     </noscript>
 
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
+    <link rel="stylesheet" href="/css/age-gate.css" />
     <link rel="stylesheet" href="/css/landing.css" />
     <link
       rel="preload"
@@ -51,6 +52,31 @@
     <noscript><link rel="stylesheet" href="/css/footer.css" /></noscript>
   </head>
   <body>
+    <div class="age-modal" id="ageModal" aria-hidden="true">
+      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
+        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+        <span class="age-pill">18+ age restricted store</span>
+        <h2 id="ageModalTitle">Confirm your age</h2>
+        <p>Snus Village sells age-restricted nicotine products. Enter your date of birth to continue. Formal age verification may still be required at checkout.</p>
+
+        <label class="age-dob-field" for="ageDob">
+          <span>Date of birth</span>
+          <input id="ageDob" type="date" autocomplete="bday" required />
+        </label>
+        <p class="age-error" id="ageError" hidden>Please enter a valid date of birth showing you are 18 or over.</p>
+
+        <div class="age-points">
+          <span>Adult customers only</span>
+          <span>Checkout age verification</span>
+        </div>
+
+        <div class="age-buttons">
+          <button id="enterSite" type="button">Enter Site</button>
+          <button id="exitSite" type="button">I am under 18</button>
+        </div>
+      </div>
+    </div>
+
     <%- include("../partials/header") %>
 
     <div class="page-shell">
@@ -744,5 +770,6 @@
     <%- include("../partials/footer") %>
 
     <script src="/js/landing.js" defer></script>
+    <script src="/js/main.js" defer></script>
   </body>
 </html>
