@@ -46,7 +46,6 @@ function redirectUnderageVisitor() {
 }
 
 if (new URLSearchParams(window.location.search).get("age") === "reset") {
-  localStorage.removeItem("ageVerified");
   sessionStorage.removeItem("ageVerified");
 }
 
@@ -81,8 +80,6 @@ function showAgeGate() {
   ageModal.setAttribute("aria-hidden", isAgeVerified ? "true" : "false");
   document.body.classList.toggle("age-modal-open", !isAgeVerified);
 }
-
-resetAgeGateOnFreshArrival();
 
 // check if already accepted during the current on-site visit
 if (ageModal) {
