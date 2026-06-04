@@ -32,13 +32,49 @@ if (new URLSearchParams(window.location.search).get("age") === "reset") {
   sessionStorage.removeItem("ageVerified");
 }
 
-// check if already accepted
-if (ageModal) {
+function isInternalReferrer() {
+  if (!document.referrer) return false;
+
+  try {
+    return new URL(document.referrer).origin === window.location.origin;
+  } catch (error) {
+    return false;
+  }
+}
+
+function isReloadNavigation() {
+  const navEntry = performance.getEntriesByType?.("navigation")?.[0];
+  return navEntry?.type === "reload";
+}
+
+function resetAgeGateOnFreshArrival() {
+  if (!isInternalReferrer() && !isReloadNavigation()) {
+    sessionStorage.removeItem("ageVerified");
+  }
+}
+
+function showAgeGate() {
+  if (!ageModal) return;
+
   const isAgeVerified = sessionStorage.getItem("ageVerified") === "true";
   ageModal.classList.toggle("is-visible", !isAgeVerified);
   ageModal.setAttribute("aria-hidden", isAgeVerified ? "true" : "false");
   document.body.classList.toggle("age-modal-open", !isAgeVerified);
 }
+
+resetAgeGateOnFreshArrival();
+
+// check if already accepted during the current on-site visit
+if (ageModal) {
+  showAgeGate();
+}
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted && !isInternalReferrer()) {
+    sessionStorage.removeItem("ageVerified");
+    showAgeGate();
+  }
+});
 
 // ENTER
 enterBtn?.addEventListener("click", () => {
