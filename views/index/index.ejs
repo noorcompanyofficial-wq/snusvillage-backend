@@ -754,6 +754,43 @@
         const ageDob = document.getElementById("ageDob");
         const ageError = document.getElementById("ageError");
 
+        function isInternalReferrer() {
+          if (!document.referrer) return false;
+
+          try {
+            return new URL(document.referrer).origin === window.location.origin;
+          } catch (error) {
+            return false;
+          }
+        }
+
+        function isReloadNavigation() {
+          const navEntry = performance.getEntriesByType?.("navigation")?.[0];
+          return navEntry?.type === "reload";
+        }
+
+        function shouldResetAgeGate() {
+          return !isInternalReferrer() && !isReloadNavigation();
+        }
+
+        function showAgeGateIfNeeded() {
+          if (shouldResetAgeGate()) {
+            sessionStorage.removeItem("ageVerified");
+          }
+
+          const isAgeVerified = sessionStorage.getItem("ageVerified") === "true";
+
+          if (isAgeVerified) {
+            ageModal?.classList.remove("is-visible");
+            ageModal?.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("age-modal-open");
+          } else {
+            ageModal?.classList.add("is-visible");
+            ageModal?.setAttribute("aria-hidden", "false");
+            document.body.classList.add("age-modal-open");
+          }
+        }
+
         function isAdultFromDob(value) {
           if (!value) return false;
 
@@ -788,6 +825,8 @@
             window.location.href = "https://www.google.com";
           }, 1800);
         }
+
+        showAgeGateIfNeeded();
 
         enterBtn?.addEventListener("click", function () {
           const dobValue = ageDob?.value || "";
