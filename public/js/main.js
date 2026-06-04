@@ -48,7 +48,9 @@ function isReloadNavigation() {
 }
 
 function resetAgeGateOnFreshArrival() {
-  if (!isInternalReferrer() && !isReloadNavigation()) {
+  const forceAgeGate = ageModal?.dataset.forceAgeGate === "true";
+
+  if (forceAgeGate || (!isInternalReferrer() && !isReloadNavigation())) {
     sessionStorage.removeItem("ageVerified");
   }
 }
