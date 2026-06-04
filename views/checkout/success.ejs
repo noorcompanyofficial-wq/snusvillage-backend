@@ -2,7 +2,11 @@
   <div class="success-card">
     <span class="success-icon">✓</span>
 
-    <% const isClickCollect = order.fulfilment && order.fulfilment.method === "click_collect"; %>
+    <%
+      const isClickCollect = order.fulfilment && order.fulfilment.method === "click_collect";
+      const deliveryServiceLabel = order.fulfilment?.deliveryServiceLabel || "Standard Delivery";
+      const deliveryCutoff = order.fulfilment?.deliveryCutoff || "4:30pm";
+    %>
 
     <% if (paymentPending) { %>
       <h1>Payment Pending</h1>
@@ -49,10 +53,13 @@
       </div>
     <% } else { %>
       <div class="success-collection-box">
-        <span>Delivery</span>
+        <span><%= deliveryServiceLabel %></span>
         <strong><%= order.delivery?.postcode || "United Kingdom" %></strong>
         <p>
-          Your order will be processed for delivery. You will receive updates if further information is needed.
+          Your order will be processed for Royal Mail delivery.
+          <% if (order.fulfilment?.deliveryService === "next_day") { %>
+            Next day delivery applies for orders placed before <%= deliveryCutoff %>.
+          <% } %>
         </p>
       </div>
     <% } %>

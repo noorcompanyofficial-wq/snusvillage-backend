@@ -5,6 +5,8 @@
   data-total="<%= total.toFixed(2) %>"
   data-free-shipping-threshold="<%= typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10 %>"
   data-standard-shipping-fee="<%= typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99 %>"
+  data-next-day-shipping-fee="<%= typeof nextDayShippingFee !== "undefined" ? nextDayShippingFee : 4.99 %>"
+  data-next-day-cutoff="<%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>"
 >
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
@@ -50,6 +52,30 @@
 
       <div id="deliveryFields">
         <h3>Delivery</h3>
+
+        <div class="checkout-delivery-service-options" id="deliveryServiceOptions">
+          <label class="checkout-delivery-service-card is-active" data-delivery-service-card="standard">
+            <input type="radio" name="deliveryService" value="standard" checked>
+            <span>
+              <strong>Standard Delivery</strong>
+              <small>
+                <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
+                  Free for this order.
+                <% } else { %>
+                  £<%= (typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99).toFixed(2) %>, or free over £<%= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10).toFixed(2) %>.
+                <% } %>
+              </small>
+            </span>
+          </label>
+
+          <label class="checkout-delivery-service-card" data-delivery-service-card="next_day">
+            <input type="radio" name="deliveryService" value="next_day">
+            <span>
+              <strong>Royal Mail Next Day</strong>
+              <small>£<%= (typeof nextDayShippingFee !== "undefined" ? nextDayShippingFee : 4.99).toFixed(2) %>. Order before <%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>.</small>
+            </span>
+          </label>
+        </div>
 
         <select name="country" required>
           <option value="United Kingdom">United Kingdom</option>
@@ -179,9 +205,12 @@
   (function () {
     const checkoutPage = document.querySelector(".checkout-page");
     const deliveryFields = document.getElementById("deliveryFields");
+    const deliveryServiceOptions = document.getElementById("deliveryServiceOptions");
     const collectNotice = document.getElementById("clickCollectNotice");
     const radios = document.querySelectorAll('input[name="fulfilmentMethod"]');
     const cards = document.querySelectorAll("[data-fulfilment-card]");
+    const deliveryServiceRadios = document.querySelectorAll('input[name="deliveryService"]');
+    const deliveryServiceCards = document.querySelectorAll("[data-delivery-service-card]");
     const deliveryInputs = deliveryFields ? deliveryFields.querySelectorAll("input, select") : [];
 
     const shippingAmount = document.getElementById("checkoutShippingAmount");
@@ -191,6 +220,8 @@
     const subtotal = Number(checkoutPage?.dataset.subtotal || 0);
     const freeShippingThreshold = Number(checkoutPage?.dataset.freeShippingThreshold || 10);
     const standardShippingFee = Number(checkoutPage?.dataset.standardShippingFee || 1.99);
+    const nextDayShippingFee = Number(checkoutPage?.dataset.nextDayShippingFee || 4.99);
+    const nextDayCutoff = checkoutPage?.dataset.nextDayCutoff || "4:30pm";
 
     function formatMoney(value) {
       return "£" + Number(value || 0).toFixed(2);
@@ -198,7 +229,15 @@
 
     function updateShipping(selected) {
       const isCollect = selected === "click_collect";
-      const shipping = isCollect || subtotal >= freeShippingThreshold ? 0 : standardShippingFee;
+      const selectedDeliveryService =
+        document.querySelector('input[name="deliveryService"]:checked')?.value || "standard";
+      const shipping = isCollect
+        ? 0
+        : selectedDeliveryService === "next_day"
+          ? nextDayShippingFee
+          : subtotal >= freeShippingThreshold
+            ? 0
+            : standardShippingFee;
       const total = subtotal + shipping;
 
       if (shippingAmount) {
@@ -212,6 +251,9 @@
       if (shippingNote) {
         if (isCollect) {
           shippingNote.textContent = "Click & Collect is free.";
+        } else if (selectedDeliveryService === "next_day") {
+          shippingNote.textContent =
+            "Royal Mail Next Day costs " + formatMoney(nextDayShippingFee) + ". Order before " + nextDayCutoff + ".";
         } else if (subtotal >= freeShippingThreshold) {
           shippingNote.textContent = "You qualify for free delivery.";
         } else {
@@ -233,6 +275,10 @@
         collectNotice.hidden = !isCollect;
       }
 
+      if (deliveryServiceOptions) {
+        deliveryServiceOptions.hidden = isCollect;
+      }
+
       deliveryInputs.forEach((input) => {
         if (isCollect) {
           input.removeAttribute("required");
@@ -245,11 +291,25 @@
         card.classList.toggle("is-active", card.dataset.fulfilmentCard === selected);
       });
 
+      deliveryServiceRadios.forEach((radio) => {
+        radio.disabled = isCollect;
+      });
+
       updateShipping(selected);
     }
 
     radios.forEach((radio) => {
       radio.addEventListener("change", updateFulfilment);
+    });
+
+    deliveryServiceRadios.forEach((radio) => {
+      radio.addEventListener("change", function () {
+        deliveryServiceCards.forEach((card) => {
+          card.classList.toggle("is-active", card.dataset.deliveryServiceCard === radio.value && radio.checked);
+        });
+
+        updateShipping(document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery");
+      });
     });
 
     updateFulfilment();

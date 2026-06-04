@@ -42,6 +42,17 @@ function isClickCollect(order) {
   return order.fulfilment?.method === "click_collect";
 }
 
+function getDeliveryServiceText(order) {
+  if (isClickCollect(order)) return "Click & Collect";
+
+  const label = order.fulfilment?.deliveryServiceLabel || "Standard Delivery";
+  const cutoff = order.fulfilment?.deliveryService === "next_day"
+    ? ` Order before ${order.fulfilment?.deliveryCutoff || "4:30pm"} applies.`
+    : "";
+
+  return `${label}${cutoff}`;
+}
+
 function buildItemsText(order) {
   return order.items
     .map((item) => {
@@ -69,6 +80,7 @@ This is a Click & Collect order. Please bring your order confirmation and valid 
 
   return `
 Delivery:
+Service: ${getDeliveryServiceText(order)}
 ${order.delivery?.address || ""}
 ${order.delivery?.city || ""}
 ${order.delivery?.postcode || ""}
@@ -114,6 +126,7 @@ ${buildItemsText(order)}
 
 Subtotal: ${formatMoney(order.subtotal)}
 Shipping: ${formatMoney(order.shipping)}
+Delivery service: ${getDeliveryServiceText(order)}
 Total: ${formatMoney(order.total)}
 
 Payment status: ${order.paymentStatus}
@@ -185,6 +198,7 @@ ${buildItemsText(order)}
 
 Subtotal: ${formatMoney(order.subtotal)}
 Shipping: ${formatMoney(order.shipping)}
+Delivery service: ${getDeliveryServiceText(order)}
 Total: ${formatMoney(order.total)}
 
 Payment status: ${order.paymentStatus}
@@ -241,6 +255,8 @@ Your Snus Village order has been shipped.
 Order #${orderNumber}
 
 ${trackingText}
+
+Delivery service: ${getDeliveryServiceText(order)}
 
 Delivery address:
 ${order.delivery?.address || ""}

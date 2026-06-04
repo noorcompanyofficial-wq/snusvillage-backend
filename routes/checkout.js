@@ -87,7 +87,20 @@ function getStandardShippingFee() {
   return Number(process.env.STANDARD_SHIPPING_FEE || 1.99);
 }
 
-function calculateCartTotals(cart, fulfilmentMethod = "delivery") {
+function getNextDayShippingFee() {
+  return Number(process.env.NEXT_DAY_SHIPPING_FEE || 4.99);
+}
+
+function getNextDayDeliveryCutoff() {
+  return process.env.NEXT_DAY_DELIVERY_CUTOFF || "4:30pm";
+}
+
+function getDeliveryServiceLabel(fulfilmentMethod, deliveryService) {
+  if (fulfilmentMethod === "click_collect") return "Click & Collect";
+  return deliveryService === "next_day" ? "Royal Mail Next Day" : "Standard Delivery";
+}
+
+function calculateCartTotals(cart, fulfilmentMethod = "delivery", deliveryService = "standard") {
   const subtotal = cart.items.reduce((sum, item) => {
     const price = item.priceAtTime || item.product?.price || 0;
     return sum + price * item.quantity;
@@ -95,11 +108,18 @@ function calculateCartTotals(cart, fulfilmentMethod = "delivery") {
 
   const freeShippingThreshold = getFreeShippingThreshold();
   const standardShippingFee = getStandardShippingFee();
+  const nextDayShippingFee = getNextDayShippingFee();
 
-  const shipping =
-    fulfilmentMethod === "click_collect" || subtotal >= freeShippingThreshold
-      ? 0
-      : standardShippingFee;
+  let shipping = 0;
+
+  if (fulfilmentMethod !== "click_collect") {
+    shipping =
+      deliveryService === "next_day"
+        ? nextDayShippingFee
+        : subtotal >= freeShippingThreshold
+          ? 0
+          : standardShippingFee;
+  }
 
   const total = subtotal + shipping;
 
@@ -109,6 +129,8 @@ function calculateCartTotals(cart, fulfilmentMethod = "delivery") {
     total,
     freeShippingThreshold,
     standardShippingFee,
+    nextDayShippingFee,
+    nextDayDeliveryCutoff: getNextDayDeliveryCutoff(),
   };
 }
 
@@ -240,9 +262,9 @@ async function calculateDiscountForCart(cart, code) {
   };
 }
 
-async function calculateCheckoutTotals(req, cart, fulfilmentMethod = "delivery") {
-  const settings = await getCheckoutStoreSettings();
-  const { subtotal, shipping } = calculateCartTotals(cart, settings, fulfilmentMethod);
+async function calculateCheckoutTotals(req, cart, fulfilmentMethod = "delivery", deliveryService = "standard") {
+  const { subtotal, shipping, freeShippingThreshold, standardShippingFee, nextDayShippingFee, nextDayDeliveryCutoff } =
+    calculateCartTotals(cart, fulfilmentMethod, deliveryService);
   const discountResult = await calculateDiscountForCart(cart, req.session.checkoutDiscountCode);
 
   if (!discountResult.ok) {
@@ -258,6 +280,10 @@ async function calculateCheckoutTotals(req, cart, fulfilmentMethod = "delivery")
     discountAmount,
     total,
     discountResult,
+    freeShippingThreshold,
+    standardShippingFee,
+    nextDayShippingFee,
+    nextDayDeliveryCutoff,
   };
 }
 
@@ -455,7 +481,7 @@ router.get("/", async (req, res, next) => {
     }
 
     const settings = await getCheckoutStoreSettings();
-    const { subtotal, shipping, discountAmount, total, discountResult } =
+    const { subtotal, shipping, discountAmount, total, discountResult, freeShippingThreshold, standardShippingFee, nextDayShippingFee, nextDayDeliveryCutoff } =
       await calculateCheckoutTotals(req, cart, "delivery");
 
     const verification = await checkoutVerificationRequired(req);
@@ -479,6 +505,10 @@ router.get("/", async (req, res, next) => {
       appliedDiscountCode: req.session.checkoutDiscountCode || "",
       checkoutSettings: settings,
       verificationRequired,
+      freeShippingThreshold,
+      standardShippingFee,
+      nextDayShippingFee,
+      nextDayDeliveryCutoff,
     });
   } catch (error) {
     next(error);
@@ -561,14 +591,16 @@ router.post("/place-order", async (req, res, next) => {
       }
     }
 
-    const settings = await getCheckoutStoreSettings();
-    const { subtotal, shipping, discountAmount, total, discountResult } =
-      await calculateCheckoutTotals(req, cart, "delivery");
-
     const fulfilmentMethod =
       req.body.fulfilmentMethod === "click_collect" ? "click_collect" : "delivery";
 
     const isClickCollect = fulfilmentMethod === "click_collect";
+    const deliveryService =
+      !isClickCollect && req.body.deliveryService === "next_day" ? "next_day" : "standard";
+
+    const settings = await getCheckoutStoreSettings();
+    const { subtotal, shipping, discountAmount, total, discountResult } =
+      await calculateCheckoutTotals(req, cart, fulfilmentMethod, deliveryService);
 
     if (!isClickCollect) {
       if (!req.body.address || !req.body.city || !req.body.postcode) {
@@ -612,6 +644,9 @@ router.post("/place-order", async (req, res, next) => {
       },
       fulfilment: {
         method: fulfilmentMethod,
+        deliveryService: isClickCollect ? "collection" : deliveryService,
+        deliveryServiceLabel: getDeliveryServiceLabel(fulfilmentMethod, deliveryService),
+        deliveryCutoff: deliveryService === "next_day" ? getNextDayDeliveryCutoff() : "",
         collectionBranch: isClickCollect ? settings.clickCollectBranch : "",
         collectionAddress: isClickCollect ? settings.clickCollectAddress : "",
       },

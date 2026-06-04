@@ -403,6 +403,13 @@ body {
   margin-bottom: 18px;
 }
 
+.checkout-delivery-service-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
 .checkout-fulfilment-card {
   display: flex;
   gap: 12px;
@@ -418,24 +425,44 @@ body {
     transform 0.2s ease;
 }
 
+.checkout-delivery-service-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 15px;
+  border-radius: 16px;
+  border: 1px solid rgba(9, 31, 77, 0.12);
+  background: linear-gradient(180deg, #ffffff, #f8faff);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
 .checkout-fulfilment-card:hover,
-.checkout-fulfilment-card.is-active {
+.checkout-fulfilment-card.is-active,
+.checkout-delivery-service-card:hover,
+.checkout-delivery-service-card.is-active {
   border-color: rgba(18, 59, 138, 0.35);
   box-shadow: 0 12px 28px rgba(9, 31, 77, 0.08);
   transform: translateY(-2px);
 }
 
-.checkout-fulfilment-card input {
+.checkout-fulfilment-card input,
+.checkout-delivery-service-card input {
   margin-top: 3px;
 }
 
-.checkout-fulfilment-card strong {
+.checkout-fulfilment-card strong,
+.checkout-delivery-service-card strong {
   display: block;
   color: #061633;
   font-size: 0.96rem;
 }
 
-.checkout-fulfilment-card small {
+.checkout-fulfilment-card small,
+.checkout-delivery-service-card small {
   display: block;
   margin-top: 4px;
   color: #64748b;
@@ -467,7 +494,8 @@ body {
 }
 
 @media (max-width: 760px) {
-  .checkout-fulfilment-options {
+  .checkout-fulfilment-options,
+  .checkout-delivery-service-options {
     grid-template-columns: 1fr;
   }
 }
@@ -513,7 +541,9 @@ body {
 /* ===== CLICK COLLECT HIDE FIX START ===== */
 
 .checkout-collect-notice[hidden],
-#clickCollectNotice[hidden] {
+#clickCollectNotice[hidden],
+.checkout-delivery-service-options[hidden],
+#deliveryServiceOptions[hidden] {
   display: none !important;
 }
 

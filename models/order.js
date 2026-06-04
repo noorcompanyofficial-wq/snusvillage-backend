@@ -51,6 +51,19 @@ const orderSchema = new mongoose.Schema(
         enum: ["delivery", "click_collect"],
         default: "delivery",
       },
+      deliveryService: {
+        type: String,
+        enum: ["standard", "next_day", "collection"],
+        default: "standard",
+      },
+      deliveryServiceLabel: {
+        type: String,
+        default: "Standard Delivery",
+      },
+      deliveryCutoff: {
+        type: String,
+        default: "",
+      },
       collectionBranch: {
         type: String,
         default: "",

@@ -52,7 +52,7 @@
       <i class="fa-solid <%= isClickCollect ? 'fa-store' : 'fa-truck' %>"></i>
       <span>Fulfilment</span>
       <strong><%= isClickCollect ? "Click & Collect" : "Delivery" %></strong>
-      <small><%= isClickCollect ? (order.fulfilment?.collectionBranch || "Collection") : "Royal Mail / Delivery" %></small>
+      <small><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? (order.fulfilment?.collectionBranch || "Collection") : "Royal Mail / Delivery") %></small>
     </div>
   </div>
 
@@ -96,7 +96,26 @@
       <div class="admin-detail-list">
         <div>
           <span>Method</span>
-          <strong><%= isClickCollect ? "Click & Collect" : "Delivery" %></strong>
+          <strong><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? "Click & Collect" : "Delivery") %></strong>
+        </div>
+
+        <% if (!isClickCollect && order.fulfilment?.deliveryService === "next_day") { %>
+          <div>
+            <span>Cut-Off</span>
+            <strong>Order before <%= order.fulfilment?.deliveryCutoff || "4:30pm" %></strong>
+          </div>
+        <% } %>
+
+        <% if (!isClickCollect) { %>
+          <div>
+            <span>Courier</span>
+            <strong>Royal Mail</strong>
+          </div>
+        <% } %>
+
+        <div>
+          <span>Delivery Charge</span>
+          <strong><%= Number(order.shipping || 0) === 0 ? "Free" : "£" + Number(order.shipping || 0).toFixed(2) %></strong>
         </div>
 
         <div>
