@@ -771,10 +771,38 @@
           return age >= 18;
         }
 
+        function hasValidDob(value) {
+          if (!value) return false;
+          const dob = new Date(value + "T00:00:00");
+          return !Number.isNaN(dob.getTime());
+        }
+
+        function redirectUnderageVisitor() {
+          if (ageError) {
+            ageError.textContent = "You must be 18 or over to enter this website. You will now be redirected.";
+            ageError.hidden = false;
+          }
+
+          sessionStorage.removeItem("ageVerified");
+          window.setTimeout(function () {
+            window.location.href = "https://www.google.com";
+          }, 1800);
+        }
+
         enterBtn?.addEventListener("click", function () {
-          if (!isAdultFromDob(ageDob?.value)) {
-            if (ageError) ageError.hidden = false;
+          const dobValue = ageDob?.value || "";
+
+          if (!hasValidDob(dobValue)) {
+            if (ageError) {
+              ageError.textContent = "Please enter a valid date of birth showing you are 18 or over.";
+              ageError.hidden = false;
+            }
             ageDob?.focus();
+            return;
+          }
+
+          if (!isAdultFromDob(dobValue)) {
+            redirectUnderageVisitor();
             return;
           }
 
