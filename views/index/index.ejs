@@ -722,5 +722,80 @@
     <%- include("../partials/footer") %>
 
     <script src="/js/landing.js" defer></script>
-</body>
+
+    <script>
+      (function () {
+        const ageModal = document.getElementById("ageModal");
+        const enterBtn = document.getElementById("enterSite");
+        const exitBtn = document.getElementById("exitSite");
+        const ageDob = document.getElementById("ageDob");
+        const ageError = document.getElementById("ageError");
+
+        if (!ageModal) return;
+
+        function isAdultFromDob(value) {
+          if (!value) return false;
+
+          const dob = new Date(value);
+          if (Number.isNaN(dob.getTime())) return false;
+
+          const today = new Date();
+          let age = today.getFullYear() - dob.getFullYear();
+          const monthDiff = today.getMonth() - dob.getMonth();
+
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age -= 1;
+          }
+
+          return age >= 18;
+        }
+
+        function hideAgeGate() {
+          ageModal.classList.remove("is-visible");
+          ageModal.setAttribute("aria-hidden", "true");
+          document.body.classList.remove("age-modal-open");
+        }
+
+        function showAgeGate() {
+          ageModal.classList.add("is-visible");
+          ageModal.setAttribute("aria-hidden", "false");
+          document.body.classList.add("age-modal-open");
+        }
+
+        if (sessionStorage.getItem("ageVerified") === "true") {
+          hideAgeGate();
+        } else {
+          showAgeGate();
+        }
+
+        enterBtn?.addEventListener("click", function () {
+          const dobValue = ageDob?.value || "";
+
+          if (!isAdultFromDob(dobValue)) {
+            if (ageError) {
+              ageError.textContent = "You must be 18 or over to enter this website.";
+              ageError.hidden = false;
+            }
+            return;
+          }
+
+          sessionStorage.setItem("ageVerified", "true");
+          hideAgeGate();
+        });
+
+        exitBtn?.addEventListener("click", function () {
+          sessionStorage.removeItem("ageVerified");
+          window.location.href = "https://www.google.com";
+        });
+
+        ageDob?.addEventListener("input", function () {
+          if (ageError) {
+            ageError.textContent = "";
+            ageError.hidden = true;
+          }
+        });
+      })();
+    </script>
+
+  </body>
 </html>
