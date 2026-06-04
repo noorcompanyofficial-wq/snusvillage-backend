@@ -1455,6 +1455,8 @@ router.post("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     );
 
+    global.__snusStoreSettingsCacheBust = Date.now();
+
     req.flash("success", "Store settings updated");
     res.redirect("/admin/settings");
   } catch (err) {

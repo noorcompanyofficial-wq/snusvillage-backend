@@ -34,11 +34,13 @@ const defaultStoreSettings = {
 
 let cachedStoreSettings = defaultStoreSettings;
 let cachedStoreSettingsAt = 0;
+const STORE_SETTINGS_CACHE_MS = 60 * 1000;
 
 async function getCachedStoreSettings() {
   const cacheAge = Date.now() - cachedStoreSettingsAt;
+  const cacheBustAt = Number(global.__snusStoreSettingsCacheBust || 0);
 
-  if (cacheAge < 60 * 1000) {
+  if (cacheAge < STORE_SETTINGS_CACHE_MS && cacheBustAt <= cachedStoreSettingsAt) {
     return cachedStoreSettings;
   }
 
@@ -62,6 +64,27 @@ async function getCachedStoreSettings() {
     console.log("Store settings load failed:", err.message);
     return cachedStoreSettings || defaultStoreSettings;
   }
+}
+
+function isMaintenanceBypass(req) {
+  const allowedPrefixes = [
+    "/admin",
+    "/auth",
+    "/css",
+    "/js",
+    "/images",
+    "/uploads",
+    "/api",
+    "/didit",
+  ];
+
+  return (
+    req.path === "/maintenance" ||
+    req.path === "/health" ||
+    req.path === "/health/db" ||
+    req.path === "/favicon.ico" ||
+    allowedPrefixes.some((prefix) => req.path.startsWith(prefix))
+  );
 }
 
 
@@ -283,6 +306,7 @@ function optimiseImageUrl(url, options = {}) {
 app.use(async (req, res, next) => {
   const siteUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
   const cleanPath = req.path === "/" ? "" : req.path;
+  const storeSettings = await getCachedStoreSettings();
 
   res.locals.user = req.session?.user || null;
   res.locals.currentPath = req.path;
@@ -290,7 +314,7 @@ app.use(async (req, res, next) => {
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
   res.locals.optimiseImageUrl = optimiseImageUrl;
-  res.locals.storeSettings = await getCachedStoreSettings();
+  res.locals.storeSettings = storeSettings;
   next();
 });
 
@@ -300,6 +324,30 @@ app.set("views", path.join(__dirname, "views"));
 app.set("layout", "layouts/layout");
 
 app.use(ejsLayouts);
+
+app.get("/maintenance", async (req, res) => {
+  const settings = await getCachedStoreSettings();
+
+  res.status(settings.maintenanceMode ? 503 : 200).render("maintenance/maintenance", {
+    layout: false,
+    title: "Snus Village Maintenance",
+    settings,
+  });
+});
+
+app.use((req, res, next) => {
+  const settings = res.locals.storeSettings || cachedStoreSettings;
+
+  if (settings?.maintenanceMode && !isMaintenanceBypass(req)) {
+    return res.status(503).render("maintenance/maintenance", {
+      layout: false,
+      title: "Snus Village Maintenance",
+      settings,
+    });
+  }
+
+  next();
+});
 
 // ====== Health Check ======
 app.get("/health", (req, res) => {

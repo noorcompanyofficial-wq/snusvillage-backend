@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snus Village Coming Soon</title>
+    <title>Snus Village Maintenance</title>
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
     <link rel="stylesheet" href="/css/maintenance.css" />
@@ -18,11 +18,10 @@
 
         <span class="maintenance-kicker">Snus Village</span>
 
-        <h1>Online Store Coming Soon</h1>
+        <h1>Maintenance Mode</h1>
 
         <p>
-          Our new website is currently being prepared. We are working on a smoother shopping experience,
-          secure online payments, and Click & Collect support.
+          <%= settings?.maintenanceMessage || "Snus Village is currently updating the website. Please check back soon." %>
         </p>
 
         <div class="maintenance-info">
@@ -37,8 +36,8 @@
           </div>
 
           <div>
-            <strong>Soon</strong>
-            <span>Online Launch</span>
+            <strong>Back Soon</strong>
+            <span>Website Update</span>
           </div>
         </div>
 
