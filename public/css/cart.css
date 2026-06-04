@@ -364,4 +364,33 @@ body > .cart .checkout-btn {
   font-weight: 850;
 }
 
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0 16px;
+}
+
+.payment-methods span {
+  width: 100%;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.payment-methods strong {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid rgba(18, 59, 138, 0.13);
+  border-radius: 999px;
+  color: #123b8a;
+  background: rgba(18, 59, 138, 0.06);
+  font-size: 0.76rem;
+  font-weight: 950;
+}
+
 /* ===== FREE SHIPPING NOTE END ===== */

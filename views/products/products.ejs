@@ -115,8 +115,8 @@
       <div class="product-service-grid">
         <div>
           <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
-          <strong>Fast UK delivery</strong>
-          <span>Dispatch and delivery options are shown clearly at checkout.</span>
+          <strong>Free delivery over £<%= Number(storeSettings?.freeDeliveryThreshold || 10).toFixed(2) %></strong>
+          <span>UK delivery options and charges are shown clearly at checkout.</span>
         </div>
         <div>
           <i class="fa-solid fa-id-card" aria-hidden="true"></i>

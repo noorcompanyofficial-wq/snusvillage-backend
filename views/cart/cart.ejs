@@ -63,6 +63,10 @@
           const subtotal = cart.items.reduce((sum, item) => {
             return sum + (item.priceAtTime * item.quantity);
           }, 0);
+          const freeDeliveryThreshold = Number(storeSettings?.freeDeliveryThreshold || 10);
+          const standardDeliveryFee = Number(storeSettings?.deliveryPrice || 1.99);
+          const deliveryFee = subtotal >= freeDeliveryThreshold ? 0 : standardDeliveryFee;
+          const cartTotal = subtotal + deliveryFee;
         %>
 
         <div class="summary-row">
@@ -72,20 +76,27 @@
 
         <div class="summary-row">
           <span>Delivery</span>
-          <strong><%= subtotal >= 10 ? "Free" : "£1.99 under £10" %></strong>
+          <strong><%= deliveryFee === 0 ? "Free" : "£" + standardDeliveryFee.toFixed(2) + " under £" + freeDeliveryThreshold.toFixed(2) %></strong>
         </div>
 
         <div class="cart-free-shipping-note">
-          <% if (subtotal >= 10) { %>
+          <% if (subtotal >= freeDeliveryThreshold) { %>
             You qualify for free delivery.
           <% } else { %>
-            Spend £<%= (10 - subtotal).toFixed(2) %> more to get free delivery.
+            Spend £<%= (freeDeliveryThreshold - subtotal).toFixed(2) %> more to get free delivery.
           <% } %>
+        </div>
+
+        <div class="payment-methods" aria-label="Accepted payment methods">
+          <span>Accepted via SumUp</span>
+          <strong>Visa</strong>
+          <strong>Mastercard</strong>
+          <strong>Debit/Credit Cards</strong>
         </div>
 
         <div class="summary-total">
           <span>Total</span>
-          <strong>£<%= subtotal.toFixed(2) %></strong>
+          <strong>£<%= cartTotal.toFixed(2) %></strong>
         </div>
 
         <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>

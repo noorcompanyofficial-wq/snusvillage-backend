@@ -69,6 +69,13 @@
         <span><%= checkoutSettings?.checkoutNotice || "You Will Be Redirected To SumUp To Complete Your Card Payment Securely." %></span>
       </div>
 
+      <div class="payment-methods checkout-payment-methods" aria-label="Accepted payment methods">
+        <span>Accepted via SumUp</span>
+        <strong>Visa</strong>
+        <strong>Mastercard</strong>
+        <strong>Debit/Credit Cards</strong>
+      </div>
+
       <% if (verificationRequired) { %>
         <div class="checkout-verification-inline">
           <div>
