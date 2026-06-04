@@ -4,6 +4,8 @@
   const hasSalePrice = product.discountPrice && product.discountPrice > 0;
   const inStock = Number(product.stock || 0) > 0;
   const productImage = product.images && product.images.length > 0 ? product.images[0] : "";
+  const pouchesPerCan = Number(product.pouchesPerCan || 20);
+  const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " pouches" : "N/A";
 %>
 
 <section class="product-detail-page product-detail-redesign">
@@ -70,6 +72,10 @@
           <dt>Flavour</dt>
           <dd><%= product.flavour || "N/A" %></dd>
         </div>
+        <div>
+          <dt>Pouches per can</dt>
+          <dd><%= pouchesPerCanLabel %></dd>
+        </div>
         <% if (product.category) { %>
           <div>
             <dt>Category</dt>
@@ -135,6 +141,7 @@
         <li><strong>Flavour profile:</strong> <%= product.flavour || "See product description" %></li>
         <li><strong>Strength level:</strong> <%= product.strength || "N/A" %></li>
         <li><strong>Nicotine:</strong> <%= product.nicotine ? product.nicotine + "mg" : "N/A" %></li>
+        <li><strong>Portion count:</strong> <%= pouchesPerCanLabel %> per can</li>
       </ul>
     </section>
 

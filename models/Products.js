@@ -29,6 +29,12 @@ const productSchema = new mongoose.Schema(
       require: true,
     },
 
+    pouchesPerCan: {
+      type: Number,
+      default: 20,
+      min: 0,
+    },
+
     price: {
       type: Number,
       required: true,
