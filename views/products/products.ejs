@@ -4,6 +4,7 @@
   const hasSalePrice = product.discountPrice && product.discountPrice > 0;
   const inStock = Number(product.stock || 0) > 0;
   const productImage = product.images && product.images.length > 0 ? product.images[0] : "";
+  const hasMultipleProductImages = product.images && product.images.length > 1;
   const pouchesPerCan = Number(product.pouchesPerCan || 20);
   const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " pouches" : "N/A";
 %>
@@ -21,16 +22,24 @@
     <div class="product-gallery">
       <div class="product-main-image">
         <% if (productImage) { %>
-          <img src="<%= optimiseImageUrl(productImage, { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
+          <% if (hasMultipleProductImages) { %>
+            <button class="product-gallery-btn product-gallery-btn--prev" type="button" aria-label="Previous product image">‹</button>
+          <% } %>
+          <img id="productMainImage" src="<%= optimiseImageUrl(productImage, { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
+          <% if (hasMultipleProductImages) { %>
+            <button class="product-gallery-btn product-gallery-btn--next" type="button" aria-label="Next product image">›</button>
+          <% } %>
         <% } else { %>
           <div class="product-image-placeholder">No image</div>
         <% } %>
       </div>
 
-      <% if (product.images && product.images.length > 1) { %>
+      <% if (hasMultipleProductImages) { %>
         <div class="product-thumbnails" aria-label="Product images">
           <% product.images.forEach((img, i) => { %>
-            <img src="<%= optimiseImageUrl(img, { width: 260 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
+            <button class="product-thumbnail-btn <%= i === 0 ? 'is-active' : '' %>" type="button" data-product-image="<%= optimiseImageUrl(img, { width: 1200, quality: 'auto:best' }) %>" aria-label="Show <%= product.name %> image <%= i + 1 %>">
+              <img src="<%= optimiseImageUrl(img, { width: 260 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
+            </button>
           <% }) %>
         </div>
       <% } %>
@@ -164,4 +173,100 @@
       </ul>
     </section>
   </div>
+
+  <% if (related && related.length) { %>
+    <section class="product-brand-carousel" aria-labelledby="brandCarouselTitle">
+      <div class="product-carousel-head">
+        <div>
+          <span class="product-carousel-eyebrow">Featured collection</span>
+          <h2 id="brandCarouselTitle">More from <%= product.brand || "this brand" %></h2>
+          <p>Explore other <%= product.brand || "Snus Village" %> products with different flavours, strengths and profiles.</p>
+        </div>
+
+        <a href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>">View all</a>
+      </div>
+
+      <div class="product-carousel-shell">
+        <button class="product-related-nav product-related-nav--prev" type="button" aria-label="Scroll previous products">‹</button>
+
+        <div class="product-related-track" id="relatedProductsTrack">
+          <% related.forEach((item) => { %>
+            <%
+              const relatedImage = item.images && item.images.length ? item.images[0] : "";
+              const relatedPrice = Number(item.discountPrice && item.discountPrice > 0 ? item.discountPrice : item.price || 0);
+            %>
+            <article class="product-related-card">
+              <a href="/products/<%= item.slug || item._id %>">
+                <div class="product-related-image">
+                  <% if (relatedImage) { %>
+                    <img src="<%= optimiseImageUrl(relatedImage, { width: 420, quality: 'auto:good' }) %>" alt="<%= item.name %>" loading="lazy" decoding="async">
+                  <% } else { %>
+                    <span>No image</span>
+                  <% } %>
+                </div>
+
+                <span><%= item.flavour || item.strength || "Nicotine pouch" %></span>
+                <h3><%= item.name %></h3>
+
+                <div class="product-related-meta">
+                  <strong>£<%= relatedPrice.toFixed(2) %></strong>
+                  <small><%= item.nicotine ? item.nicotine + "mg" : item.strength || "View product" %></small>
+                </div>
+              </a>
+            </article>
+          <% }) %>
+        </div>
+
+        <button class="product-related-nav product-related-nav--next" type="button" aria-label="Scroll next products">›</button>
+      </div>
+    </section>
+  <% } %>
 </section>
+
+<script>
+  (function () {
+    const mainImage = document.getElementById("productMainImage");
+    const thumbnailButtons = Array.from(document.querySelectorAll(".product-thumbnail-btn"));
+    const galleryPrev = document.querySelector(".product-gallery-btn--prev");
+    const galleryNext = document.querySelector(".product-gallery-btn--next");
+    let activeIndex = 0;
+
+    function showImage(index) {
+      if (!mainImage || !thumbnailButtons.length) return;
+
+      activeIndex = (index + thumbnailButtons.length) % thumbnailButtons.length;
+      const selected = thumbnailButtons[activeIndex];
+      const imageUrl = selected.dataset.productImage;
+
+      if (imageUrl) {
+        mainImage.src = imageUrl;
+      }
+
+      thumbnailButtons.forEach((button, buttonIndex) => {
+        button.classList.toggle("is-active", buttonIndex === activeIndex);
+      });
+    }
+
+    thumbnailButtons.forEach((button, index) => {
+      button.addEventListener("click", () => showImage(index));
+    });
+
+    galleryPrev?.addEventListener("click", () => showImage(activeIndex - 1));
+    galleryNext?.addEventListener("click", () => showImage(activeIndex + 1));
+
+    const relatedTrack = document.getElementById("relatedProductsTrack");
+    const relatedPrev = document.querySelector(".product-related-nav--prev");
+    const relatedNext = document.querySelector(".product-related-nav--next");
+
+    function scrollRelated(direction) {
+      if (!relatedTrack) return;
+      relatedTrack.scrollBy({
+        left: direction * Math.max(260, relatedTrack.clientWidth * 0.8),
+        behavior: "smooth",
+      });
+    }
+
+    relatedPrev?.addEventListener("click", () => scrollRelated(-1));
+    relatedNext?.addEventListener("click", () => scrollRelated(1));
+  })();
+</script>

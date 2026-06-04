@@ -84,7 +84,11 @@ router.get("/:id", async (req, res) => {
     const related = await Product.find({
       brand: product.brand,
       _id: { $ne: product._id },
-    }).limit(4);
+      isActive: { $ne: false },
+    })
+      .sort({ isBestSeller: -1, isFeatured: -1, updatedAt: -1 })
+      .limit(10)
+      .lean();
 
     const seo = buildProductSeo(product);
 
