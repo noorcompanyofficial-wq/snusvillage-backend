@@ -117,6 +117,7 @@ const verificationRoutes = require("./routes/verification");
 const diditRoutes = require("./routes/didit");
 const Product = require("./models/Products");
 const legalRoutes = require("./routes/legal");
+const newsletterRoutes = require("./routes/newsletter");
 
 const wholesaleRoutes = require("./routes/wholesale");
 
@@ -313,6 +314,7 @@ app.use(async (req, res, next) => {
   res.locals.canonical = `${siteUrl}${cleanPath}`;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
+  res.locals.query = req.query || {};
   res.locals.optimiseImageUrl = optimiseImageUrl;
   res.locals.storeSettings = storeSettings;
   next();
@@ -388,6 +390,7 @@ app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
 app.use("/api", verificationRoutes);
 app.use("/didit", diditRoutes);
+app.use("/newsletter", newsletterRoutes);
 app.use("/", legalRoutes);
 
 app.use("/cart", cartRoutes);

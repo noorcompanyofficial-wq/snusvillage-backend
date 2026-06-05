@@ -51,25 +51,43 @@
       <a href="/contact">Contact Form</a>
     </div>
 
-    <!-- CONTACT -->
-    <div class="footer-col footer-contact-col">
-      <h4>Support</h4>
+    <div class="footer-col footer-contact-col" id="newsletter">
+      <div class="newsletter-card">
+        <span class="newsletter-eyebrow">Snus Village updates</span>
+        <h4>Join The Newsletter</h4>
+        <p>Receive new stock alerts, product drops, delivery updates, and store notices for adult customers.</p>
 
-      <p>Join updates for new stock, product drops, and service notices.</p>
+        <% if (typeof query !== "undefined" && query.newsletter === "joined") { %>
+          <p class="newsletter-message newsletter-message--success">You are subscribed to Snus Village updates.</p>
+        <% } else if (typeof query !== "undefined" && query.newsletter === "already") { %>
+          <p class="newsletter-message newsletter-message--success">You are already on the Snus Village newsletter list.</p>
+        <% } else if (typeof query !== "undefined" && query.newsletter === "invalid") { %>
+          <p class="newsletter-message newsletter-message--error">Please enter a valid email address.</p>
+        <% } else if (typeof query !== "undefined" && query.newsletter === "consent") { %>
+          <p class="newsletter-message newsletter-message--error">Please tick the marketing consent box to subscribe.</p>
+        <% } else if (typeof query !== "undefined" && query.newsletter === "limited") { %>
+          <p class="newsletter-message newsletter-message--error">Too many signup attempts. Please try again shortly.</p>
+        <% } else if (typeof query !== "undefined" && query.newsletter === "error") { %>
+          <p class="newsletter-message newsletter-message--error">We could not save your signup right now. Please try again.</p>
+        <% } %>
 
-      <form class="newsletter" aria-label="Newsletter signup">
-        <input type="email" placeholder="Email updates" aria-label="Email address" />
-        <label class="newsletter-consent">
-          <input type="checkbox" required>
-          <span>I agree to receive Snus Village marketing emails and understand I can unsubscribe at any time.</span>
-        </label>
-        <small class="newsletter-privacy">
-          We handle your data under our <a href="/privacy-policy">Privacy Policy</a>.
-        </small>
-        <button type="submit" aria-label="Join newsletter">
-          <span aria-hidden="true">→</span>
-        </button>
-      </form>
+        <form class="newsletter" action="/newsletter/subscribe" method="POST" aria-label="Newsletter signup">
+          <div class="newsletter-input-row">
+            <label for="newsletterEmail">Email address</label>
+            <input id="newsletterEmail" name="email" type="email" placeholder="hello@example.com" autocomplete="email" required />
+            <button type="submit" aria-label="Join newsletter">
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <label class="newsletter-consent">
+            <input type="checkbox" name="marketingConsent" required>
+            <span>I am 18+ and agree to receive Snus Village marketing emails. I understand I can unsubscribe at any time.</span>
+          </label>
+          <small class="newsletter-privacy">
+            We handle your data under our <a href="/privacy-policy">Privacy Policy</a>.
+          </small>
+        </form>
+      </div>
     </div>
   </div>
 
