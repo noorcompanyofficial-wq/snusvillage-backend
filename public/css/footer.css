@@ -336,3 +336,94 @@
     grid-column: auto;
   }
 }
+
+/* ===== NEWSLETTER CROSS-BROWSER FIX START ===== */
+
+.footer .newsletter-card {
+  width: 100%;
+  max-width: 360px;
+}
+
+.footer .newsletter {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.footer .newsletter-input-row {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 48px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 52px !important;
+}
+
+.footer .newsletter-input-row label {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.footer .newsletter-input-row input[type="email"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 52px !important;
+  padding: 0 15px !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  background: transparent !important;
+  font-size: 16px !important;
+}
+
+.footer .newsletter-input-row button {
+  width: 48px !important;
+  height: 52px !important;
+  min-width: 48px !important;
+  border-radius: 0 !important;
+}
+
+.footer .newsletter-consent {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.footer .newsletter-consent input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  margin: 2px 0 0 !important;
+}
+
+.footer .newsletter-consent span {
+  display: block !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.footer .newsletter-privacy {
+  display: block !important;
+}
+
+@media (max-width: 640px) {
+  .footer .newsletter-card {
+    max-width: none;
+  }
+}
+
+/* ===== NEWSLETTER CROSS-BROWSER FIX END ===== */
