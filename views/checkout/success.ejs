@@ -1,4 +1,20 @@
 <div class="checkout-success-page">
+  <% const isPaymentPending = typeof paymentPending !== "undefined" && paymentPending; %>
+
+  <% if (!isPaymentPending) { %>
+    <!-- Event snippet for Purchase (1) conversion page -->
+    <script>
+      if (typeof gtag === "function") {
+        gtag("event", "conversion", {
+          send_to: "AW-18231402827/mT1NCK39tL4cEMvCtPVD",
+          value: <%= Number(order.total || 0).toFixed(2) %>,
+          currency: "GBP",
+          transaction_id: <%- JSON.stringify(String(order._id || "")) %>
+        });
+      }
+    </script>
+  <% } %>
+
   <div class="success-card">
     <span class="success-icon">✓</span>
 
@@ -8,7 +24,7 @@
       const deliveryCutoff = order.fulfilment?.deliveryCutoff || "4:30pm";
     %>
 
-    <% if (paymentPending) { %>
+    <% if (isPaymentPending) { %>
       <h1>Payment Pending</h1>
 
       <p>
