@@ -207,14 +207,6 @@ const homepageContentSchema = new mongoose.Schema(
             imageSrc: "/images/header/h-1.jpeg",
             alt: "SVG Distro Location Image 1",
           },
-          {
-            imageSrc: "/images/header/h-2.jpeg",
-            alt: "SVG Distro Location Image 2",
-          },
-          {
-            imageSrc: "/images/delivery/delivery.jpg",
-            alt: "SVG Distro Location Image 3",
-          },
         ],
       },
     },

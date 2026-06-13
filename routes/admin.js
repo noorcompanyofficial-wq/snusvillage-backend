@@ -334,8 +334,6 @@ router.post(
     { name: "heroImage2", maxCount: 1 },
     { name: "heroImage3", maxCount: 1 },
     { name: "distroImage1", maxCount: 1 },
-    { name: "distroImage2", maxCount: 1 },
-    { name: "distroImage3", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
@@ -366,15 +364,12 @@ router.post(
         }))
       );
 
-      const distroImages = await Promise.all(
-        [1, 2, 3].map(async (number) => ({
-          imageSrc: await imagePath(
-            `distroImage${number}`,
-            body[`distroImageSrc${number}`]
-          ),
-          alt: String(body[`distroImageAlt${number}`] || "").trim(),
-        }))
-      );
+      const distroImages = [
+        {
+          imageSrc: await imagePath("distroImage1", body.distroImageSrc1),
+          alt: String(body.distroImageAlt1 || "").trim(),
+        },
+      ];
 
       const badges = String(body.distroBadges || "")
         .split(",")

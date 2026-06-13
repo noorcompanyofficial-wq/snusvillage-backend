@@ -491,9 +491,8 @@
                 ? svDistro.images
                 : [
                     { imageSrc: "/images/header/h-1.jpeg", alt: "Snus Village premium nicotine pouches UK" },
-                    { imageSrc: "/images/header/h-2.webp", alt: "Tobacco-free nicotine pouches for adult customers" },
-                    { imageSrc: "/images/delivery/delivery.webp", alt: "Smoke-free alternatives from Snus Village London" },
                   ];
+              const svDistroImage = svDistroImages[0] || {};
               const svDistroBadges = svDistro.badges && svDistro.badges.length
                 ? svDistro.badges
                 : ["Stock Support", "Trade Enquiries", "Southall", "18+ Only"];
@@ -521,26 +520,13 @@
 
               <div class="sv-distro-carousel" id="svgDistroCarousel">
                 <div class="sv-distro-track">
-                  <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
-                    <img
-                      src="<%= optimiseImageUrl(image.imageSrc || '/images/header/h-1.jpeg', { width: 640 }) %>"
-                      alt="<%= image.alt || 'SVG Distro Location Image' %>"
-                      class="<%= index === 0 ? 'is-active' : '' %>"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  <% }) %>
-                </div>
-
-                <div class="sv-distro-controls">
-                  <button type="button" class="sv-distro-prev" aria-label="Previous Location Image">‹</button>
-                  <button type="button" class="sv-distro-next" aria-label="Next Location Image">›</button>
-                </div>
-
-                <div class="sv-distro-dots">
-                  <% svDistroImages.slice(0, 3).forEach((image, index) => { %>
-                    <button type="button" class="<%= index === 0 ? 'is-active' : '' %>" aria-label="Show Location Image <%= index + 1 %>"></button>
-                  <% }) %>
+                  <img
+                    src="<%= optimiseImageUrl(svDistroImage.imageSrc || '/images/header/h-1.jpeg', { width: 640 }) %>"
+                    alt="<%= svDistroImage.alt || 'SVG Distro Location Image' %>"
+                    class="is-active"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </div>
             </article>

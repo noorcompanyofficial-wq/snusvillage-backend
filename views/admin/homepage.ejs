@@ -31,9 +31,8 @@
     ? distro.images
     : [
         { imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" },
-        { imageSrc: "/images/header/h-2.jpeg", alt: "SVG Distro Location Image 2" },
-        { imageSrc: "/images/delivery/delivery.jpg", alt: "SVG Distro Location Image 3" },
       ];
+  const distroImage = distroImages[0] || {};
 
   const collections = homepageContent?.collections || {};
   const collectionCards = collections.cards && collections.cards.length
@@ -228,7 +227,7 @@
 
     <div class="admin-panel__head">
       <h2>SVG Distro Section</h2>
-      <span>Text, Badges And Carousel Images</span>
+      <span>Text, Badges And Main Image</span>
     </div>
 
     <div class="admin-homepage-grid">
@@ -269,31 +268,27 @@
     </div>
 
     <div class="admin-homepage-slides">
-      <% [0, 1, 2].forEach((index) => { %>
-        <% const image = distroImages[index] || {}; %>
-
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Distro Image <%= index + 1 %></strong>
-            <span>Carousel Image</span>
-          </div>
-
-          <label>
-            Current Image Path
-            <input name="distroImageSrc<%= index + 1 %>" value="<%= image.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
-          </label>
-
-          <label>
-            Upload New Distro Image
-            <input type="file" name="distroImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
-          </label>
-
-          <label>
-            Alt Text
-            <input name="distroImageAlt<%= index + 1 %>" value="<%= image.alt || '' %>">
-          </label>
+      <div class="admin-homepage-slide-card">
+        <div class="admin-homepage-slide-head">
+          <strong>Distro Image</strong>
+          <span>Main Image</span>
         </div>
-      <% }) %>
+
+        <label>
+          Current Image Path
+          <input name="distroImageSrc1" value="<%= distroImage.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
+        </label>
+
+        <label>
+          Upload New Distro Image
+          <input type="file" name="distroImage1" accept="image/jpeg,image/png,image/webp,image/avif">
+        </label>
+
+        <label>
+          Alt Text
+          <input name="distroImageAlt1" value="<%= distroImage.alt || '' %>">
+        </label>
+      </div>
     </div>
 
     <button class="admin-primary" type="submit">

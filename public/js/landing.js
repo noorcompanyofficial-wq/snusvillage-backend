@@ -134,45 +134,6 @@ document.querySelectorAll("#navLinks a").forEach((link) => {
 
 
 function runNonCriticalHomepageScripts() {
-  // ===== SNUS VILLAGE DISTRO CAROUSEL START =====
-  (function () {
-    const carousel = document.getElementById("svgDistroCarousel");
-    if (!carousel) return;
-
-    const slides = Array.from(carousel.querySelectorAll(".sv-distro-track img"));
-    const dots = Array.from(carousel.querySelectorAll(".sv-distro-dots button"));
-    const prev = carousel.querySelector(".sv-distro-prev");
-    const next = carousel.querySelector(".sv-distro-next");
-
-    if (!slides.length) return;
-
-    let index = 0;
-
-    function showSlide(nextIndex) {
-      index = (nextIndex + slides.length) % slides.length;
-
-      slides.forEach((slide, slideIndex) => {
-        slide.classList.toggle("is-active", slideIndex === index);
-      });
-
-      dots.forEach((dot, dotIndex) => {
-        dot.classList.toggle("is-active", dotIndex === index);
-      });
-    }
-
-    prev?.addEventListener("click", () => showSlide(index - 1));
-    next?.addEventListener("click", () => showSlide(index + 1));
-
-    dots.forEach((dot, dotIndex) => {
-      dot.addEventListener("click", () => showSlide(dotIndex));
-    });
-
-    window.setInterval(() => {
-      showSlide(index + 1);
-    }, 4500);
-  })();
-  // ===== SNUS VILLAGE DISTRO CAROUSEL END =====
-
 
   // ===== SNUS VILLAGE SOCIAL IPHONE START =====
   (function () {
@@ -260,4 +221,3 @@ if ("requestIdleCallback" in window) {
 } else {
   window.setTimeout(runNonCriticalHomepageScripts, 1200);
 }
-
