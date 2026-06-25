@@ -418,6 +418,7 @@
                       <%= p.description ? p.description.substring(0, 92) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 92 ? "..." : "" %>
                     </p>
 
+                    <span class="sv-strength-badge sv-strength-badge--<%= (p.strength || 'medium').toLowerCase().replace('-','') %>"><%= p.strength || 'MEDIUM' %></span>
                     <div class="product-card__price">
                       <strong>
                         <% if (p.discountPrice && p.discountPrice > 0) { %>
