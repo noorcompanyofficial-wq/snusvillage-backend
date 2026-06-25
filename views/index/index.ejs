@@ -206,6 +206,27 @@
           </div>
         </section>
 
+
+        <div class='sv-trust-bar'>
+          <div class='sv-trust-bar__inner'>
+            <div class='sv-trust-bar__item'>
+              <i class='fa-solid fa-shield-halved' aria-hidden='true'></i>
+              <span>Age-Verified Checkout</span>
+            </div>
+            <div class='sv-trust-bar__item'>
+              <i class='fa-solid fa-truck-fast' aria-hidden='true'></i>
+              <span>UK Delivery from £1.99</span>
+            </div>
+            <div class='sv-trust-bar__item'>
+              <i class='fa-solid fa-map-pin' aria-hidden='true'></i>
+              <span>Camden &amp; Oxford Street Stores</span>
+            </div>
+            <div class='sv-trust-bar__item'>
+              <i class='fa-solid fa-certificate' aria-hidden='true'></i>
+              <span>100% Authentic Stock</span>
+            </div>
+          </div>
+        </div>
 <%
           const svCollections = homepageContent?.collections || {};
           const svCollectionCards = svCollections.cards && svCollections.cards.length
@@ -333,13 +354,7 @@
                       <%= p.description ? p.description.substring(0, 92) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 92 ? "..." : "" %>
                     </p>
 
-                    <div class="strength">
-                      <span class="<%= ['LOW','MEDIUM','STRONG','X-STRONG','EXTREME'].indexOf(p.strength) >= 0 ? 'is-on' : '' %>"></span>
-                      <span class="<%= ['MEDIUM','STRONG','X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
-                      <span class="<%= ['STRONG','X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
-                      <span class="<%= ['X-STRONG','EXTREME'].includes(p.strength) ? 'is-on' : '' %>"></span>
-                      <span class="<%= p.strength === 'EXTREME' ? 'is-on' : '' %>"></span>
-                    </div>
+                    <span class="sv-strength-badge sv-strength-badge--<%= (p.strength || 'medium').toLowerCase().replace('-','') %>"><%= p.strength || 'MEDIUM' %></span>
 
                     <div class="product-card__price">
                       <strong>

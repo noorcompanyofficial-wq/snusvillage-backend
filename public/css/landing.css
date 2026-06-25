@@ -8469,3 +8469,18 @@ body {
   }
 }
 /* ===== HOMEPAGE SEO POSITIONING END ===== */
+
+/* ===== TRUST BAR ===== */
+.sv-trust-bar { background: #b41232; padding: 10px 0; }
+.sv-trust-bar__inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+.sv-trust-bar__item { display: flex; align-items: center; gap: 7px; color: #fff; font-size: 12px; font-weight: 700; }
+.sv-trust-bar__item i { font-size: 14px; }
+@media (max-width: 600px) { .sv-trust-bar__inner { gap: 14px; } .sv-trust-bar__item { font-size: 11px; } }
+
+/* ===== STRENGTH BADGES ===== */
+.sv-strength-badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.sv-strength-badge--low { background: #16a34a; color: #fff; }
+.sv-strength-badge--medium { background: #2563eb; color: #fff; }
+.sv-strength-badge--strong { background: #d97706; color: #fff; }
+.sv-strength-badge--xstrong { background: #dc2626; color: #fff; }
+.sv-strength-badge--extreme { background: #450a0a; border: 1px solid #dc2626; color: #fca5a5; }
