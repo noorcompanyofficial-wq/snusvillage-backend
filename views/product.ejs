@@ -1,0 +1,20 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "<%= product.name %>",
+  "image": "<%= product.image %>",
+  "description": "<%= product.description %>",
+  "brand": {
+    "@type": "Brand",
+    "name": "<%= product.brand %>"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "https://www.snusvillage.com/products/<%= product.slug %>",
+    "priceCurrency": "GBP",
+    "price": "<%= product.salePrice || product.price %>",
+    "availability": "<%= product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' %>"
+  }
+}
+</script>

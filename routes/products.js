@@ -91,11 +91,29 @@ router.get("/:id", async (req, res) => {
       .lean();
 
     const seo = buildProductSeo(product);
-
-    res.render("products/products", {
+    const displayPrice = product.discountPrice || product.price || 0;
+    const schema = JSON.stringify({
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      'name': cleanText(product.name),
+      'image': (product.images && product.images[0]) || 'https://www.snusvillage.com/images/logo/snusvillage-logo.png',
+      'description': seo.description,
+      'brand': { '@type': 'Brand', 'name': cleanText(product.brand || 'Snus Village') },
+      'offers': {
+        '@type': 'Offer',
+        'url': seo.canonical,
+        'priceCurrency': 'GBP',
+        'price': Number(displayPrice).toFixed(2),
+        'availability': (product.stock > 0 || product.isActive !== false)
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock'
+      }
+    });
+    res.render('products/products', {
       title: seo.title,
       description: seo.description,
       canonical: seo.canonical,
+      schema,
       product,
       related,
     });

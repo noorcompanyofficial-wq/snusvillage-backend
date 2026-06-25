@@ -34,7 +34,9 @@ router.get("/", async (req, res) => {
 
   res.render("index/index", {
     layout: false,
-    title: "Home - SNUS VILLAGE",
+    title: "Snus Village | Premium Nicotine Pouches UK",
+    description: "Shop premium nicotine pouches in the UK from Snus Village London. Trusted brands, age-verified checkout and fast UK delivery.",
+    canonical: "https://www.snusvillage.com",
     homepageContent,
     bestSellerProducts,
     featuredProducts,

@@ -188,11 +188,26 @@ router.get("/", async (req, res) => {
       });
     }
 
-    res.render("shop/shop", {
-      title: "Shop Nicotine Pouches UK | Snus Village",
-      description:
-        "Shop premium nicotine pouches in the UK from Snus Village. Browse trusted brands, mint and fruit flavours, strengths and UK delivery options.",
-      canonical: "https://www.snusvillage.com/shop",
+    let metaTitle = 'Shop Nicotine Pouches UK | Snus Village';
+    let metaDesc = 'Shop premium nicotine pouches in the UK from Snus Village. Browse trusted brands, mint and fruit flavours, strengths and UK delivery options.';
+    let metaCanonical = 'https://www.snusvillage.com/shop';
+    if (brand) {
+      metaTitle = brand + ' Nicotine Pouches UK | Snus Village';
+      metaDesc = 'Buy ' + brand + ' nicotine pouches in the UK. Fast UK delivery from Snus Village London.';
+      metaCanonical = 'https://www.snusvillage.com/shop?brand=' + encodeURIComponent(brand);
+    } else if (strength) {
+      metaTitle = strength + ' Nicotine Pouches UK | Snus Village';
+      metaDesc = 'Shop ' + strength.toLowerCase() + ' strength nicotine pouches at Snus Village London. Fast UK delivery.';
+      metaCanonical = 'https://www.snusvillage.com/shop?strength=' + encodeURIComponent(strength);
+    } else if (flavour) {
+      metaTitle = flavour + ' Flavour Nicotine Pouches UK | Snus Village';
+      metaDesc = 'Buy ' + flavour + ' flavour nicotine pouches in the UK from Snus Village.';
+      metaCanonical = 'https://www.snusvillage.com/shop?flavour=' + encodeURIComponent(flavour);
+    }
+    res.render('shop/shop', {
+      title: metaTitle,
+      description: metaDesc,
+      canonical: metaCanonical,
       products,
       brandSections,
       totalProducts: products.length,

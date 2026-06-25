@@ -7,6 +7,9 @@
   const hasMultipleProductImages = product.images && product.images.length > 1;
   const pouchesPerCan = Number(product.pouchesPerCan || 20);
   const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " pouches" : "N/A";
+  const freeDeliveryThreshold = Number((typeof storeSettings !== "undefined" && storeSettings?.freeDeliveryThreshold) || 10);
+  const bundleQuantities = [1, 3, 5, 10].filter((qty) => qty <= Math.max(Number(product.stock || 0), 1));
+  const unitPrice = activePrice > 0 ? activePrice : originalPrice;
 %>
 
 <section class="product-detail-page product-detail-redesign">
@@ -18,16 +21,20 @@
     <strong><%= product.name %></strong>
   </nav>
 
-  <div class="product-detail-card">
+  <div class="product-shell">
     <div class="product-gallery">
       <div class="product-main-image">
         <% if (productImage) { %>
           <% if (hasMultipleProductImages) { %>
-            <button class="product-gallery-btn product-gallery-btn--prev" type="button" aria-label="Previous product image">‹</button>
+            <button class="product-gallery-btn product-gallery-btn--prev" type="button" aria-label="Previous product image">
+              <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            </button>
           <% } %>
           <img id="productMainImage" src="<%= optimiseImageUrl(productImage, { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
           <% if (hasMultipleProductImages) { %>
-            <button class="product-gallery-btn product-gallery-btn--next" type="button" aria-label="Next product image">›</button>
+            <button class="product-gallery-btn product-gallery-btn--next" type="button" aria-label="Next product image">
+              <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            </button>
           <% } %>
         <% } else { %>
           <div class="product-image-placeholder">No image</div>
@@ -45,9 +52,9 @@
       <% } %>
     </div>
 
-    <div class="product-info-panel">
+    <aside class="product-purchase-panel" aria-label="Product purchase information">
       <div class="product-kicker-row">
-        <span class="product-brand"><%= product.brand || "Snus Village" %></span>
+        <a class="product-brand" href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>"><%= product.brand || "Snus Village" %></a>
         <span class="<%= inStock ? 'stock-pill in-stock' : 'stock-pill out-stock' %>">
           <%= inStock ? "In stock" : "Out of stock" %>
         </span>
@@ -55,20 +62,32 @@
 
       <h1><%= product.name %></h1>
 
+      <div class="product-rating-row" aria-label="Product highlights">
+        <span>
+          <i class="fa-solid fa-star" aria-hidden="true"></i>
+          <i class="fa-solid fa-star" aria-hidden="true"></i>
+          <i class="fa-solid fa-star" aria-hidden="true"></i>
+          <i class="fa-solid fa-star" aria-hidden="true"></i>
+          <i class="fa-solid fa-star" aria-hidden="true"></i>
+        </span>
+        <small>Popular with adult customers</small>
+      </div>
+
       <p class="product-description">
         <%= product.description || "Premium nicotine pouch available from Snus Village." %>
       </p>
 
-      <div class="product-nicotine-warning" role="note">
-        <strong>Nicotine warning</strong>
-        <span>Nicotine is an addictive substance. Not for use by non-nicotine users, minors, pregnant or breastfeeding persons.</span>
+      <div class="product-price-block">
+        <div>
+          <span class="product-price">£<%= activePrice.toFixed(2) %></span>
+          <% if (hasSalePrice) { %>
+            <span class="product-old-price">£<%= originalPrice.toFixed(2) %></span>
+          <% } %>
+        </div>
+        <small><%= inStock ? product.stock + " available" : "Restock coming soon" %></small>
       </div>
 
-      <dl class="product-spec-list">
-        <div>
-          <dt>Brand</dt>
-          <dd><%= product.brand || "Snus Village" %></dd>
-        </div>
+      <dl class="product-key-specs">
         <div>
           <dt>Strength</dt>
           <dd><%= product.strength || "N/A" %></dd>
@@ -82,42 +101,38 @@
           <dd><%= product.flavour || "N/A" %></dd>
         </div>
         <div>
-          <dt>Pouches per can</dt>
+          <dt>Portions</dt>
           <dd><%= pouchesPerCanLabel %></dd>
         </div>
-        <% if (product.category) { %>
-          <div>
-            <dt>Category</dt>
-            <dd><%= product.category %></dd>
-          </div>
-        <% } %>
-        <% if (product.sku) { %>
-          <div>
-            <dt>SKU</dt>
-            <dd><%= product.sku %></dd>
-          </div>
-        <% } %>
       </dl>
 
-      <div class="product-buy-box">
-        <div class="product-price-row">
-          <div>
-            <span class="product-price">£<%= activePrice.toFixed(2) %></span>
-            <% if (hasSalePrice) { %>
-              <span class="product-old-price">£<%= originalPrice.toFixed(2) %></span>
-            <% } %>
-          </div>
-          <small><%= inStock ? product.stock + " available" : "Restock coming soon" %></small>
-        </div>
+      <div class="product-nicotine-warning" role="note">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <span>Nicotine is an addictive substance. This product is for adults aged 18+ only.</span>
+      </div>
 
+      <div class="product-buy-box">
         <% if (inStock) { %>
-          <form action="/cart/add/<%= product._id %>" method="POST" class="add-cart-form">
-            <label>
-              Quantity
-              <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
+          <form action="/cart/add/<%= product._id %>" method="POST" class="add-cart-form" id="productAddForm">
+            <fieldset class="product-quantity-options">
+              <legend>Choose quantity</legend>
+              <div class="product-quantity-grid">
+                <% bundleQuantities.forEach((qty, index) => { %>
+                  <button class="product-quantity-chip <%= index === 0 ? 'is-active' : '' %>" type="button" data-quantity="<%= qty %>">
+                    <strong><%= qty %></strong>
+                    <span><%= qty === 1 ? "can" : "cans" %></span>
+                    <small>£<%= (unitPrice * qty).toFixed(2) %></small>
+                  </button>
+                <% }) %>
+              </div>
+            </fieldset>
+
+            <label class="product-quantity-input">
+              <span>Quantity</span>
+              <input id="productQuantity" type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
             </label>
 
-            <button type="submit">
+            <button class="product-add-button" type="submit">
               <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
               Add to cart
             </button>
@@ -127,67 +142,74 @@
         <% } %>
       </div>
 
-      <div class="product-service-grid">
+      <div class="product-service-stack">
         <div>
           <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
-          <strong>Free delivery over £<%= Number(storeSettings?.freeDeliveryThreshold || 10).toFixed(2) %></strong>
-          <span>UK delivery options and charges are shown clearly at checkout.</span>
+          <span>Free delivery over £<%= freeDeliveryThreshold.toFixed(2) %></span>
         </div>
         <div>
-          <i class="fa-solid fa-id-card" aria-hidden="true"></i>
-          <strong>18+ only</strong>
-          <span>Age-restricted products are only available to adult customers.</span>
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          <span>Secure checkout with age verification</span>
+        </div>
+        <div>
+          <i class="fa-solid fa-store" aria-hidden="true"></i>
+          <span>London store support and fulfilment</span>
         </div>
       </div>
-    </div>
+    </aside>
   </div>
 
-  <div class="product-extra-section product-detail-sections">
-    <section>
-      <h2>Product details</h2>
+  <div class="product-detail-sections">
+    <details open>
+      <summary>Product details</summary>
       <ul class="product-organised-list">
         <li><strong>Product type:</strong> <%= product.category || "Nicotine pouch" %></li>
+        <li><strong>Brand:</strong> <%= product.brand || "Snus Village" %></li>
         <li><strong>Flavour profile:</strong> <%= product.flavour || "See product description" %></li>
         <li><strong>Strength level:</strong> <%= product.strength || "N/A" %></li>
         <li><strong>Nicotine:</strong> <%= product.nicotine ? product.nicotine + "mg" : "N/A" %></li>
         <li><strong>Portion count:</strong> <%= pouchesPerCanLabel %> per can</li>
+        <% if (product.sku) { %>
+          <li><strong>SKU:</strong> <%= product.sku %></li>
+        <% } %>
       </ul>
-    </section>
+    </details>
 
-    <section>
-      <h2>Delivery & checkout</h2>
+    <details>
+      <summary>Delivery and checkout</summary>
       <ul class="product-organised-list">
-        <li>Fast UK delivery options are available for eligible orders.</li>
-        <li>Order confirmation is sent by email after successful checkout.</li>
-        <li>All orders are reviewed before fulfilment for customer safety.</li>
+        <li>Fast UK delivery options are shown at checkout.</li>
+        <li>Order confirmation is sent by email after payment.</li>
         <li>Age verification may be required before checkout is completed.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Support</h2>
-      <ul class="product-organised-list">
-        <li>Need help choosing a strength or flavour? Contact Snus Village support.</li>
         <li>Stock can vary between online availability and London locations.</li>
-        <li>Wholesale customers can apply for trader access from the wholesale page.</li>
       </ul>
-    </section>
+    </details>
+
+    <details>
+      <summary>Support</summary>
+      <ul class="product-organised-list">
+        <li>Need help choosing strength or flavour? Contact Snus Village support.</li>
+        <li>Wholesale customers can apply for trader access from the wholesale page.</li>
+        <li>All orders are reviewed before fulfilment for customer safety.</li>
+      </ul>
+    </details>
   </div>
 
   <% if (related && related.length) { %>
     <section class="product-brand-carousel" aria-labelledby="brandCarouselTitle">
       <div class="product-carousel-head">
         <div>
-          <span class="product-carousel-eyebrow">Featured collection</span>
+          <span class="product-carousel-eyebrow">You may also like</span>
           <h2 id="brandCarouselTitle">More from <%= product.brand || "this brand" %></h2>
-          <p>Explore other <%= product.brand || "Snus Village" %> products with different flavours, strengths and profiles.</p>
         </div>
 
         <a href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>">View all</a>
       </div>
 
       <div class="product-carousel-shell">
-        <button class="product-related-nav product-related-nav--prev" type="button" aria-label="Scroll previous products">‹</button>
+        <button class="product-related-nav product-related-nav--prev" type="button" aria-label="Scroll previous products">
+          <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+        </button>
 
         <div class="product-related-track" id="relatedProductsTrack">
           <% related.forEach((item) => { %>
@@ -217,7 +239,9 @@
           <% }) %>
         </div>
 
-        <button class="product-related-nav product-related-nav--next" type="button" aria-label="Scroll next products">›</button>
+        <button class="product-related-nav product-related-nav--next" type="button" aria-label="Scroll next products">
+          <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+        </button>
       </div>
     </section>
   <% } %>
@@ -253,6 +277,27 @@
 
     galleryPrev?.addEventListener("click", () => showImage(activeIndex - 1));
     galleryNext?.addEventListener("click", () => showImage(activeIndex + 1));
+
+    const quantityInput = document.getElementById("productQuantity");
+    const quantityChips = Array.from(document.querySelectorAll(".product-quantity-chip"));
+
+    function setQuantity(value) {
+      if (!quantityInput) return;
+
+      const max = Number(quantityInput.max || value);
+      const quantity = Math.max(1, Math.min(Number(value || 1), max));
+      quantityInput.value = quantity;
+
+      quantityChips.forEach((chip) => {
+        chip.classList.toggle("is-active", Number(chip.dataset.quantity) === quantity);
+      });
+    }
+
+    quantityChips.forEach((chip) => {
+      chip.addEventListener("click", () => setQuantity(chip.dataset.quantity));
+    });
+
+    quantityInput?.addEventListener("input", () => setQuantity(quantityInput.value));
 
     const relatedTrack = document.getElementById("relatedProductsTrack");
     const relatedPrev = document.querySelector(".product-related-nav--prev");
