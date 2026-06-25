@@ -15,3 +15,4 @@ routes/*.backup-*
 views/**/*.backup-*
 public/css/*.backup-*
 public/js/*.backup-*
+scripts/fix-product-data.js
