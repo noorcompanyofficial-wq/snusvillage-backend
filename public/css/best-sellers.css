@@ -1,6 +1,6 @@
 .best-sellers {
   padding: 100px 20px;
-  background: #f5f7fb;
+  background: transparent;
 }
 
 /* CONTAINER */
@@ -21,7 +21,7 @@
 .section-title {
   font-size: clamp(34px, 4vw, 52px);
   font-weight: 900;
-  color: #0f2d6b;
+  color: #ffffff;
   letter-spacing: -0.03em;
 }
 
@@ -73,7 +73,8 @@
 /* CARD */
 .product-card {
   min-width: calc(25% - 15px);
-  background: white;
+  background: #0d1e3d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   padding: 20px;
   text-align: center;
@@ -105,12 +106,12 @@
 /* TEXT */
 .product-card h3 {
   margin: 10px 0;
-  color: #0a1f44;
+  color: #f1f5f9;
   font-size: 16px;
 }
 
 .product-card p {
-  color: gray;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
 }
 
@@ -118,7 +119,7 @@
 .card-price {
   display: block;
   margin: 10px 0;
-  color: #d1001c;
+  color: var(--sv-red);
   font-weight: bold;
 }
 
@@ -133,7 +134,7 @@
   border-radius: 50%;
   border: none;
 
-  background: #0a1f44;
+  background: var(--sv-red);
   color: white;
 
   cursor: pointer;
@@ -141,7 +142,7 @@
 }
 
 .cart-btn:hover {
-  background: #d1001c;
+  background: #a01429;
   transform: rotate(10deg);
 }
 

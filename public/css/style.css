@@ -1255,7 +1255,7 @@ main .contact-page {
 
 .shop-hero h1 {
   margin: 14px 0 12px;
-  color: #061633;
+  color: #ffffff;
   font-size: clamp(44px, 5vw, 72px);
   line-height: 0.95;
   letter-spacing: -0.06em;
@@ -1264,7 +1264,7 @@ main .contact-page {
 .shop-hero p {
   margin: 0 auto;
   max-width: 620px;
-  color: #465a7a;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 17px;
   line-height: 1.7;
 }
@@ -1302,9 +1302,9 @@ main .contact-page {
 .shop-product-card {
   overflow: hidden;
   border-radius: 26px;
-  background: #ffffff;
-  border: 1px solid rgba(9, 31, 77, 0.08);
-  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08);
+  background: #0d1e3d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.22);
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;
@@ -1312,7 +1312,7 @@ main .contact-page {
 
 .shop-product-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 24px 70px rgba(9, 31, 77, 0.14);
+  box-shadow: 0 24px 70px rgba(201, 31, 54, 0.14);
 }
 
 .shop-product-image {
@@ -1321,7 +1321,7 @@ main .contact-page {
   align-items: center;
   justify-content: center;
   padding: 22px;
-  background: radial-gradient(circle at center, rgba(18, 59, 138, 0.08), transparent 60%), #f8faff;
+  background: radial-gradient(circle at center, rgba(201, 31, 54, 0.06), transparent 60%), rgba(255, 255, 255, 0.04);
   text-decoration: none;
 }
 
@@ -1334,7 +1334,7 @@ main .contact-page {
 }
 
 .shop-product-image span {
-  color: #6b7893;
+  color: rgba(255, 255, 255, 0.4);
   font-weight: 900;
 }
 
@@ -1384,22 +1384,22 @@ main .contact-page {
 }
 
 .shop-product-body h2 a {
-  color: #061633;
+  color: #f1f5f9;
   text-decoration: none;
 }
 
 .shop-product-body p {
   min-height: 48px;
   margin: 0 0 14px;
-  color: #465a7a;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
   line-height: 1.55;
 }
 
 .shop-product-meta {
   padding-top: 12px;
-  border-top: 1px solid rgba(9, 31, 77, 0.08);
-  color: #6b7893;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1409,7 +1409,7 @@ main .contact-page {
 }
 
 .shop-product-bottom strong {
-  color: #d71234;
+  color: var(--sv-red);
   font-size: 24px;
   font-weight: 950;
 }
@@ -1432,19 +1432,19 @@ main .contact-page {
   padding: 34px;
   text-align: center;
   border-radius: 26px;
-  background: #ffffff;
-  border: 1px solid rgba(9, 31, 77, 0.08);
-  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08);
+  background: #0d1e3d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24);
 }
 
 .empty-shop h2 {
   margin: 0 0 10px;
-  color: #061633;
+  color: #ffffff;
 }
 
 .empty-shop p {
   margin: 0;
-  color: #465a7a;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @media (max-width: 1100px) {

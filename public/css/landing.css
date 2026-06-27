@@ -4,7 +4,7 @@
   --muted: rgba(255, 255, 255, 0.55);
   --line: rgba(255, 255, 255, 0.1);
   --blue: #153fb8;
-  --blue-deep: #0d2f86;
+  --blue-deep: #c91f36;
   --red: #c91f36;
   --radius-xl: 32px;
   --shadow: 0 20px 60px rgba(21, 63, 184, 0.09), 0 16px 40px rgba(201, 31, 54, 0.07);
@@ -427,8 +427,8 @@ input {
   padding: 0 20px;
   color: var(--text);
   font-weight: 600;
-  border: 1px solid rgba(21, 63, 184, 0.12);
-  background: linear-gradient(90deg, rgba(21, 63, 184, 0.05), rgba(201, 31, 54, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .btn:hover,
@@ -524,8 +524,8 @@ input {
 
 .eyebrow.dark,
 .pill {
-  border: 1px solid rgba(21, 63, 184, 0.1);
-  background: linear-gradient(90deg, rgba(21, 63, 184, 0.06), rgba(201, 31, 54, 0.06));
+  border: 1px solid rgba(201, 31, 54, 0.2);
+  background: rgba(201, 31, 54, 0.1);
   color: var(--blue-deep);
 }
 
@@ -803,7 +803,7 @@ input {
   flex: 1;
   height: 8px;
   border-radius: 999px;
-  background: rgba(12, 23, 48, 0.08);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .strength .is-on {
@@ -1427,7 +1427,7 @@ input {
   align-items: center;
   gap: 10px;
   margin-bottom: 18px;
-  color: #7eb3f5;
+  color: var(--red);
   font-size: 12px;
   font-weight: 950;
   letter-spacing: 0.24em;
@@ -1461,7 +1461,7 @@ input {
 .sv-ab-hero__copy p {
   max-width: 620px;
   margin: 24px 0 0;
-  color: #52617a;
+  color: rgba(255, 255, 255, 0.72);
   font-size: clamp(1rem, 1.22vw, 1.18rem);
   line-height: 1.85;
 }
@@ -3097,7 +3097,7 @@ input {
 }
 
 .sv-distro-address {
-  color: #123b8a !important;
+  color: #ffffff !important;
   font-weight: 900;
 }
 
@@ -5370,7 +5370,7 @@ input {
 .sv-hero-copy h1 {
   margin: 0 !important;
   max-width: 500px !important;
-  color: #071b3f !important;
+  color: #ffffff !important;
   font-size: clamp(2.1rem, 3.4vw, 3.45rem) !important;
   line-height: 0.96 !important;
   letter-spacing: -0.06em !important;
@@ -5763,7 +5763,7 @@ input {
   font-size: clamp(2.1rem, 3.6vw, 3.45rem) !important;
   line-height: 0.96 !important;
   letter-spacing: -0.06em !important;
-  color: #071b3f !important;
+  color: #ffffff !important;
 }
 
 .sv-hero-copy h1 span {
@@ -6277,7 +6277,7 @@ input {
   font-size: clamp(2.1rem, 3.2vw, 3.2rem) !important;
   line-height: 0.95 !important;
   letter-spacing: -0.06em !important;
-  color: #071b3f !important;
+  color: #ffffff !important;
 }
 
 .sv-hero-copy h1 span {
@@ -7848,9 +7848,9 @@ body {
   justify-content: space-between;
   padding: 13px 15px;
   border-radius: 18px;
-  color: #061633 !important;
-  background: #f7f9ff;
-  border: 1px solid rgba(9, 31, 77, 0.08);
+  color: #f1f5f9 !important;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 14px;
   font-weight: 950;
   text-decoration: none;
@@ -8325,7 +8325,7 @@ body {
 .sv-simple-carousel-hero .sv-hero-copy h1 {
   margin: 8px 0 12px !important;
   max-width: 880px !important;
-  color: #071225 !important;
+  color: #ffffff !important;
   font-size: clamp(2rem, 4vw, 4rem) !important;
   line-height: 0.98 !important;
   letter-spacing: 0 !important;
@@ -8334,7 +8334,7 @@ body {
 .sv-simple-carousel-hero .sv-hero-copy p {
   margin: 0 !important;
   max-width: 880px !important;
-  color: #64708a !important;
+  color: rgba(255, 255, 255, 0.7) !important;
   font-size: 1rem !important;
   line-height: 1.7 !important;
 }
@@ -8398,7 +8398,7 @@ body {
 .sv-seo-grid h2,
 .sv-responsible-retail h2 {
   margin: 0 0 10px;
-  color: #071225;
+  color: #ffffff;
   font-size: 1.18rem;
   line-height: 1.15;
 }
@@ -8406,7 +8406,7 @@ body {
 .sv-seo-grid p,
 .sv-responsible-retail p {
   margin: 0;
-  color: #64708a;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.65;
 }
 
@@ -8437,12 +8437,12 @@ body {
 }
 
 .sv-review-placeholder strong {
-  color: #071225;
+  color: #ffffff;
   font-size: 1.08rem;
 }
 
 .sv-review-placeholder span {
-  color: #64708a;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
 }
 

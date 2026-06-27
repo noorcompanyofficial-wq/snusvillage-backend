@@ -18,11 +18,11 @@
 .collections-toolbar,
 .collections-product,
 .collections-empty {
-  border: 1px solid rgba(12, 23, 48, 0.1);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(245, 248, 252, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d1e3d;
   box-shadow:
-    0 20px 60px rgba(21, 63, 184, 0.09),
-    0 16px 40px rgba(201, 31, 54, 0.07);
+    0 20px 60px rgba(0, 0, 0, 0.28),
+    0 16px 40px rgba(201, 31, 54, 0.08);
 }
 
 .collections-hero__copy {
@@ -54,8 +54,8 @@
   width: fit-content;
   padding: 8px 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(21, 63, 184, 0.08), rgba(201, 31, 54, 0.08));
-  color: #0d2f86;
+  background: rgba(201, 31, 54, 0.12);
+  color: var(--sv-red);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -68,13 +68,13 @@
   font-size: clamp(2.5rem, 5vw, 5.4rem);
   line-height: 0.95;
   letter-spacing: -0.04em;
-  color: #0c1730;
+  color: #ffffff;
 }
 
 .collections-hero p {
   max-width: 58ch;
   margin: 18px 0 0;
-  color: #627089;
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.75;
 }
 
@@ -98,9 +98,9 @@
 }
 
 .collections-btn--ghost {
-  color: #0c1730;
-  background: linear-gradient(90deg, rgba(21, 63, 184, 0.06), rgba(201, 31, 54, 0.06));
-  border: 1px solid rgba(21, 63, 184, 0.12);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .collections-hero__panel {
@@ -113,19 +113,19 @@
 .collections-hero__panel div {
   border-radius: 22px;
   padding: 24px;
-  background: #fff;
-  border: 1px solid rgba(21, 63, 184, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .collections-hero__panel strong {
   display: block;
-  color: #0d2f86;
+  color: var(--sv-red);
   font-size: 2.4rem;
   letter-spacing: -0.04em;
 }
 
 .collections-hero__panel span {
-  color: #627089;
+  color: rgba(255, 255, 255, 0.65);
   font-weight: 700;
 }
 
@@ -148,10 +148,10 @@
 .collections-tabs button {
   min-height: 44px;
   padding: 0 16px;
-  border: 1px solid rgba(21, 63, 184, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  background: #fff;
-  color: #627089;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   font-weight: 800;
 }
@@ -169,8 +169,8 @@
   gap: 10px;
   padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid rgba(21, 63, 184, 0.1);
-  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .collections-search input {
@@ -178,6 +178,7 @@
   border: 0;
   outline: 0;
   background: transparent;
+  color: #f1f5f9;
 }
 
 .collections-grid {
@@ -218,7 +219,7 @@
 }
 
 .collection-tile__body span {
-  color: #0d2f86;
+  color: var(--sv-red);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -228,13 +229,13 @@
 .collection-tile h2,
 .collections-section-head h2 {
   margin: 8px 0 0;
-  color: #0c1730;
+  color: #ffffff;
   letter-spacing: -0.04em;
 }
 
 .collection-tile p {
   min-height: 78px;
-  color: #627089;
+  color: rgba(255, 255, 255, 0.65);
   line-height: 1.65;
 }
 
@@ -246,7 +247,7 @@
 }
 
 .collection-tile__footer strong {
-  color: #0d2f86;
+  color: var(--sv-red);
   font-size: 1.4rem;
 }
 
@@ -306,25 +307,25 @@
 }
 
 .collections-product span {
-  color: #627089;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .collections-product strong {
-  color: #0c1730;
+  color: #ffffff;
 }
 
 .collections-product em {
-  color: #0d2f86;
+  color: var(--sv-red);
   font-style: normal;
   font-weight: 900;
 }
 
 .collections-empty {
   grid-column: 1 / -1;
-  color: #627089;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @keyframes collectionRise {

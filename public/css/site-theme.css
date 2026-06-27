@@ -2349,7 +2349,7 @@ main {
 
 .seo-support-copy h2 {
   margin: 0 0 12px;
-  color: #071b3f;
+  color: var(--sv-text);
   font-size: clamp(1.45rem, 2.3vw, 2.2rem);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -2357,7 +2357,7 @@ main {
 
 .seo-support-copy p {
   margin: 10px 0 0;
-  color: #64748b;
+  color: var(--sv-muted);
   font-size: 1rem;
   line-height: 1.75;
 }
