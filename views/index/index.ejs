@@ -47,6 +47,7 @@
     <link rel="icon" href="/images/logo/snus-village-logo.webp" />
     <link rel="stylesheet" href="/css/age-gate.css" />
     <link rel="stylesheet" href="/css/landing.css" />
+    <link rel="stylesheet" href="/css/homepage-redesign.css?v=20260630" />
     <link
       rel="preload"
       href="/css/footer.css?v=footer-newsletter-20260611"
@@ -120,92 +121,46 @@
                   imageSrc: "/images/delivery/delivery.webp",
                 },
               ];
+          const svHeroPrimary = svHeroSlides[0] || {};
+          const svHeroVisualProducts = (bestSellerProducts && bestSellerProducts.length
+            ? bestSellerProducts
+            : (featuredProducts || [])
+          ).slice(0, 3);
         %>
 
-        <section class="sv-simple-carousel-hero">
-          <div class="sv-hero-inner">
-            <div class="sv-carousel-wrap">
-              <div class="sv-carousel">
-                <div class="sv-slides">
-                  <% svHeroSlides.slice(0, 3).forEach((slide, index) => { %>
-                    <div class="sv-slide">
-                      <img
-                        class="sv-slide__image"
-                        src="<%= optimiseImageUrl(slide.imageSrc || '/images/header/h-1.jpeg', { width: 1600, quality: 'auto:best' }) %>"
-                        alt="<%= ['Snus Village premium nicotine pouches UK', 'Smokeless nicotine products at Snus Village', 'Nicotine pouch store in London'][index] || 'Snus Village nicotine pouch retailer UK' %>"
-                        loading="<%= index === 0 ? 'eager' : 'lazy' %>"
-                        decoding="async"
-                        fetchpriority="<%= index === 0 ? 'high' : 'auto' %>"
-                      >
-                      <div class="sv-slide-brand">
-                        <small><%= slide.kicker || "Snus Village" %></small>
-                        <h2><%= slide.title || "Premium Brands" %></h2>
-                        <a href="<%= slide.buttonLink || '/shop' %>"><%= slide.buttonText || "Shop Now" %></a>
-                      </div>
-                    </div>
-                  <% }) %>
-                </div>
-
-                <div class="sv-dots">
-                  <% svHeroSlides.slice(0, 3).forEach(() => { %>
-                    <span></span>
-                  <% }) %>
-                </div>
-              </div>
+        <section class="svr-hero">
+          <div class="svr-hero__copy">
+            <span class="svr-hero__kicker"><%= svHeroPrimary.kicker || "London's Pouch Specialists" %></span>
+            <h1>Premium Nicotine<br>Pouches <span><%= svHeroPrimary.title || "UK-Wide" %></span></h1>
+            <p>100+ Products From The World's Best Brands. Age-Verified Checkout, Camden &amp; Oxford Street Stores, Next-Day Delivery.</p>
+            <div class="svr-hero__actions">
+              <a href="<%= svHeroPrimary.buttonLink || '/shop' %>" class="svr-btn svr-btn--primary"><%= svHeroPrimary.buttonText || "Shop Now" %></a>
+              <a href="#shops" class="svr-btn svr-btn--ghost">Find A Store</a>
             </div>
-
           </div>
+
+          <% if (svHeroVisualProducts.length) { %>
+            <div class="svr-hero__visual">
+              <% svHeroVisualProducts.forEach((p, index) => { %>
+                <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
+                <div class="svr-hero-can">
+                  <% if (index === 1) { %>
+                    <span class="svr-hero-can__badge"><i class="fa-solid fa-fire" aria-hidden="true"></i> Best Seller</span>
+                  <% } %>
+                  <div class="svr-hero-can__media">
+                    <% if (p.images && p.images.length) { %>
+                      <img src="<%= optimiseImageUrl(p.images[0], { width: 240 }) %>" alt="<%= p.name %>" loading="eager" decoding="async" />
+                    <% } else { %>
+                      <span>No Image</span>
+                    <% } %>
+                  </div>
+                  <div class="svr-hero-can__name"><%= p.name %></div>
+                  <div class="svr-hero-can__price">£<%= Number(finalPrice || 0).toFixed(2) %></div>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
         </section>
-
-        <section class="sv-brand-strip" aria-label="Available brands">
-          <div class="sv-brand-strip__track">
-
-            <span>White Fox</span>
-            <span>Siberia</span>
-            <span>Cuba</span>
-            <span>Pablo</span>
-            <span>Velo</span>
-            <span>Killa</span>
-            <span>Garant</span>
-            <span>Iceberg</span>
-            <span>Fumi</span>
-            <span>Zyn</span>
-
-            <span>White Fox</span>
-            <span>Siberia</span>
-            <span>Cuba</span>
-            <span>Pablo</span>
-            <span>Velo</span>
-            <span>Killa</span>
-            <span>Garant</span>
-            <span>Iceberg</span>
-            <span>Fumi</span>
-            <span>Zyn</span>
-
-            <span>White Fox</span>
-            <span>Siberia</span>
-            <span>Cuba</span>
-            <span>Pablo</span>
-            <span>Velo</span>
-            <span>Killa</span>
-            <span>Garant</span>
-            <span>Iceberg</span>
-            <span>Fumi</span>
-            <span>Zyn</span>
-
-            <span>White Fox</span>
-            <span>Siberia</span>
-            <span>Cuba</span>
-            <span>Pablo</span>
-            <span>Velo</span>
-            <span>Killa</span>
-            <span>Garant</span>
-            <span>Iceberg</span>
-            <span>Fumi</span>
-            <span>Zyn</span>
-          </div>
-        </section>
-
 
         <div class='sv-trust-bar'>
           <div class='sv-trust-bar__inner'>
@@ -227,6 +182,91 @@
             </div>
           </div>
         </div>
+
+        <div class="svr-brand-filter">
+          <div class="svr-brand-filter__label">Filter By Brand</div>
+          <div class="svr-brand-filter__pills">
+            <a href="/shop" class="svr-pill svr-pill--active">All</a>
+            <a href="/shop?brand=WHITE%20FOX" class="svr-pill">White Fox</a>
+            <a href="/shop?brand=PABLO" class="svr-pill">Pablo</a>
+            <a href="/shop?brand=SIBERIA" class="svr-pill">Siberia</a>
+            <a href="/shop?brand=ICEBERG" class="svr-pill">Iceberg</a>
+            <a href="/shop?brand=KILLA" class="svr-pill">Killa</a>
+            <a href="/shop?brand=VELO" class="svr-pill">Velo</a>
+            <a href="/shop" class="svr-pill">View All</a>
+          </div>
+        </div>
+
+        <section class="svr-best-sellers" id="bestsellers">
+          <div class="svr-section-head">
+            <h2>Best Sellers</h2>
+            <a href="/shop">View All Products &rarr;</a>
+          </div>
+
+          <% if (bestSellerProducts && bestSellerProducts.length) { %>
+            <div class="svr-product-grid">
+              <% bestSellerProducts.forEach((p) => { %>
+                <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
+                <a class="svr-product-card" href="/products/<%= p.slug || p._id %>">
+                  <div class="svr-product-card__media">
+                    <span class="sv-strength-badge sv-strength-badge--<%= (p.strength || 'medium').toLowerCase().replace('-','') %>"><%= p.strength || 'MEDIUM' %></span>
+                    <% if (p.images && p.images.length) { %>
+                      <img src="<%= optimiseImageUrl(p.images[0], { width: 400 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                    <% } else { %>
+                      <span>No Image</span>
+                    <% } %>
+                  </div>
+                  <div class="svr-product-card__body">
+                    <div class="svr-product-card__brand"><%= p.brand || "Snus Village" %></div>
+                    <div class="svr-product-card__name"><%= p.name %></div>
+                    <div class="svr-product-card__footer">
+                      <span class="svr-product-card__price">
+                        <% if (p.discountPrice && p.discountPrice > 0) { %>
+                          <small>£<%= Number(p.price || 0).toFixed(2) %></small>
+                        <% } %>
+                        £<%= Number(finalPrice || 0).toFixed(2) %>
+                      </span>
+                      <span class="svr-product-card__add">View</span>
+                    </div>
+                  </div>
+                </a>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="svr-empty-bestsellers">
+              <h3>No Best Sellers Selected Yet</h3>
+              <p>Our Best-Selling Products Will Appear Here Soon.</p>
+              <a href="/shop">View Shop</a>
+            </div>
+          <% } %>
+        </section>
+
+        <div class="svr-strength-guide">
+          <div class="svr-strength-guide__label">Strength Guide</div>
+          <div class="svr-strength-guide__row">
+            <div class="svr-strength-guide__item">
+              <div class="svr-strength-guide__chip svr-strength-guide__chip--low">Low</div>
+              <div class="svr-strength-guide__range">Under 6mg</div>
+            </div>
+            <div class="svr-strength-guide__item">
+              <div class="svr-strength-guide__chip svr-strength-guide__chip--medium">Medium</div>
+              <div class="svr-strength-guide__range">6&ndash;12mg</div>
+            </div>
+            <div class="svr-strength-guide__item">
+              <div class="svr-strength-guide__chip svr-strength-guide__chip--strong">Strong</div>
+              <div class="svr-strength-guide__range">12&ndash;20mg</div>
+            </div>
+            <div class="svr-strength-guide__item">
+              <div class="svr-strength-guide__chip svr-strength-guide__chip--xstrong">X-Strong</div>
+              <div class="svr-strength-guide__range">20&ndash;40mg</div>
+            </div>
+            <div class="svr-strength-guide__item">
+              <div class="svr-strength-guide__chip svr-strength-guide__chip--extreme">Extreme</div>
+              <div class="svr-strength-guide__range">40mg+</div>
+            </div>
+          </div>
+        </div>
+
 <%
           const svCollections = homepageContent?.collections || {};
           const svCollectionCards = svCollections.cards && svCollections.cards.length
@@ -311,70 +351,6 @@
                 </article>
               <% }) %>
             </div>
-          </div>
-        </section>
-
-        <section class="section sv-bestsellers-redesign" id="bestsellers">
-          <div class="container">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow dark">Best Sellers</span>
-                <h2>Customer Favourites</h2>
-                <p>A focused selection of popular products customers keep coming back for.</p>
-              </div>
-              <a class="ghost-btn" href="/shop">View All Products</a>
-            </div>
-
-            <% if (bestSellerProducts && bestSellerProducts.length) { %>
-              <div class="product-grid sv-product-grid-pro">
-                <% bestSellerProducts.forEach((p) => { %>
-                  <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
-
-                  <article class="product-card sv-product-card-pro">
-                    <% if (p.showSaleBadge && p.discountPrice && p.discountPrice > 0) { %>
-                      <span class="sv-product-sale-badge">Sale</span>
-                    <% } %>
-
-                    <div class="product-card__media">
-                      <% if (p.images && p.images.length) { %>
-                        <img src="<%= optimiseImageUrl(p.images[0], { width: 560 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
-                      <% } else { %>
-                        <span>No Image</span>
-                      <% } %>
-                    </div>
-
-                    <div class="product-card__top">
-                      <span class="product-card__tag"><%= p.brand || "Snus Village" %></span>
-                      <span class="product-card__tag"><%= p.strength || "Strength" %></span>
-                    </div>
-
-                    <h3><%= p.name %></h3>
-
-                    <p>
-                      <%= p.description ? p.description.substring(0, 92) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 92 ? "..." : "" %>
-                    </p>
-
-                    <span class="sv-strength-badge sv-strength-badge--<%= (p.strength || 'medium').toLowerCase().replace('-','') %>"><%= p.strength || 'MEDIUM' %></span>
-
-                    <div class="product-card__price">
-                      <strong>
-                        <% if (p.discountPrice && p.discountPrice > 0) { %>
-                          <small>£<%= Number(p.price || 0).toFixed(2) %></small>
-                        <% } %>
-                        £<%= Number(finalPrice || 0).toFixed(2) %>
-                      </strong>
-                      <a class="sv-product-card-btn" href="/products/<%= p.slug || p._id %>">View Product</a>
-                    </div>
-                  </article>
-                <% }) %>
-              </div>
-            <% } else { %>
-              <div class="sv-dynamic-empty">
-                <h3>No best sellers selected yet</h3>
-                <p>Our best-selling products will appear here soon.</p>
-                <a href="/shop">View Shop</a>
-              </div>
-            <% } %>
           </div>
         </section>
 
