@@ -3,243 +3,238 @@
   const originalPrice = Number(product.price || 0);
   const hasSalePrice = product.discountPrice && product.discountPrice > 0;
   const inStock = Number(product.stock || 0) > 0;
-  const productImage = product.images && product.images.length > 0 ? product.images[0] : "";
-  const hasMultipleProductImages = product.images && product.images.length > 1;
+  const productImages = product.images && product.images.length ? product.images : [];
+  const hasMultipleProductImages = productImages.length > 1;
   const pouchesPerCan = Number(product.pouchesPerCan || 20);
-  const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " pouches" : "N/A";
+  const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " per can" : "N/A";
   const freeDeliveryThreshold = Number((typeof storeSettings !== "undefined" && storeSettings?.freeDeliveryThreshold) || 10);
   const bundleQuantities = [1, 3, 5, 10].filter((qty) => qty <= Math.max(Number(product.stock || 0), 1));
-  const unitPrice = activePrice > 0 ? activePrice : originalPrice;
+  const strengthClass = (product.strength || "medium").toLowerCase().replace("-", "");
 %>
 
-<section class="product-detail-page product-detail-redesign">
-  <nav class="product-breadcrumb" aria-label="Breadcrumb">
+<% if (typeof schema !== "undefined" && schema) { %>
+  <script type="application/ld+json"><%- schema %></script>
+<% } %>
+
+<section class="pd">
+  <nav class="pd-breadcrumb" aria-label="Breadcrumb">
     <a href="/">Home</a>
     <span>/</span>
     <a href="/shop">Shop</a>
+    <% if (product.brand) { %>
+      <span>/</span>
+      <a href="/shop?brand=<%= encodeURIComponent(product.brand) %>"><%= product.brand %></a>
+    <% } %>
     <span>/</span>
     <strong><%= product.name %></strong>
   </nav>
 
-  <div class="product-shell">
-    <div class="product-gallery">
-      <div class="product-main-image">
-        <% if (productImage) { %>
+  <div class="pd-detail">
+    <div class="pd-gallery">
+      <div class="pd-gallery__main">
+        <span class="pd-strength-badge pd-strength-badge--<%= strengthClass %>"><%= product.strength || "Medium" %></span>
+        <% if (hasSalePrice) { %>
+          <span class="pd-sale-badge">Sale</span>
+        <% } %>
+
+        <% if (productImages.length) { %>
           <% if (hasMultipleProductImages) { %>
-            <button class="product-gallery-btn product-gallery-btn--prev" type="button" aria-label="Previous product image">
+            <button class="pd-gallery__nav pd-gallery__nav--prev" type="button" aria-label="Previous product image">
               <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
             </button>
           <% } %>
-          <img id="productMainImage" src="<%= optimiseImageUrl(productImage, { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
+          <img id="pdMainImage" src="<%= optimiseImageUrl(productImages[0], { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
           <% if (hasMultipleProductImages) { %>
-            <button class="product-gallery-btn product-gallery-btn--next" type="button" aria-label="Next product image">
+            <button class="pd-gallery__nav pd-gallery__nav--next" type="button" aria-label="Next product image">
               <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
             </button>
           <% } %>
         <% } else { %>
-          <div class="product-image-placeholder">No image</div>
+          <div class="pd-gallery__placeholder">No image</div>
         <% } %>
       </div>
 
       <% if (hasMultipleProductImages) { %>
-        <div class="product-thumbnails" aria-label="Product images">
-          <% product.images.forEach((img, i) => { %>
-            <button class="product-thumbnail-btn <%= i === 0 ? 'is-active' : '' %>" type="button" data-product-image="<%= optimiseImageUrl(img, { width: 1200, quality: 'auto:best' }) %>" aria-label="Show <%= product.name %> image <%= i + 1 %>">
-              <img src="<%= optimiseImageUrl(img, { width: 260 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
+        <div class="pd-gallery__thumbs" aria-label="Product images">
+          <% productImages.forEach((img, i) => { %>
+            <button class="pd-gallery__thumb <%= i === 0 ? 'is-active' : '' %>" type="button" data-product-image="<%= optimiseImageUrl(img, { width: 1200, quality: 'auto:best' }) %>" aria-label="Show <%= product.name %> image <%= i + 1 %>">
+              <img src="<%= optimiseImageUrl(img, { width: 200 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
             </button>
           <% }) %>
         </div>
       <% } %>
     </div>
 
-    <aside class="product-purchase-panel" aria-label="Product purchase information">
-      <div class="product-kicker-row">
-        <a class="product-brand" href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>"><%= product.brand || "Snus Village" %></a>
-        <span class="<%= inStock ? 'stock-pill in-stock' : 'stock-pill out-stock' %>">
-          <%= inStock ? "In stock" : "Out of stock" %>
-        </span>
-      </div>
+    <aside class="pd-info" aria-label="Product purchase information">
+      <a class="pd-info__brand" href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>"><%= product.brand || "Snus Village" %></a>
 
       <h1><%= product.name %></h1>
 
-      <div class="product-rating-row" aria-label="Product highlights">
-        <span>
-          <i class="fa-solid fa-star" aria-hidden="true"></i>
-          <i class="fa-solid fa-star" aria-hidden="true"></i>
-          <i class="fa-solid fa-star" aria-hidden="true"></i>
-          <i class="fa-solid fa-star" aria-hidden="true"></i>
-          <i class="fa-solid fa-star" aria-hidden="true"></i>
-        </span>
-        <small>Popular with adult customers</small>
-      </div>
-
-      <p class="product-description">
+      <p class="pd-info__description">
         <%= product.description || "Premium nicotine pouch available from Snus Village." %>
       </p>
 
-      <div class="product-price-block">
-        <div>
-          <span class="product-price">£<%= activePrice.toFixed(2) %></span>
+      <div class="pd-spec-grid">
+        <div class="pd-spec">
+          <div class="pd-spec__label">Strength</div>
+          <div class="pd-spec__value"><%= product.strength || "N/A" %></div>
+        </div>
+        <div class="pd-spec">
+          <div class="pd-spec__label">Nicotine</div>
+          <div class="pd-spec__value"><%= product.nicotine ? product.nicotine + "mg/g" : "N/A" %></div>
+        </div>
+        <div class="pd-spec">
+          <div class="pd-spec__label">Pouches</div>
+          <div class="pd-spec__value"><%= pouchesPerCanLabel %></div>
+        </div>
+        <div class="pd-spec">
+          <div class="pd-spec__label">Flavour</div>
+          <div class="pd-spec__value"><%= product.flavour || "N/A" %></div>
+        </div>
+      </div>
+
+      <div class="pd-warning" role="note">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        <span>
+          <strong>Nicotine Pouch Warning</strong>
+          Contains nicotine. Nicotine is an addictive substance. For use by adults 18+ only.
+        </span>
+      </div>
+
+      <div class="pd-buybox">
+        <div class="pd-buybox__price-row">
+          <span class="pd-price">£<%= activePrice.toFixed(2) %></span>
           <% if (hasSalePrice) { %>
-            <span class="product-old-price">£<%= originalPrice.toFixed(2) %></span>
+            <span class="pd-price-old">£<%= originalPrice.toFixed(2) %></span>
           <% } %>
+          <span class="pd-stock-pill <%= inStock ? 'pd-stock-pill--in' : 'pd-stock-pill--out' %>">
+            <%= inStock ? "In Stock" : "Out of Stock" %>
+          </span>
         </div>
-        <small><%= inStock ? product.stock + " available" : "Restock coming soon" %></small>
-      </div>
 
-      <dl class="product-key-specs">
-        <div>
-          <dt>Strength</dt>
-          <dd><%= product.strength || "N/A" %></dd>
-        </div>
-        <div>
-          <dt>Nicotine</dt>
-          <dd><%= product.nicotine ? product.nicotine + "mg" : "N/A" %></dd>
-        </div>
-        <div>
-          <dt>Flavour</dt>
-          <dd><%= product.flavour || "N/A" %></dd>
-        </div>
-        <div>
-          <dt>Portions</dt>
-          <dd><%= pouchesPerCanLabel %></dd>
-        </div>
-      </dl>
-
-      <div class="product-nicotine-warning" role="note">
-        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-        <span>Nicotine is an addictive substance. This product is for adults aged 18+ only.</span>
-      </div>
-
-      <div class="product-buy-box">
         <% if (inStock) { %>
-          <form action="/cart/add/<%= product._id %>" method="POST" class="add-cart-form" id="productAddForm">
-            <fieldset class="product-quantity-options">
-              <legend>Choose quantity</legend>
-              <div class="product-quantity-grid">
-                <% bundleQuantities.forEach((qty, index) => { %>
-                  <button class="product-quantity-chip <%= index === 0 ? 'is-active' : '' %>" type="button" data-quantity="<%= qty %>">
-                    <strong><%= qty %></strong>
-                    <span><%= qty === 1 ? "can" : "cans" %></span>
-                    <small>£<%= (unitPrice * qty).toFixed(2) %></small>
-                  </button>
-                <% }) %>
-              </div>
-            </fieldset>
+          <form action="/cart/add/<%= product._id %>" method="POST" class="pd-buybox__form" id="pdAddForm">
+            <% if (bundleQuantities.length > 1) { %>
+              <fieldset class="pd-qty-options">
+                <legend>Choose quantity</legend>
+                <div class="pd-qty-grid">
+                  <% bundleQuantities.forEach((qty, index) => { %>
+                    <button class="pd-qty-chip <%= index === 0 ? 'is-active' : '' %>" type="button" data-quantity="<%= qty %>">
+                      <strong><%= qty %></strong>
+                      <span><%= qty === 1 ? "can" : "cans" %></span>
+                    </button>
+                  <% }) %>
+                </div>
+              </fieldset>
+            <% } %>
 
-            <label class="product-quantity-input">
+            <label class="pd-qty-input">
               <span>Quantity</span>
-              <input id="productQuantity" type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
+              <input id="pdQuantity" type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
             </label>
 
-            <button class="product-add-button" type="submit">
-              <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
-              Add to cart
+            <button class="pd-add-button" type="submit">
+              <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+              Add to Cart
             </button>
           </form>
         <% } else { %>
-          <button class="disabled-cart-btn" disabled>Out of stock</button>
+          <button class="pd-disabled-button" disabled>Out of Stock</button>
         <% } %>
-      </div>
 
-      <div class="product-service-stack">
-        <div>
-          <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
-          <span>Free delivery over £<%= freeDeliveryThreshold.toFixed(2) %></span>
-        </div>
-        <div>
-          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-          <span>Secure checkout with age verification</span>
-        </div>
-        <div>
-          <i class="fa-solid fa-store" aria-hidden="true"></i>
-          <span>London store support and fulfilment</span>
+        <div class="pd-service-grid">
+          <div class="pd-service">
+            <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+            <div><strong>Fast UK Delivery</strong><span>From £<%= freeDeliveryThreshold.toFixed(2) %>, next day available</span></div>
+          </div>
+          <div class="pd-service">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+            <div><strong>Age Verified</strong><span>Checkout requires 18+ ID check</span></div>
+          </div>
         </div>
       </div>
     </aside>
   </div>
 
-  <div class="product-detail-sections">
-    <details open>
-      <summary>Product details</summary>
-      <ul class="product-organised-list">
-        <li><strong>Product type:</strong> <%= product.category || "Nicotine pouch" %></li>
+  <div class="pd-sections">
+    <div class="pd-section">
+      <h2>Product Details</h2>
+      <ul>
         <li><strong>Brand:</strong> <%= product.brand || "Snus Village" %></li>
+        <li><strong>Product type:</strong> <%= product.category || "Nicotine pouch" %></li>
         <li><strong>Flavour profile:</strong> <%= product.flavour || "See product description" %></li>
         <li><strong>Strength level:</strong> <%= product.strength || "N/A" %></li>
-        <li><strong>Nicotine:</strong> <%= product.nicotine ? product.nicotine + "mg" : "N/A" %></li>
-        <li><strong>Portion count:</strong> <%= pouchesPerCanLabel %> per can</li>
         <% if (product.sku) { %>
           <li><strong>SKU:</strong> <%= product.sku %></li>
         <% } %>
+        <li><strong>Tobacco-free</strong> nicotine pouch</li>
       </ul>
-    </details>
+    </div>
 
-    <details>
-      <summary>Delivery and checkout</summary>
-      <ul class="product-organised-list">
-        <li>Fast UK delivery options are shown at checkout.</li>
-        <li>Order confirmation is sent by email after payment.</li>
-        <li>Age verification may be required before checkout is completed.</li>
-        <li>Stock can vary between online availability and London locations.</li>
+    <div class="pd-section">
+      <h2>Delivery &amp; Returns</h2>
+      <ul>
+        <li>Standard UK delivery from <strong>£1.99</strong></li>
+        <li>Next-day delivery available before <strong>4:30pm</strong></li>
+        <li>Free shipping over <strong>£<%= freeDeliveryThreshold.toFixed(2) %></strong></li>
+        <li>Age verification required on delivery</li>
       </ul>
-    </details>
+    </div>
 
-    <details>
-      <summary>Support</summary>
-      <ul class="product-organised-list">
-        <li>Need help choosing strength or flavour? Contact Snus Village support.</li>
-        <li>Wholesale customers can apply for trader access from the wholesale page.</li>
-        <li>All orders are reviewed before fulfilment for customer safety.</li>
+    <div class="pd-section">
+      <h2>Responsible Use</h2>
+      <ul>
+        <li>For adults <strong>18+</strong> only</li>
+        <li>Contains nicotine, an addictive substance</li>
+        <li>Keep out of reach of children and pets</li>
+        <li>Not a smoking cessation product</li>
       </ul>
-    </details>
+    </div>
   </div>
 
   <% if (related && related.length) { %>
-    <section class="product-brand-carousel" aria-labelledby="brandCarouselTitle">
-      <div class="product-carousel-head">
+    <section class="pd-related" aria-labelledby="pdRelatedTitle">
+      <div class="pd-related__head">
         <div>
-          <span class="product-carousel-eyebrow">You may also like</span>
-          <h2 id="brandCarouselTitle">More from <%= product.brand || "this brand" %></h2>
+          <span class="pd-related__eyebrow">You May Also Like</span>
+          <h2 id="pdRelatedTitle">More From <%= product.brand || "This Brand" %></h2>
         </div>
 
-        <a href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>">View all</a>
+        <a href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>">View All</a>
       </div>
 
-      <div class="product-carousel-shell">
-        <button class="product-related-nav product-related-nav--prev" type="button" aria-label="Scroll previous products">
+      <div class="pd-related__shell">
+        <button class="pd-related__nav pd-related__nav--prev" type="button" aria-label="Scroll previous products">
           <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
         </button>
 
-        <div class="product-related-track" id="relatedProductsTrack">
+        <div class="pd-related__track" id="pdRelatedTrack">
           <% related.forEach((item) => { %>
             <%
               const relatedImage = item.images && item.images.length ? item.images[0] : "";
               const relatedPrice = Number(item.discountPrice && item.discountPrice > 0 ? item.discountPrice : item.price || 0);
+              const relatedStrengthClass = (item.strength || "medium").toLowerCase().replace("-", "");
             %>
-            <article class="product-related-card">
-              <a href="/products/<%= item.slug || item._id %>">
-                <div class="product-related-image">
-                  <% if (relatedImage) { %>
-                    <img src="<%= optimiseImageUrl(relatedImage, { width: 420, quality: 'auto:good' }) %>" alt="<%= item.name %>" loading="lazy" decoding="async">
-                  <% } else { %>
-                    <span>No image</span>
-                  <% } %>
-                </div>
+            <a class="pd-related-card" href="/products/<%= item.slug || item._id %>">
+              <div class="pd-related-card__media">
+                <span class="pd-strength-badge pd-strength-badge--<%= relatedStrengthClass %> pd-strength-badge--sm"><%= item.strength || "Medium" %></span>
+                <% if (relatedImage) { %>
+                  <img src="<%= optimiseImageUrl(relatedImage, { width: 420, quality: 'auto:good' }) %>" alt="<%= item.name %>" loading="lazy" decoding="async">
+                <% } else { %>
+                  <span>No image</span>
+                <% } %>
+              </div>
 
-                <span><%= item.flavour || item.strength || "Nicotine pouch" %></span>
-                <h3><%= item.name %></h3>
-
-                <div class="product-related-meta">
-                  <strong>£<%= relatedPrice.toFixed(2) %></strong>
-                  <small><%= item.nicotine ? item.nicotine + "mg" : item.strength || "View product" %></small>
-                </div>
-              </a>
-            </article>
+              <div class="pd-related-card__body">
+                <div class="pd-related-card__brand"><%= item.brand || "Snus Village" %></div>
+                <div class="pd-related-card__name"><%= item.name %></div>
+                <div class="pd-related-card__price">£<%= relatedPrice.toFixed(2) %></div>
+              </div>
+            </a>
           <% }) %>
         </div>
 
-        <button class="product-related-nav product-related-nav--next" type="button" aria-label="Scroll next products">
+        <button class="pd-related__nav pd-related__nav--next" type="button" aria-label="Scroll next products">
           <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
         </button>
       </div>
@@ -249,10 +244,10 @@
 
 <script>
   (function () {
-    const mainImage = document.getElementById("productMainImage");
-    const thumbnailButtons = Array.from(document.querySelectorAll(".product-thumbnail-btn"));
-    const galleryPrev = document.querySelector(".product-gallery-btn--prev");
-    const galleryNext = document.querySelector(".product-gallery-btn--next");
+    const mainImage = document.getElementById("pdMainImage");
+    const thumbnailButtons = Array.from(document.querySelectorAll(".pd-gallery__thumb"));
+    const galleryPrev = document.querySelector(".pd-gallery__nav--prev");
+    const galleryNext = document.querySelector(".pd-gallery__nav--next");
     let activeIndex = 0;
 
     function showImage(index) {
@@ -278,8 +273,8 @@
     galleryPrev?.addEventListener("click", () => showImage(activeIndex - 1));
     galleryNext?.addEventListener("click", () => showImage(activeIndex + 1));
 
-    const quantityInput = document.getElementById("productQuantity");
-    const quantityChips = Array.from(document.querySelectorAll(".product-quantity-chip"));
+    const quantityInput = document.getElementById("pdQuantity");
+    const quantityChips = Array.from(document.querySelectorAll(".pd-qty-chip"));
 
     function setQuantity(value) {
       if (!quantityInput) return;
@@ -299,9 +294,9 @@
 
     quantityInput?.addEventListener("input", () => setQuantity(quantityInput.value));
 
-    const relatedTrack = document.getElementById("relatedProductsTrack");
-    const relatedPrev = document.querySelector(".product-related-nav--prev");
-    const relatedNext = document.querySelector(".product-related-nav--next");
+    const relatedTrack = document.getElementById("pdRelatedTrack");
+    const relatedPrev = document.querySelector(".pd-related__nav--prev");
+    const relatedNext = document.querySelector(".pd-related__nav--next");
 
     function scrollRelated(direction) {
       if (!relatedTrack) return;
