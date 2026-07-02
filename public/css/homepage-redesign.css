@@ -14,9 +14,9 @@
 
 /* ===== HERO ===== */
 .svr-hero {
-  max-width: 1280px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 60px 24px;
+  padding: 70px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -190,8 +190,8 @@
 
 /* ===== BRAND FILTER ===== */
 .svr-brand-filter {
-  background: var(--bg-soft, #0d1e3d);
-  padding: 24px;
+  background: var(--bg-soft, #f0f4f8);
+  padding: 30px 20px;
   text-align: center;
 }
 
@@ -209,7 +209,7 @@
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
@@ -241,15 +241,15 @@
 /* ===== BEST SELLERS (redesigned product grid) ===== */
 .svr-best-sellers {
   background: #f8fafc;
-  padding: 40px 24px;
+  padding: 50px 20px;
 }
 
 .svr-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto 22px;
+  max-width: 1360px;
+  margin: 0 auto 24px;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -273,11 +273,11 @@
 }
 
 .svr-product-grid {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 20px;
 }
 
 .svr-product-card {
@@ -425,8 +425,8 @@
 
 /* ===== STRENGTH GUIDE ===== */
 .svr-strength-guide {
-  background: var(--bg-soft, #0d1e3d);
-  padding: 28px 24px;
+  background: var(--bg-soft, #f0f4f8);
+  padding: 36px 20px;
   text-align: center;
 }
 
@@ -440,11 +440,11 @@
 }
 
 .svr-strength-guide__row {
-  max-width: 900px;
+  max-width: 1360px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  gap: 16px;
 }
 
 .svr-strength-guide__item {
