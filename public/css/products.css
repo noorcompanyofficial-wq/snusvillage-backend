@@ -14,8 +14,8 @@
    ========================================================================= */
 
 :root {
-  --pd-bg-card: #0d1628;
-  --pd-bg-alt: #0a0f1e;
+  --pd-bg-card: #ffffff;
+  --pd-bg-alt: #f8fafc;
   --pd-strength-low: #16a34a;
   --pd-strength-medium: #2563eb;
   --pd-strength-strong: #d97706;
@@ -50,7 +50,7 @@
 }
 
 .pd-breadcrumb strong {
-  color: #fff;
+  color: #071225;
 }
 
 .pd-detail {
@@ -208,9 +208,9 @@
   width: fit-content;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: #f0f4f8;
   border: 1px solid var(--sv-line);
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(7, 18, 37, 0.7);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -221,7 +221,7 @@
 
 .pd-info__brand:hover {
   border-color: rgba(201, 31, 54, 0.45);
-  color: #fff;
+  color: var(--sv-red);
 }
 
 .pd-info h1 {
@@ -289,7 +289,7 @@
 
 .pd-warning span {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(7, 18, 37, 0.75);
   line-height: 1.5;
 }
 
@@ -298,7 +298,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #fff;
+  color: var(--sv-red);
   margin-bottom: 3px;
 }
 
@@ -375,7 +375,7 @@
   padding: 10px 8px;
   border-radius: 10px;
   border: 1px solid var(--sv-line);
-  background: rgba(255, 255, 255, 0.04);
+  background: #f8fafc;
   color: var(--sv-text);
   text-align: center;
   cursor: pointer;
@@ -405,10 +405,10 @@
 }
 
 .pd-qty-input input {
-  background: rgba(255, 255, 255, 0.06);
+  background: #f6f8fc;
   border: 1px solid var(--sv-line);
   border-radius: 12px;
-  color: #fff;
+  color: #071225;
   text-align: center;
   font-weight: 800;
   font-size: 15px;
@@ -444,7 +444,7 @@
 }
 
 .pd-disabled-button {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(7, 18, 37, 0.08);
   color: var(--sv-muted);
   cursor: not-allowed;
 }
@@ -463,7 +463,7 @@
   align-items: flex-start;
   padding: 14px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: #f8fafc;
   border: 1px solid var(--sv-line);
 }
 
@@ -609,7 +609,7 @@
 
 .pd-related__track::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(7, 18, 37, 0.15);
 }
 
 .pd-related-card {
@@ -635,7 +635,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: #f0f4f8;
 }
 
 .pd-related-card__media img {
