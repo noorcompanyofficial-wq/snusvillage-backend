@@ -1,13 +1,13 @@
 :root {
-  --bg-soft: #0d1e3d;
-  --text: #f1f5f9;
-  --muted: rgba(255, 255, 255, 0.55);
-  --line: rgba(255, 255, 255, 0.1);
+  --bg-soft: #f0f4f8;
+  --text: #071225;
+  --muted: rgba(7, 18, 37, 0.65);
+  --line: rgba(7, 18, 37, 0.12);
   --blue: #153fb8;
   --blue-deep: #c91f36;
   --red: #c91f36;
   --radius-xl: 32px;
-  --shadow: 0 20px 60px rgba(21, 63, 184, 0.09), 0 16px 40px rgba(201, 31, 54, 0.07);
+  --shadow: 0 4px 24px rgba(7, 18, 37, 0.07), 0 2px 8px rgba(201, 31, 54, 0.05);
   --max: 1360px;
   --nav-h: 138px;
 }
@@ -31,7 +31,7 @@ body {
     "Segoe UI",
     sans-serif;
   color: var(--text);
-  background: #071225;
+  background: #ffffff;
   min-height: 100vh;
   overflow-x: hidden;
   padding-top: 138px;
@@ -57,8 +57,8 @@ input {
   width: min(calc(100% - 24px), 1480px);
   margin: 12px auto;
   border-radius: 34px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #ffffff;
+  border: 1px solid rgba(7, 18, 37, 0.08);
   box-shadow: var(--shadow);
   overflow: clip;
   isolation: isolate;
@@ -72,10 +72,10 @@ input {
   width: 100%;
   min-height: 138px;
   height: auto;
-  background: rgba(7, 18, 37, 0.96);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid rgba(7, 18, 37, 0.1);
   backdrop-filter: blur(16px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 18px rgba(7, 18, 37, 0.08);
 }
 
 .header .nav-container {
@@ -406,8 +406,8 @@ input {
   min-width: 48px;
   height: 48px;
   padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(7, 18, 37, 0.15);
+  background: #f0f4f8;
   color: var(--text);
 }
 
@@ -427,8 +427,8 @@ input {
   padding: 0 20px;
   color: var(--text);
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(7, 18, 37, 0.18);
+  background: #f0f4f8;
 }
 
 .btn:hover,
@@ -517,9 +517,9 @@ input {
 }
 
 .eyebrow {
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: #eef4ff;
+  border: 1px solid rgba(201, 31, 54, 0.2);
+  background: rgba(201, 31, 54, 0.07);
+  color: #c91f36;
 }
 
 .eyebrow.dark,
@@ -677,10 +677,16 @@ input {
 .collection-card,
 .product-card,
 .shop-card,
-.info-card,
-.footer__panel {
+.info-card {
   border-radius: var(--radius-xl);
   border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.footer__panel {
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: #0d1e3d;
   box-shadow: var(--shadow);
 }
@@ -754,8 +760,8 @@ input {
   min-height: 235px;
   margin-bottom: 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(135deg, rgba(74, 127, 212, 0.12), rgba(201, 31, 54, 0.08)), #0d1e3d;
+  border: 1px solid rgba(7, 18, 37, 0.08);
+  background: linear-gradient(135deg, rgba(74, 127, 212, 0.06), rgba(201, 31, 54, 0.05)), #f6f8fc;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -803,7 +809,7 @@ input {
   flex: 1;
   height: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(7, 18, 37, 0.1);
 }
 
 .strength .is-on {
@@ -2971,11 +2977,9 @@ input {
 .sv-location-card {
   overflow: hidden;
   border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0d1e3d;
-  box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(255,255,255,0.06);
+  border: 1px solid rgba(7, 18, 37, 0.1);
+  background: #ffffff;
+  box-shadow: 0 4px 22px rgba(7, 18, 37, 0.08);
   transition:
     transform 0.28s ease,
     box-shadow 0.28s ease;
@@ -3015,7 +3019,7 @@ input {
 .sv-location-body h3,
 .sv-distro-copy h3 {
   margin: 0;
-  color: #ffffff;
+  color: #071225;
   font-size: clamp(1.45rem, 2vw, 2rem);
   line-height: 1;
   letter-spacing: -0.045em;
@@ -3024,14 +3028,14 @@ input {
 .sv-location-body p,
 .sv-distro-copy p {
   margin: 12px 0 0;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(7, 18, 37, 0.62);
   line-height: 1.65;
 }
 
 .sv-location-body a {
   display: inline-flex;
   margin-top: 16px;
-  color: #7eb3f5;
+  color: #153fb8;
   text-decoration: none;
   font-size: 12px;
   font-weight: 950;
@@ -3059,14 +3063,12 @@ input {
   padding: 26px;
   overflow: hidden;
   border-radius: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(7, 18, 37, 0.1);
   background:
-    radial-gradient(circle at 20% 16%, rgba(201, 31, 54, 0.18), transparent 34%),
-    radial-gradient(circle at 88% 18%, rgba(74, 127, 212, 0.18), transparent 36%),
-    #0d1e3d;
-  box-shadow:
-    0 28px 90px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(255,255,255,0.06);
+    radial-gradient(circle at 20% 16%, rgba(201, 31, 54, 0.07), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(74, 127, 212, 0.07), transparent 36%),
+    #ffffff;
+  box-shadow: 0 4px 22px rgba(7, 18, 37, 0.08);
 }
 
 .sv-distro-card::before {
@@ -3097,7 +3099,7 @@ input {
 }
 
 .sv-distro-address {
-  color: #ffffff !important;
+  color: #071225 !important;
   font-weight: 900;
 }
 

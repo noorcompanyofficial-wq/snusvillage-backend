@@ -50,7 +50,7 @@
   line-height: 1.08;
   letter-spacing: -1.5px;
   margin: 0 0 16px;
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
 }
 
 .svr-hero h1 span {
@@ -58,7 +58,7 @@
 }
 
 .svr-hero p {
-  color: var(--muted, rgba(255, 255, 255, 0.55));
+  color: var(--muted, rgba(7, 18, 37, 0.65));
   font-size: 14px;
   line-height: 1.7;
   margin: 0 0 28px;
@@ -96,14 +96,14 @@
 }
 
 .svr-btn--ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.75);
+  background: #f0f4f8;
+  border: 1px solid rgba(7, 18, 37, 0.18);
+  color: rgba(7, 18, 37, 0.75);
 }
 
 .svr-btn--ghost:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #fff;
+  border-color: rgba(21, 63, 184, 0.4);
+  color: #153fb8;
 }
 
 .svr-hero__visual {
@@ -138,7 +138,7 @@
 }
 
 .svr-hero-can__media span {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(7, 18, 37, 0.3);
   font-size: 10px;
 }
 
@@ -159,7 +159,7 @@
 }
 
 .svr-hero-can__name {
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
@@ -168,7 +168,7 @@
 }
 
 .svr-hero-can__price {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(7, 18, 37, 0.45);
   font-size: 11px;
   margin-top: 6px;
 }
@@ -196,7 +196,7 @@
 }
 
 .svr-brand-filter__label {
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(7, 18, 37, 0.45);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
@@ -219,16 +219,16 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(7, 18, 37, 0.12);
+  background: #f0f4f8;
+  color: rgba(7, 18, 37, 0.65);
   text-decoration: none;
   transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .svr-pill:hover {
   border-color: rgba(201, 31, 54, 0.45);
-  color: #fff;
+  color: #c91f36;
 }
 
 .svr-pill--active {
@@ -240,7 +240,7 @@
 
 /* ===== BEST SELLERS (redesigned product grid) ===== */
 .svr-best-sellers {
-  background: #0a0f1e;
+  background: #f8fafc;
   padding: 40px 24px;
 }
 
@@ -257,7 +257,7 @@
 .svr-section-head h2 {
   font-size: 22px;
   font-weight: 900;
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
   margin: 0;
 }
 
@@ -281,9 +281,9 @@
 }
 
 .svr-product-card {
-  background: var(--bg-soft, #0d1e3d);
+  background: #ffffff;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(7, 18, 37, 0.1);
   overflow: hidden;
   display: block;
   text-decoration: none;
@@ -302,7 +302,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: #f0f4f8;
 }
 
 .svr-product-card__media img {
@@ -312,7 +312,7 @@
 }
 
 .svr-product-card__media span {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(7, 18, 37, 0.3);
   font-size: 12px;
 }
 
@@ -329,7 +329,7 @@
 }
 
 .svr-product-card__brand {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(7, 18, 37, 0.45);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -340,7 +340,7 @@
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 12px;
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
 }
 
 .svr-product-card__footer {
@@ -353,7 +353,7 @@
 .svr-product-card__price {
   font-size: 17px;
   font-weight: 900;
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
   line-height: 1.1;
 }
 
@@ -361,7 +361,7 @@
   display: block;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(7, 18, 37, 0.4);
   text-decoration: line-through;
 }
 
@@ -390,18 +390,18 @@
   margin: 0 auto;
   text-align: center;
   padding: 48px 24px;
-  background: var(--bg-soft, #0d1e3d);
+  background: #ffffff;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(7, 18, 37, 0.1);
 }
 
 .svr-empty-bestsellers h3 {
-  color: var(--text, #f1f5f9);
+  color: var(--text, #071225);
   margin: 0 0 8px;
 }
 
 .svr-empty-bestsellers p {
-  color: var(--muted, rgba(255, 255, 255, 0.6));
+  color: var(--muted, rgba(7, 18, 37, 0.6));
   margin: 0 0 16px;
 }
 
@@ -431,7 +431,7 @@
 }
 
 .svr-strength-guide__label {
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(7, 18, 37, 0.45);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
@@ -472,7 +472,7 @@
 }
 
 .svr-strength-guide__range {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(7, 18, 37, 0.5);
   font-size: 10px;
 }
 
