@@ -30,10 +30,10 @@ main {
 
 .navbar {
   height: 84px;
-  background: rgba(7, 18, 37, 0.96);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  box-shadow: none;
+  background: linear-gradient(90deg, #123b8a 50%, #b41232 50%);
+  border-bottom: none;
+  backdrop-filter: none;
+  box-shadow: 0 4px 28px rgba(7, 18, 37, 0.3);
 }
 
 .nav-container {
@@ -46,7 +46,7 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  color: var(--sv-text);
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -69,7 +69,7 @@ main {
 }
 
 .logo small {
-  color: var(--sv-muted);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -86,7 +86,7 @@ main {
   padding: 0 16px;
   border: 1px solid transparent;
   border-radius: 999px;
-  color: var(--sv-muted);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -95,8 +95,8 @@ main {
 
 .nav-links li a:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
 }
 
@@ -139,7 +139,7 @@ main {
 #nav-icon4 span {
   width: 20px;
   left: 13px;
-  background: var(--sv-text);
+  background: #ffffff;
 }
 
 #nav-icon4 span:nth-child(1) {
@@ -541,7 +541,7 @@ main {
 
 /* ===== CENTERED HEADER REDESIGN ===== */
 main {
-  padding-top: 132px;
+  padding-top: 138px;
 }
 
 .header .navbar,
@@ -551,17 +551,17 @@ main {
   z-index: 1000;
   width: 100%;
   height: auto !important;
-  min-height: 118px !important;
-  background: rgba(7, 18, 37, 0.96) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3) !important;
+  min-height: 138px !important;
+  background: linear-gradient(90deg, #123b8a 50%, #b41232 50%) !important;
+  border-bottom: none !important;
+  backdrop-filter: none;
+  box-shadow: 0 4px 28px rgba(7, 18, 37, 0.3) !important;
 }
 
 .header .nav-container,
 .nav-container {
   width: min(calc(100% - 40px), 1360px) !important;
-  min-height: 118px !important;
+  min-height: 138px !important;
   margin: 0 auto !important;
   padding: 0 !important;
   display: grid !important;
@@ -585,7 +585,7 @@ main {
   min-height: 38px !important;
   padding: 0 12px !important;
   border-radius: 999px !important;
-  color: var(--sv-muted) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-size: 13px !important;
   font-weight: 800 !important;
   letter-spacing: 0.04em !important;
@@ -595,7 +595,7 @@ main {
 
 .header .nav-links li a:hover {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .header .logo {
@@ -611,17 +611,17 @@ main {
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
-  color: var(--sv-text) !important;
+  color: #ffffff !important;
   text-decoration: none !important;
 }
 
 .header .logo img,
 .navbar .logo img,
 .logo img {
-  width: 92px !important;
-  max-width: 92px !important;
-  height: 92px !important;
-  max-height: 92px !important;
+  width: 124px !important;
+  max-width: 124px !important;
+  height: 124px !important;
+  max-height: 124px !important;
   object-fit: contain !important;
 }
 
@@ -634,7 +634,7 @@ main {
 }
 
 .header .logo strong {
-  color: var(--sv-text) !important;
+  color: #ffffff !important;
   font-size: 17px !important;
   font-weight: 950 !important;
   letter-spacing: 0.08em !important;
@@ -642,7 +642,7 @@ main {
 }
 
 .header .logo small {
-  color: var(--sv-red) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
   font-size: 11px !important;
   font-weight: 800 !important;
   letter-spacing: 0.11em !important;
@@ -685,9 +685,12 @@ main {
   padding: 0 12px !important;
   border: 0 !important;
   outline: 0 !important;
-  color: var(--sv-text) !important;
+  color: #ffffff !important;
   background: transparent !important;
   font-size: 13px !important;
+}
+.header .header-search input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .header .header-search button {

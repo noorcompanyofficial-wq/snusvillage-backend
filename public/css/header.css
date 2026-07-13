@@ -676,9 +676,9 @@
   justify-content: space-between;
   padding: 13px 15px;
   border-radius: 18px;
-  color: #f1f5f9 !important;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #071225 !important;
+  background: #f4f6fa;
+  border: 1px solid #e8ecf4;
   font-size: 14px;
   font-weight: 950;
   text-decoration: none;
@@ -720,7 +720,7 @@
 
 .header .nav-mega__grid--strength a small {
   margin-top: 4px;
-  color: rgba(255, 255, 255, 0.55);
+  color: #6b7a99;
   font-size: 12px;
   font-weight: 800;
 }
