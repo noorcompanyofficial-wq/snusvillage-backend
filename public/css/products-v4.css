@@ -45,6 +45,13 @@
   color: #ffffff;
 }
 
+/* Break main out of the 1180px cap that style.css sets —
+   products-v4.css only loads on product pages so this is safe */
+main {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 /* ---- Outer wrapper ---- */
 .pdv4 {
   background: #ffffff;
