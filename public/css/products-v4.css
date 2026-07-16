@@ -406,20 +406,19 @@ main {
   border-color: #071225;
 }
 
-/* Related product cards — centred row */
+/* Related product cards — single horizontal scroll row */
 .pdv4 .pd-related__track {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
   gap: 16px;
-  overflow-x: unset;
-  scroll-snap-type: unset;
-  padding-bottom: 0;
-  background: transparent;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 6px;
 }
 .pdv4 .pd-related-card {
   border-radius: 0;
   flex: 0 0 240px;
+  scroll-snap-align: start;
   border: none;
   background: #ffffff;
   outline: 1px solid #e8ecf4;
