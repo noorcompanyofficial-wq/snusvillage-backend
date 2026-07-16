@@ -11,7 +11,7 @@
   width: 100%;
 }
 .pdv4-breadcrumb-bar__inner {
-  width: min(100% - 40px, 1360px);
+  width: min(100% - 48px, 1480px);
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -48,8 +48,14 @@
   background: #ffffff;
 }
 .pdv4 .pd {
-  width: min(100% - 40px, 1360px);
-  padding: 40px 0 60px;
+  width: min(100% - 48px, 1480px);
+  padding: 48px 0 72px;
+}
+
+/* Wider, more balanced 2-column split */
+.pdv4 .pd-detail {
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
 }
 
 /* Hide legacy breadcrumb (now replaced by the bar above) */
@@ -60,13 +66,13 @@
    ======================== */
 .pdv4 .pd-gallery__main {
   border-radius: 0;
-  height: 520px;
+  height: 580px;
   background: #f4f6fa;
   border: 1px solid #e8ecf4;
 }
 .pdv4 .pd-gallery__main img {
-  max-width: 65%;
-  max-height: 65%;
+  max-width: 86%;
+  max-height: 86%;
 }
 .pdv4 .pd-gallery__nav {
   border-radius: 0;
@@ -92,8 +98,8 @@
 /* Thumbnails */
 .pdv4 .pd-gallery__thumb {
   border-radius: 0;
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   background: #f4f6fa;
   border: 2px solid #e8ecf4;
   padding: 8px;
@@ -132,7 +138,7 @@
 
 .pdv4 .pd-info h1 {
   font-family: 'Montserrat', system-ui, sans-serif !important;
-  font-size: clamp(32px, 4vw, 52px) !important;
+  font-size: clamp(36px, 4.5vw, 58px) !important;
   font-weight: 900 !important;
   color: #071225 !important;
   letter-spacing: -0.03em !important;
@@ -152,7 +158,7 @@
   background: #f4f6fa;
   border: none;
   border-bottom: 2px solid #e8ecf4;
-  padding: 14px 16px;
+  padding: 18px 20px;
 }
 .pdv4 .pd-spec__label {
   font-family: 'Montserrat', system-ui, sans-serif;
@@ -161,11 +167,11 @@
   letter-spacing: 0.2em;
   color: #6b7a99;
   text-transform: uppercase;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .pdv4 .pd-spec__value {
   font-family: 'Montserrat', system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   color: #071225;
 }
@@ -296,7 +302,7 @@
   border-radius: 0;
   background: #f4f6fa;
   border: none;
-  padding: 28px;
+  padding: 36px 32px;
 }
 .pdv4 .pd-section h2 {
   font-family: 'Montserrat', system-ui, sans-serif;
@@ -392,7 +398,7 @@
 /* Related product cards — V4 style */
 .pdv4 .pd-related-card {
   border-radius: 0;
-  flex: 0 0 240px;
+  flex: 0 0 270px;
   border: none;
   background: #ffffff;
   outline: 1px solid #e8ecf4;
@@ -403,13 +409,13 @@
   outline-color: #b41232;
 }
 .pdv4 .pd-related-card__media {
-  height: 200px;
+  height: 240px;
   background: #f4f6fa;
   position: relative;
 }
 .pdv4 .pd-related-card__media img {
-  max-width: 70%;
-  max-height: 70%;
+  max-width: 82%;
+  max-height: 82%;
 }
 .pdv4 .pd-related-card__body {
   padding: 16px;
@@ -466,7 +472,7 @@
   grid-template-columns: repeat(5, 1fr);
 }
 .pdv4-strength-strip__item {
-  padding: 24px 20px;
+  padding: 32px 28px;
   border-right: 1px solid rgba(255, 255, 255, 0.07);
   position: relative;
   transition: background 0.2s;
@@ -486,15 +492,15 @@
 .pdv4-strength-strip__item--extreme::before { background: linear-gradient(90deg, #7f1d1d, #dc2626); }
 .pdv4-strength-strip__name {
   font-family: 'Montserrat', system-ui, sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #ffffff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .pdv4-strength-strip__range {
-  font-size: 11px;
+  font-size: 13px;
   color: #6b7a99;
 }
 .pdv4-strength-strip__item--active .pdv4-strength-strip__name { color: #ffffff; }
@@ -503,15 +509,18 @@
 /* ========================
    RESPONSIVE
    ======================== */
-@media (max-width: 900px) {
-  .pdv4 .pd-detail { grid-template-columns: 1fr; }
-  .pdv4 .pd-gallery__main { height: 360px; }
+@media (max-width: 1000px) {
+  .pdv4 .pd-detail { grid-template-columns: 1fr; gap: 40px; }
+  .pdv4 .pd-gallery__main { height: 420px; }
+}
+@media (max-width: 768px) {
+  .pdv4 .pd-sections { grid-template-columns: 1fr; }
+  .pdv4 .pd-gallery__main { height: 340px; }
   .pdv4-strength-strip { grid-template-columns: repeat(3, 1fr); }
   .pdv4-strength-strip__item:nth-child(3) { border-right: none; }
   .pdv4-strength-strip__item:nth-child(4),
   .pdv4-strength-strip__item:nth-child(5) { border-top: 1px solid rgba(255,255,255,0.07); }
 }
-@media (max-width: 640px) {
-  .pdv4 .pd-sections { grid-template-columns: 1fr; }
+@media (max-width: 480px) {
   .pdv4-strength-strip { grid-template-columns: 1fr 1fr; }
 }
