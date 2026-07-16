@@ -11,8 +11,10 @@
   width: 100%;
 }
 .pdv4-breadcrumb-bar__inner {
-  width: min(100% - 48px, 1480px);
-  margin: 0 auto;
+  width: auto;
+  margin: 0;
+  padding-left: 32px;
+  padding-right: 32px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -48,11 +50,13 @@
   background: #ffffff;
 }
 .pdv4 .pd {
-  width: min(100% - 48px, 1480px);
-  padding: 48px 0 72px;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 48px 32px 72px;
 }
 
-/* Wider, more balanced 2-column split */
+/* Full-width 2-column split */
 .pdv4 .pd-detail {
   grid-template-columns: 1.1fr 1fr;
   gap: 64px;
@@ -66,13 +70,13 @@
    ======================== */
 .pdv4 .pd-gallery__main {
   border-radius: 0;
-  height: 580px;
+  height: 480px;
   background: #f4f6fa;
   border: 1px solid #e8ecf4;
 }
 .pdv4 .pd-gallery__main img {
-  max-width: 86%;
-  max-height: 86%;
+  max-width: 72%;
+  max-height: 72%;
 }
 .pdv4 .pd-gallery__nav {
   border-radius: 0;
@@ -98,8 +102,8 @@
 /* Thumbnails */
 .pdv4 .pd-gallery__thumb {
   border-radius: 0;
-  width: 96px;
-  height: 96px;
+  width: 80px;
+  height: 80px;
   background: #f4f6fa;
   border: 2px solid #e8ecf4;
   padding: 8px;
@@ -398,7 +402,7 @@
 /* Related product cards — V4 style */
 .pdv4 .pd-related-card {
   border-radius: 0;
-  flex: 0 0 270px;
+  flex: 0 0 240px;
   border: none;
   background: #ffffff;
   outline: 1px solid #e8ecf4;
@@ -409,13 +413,13 @@
   outline-color: #b41232;
 }
 .pdv4 .pd-related-card__media {
-  height: 240px;
+  height: 200px;
   background: #f4f6fa;
   position: relative;
 }
 .pdv4 .pd-related-card__media img {
-  max-width: 82%;
-  max-height: 82%;
+  max-width: 72%;
+  max-height: 72%;
 }
 .pdv4 .pd-related-card__body {
   padding: 16px;
