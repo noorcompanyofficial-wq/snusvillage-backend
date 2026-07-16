@@ -393,30 +393,41 @@ main {
   padding-bottom: 2px;
 }
 .pdv4 .pd-related__nav {
-  display: none;
+  border-radius: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e8ecf4;
+  background: #f4f6fa;
+  color: #071225;
+}
+.pdv4 .pd-related__nav:hover {
+  background: #071225;
+  color: #ffffff;
+  border-color: #071225;
 }
 
-/* Related product cards — V4 style, fill the row */
+/* Related product cards — centred row */
 .pdv4 .pd-related__track {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1px;
-  background: #e8ecf4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
   overflow-x: unset;
   scroll-snap-type: unset;
   padding-bottom: 0;
+  background: transparent;
 }
 .pdv4 .pd-related-card {
   border-radius: 0;
-  flex: none;
+  flex: 0 0 240px;
   border: none;
   background: #ffffff;
-  outline: none;
-  transition: background 0.2s;
+  outline: 1px solid #e8ecf4;
+  transition: outline-color 0.2s;
 }
 .pdv4 .pd-related-card:hover {
   transform: none;
-  background: #fafafa;
+  outline-color: #b41232;
 }
 .pdv4 .pd-related-card__media {
   height: 220px;
