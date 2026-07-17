@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["user", "admin"],
+    enum: ["user", "owner", "admin", "manager", "fulfilment", "support", "product_manager"],
     default: "user",
   },
 
@@ -27,6 +27,39 @@ const userSchema = new mongoose.Schema({
   },
 
   isVerified: { type: Boolean, default: false },
+
+  diditSessionId: { type: String, default: null },
+  diditStatus: { type: String, default: "not_started" },
+  isAgeVerified: { type: Boolean, default: false },
+  ageVerifiedAt: { type: Date, default: null },
+
+  // DIDIT KYC
+  didit: {
+    sessionId: String,
+    workflowId: String,
+    status: {
+      type: String,
+      enum: [
+        "Not Started",
+        "In Progress",
+        "Awaiting User",
+        "In Review",
+        "Approved",
+        "Declined",
+        "Resubmitted",
+        "Abandoned",
+        "Expired",
+        "Kyc Expired",
+      ],
+      default: "Not Started",
+    },
+    verified: { type: Boolean, default: false },
+    verifiedAt: Date,
+    declinedAt: Date,
+    lastWebhookAt: Date,
+    decision: mongoose.Schema.Types.Mixed,
+    metadata: mongoose.Schema.Types.Mixed,
+  },
 
   //  VERIFY
   verifyCode: String,
@@ -51,6 +84,12 @@ const userSchema = new mongoose.Schema({
   suspiciousIPs: [String],
   blockedIPs: [String],
   lastResend: Date,
+
+  // ADMIN NOTES
+  adminNotes: {
+    type: String,
+    default: "",
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

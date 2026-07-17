@@ -239,6 +239,22 @@
   line-height: 1.65;
 }
 
+.contact-support-note {
+  padding: 0;
+}
+
+.contact-support-note a {
+  display: inline-flex;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #153fb8, #c91f36);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 @media (max-width: 900px) {
   .contact-hero,
   .contact-grid,

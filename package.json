@@ -5,6 +5,9 @@
   "scripts": {
     "start": "node app.js",
     "nodemon": "nodemon app.js",
+    "didit:account": "node scripts/didit-account.js",
+    "didit:setup": "node scripts/didit-setup.js",
+    "images:migrate-cloudinary": "node scripts/migrate-product-images-to-cloudinary.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -15,6 +18,7 @@
   "dependencies": {
     "axios": "^1.15.2",
     "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",

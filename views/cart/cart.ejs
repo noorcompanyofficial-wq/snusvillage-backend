@@ -1,88 +1,144 @@
-<section class="cart-page">
-  <div class="cart-header">
-    <span class="eyebrow">CART</span>
-    <h1>Your Cart</h1>
-    <p>Review your items before checkout.</p>
+<div class="cv4-page">
+
+  <!-- Dark nav breadcrumb strip -->
+  <div class="cv4-breadcrumb-bar">
+    <div class="cv4-breadcrumb-inner">
+      <a href="/">Home</a>
+      <span class="cv4-sep">›</span>
+      <strong>Your Cart</strong>
+    </div>
   </div>
 
   <% if (!cart || !cart.items || cart.items.length === 0) { %>
-    <div class="empty-cart">
+    <div class="cv4-empty">
+      <div class="cv4-empty__icon"><i class="fa-solid fa-bag-shopping"></i></div>
       <h2>Your cart is empty</h2>
       <p>Add products from the shop to start your order.</p>
-      <a href="/shop">Continue Shopping</a>
+      <a href="/shop" class="cv4-btn cv4-btn--primary">Shop Products</a>
     </div>
+
   <% } else { %>
-    <div class="cart-layout">
-      <div class="cart-items">
-        <% cart.items.forEach(item => { %>
-          <% if (item.product) { %>
-            <div class="cart-item">
-              <div class="cart-item-image">
-                <% if (item.product.images && item.product.images.length > 0) { %>
-                  <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
-                <% } else { %>
-                  <span>No image</span>
-                <% } %>
+    <%
+      const subtotal = cart.items.reduce((sum, item) => sum + (item.priceAtTime * item.quantity), 0);
+      const freeDeliveryThreshold = Number(storeSettings?.freeDeliveryThreshold || 10);
+      const standardDeliveryFee = Number(storeSettings?.deliveryPrice || 1.99);
+      const deliveryFee = subtotal >= freeDeliveryThreshold ? 0 : standardDeliveryFee;
+      const cartTotal = subtotal + deliveryFee;
+    %>
+    <div class="cv4-layout">
+
+      <!-- Items column -->
+      <div class="cv4-items-col">
+        <div class="cv4-items-head">
+          <span class="cv4-items-count"><%= cart.items.length %> item<%= cart.items.length === 1 ? "" : "s" %></span>
+          <form action="/cart/clear" method="POST">
+            <button type="submit" class="cv4-clear-btn">
+              <i class="fa-solid fa-trash-can"></i> Clear Cart
+            </button>
+          </form>
+        </div>
+
+        <div class="cv4-items">
+          <% cart.items.forEach(item => { %>
+            <% if (item.product) { %>
+              <div class="cv4-item">
+                <div class="cv4-item__img">
+                  <% if (item.product.images && item.product.images.length > 0) { %>
+                    <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                  <% } else { %>
+                    <span>No image</span>
+                  <% } %>
+                </div>
+
+                <div class="cv4-item__info">
+                  <div class="cv4-item__brand"><%= item.product.brand || "Snus Village" %></div>
+                  <h2 class="cv4-item__name"><%= item.product.name %></h2>
+                  <div class="cv4-item__price">£<%= item.priceAtTime.toFixed(2) %> each</div>
+                </div>
+
+                <div class="cv4-item__controls">
+                  <div class="cv4-qty">
+                    <form action="/cart/update" method="POST">
+                      <input type="hidden" name="productId" value="<%= item.product._id %>">
+                      <input type="hidden" name="action" value="minus">
+                      <button type="submit" class="cv4-qty__btn" <%= item.quantity <= 1 ? 'disabled' : '' %>>−</button>
+                    </form>
+                    <span class="cv4-qty__num"><%= item.quantity %></span>
+                    <form action="/cart/update" method="POST">
+                      <input type="hidden" name="productId" value="<%= item.product._id %>">
+                      <input type="hidden" name="action" value="plus">
+                      <button type="submit" class="cv4-qty__btn">+</button>
+                    </form>
+                  </div>
+                  <div class="cv4-item__line-price">£<%= (item.priceAtTime * item.quantity).toFixed(2) %></div>
+                  <form action="/cart/remove" method="POST">
+                    <input type="hidden" name="productId" value="<%= item.product._id %>">
+                    <button type="submit" class="cv4-remove-btn" title="Remove item">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </form>
+                </div>
               </div>
+            <% } %>
+          <% }) %>
+        </div>
 
-              <div class="cart-item-info">
-                <h2><%= item.product.name %></h2>
-                <p><%= item.product.brand || "Snus Village" %></p>
-                <strong>£<%= item.priceAtTime.toFixed(2) %></strong>
-              </div>
-
-              <div class="cart-item-actions">
-                <form action="/cart/update" method="POST">
-                  <input type="hidden" name="productId" value="<%= item.product._id %>">
-                  <input type="hidden" name="action" value="minus">
-                  <button type="submit">−</button>
-                </form>
-
-                <span><%= item.quantity %></span>
-
-                <form action="/cart/update" method="POST">
-                  <input type="hidden" name="productId" value="<%= item.product._id %>">
-                  <input type="hidden" name="action" value="plus">
-                  <button type="submit">+</button>
-                </form>
-
-                <form action="/cart/remove" method="POST">
-                  <input type="hidden" name="productId" value="<%= item.product._id %>">
-                  <button type="submit" class="remove-btn">Remove</button>
-                </form>
-              </div>
-            </div>
-          <% } %>
-        <% }) %>
+        <a href="/shop" class="cv4-continue-link">
+          <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+        </a>
       </div>
 
-      <aside class="cart-summary">
-        <h2>Order Summary</h2>
+      <!-- Summary column -->
+      <aside class="cv4-summary">
+        <h2 class="cv4-summary__title">Order Summary</h2>
 
-        <% 
-          const subtotal = cart.items.reduce((sum, item) => {
-            return sum + (item.priceAtTime * item.quantity);
-          }, 0);
-        %>
-
-        <div class="summary-row">
-          <span>Subtotal</span>
-          <strong>£<%= subtotal.toFixed(2) %></strong>
+        <div class="cv4-summary__rows">
+          <div class="cv4-summary__row">
+            <span>Subtotal</span>
+            <strong>£<%= subtotal.toFixed(2) %></strong>
+          </div>
+          <div class="cv4-summary__row">
+            <span>Delivery</span>
+            <strong>
+              <% if (deliveryFee === 0) { %>Free
+              <% } else { %>£<%= standardDeliveryFee.toFixed(2) %><% } %>
+            </strong>
+          </div>
+          <% if (deliveryFee > 0) { %>
+            <div class="cv4-summary__shipping-note">
+              Spend <strong>£<%= (freeDeliveryThreshold - subtotal).toFixed(2) %></strong> more for free delivery
+            </div>
+          <% } else { %>
+            <div class="cv4-summary__shipping-note cv4-summary__shipping-note--free">
+              <i class="fa-solid fa-circle-check"></i> You qualify for free delivery
+            </div>
+          <% } %>
         </div>
 
-        <div class="summary-row">
-          <span>Delivery</span>
-          <strong>Calculated at checkout</strong>
-        </div>
-
-        <div class="summary-total">
+        <div class="cv4-summary__total">
           <span>Total</span>
-          <strong>£<%= subtotal.toFixed(2) %></strong>
+          <strong>£<%= cartTotal.toFixed(2) %></strong>
         </div>
 
-        <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
-        <a href="/shop" class="continue-btn">Continue Shopping</a>
+        <a href="/checkout" class="cv4-btn cv4-btn--primary cv4-btn--full">
+          <i class="fa-solid fa-lock"></i> Secure Checkout
+        </a>
+
+        <div class="cv4-summary__payments">
+          <span>Accepted payments via SumUp</span>
+          <div class="cv4-payment-badges">
+            <span>Visa</span>
+            <span>Mastercard</span>
+            <span>Debit / Credit</span>
+          </div>
+        </div>
+
+        <div class="cv4-summary__trust">
+          <div><i class="fa-solid fa-shield-halved"></i> Age-verified checkout</div>
+          <div><i class="fa-solid fa-truck-fast"></i> Fast UK delivery</div>
+          <div><i class="fa-solid fa-rotate-left"></i> Hassle-free returns</div>
+        </div>
       </aside>
     </div>
   <% } %>
-</section>
+</div>

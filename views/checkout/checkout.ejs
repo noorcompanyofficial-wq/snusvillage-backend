@@ -1,53 +1,128 @@
-<div class="checkout-page">
+<div
+  class="checkout-page"
+  data-subtotal="<%= subtotal.toFixed(2) %>"
+  data-shipping="<%= shipping.toFixed(2) %>"
+  data-total="<%= total.toFixed(2) %>"
+  data-free-shipping-threshold="<%= typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10 %>"
+  data-standard-shipping-fee="<%= typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99 %>"
+  data-next-day-shipping-fee="<%= typeof nextDayShippingFee !== "undefined" ? nextDayShippingFee : 4.99 %>"
+  data-next-day-cutoff="<%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>"
+>
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
-    <div class="express-payments">
-      <button type="button" class="paypal-btn">PayPal</button>
-      <button type="button" class="gpay-btn">Google Pay</button>
-    </div>
+    <form action="/didit/start" method="POST" id="checkoutDiditForm"></form>
 
-    <div class="checkout-divider">OR</div>
-
-    <form action="/checkout/place-order" method="POST">
+    <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
-
-      <h3>Delivery</h3>
-      <select name="country" required>
-        <option value="United Kingdom">United Kingdom</option>
-      </select>
 
       <div class="checkout-row">
         <input type="text" name="firstName" placeholder="First Name" required>
         <input type="text" name="lastName" placeholder="Last Name" required>
       </div>
 
-      <input type="text" name="address" placeholder="Address" required>
-
-      <div class="checkout-row">
-        <input type="text" name="city" placeholder="City" required>
-        <input type="text" name="postcode" placeholder="Postcode" required>
-      </div>
-
       <input type="text" name="phone" placeholder="Phone" required>
 
-      <h3>Payment</h3>
-      <input type="text" name="cardNumber" placeholder="Card Number" disabled>
+      <h3>Fulfilment</h3>
 
-      <div class="checkout-row">
-        <input type="text" name="expiry" placeholder="MM/YY" disabled>
-        <input type="text" name="cvc" placeholder="CVC" disabled>
+      <div class="checkout-fulfilment-options">
+        <label class="checkout-fulfilment-card is-active" data-fulfilment-card="delivery">
+          <input type="radio" name="fulfilmentMethod" value="delivery" checked>
+          <span>
+            <strong>Delivery</strong>
+            <small>Pay online and have your order delivered.</small>
+          </span>
+        </label>
+
+        <label class="checkout-fulfilment-card" data-fulfilment-card="click_collect">
+          <input type="radio" name="fulfilmentMethod" value="click_collect">
+          <span>
+            <strong>Click & Collect</strong>
+            <small>Pay online and collect from Edgware Road only.</small>
+          </span>
+        </label>
       </div>
 
-      <input type="text" name="cardName" placeholder="Name on card" disabled>
+      <div class="checkout-collect-notice" id="clickCollectNotice" hidden>
+        <strong>Collection Address</strong>
+        <span><%= checkoutSettings?.clickCollectAddress || "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX" %></span>
+        <small>Your order will not be sent to Royal Mail. Bring your order confirmation and valid ID when collecting.</small>
+      </div>
+
+      <div id="deliveryFields">
+        <h3>Delivery</h3>
+
+        <div class="checkout-delivery-service-options" id="deliveryServiceOptions">
+          <label class="checkout-delivery-service-card is-active" data-delivery-service-card="standard">
+            <input type="radio" name="deliveryService" value="standard" checked>
+            <span>
+              <strong>Standard Delivery</strong>
+              <small>
+                <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
+                  Free for this order.
+                <% } else { %>
+                  £<%= (typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99).toFixed(2) %>, or free over £<%= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10).toFixed(2) %>.
+                <% } %>
+              </small>
+            </span>
+          </label>
+
+          <label class="checkout-delivery-service-card" data-delivery-service-card="next_day">
+            <input type="radio" name="deliveryService" value="next_day">
+            <span>
+              <strong>Royal Mail Next Day</strong>
+              <small>£<%= (typeof nextDayShippingFee !== "undefined" ? nextDayShippingFee : 4.99).toFixed(2) %>. Order before <%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>.</small>
+            </span>
+          </label>
+        </div>
+
+        <select name="country" required>
+          <option value="United Kingdom">United Kingdom</option>
+        </select>
+
+        <input type="text" name="address" placeholder="Address" required>
+
+        <div class="checkout-row">
+          <input type="text" name="city" placeholder="City" required>
+          <input type="text" name="postcode" placeholder="Postcode" required>
+        </div>
+      </div>
+
+      <h3>Payment</h3>
+      <div class="checkout-sumup-notice">
+        <strong>Secure SumUp Payment</strong>
+        <span><%= checkoutSettings?.checkoutNotice || "You Will Be Redirected To SumUp To Complete Your Card Payment Securely." %></span>
+      </div>
+
+      <div class="payment-methods checkout-payment-methods" aria-label="Accepted payment methods">
+        <span>Accepted via SumUp</span>
+        <strong>Visa</strong>
+        <strong>Mastercard</strong>
+        <strong>Debit/Credit Cards</strong>
+      </div>
+
+      <% if (verificationRequired) { %>
+        <div class="checkout-verification-inline">
+          <div>
+            <strong>Age Verification Required</strong>
+            <span>Please complete age verification before paying with SumUp.</span>
+          </div>
+
+          <button type="submit" form="checkoutDiditForm">
+            Start Verification
+          </button>
+        </div>
+      <% } %>
 
       <label class="checkout-age-confirm">
         <input type="checkbox" name="ageConfirm" value="yes" required>
         <span>I confirm I am 18+ and understand age verification may be required before receiving my order.</span>
       </label>
 
-      <button type="submit" class="pay-now-btn">Pay Now</button>
+      <button type="submit" class="pay-now-btn" <%= verificationRequired ? "disabled" : "" %>>
+        <%= verificationRequired ? "Complete Verification First" : "Pay Securely With SumUp" %>
+      </button>
     </form>
   </section>
 
@@ -74,9 +149,24 @@
       <% } %>
     <% }) %>
 
-    <div class="discount-row">
-      <input type="text" placeholder="Discount code">
-      <button type="button">Apply</button>
+    <div class="checkout-discount-box">
+      <% if (appliedDiscountCode) { %>
+        <div class="checkout-applied-discount">
+          <div>
+            <span>Discount Applied</span>
+            <strong><%= appliedDiscountCode %></strong>
+          </div>
+
+          <form action="/checkout/remove-discount" method="POST">
+            <button type="submit">Remove</button>
+          </form>
+        </div>
+      <% } else { %>
+        <form action="/checkout/apply-discount" method="POST" class="discount-row">
+          <input type="text" name="discountCode" placeholder="Discount Code">
+          <button type="submit">Apply</button>
+        </form>
+      <% } %>
     </div>
 
     <div class="checkout-total-row">
@@ -86,13 +176,142 @@
 
     <div class="checkout-total-row">
       <span>Shipping</span>
-      <strong><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
+      <strong id="checkoutShippingAmount"><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
+    </div>
+
+    <% if (discountAmount && discountAmount > 0) { %>
+      <div class="checkout-total-row checkout-discount-total">
+        <span>Discount</span>
+        <strong>-£<%= discountAmount.toFixed(2) %></strong>
+      </div>
+    <% } %>
+
+    <div class="checkout-free-shipping-note" id="checkoutShippingNote">
+      <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
+        You qualify for free delivery.
+      <% } else { %>
+        Spend £<%= ((typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10) - subtotal).toFixed(2) %> more to get free delivery.
+      <% } %>
     </div>
 
     <div class="checkout-grand-total">
       <span>Total</span>
-      <strong>£<%= total.toFixed(2) %></strong>
+      <strong id="checkoutGrandTotal">£<%= total.toFixed(2) %></strong>
     </div>
   </aside>
 </div>
 
+<script>
+  (function () {
+    const checkoutPage = document.querySelector(".checkout-page");
+    const deliveryFields = document.getElementById("deliveryFields");
+    const deliveryServiceOptions = document.getElementById("deliveryServiceOptions");
+    const collectNotice = document.getElementById("clickCollectNotice");
+    const radios = document.querySelectorAll('input[name="fulfilmentMethod"]');
+    const cards = document.querySelectorAll("[data-fulfilment-card]");
+    const deliveryServiceRadios = document.querySelectorAll('input[name="deliveryService"]');
+    const deliveryServiceCards = document.querySelectorAll("[data-delivery-service-card]");
+    const deliveryInputs = deliveryFields ? deliveryFields.querySelectorAll("input, select") : [];
+
+    const shippingAmount = document.getElementById("checkoutShippingAmount");
+    const grandTotal = document.getElementById("checkoutGrandTotal");
+    const shippingNote = document.getElementById("checkoutShippingNote");
+
+    const subtotal = Number(checkoutPage?.dataset.subtotal || 0);
+    const freeShippingThreshold = Number(checkoutPage?.dataset.freeShippingThreshold || 10);
+    const standardShippingFee = Number(checkoutPage?.dataset.standardShippingFee || 1.99);
+    const nextDayShippingFee = Number(checkoutPage?.dataset.nextDayShippingFee || 4.99);
+    const nextDayCutoff = checkoutPage?.dataset.nextDayCutoff || "4:30pm";
+
+    function formatMoney(value) {
+      return "£" + Number(value || 0).toFixed(2);
+    }
+
+    function updateShipping(selected) {
+      const isCollect = selected === "click_collect";
+      const selectedDeliveryService =
+        document.querySelector('input[name="deliveryService"]:checked')?.value || "standard";
+      const shipping = isCollect
+        ? 0
+        : selectedDeliveryService === "next_day"
+          ? nextDayShippingFee
+          : subtotal >= freeShippingThreshold
+            ? 0
+            : standardShippingFee;
+      const total = subtotal + shipping;
+
+      if (shippingAmount) {
+        shippingAmount.textContent = shipping === 0 ? "Free" : formatMoney(shipping);
+      }
+
+      if (grandTotal) {
+        grandTotal.textContent = formatMoney(total);
+      }
+
+      if (shippingNote) {
+        if (isCollect) {
+          shippingNote.textContent = "Click & Collect is free.";
+        } else if (selectedDeliveryService === "next_day") {
+          shippingNote.textContent =
+            "Royal Mail Next Day costs " + formatMoney(nextDayShippingFee) + ". Order before " + nextDayCutoff + ".";
+        } else if (subtotal >= freeShippingThreshold) {
+          shippingNote.textContent = "You qualify for free delivery.";
+        } else {
+          shippingNote.textContent =
+            "Spend " + formatMoney(freeShippingThreshold - subtotal) + " more to get free delivery.";
+        }
+      }
+    }
+
+    function updateFulfilment() {
+      const selected = document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery";
+      const isCollect = selected === "click_collect";
+
+      if (deliveryFields) {
+        deliveryFields.hidden = isCollect;
+      }
+
+      if (collectNotice) {
+        collectNotice.hidden = !isCollect;
+      }
+
+      if (deliveryServiceOptions) {
+        deliveryServiceOptions.hidden = isCollect;
+      }
+
+      deliveryInputs.forEach((input) => {
+        if (isCollect) {
+          input.removeAttribute("required");
+        } else {
+          input.setAttribute("required", "required");
+        }
+      });
+
+      cards.forEach((card) => {
+        card.classList.toggle("is-active", card.dataset.fulfilmentCard === selected);
+      });
+
+      deliveryServiceRadios.forEach((radio) => {
+        radio.disabled = isCollect;
+      });
+
+      updateShipping(selected);
+    }
+
+    radios.forEach((radio) => {
+      radio.addEventListener("change", updateFulfilment);
+    });
+
+    deliveryServiceRadios.forEach((radio) => {
+      radio.addEventListener("change", function () {
+        deliveryServiceCards.forEach((card) => {
+          card.classList.toggle("is-active", card.dataset.deliveryServiceCard === radio.value && radio.checked);
+        });
+
+        updateShipping(document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery");
+      });
+    });
+
+    updateFulfilment();
+  })();
+</script>

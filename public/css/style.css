@@ -1,49 +1,220 @@
 .age-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
+  display: grid;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(201, 31, 54, 0.2), transparent 34%),
+    rgba(5, 10, 22, 0.82);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
   z-index: 9999;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.age-modal.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+body.age-modal-open {
+  overflow: hidden;
 }
 
 .age-box {
-  background: white;
-  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 460px);
+  padding: 34px;
   text-align: center;
-  border-radius: 10px;
-  max-width: 400px;
-  width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  color: #fff;
+  background:
+    linear-gradient(145deg, rgba(13, 30, 72, 0.96), rgba(29, 42, 80, 0.94) 55%, rgba(150, 28, 61, 0.94)),
+    #0d1e48;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
+  transform: translateY(10px) scale(0.98);
+  transition: transform 180ms ease;
+}
+
+.age-modal.is-visible .age-box {
+  transform: translateY(0) scale(1);
+}
+
+.age-box::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 34px 34px;
+  content: "";
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.age-box > * {
+  position: relative;
+  z-index: 1;
+}
+
+.age-logo {
+  display: block;
+  width: 92px;
+  height: auto;
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.22));
+}
+
+.age-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
 }
 
 .age-box h2 {
-  margin-bottom: 15px;
-  color: var(--navy);
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(30px, 5vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .age-box p {
-  margin-bottom: 25px;
-  color: #555;
+  margin: 0 auto 22px;
+  max-width: 360px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.age-points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.age-points span {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.age-points i {
+  color: #fff;
+}
+
+.age-dob-field {
+  display: grid;
+  gap: 8px;
+  margin: 0 auto 14px;
+  max-width: 310px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.age-dob-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.age-dob-field input:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 2px;
+}
+
+.age-error {
+  margin: -4px auto 14px;
+  max-width: 310px;
+  color: #ffd7dc;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.age-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .age-buttons button {
-  padding: 12px 20px;
-  margin: 5px;
+  width: 100%;
+  min-height: 48px;
+  padding: 13px 18px;
   border: none;
   cursor: pointer;
-  font-weight: bold;
-  border-radius: 10px;
+  font-weight: 900;
+  border-radius: 999px;
+  transition: transform 160ms ease, filter 160ms ease, background 160ms ease;
+}
+
+.age-buttons button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.04);
 }
 
 #enterSite {
-  background: red;
+  background: linear-gradient(135deg, #c91f36, #233f8c);
   color: white;
+  box-shadow: 0 14px 32px rgba(201, 31, 54, 0.28);
 }
 
 #exitSite {
-  background: #ccc;
-  color: #000;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 520px) {
+  .age-box {
+    padding: 26px 18px;
+  }
+
+  .age-logo {
+    width: 78px;
+  }
+
+  .age-points {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cookie-banner {
@@ -126,7 +297,7 @@
 
 /* Main page wrapper */
 body {
-  background: #f8faff;
+  background: #ffffff;
 }
 
 /* Make common page containers wider */
@@ -185,7 +356,7 @@ section {
 
 /* Main page wrapper */
 body {
-  background: #f8faff;
+  background: #ffffff;
 }
 
 /* Make common page containers wider */
@@ -253,7 +424,7 @@ section {
   border-radius: 32px;
   background:
     linear-gradient(135deg, rgba(9, 31, 77, 0.9), rgba(180, 18, 50, 0.78)),
-    url("/images/logo/snusvillage-logo.png");
+    url("/images/logo/snus-village-logo.webp");
   background-size: 360px, 260px;
   background-position:
     center,
@@ -1084,7 +1255,7 @@ main .contact-page {
 
 .shop-hero h1 {
   margin: 14px 0 12px;
-  color: #061633;
+  color: #ffffff;
   font-size: clamp(44px, 5vw, 72px);
   line-height: 0.95;
   letter-spacing: -0.06em;
@@ -1093,7 +1264,7 @@ main .contact-page {
 .shop-hero p {
   margin: 0 auto;
   max-width: 620px;
-  color: #465a7a;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 17px;
   line-height: 1.7;
 }
@@ -1132,8 +1303,8 @@ main .contact-page {
   overflow: hidden;
   border-radius: 26px;
   background: #ffffff;
-  border: 1px solid rgba(9, 31, 77, 0.08);
-  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08);
+  border: 1px solid rgba(7, 18, 37, 0.1);
+  box-shadow: 0 4px 18px rgba(7, 18, 37, 0.07);
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;
@@ -1141,7 +1312,7 @@ main .contact-page {
 
 .shop-product-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 24px 70px rgba(9, 31, 77, 0.14);
+  box-shadow: 0 24px 70px rgba(201, 31, 54, 0.14);
 }
 
 .shop-product-image {
@@ -1150,7 +1321,7 @@ main .contact-page {
   align-items: center;
   justify-content: center;
   padding: 22px;
-  background: radial-gradient(circle at center, rgba(18, 59, 138, 0.08), transparent 60%), #f8faff;
+  background: radial-gradient(circle at center, rgba(201, 31, 54, 0.06), transparent 60%), rgba(255, 255, 255, 0.04);
   text-decoration: none;
 }
 
@@ -1163,7 +1334,7 @@ main .contact-page {
 }
 
 .shop-product-image span {
-  color: #6b7893;
+  color: rgba(7, 18, 37, 0.35);
   font-weight: 900;
 }
 
@@ -1213,22 +1384,22 @@ main .contact-page {
 }
 
 .shop-product-body h2 a {
-  color: #061633;
+  color: #071225;
   text-decoration: none;
 }
 
 .shop-product-body p {
   min-height: 48px;
   margin: 0 0 14px;
-  color: #465a7a;
+  color: rgba(7, 18, 37, 0.6);
   font-size: 14px;
   line-height: 1.55;
 }
 
 .shop-product-meta {
   padding-top: 12px;
-  border-top: 1px solid rgba(9, 31, 77, 0.08);
-  color: #6b7893;
+  border-top: 1px solid rgba(7, 18, 37, 0.08);
+  color: rgba(7, 18, 37, 0.5);
   font-size: 12px;
   font-weight: 800;
 }
@@ -1238,7 +1409,7 @@ main .contact-page {
 }
 
 .shop-product-bottom strong {
-  color: #d71234;
+  color: var(--sv-red);
   font-size: 24px;
   font-weight: 950;
 }
@@ -1262,18 +1433,18 @@ main .contact-page {
   text-align: center;
   border-radius: 26px;
   background: #ffffff;
-  border: 1px solid rgba(9, 31, 77, 0.08);
-  box-shadow: 0 18px 55px rgba(9, 31, 77, 0.08);
+  border: 1px solid rgba(7, 18, 37, 0.1);
+  box-shadow: 0 4px 18px rgba(7, 18, 37, 0.07);
 }
 
 .empty-shop h2 {
   margin: 0 0 10px;
-  color: #061633;
+  color: #071225;
 }
 
 .empty-shop p {
   margin: 0;
-  color: #465a7a;
+  color: rgba(7, 18, 37, 0.6);
 }
 
 @media (max-width: 1100px) {

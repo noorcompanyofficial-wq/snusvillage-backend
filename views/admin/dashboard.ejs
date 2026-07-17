@@ -1,59 +1,203 @@
-<section class="admin-page">
+<section class="admin-page admin-dashboard-page">
   <div class="admin-page-head">
     <div>
       <span>Dashboard</span>
-      <h1>Store overview</h1>
-      <p>Track products, trader reviews, users, and key operating signals.</p>
+      <h1>Store Overview</h1>
+      <p>Track sales, orders, products, customers, carts, wholesale reviews, and key operating signals.</p>
     </div>
-    <a class="admin-primary" href="/admin/products/add">
-      <i class="fa-solid fa-plus"></i>
-      Add Product
-    </a>
+
+    <div class="admin-head-actions">
+      <a class="admin-primary" href="/admin/products/add">
+        <i class="fa-solid fa-plus"></i>
+        Add Product
+      </a>
+      <a class="admin-secondary" href="/admin/orders/export/csv">
+        <i class="fa-solid fa-file-export"></i>
+        Export Orders
+      </a>
+    </div>
   </div>
 
-  <div class="admin-stat-grid">
-    <a class="admin-stat-card" href="/admin/products">
+  <div class="admin-analytics-grid">
+    <a class="admin-analytics-card admin-analytics-card--dark" href="/admin/orders">
+      <i class="fa-solid fa-bag-shopping"></i>
+      <span>Today's Orders</span>
+      <strong><%= stats.todayOrders || 0 %></strong>
+      <small>Orders Created Today</small>
+    </a>
+
+    <a class="admin-analytics-card" href="/admin/orders">
+      <i class="fa-solid fa-sterling-sign"></i>
+      <span>Today's Revenue</span>
+      <strong>£<%= Number(stats.todayRevenue || 0).toFixed(2) %></strong>
+      <small>Paid Orders Today</small>
+    </a>
+
+    <a class="admin-analytics-card" href="/admin/orders">
+      <i class="fa-solid fa-clock"></i>
+      <span>Pending Orders</span>
+      <strong><%= stats.pendingOrders || 0 %></strong>
+      <small>New, Processing Or Packed</small>
+    </a>
+
+    <a class="admin-analytics-card" href="/admin/orders">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>Failed Payments</span>
+      <strong><%= stats.failedPayments || 0 %></strong>
+      <small>Needs Attention</small>
+    </a>
+
+    <a class="admin-analytics-card" href="/admin/carts">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span>Active Carts</span>
+      <strong><%= stats.activeCarts || 0 %></strong>
+      <small>Updated In Last Hour</small>
+    </a>
+
+    <a class="admin-analytics-card admin-analytics-card--warning" href="/admin/carts">
+      <i class="fa-solid fa-cart-arrow-down"></i>
+      <span>Abandoned Carts</span>
+      <strong><%= stats.abandonedCarts || 0 %></strong>
+      <small>Value: £<%= Number(stats.abandonedCartValue || 0).toFixed(2) %></small>
+    </a>
+
+    <a class="admin-analytics-card" href="/admin/products">
       <i class="fa-solid fa-box"></i>
       <span>Total Products</span>
-      <strong><%= stats.totalProducts %></strong>
+      <strong><%= stats.totalProducts || 0 %></strong>
+      <small><%= stats.inStock || 0 %> In Stock</small>
     </a>
-    <a class="admin-stat-card" href="/admin/products?stock=in">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>In Stock</span>
-      <strong><%= stats.inStock %></strong>
-    </a>
-    <a class="admin-stat-card" href="/admin/wholesale">
-      <i class="fa-solid fa-clock"></i>
-      <span>Pending Wholesale</span>
-      <strong><%= stats.pendingWholesale %></strong>
-    </a>
-    <a class="admin-stat-card" href="/admin/users">
-      <i class="fa-solid fa-users"></i>
-      <span>Approved Traders</span>
-      <strong><%= stats.approvedTraders %></strong>
+
+    <a class="admin-analytics-card" href="/admin/products">
+      <i class="fa-solid fa-arrow-trend-down"></i>
+      <span>Low Stock</span>
+      <strong><%= stats.lowStock || 0 %></strong>
+      <small>5 Or Less Remaining</small>
     </a>
   </div>
 
-  <div class="admin-dashboard-grid">
+  <section class="admin-panel admin-dashboard-alerts-panel">
+    <div class="admin-panel__head">
+      <h2>Dashboard Alerts</h2>
+      <a href="/admin/orders">Review Operations</a>
+    </div>
+
+    <div class="admin-dashboard-alerts-grid">
+      <a href="/admin/products?stock=low" class="admin-dashboard-alert-card">
+        <i class="fa-solid fa-arrow-trend-down"></i>
+        <span>Low Stock</span>
+        <strong><%= dashboardAlerts.lowStockProducts.length %></strong>
+        <small>Products with 5 or less remaining</small>
+      </a>
+
+      <a href="/admin/products?stock=out" class="admin-dashboard-alert-card danger">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Out Of Stock</span>
+        <strong><%= dashboardAlerts.outOfStockProducts.length %></strong>
+        <small>Products currently unavailable</small>
+      </a>
+
+      <a href="/admin/orders" class="admin-dashboard-alert-card danger">
+        <i class="fa-solid fa-credit-card"></i>
+        <span>Failed Payments</span>
+        <strong><%= dashboardAlerts.failedPaymentOrders.length %></strong>
+        <small>Orders needing payment review</small>
+      </a>
+
+      <a href="/admin/orders" class="admin-dashboard-alert-card warning">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Royal Mail Failed</span>
+        <strong><%= dashboardAlerts.royalMailFailedOrders.length %></strong>
+        <small>Fulfilment needs attention</small>
+      </a>
+
+      <a href="/admin/messages?status=unread" class="admin-dashboard-alert-card">
+        <i class="fa-solid fa-envelope"></i>
+        <span>Unread Messages</span>
+        <strong><%= dashboardAlerts.unreadContactMessages.length %></strong>
+        <small>Customer contact messages</small>
+      </a>
+
+      <a href="/admin/wholesale" class="admin-dashboard-alert-card warning">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Pending Wholesale</span>
+        <strong><%= dashboardAlerts.pendingWholesaleApplications.length %></strong>
+        <small>Trader applications waiting</small>
+      </a>
+    </div>
+  </section>
+
+  <div class="admin-dashboard-grid admin-dashboard-grid--analytics">
     <section class="admin-panel">
       <div class="admin-panel__head">
-        <h2>Quick actions</h2>
+        <h2>Quick Actions</h2>
       </div>
+
       <div class="admin-action-grid">
-        <a href="/admin/products"><i class="fa-solid fa-pen-to-square"></i>Edit catalogue</a>
-        <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i>Review traders</a>
-        <a href="/admin/users"><i class="fa-solid fa-user-shield"></i>Manage access</a>
-        <a href="/shop"><i class="fa-solid fa-eye"></i>Preview shop</a>
+        <a href="/admin/orders"><i class="fa-solid fa-receipt"></i>Manage Orders</a>
+        <a href="/admin/carts"><i class="fa-solid fa-cart-shopping"></i>View Carts</a>
+        <a href="/admin/products"><i class="fa-solid fa-pen-to-square"></i>Edit Catalogue</a>
+        <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i>Review Traders</a>
+        <a href="/admin/users"><i class="fa-solid fa-user-shield"></i>Manage Users</a>
+        <a href="/shop"><i class="fa-solid fa-eye"></i>Preview Shop</a>
       </div>
     </section>
 
     <section class="admin-panel">
       <div class="admin-panel__head">
-        <h2>Recent products</h2>
-        <a href="/admin/products">View all</a>
+        <h2>Recent Orders</h2>
+        <a href="/admin/orders">View All</a>
       </div>
+
+      <div class="admin-list admin-list--orders">
+        <% if (recentOrders && recentOrders.length) { %>
+          <% recentOrders.forEach((order) => { %>
+            <a href="/admin/orders/<%= order._id %>">
+              <span>
+                <strong>#<%= order._id.toString().slice(-6).toUpperCase() %></strong>
+                <small><%= order.customer?.email || "No Email" %></small>
+              </span>
+              <strong>£<%= Number(order.total || 0).toFixed(2) %></strong>
+            </a>
+          <% }) %>
+        <% } else { %>
+          <p>No Orders Found Yet.</p>
+        <% } %>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Abandoned / Unfinished Carts</h2>
+        <a href="/admin/carts">View All</a>
+      </div>
+
+      <div class="admin-list admin-list--orders">
+        <% if (abandonedCarts && abandonedCarts.length) { %>
+          <% abandonedCarts.forEach((cart) => { %>
+            <% const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0); %>
+            <a href="/admin/carts">
+              <span>
+                <strong><%= cart.user ? "User Cart" : "Guest Cart" %></strong>
+                <small><%= cart.items.length %> Item<%= cart.items.length === 1 ? "" : "s" %> • Last Active <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></small>
+              </span>
+              <strong>£<%= Number(cartTotal || 0).toFixed(2) %></strong>
+            </a>
+          <% }) %>
+        <% } else { %>
+          <p>No Abandoned Carts Found.</p>
+        <% } %>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel__head">
+        <h2>Recent Products</h2>
+        <a href="/admin/products">View All</a>
+      </div>
+
       <div class="admin-list">
-        <% if (recentProducts.length) { %>
+        <% if (recentProducts && recentProducts.length) { %>
           <% recentProducts.forEach((product) => { %>
             <a href="/admin/products/edit/<%= product._id %>">
               <span><%= product.name %></span>
@@ -61,7 +205,7 @@
             </a>
           <% }) %>
         <% } else { %>
-          <p>No products found yet.</p>
+          <p>No Products Found Yet.</p>
         <% } %>
       </div>
     </section>

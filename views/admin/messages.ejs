@@ -1,0 +1,125 @@
+<section class="admin-page admin-messages-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Customer Support</span>
+      <h1>Contact Messages</h1>
+      <p>Read customer contact form submissions, track unread enquiries, and reply quickly.</p>
+    </div>
+
+    <div class="admin-head-actions">
+      <a class="admin-primary" href="/contact" target="_blank" rel="noopener">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        View Contact Page
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-stat-grid">
+    <a class="admin-stat-card" href="/admin/messages">
+      <i class="fa-solid fa-envelope"></i>
+      <span>Total Messages</span>
+      <strong><%= totalMessages %></strong>
+    </a>
+
+    <a class="admin-stat-card" href="/admin/messages?status=unread">
+      <i class="fa-solid fa-envelope-open-text"></i>
+      <span>Unread</span>
+      <strong><%= unreadMessages %></strong>
+    </a>
+
+    <a class="admin-stat-card" href="/admin/messages?status=read">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Read</span>
+      <strong><%= readMessages %></strong>
+    </a>
+
+    <a class="admin-stat-card" href="mailto:info@snusvillage.co.uk">
+      <i class="fa-solid fa-reply"></i>
+      <span>Reply Email</span>
+      <strong>Open</strong>
+    </a>
+  </div>
+
+  <section class="admin-panel">
+    <div class="admin-panel__head">
+      <h2>
+        <% if (query.status === "unread") { %>
+          Unread Messages
+        <% } else if (query.status === "read") { %>
+          Read Messages
+        <% } else { %>
+          All Messages
+        <% } %>
+      </h2>
+
+      <div class="admin-message-filters">
+        <a class="<%= !query.status ? 'is-active' : '' %>" href="/admin/messages">All</a>
+        <a class="<%= query.status === 'unread' ? 'is-active' : '' %>" href="/admin/messages?status=unread">Unread</a>
+        <a class="<%= query.status === 'read' ? 'is-active' : '' %>" href="/admin/messages?status=read">Read</a>
+      </div>
+    </div>
+
+    <% if (!messages || messages.length === 0) { %>
+      <div class="admin-empty-state">
+        <h2>No Messages Found</h2>
+        <p>Customer contact messages will appear here when submitted from the contact page.</p>
+      </div>
+    <% } else { %>
+      <div class="admin-message-list">
+        <% messages.forEach((message) => { %>
+          <article class="admin-message-card <%= message.isRead ? '' : 'is-unread' %>">
+            <div class="admin-message-main">
+              <div class="admin-message-icon">
+                <i class="fa-solid <%= message.isRead ? 'fa-envelope-open' : 'fa-envelope' %>"></i>
+              </div>
+
+              <div>
+                <div class="admin-message-topline">
+                  <strong><%= message.subject %></strong>
+                  <% if (message.isReplied) { %>
+                    <span class="status-pill order-completed">Replied</span>
+                  <% } else { %>
+                    <span class="status-pill <%= message.isRead ? 'order-completed' : 'payment-pending' %>">
+                      <%= message.isRead ? "Read" : "Unread" %>
+                    </span>
+                  <% } %>
+                </div>
+
+                <p><%= message.message.length > 150 ? message.message.substring(0, 150) + "..." : message.message %></p>
+
+                <div class="admin-message-meta">
+                  <span><i class="fa-solid fa-user"></i> <%= message.name %></span>
+                  <span><i class="fa-solid fa-envelope"></i> <%= message.email %></span>
+                  <% if (message.phone) { %>
+                    <span><i class="fa-solid fa-phone"></i> <%= message.phone %></span>
+                  <% } %>
+                  <span><i class="fa-solid fa-clock"></i> <%= new Date(message.createdAt).toLocaleString("en-GB") %></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-message-actions">
+              <a href="/admin/messages/<%= message._id %>">Open</a>
+
+              <% if (message.isRead) { %>
+                <form action="/admin/messages/<%= message._id %>/unread" method="POST">
+                  <button type="submit">Mark Unread</button>
+                </form>
+              <% } else { %>
+                <form action="/admin/messages/<%= message._id %>/read" method="POST">
+                  <button type="submit">Mark Read</button>
+                </form>
+              <% } %>
+
+              <a href="/admin/messages/<%= message._id %>#adminReplyBox">Reply</a>
+
+              <form action="/admin/messages/<%= message._id %>/delete" method="POST" onsubmit="return confirm('Delete this message?');">
+                <button type="submit" class="is-danger">Delete</button>
+              </form>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    <% } %>
+  </section>
+</section>

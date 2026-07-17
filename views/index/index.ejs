@@ -1,357 +1,769 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <%- include("../partials/google-tag") %>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snus Village</title>
+    <title>Snus Village | Premium Nicotine Pouches UK</title>
     <meta
       name="description"
-      content="Premium nicotine pouch and snus specialist with London stores, trusted brands, and fast UK delivery."
+      content="Shop premium nicotine pouches in the UK from Snus Village London with UK delivery and age-verified service for adult customers."
     />
-    <link rel="icon" href="/images/logo/snusvillage-logo.png" />
-    <link rel="stylesheet" href="/css/landing.css" />
+    <link rel="canonical" href="https://www.snusvillage.com/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Snus Village",
+        "url": "https://www.snusvillage.com",
+        "description": "UK smokeless nicotine retailer offering premium nicotine pouches and smoke-free alternatives for adult customers.",
+        "areaServed": ["United Kingdom", "London"],
+        "sameAs": [
+          "https://www.instagram.com/snusvillage.uk/",
+          "https://www.youtube.com/@SnusVillage"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "89 Edgware Road",
+          "addressLocality": "London",
+          "postalCode": "W2 2HX",
+          "addressCountry": "GB"
+        }
+      }
+    </script>
+
+    <!-- Fonts: Montserrat (headings/labels) -->
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <link rel="icon" href="/images/logo/snus-village-logo.webp" />
+
+    <!-- Core CSS: age-gate, landing (keeps header/nav/footer/mega-menu styles), v4 sections -->
+    <link rel="stylesheet" href="/css/age-gate.css" />
+    <link rel="stylesheet" href="/css/landing.css?v=megamenu-fix-20260713" />
+    <link rel="stylesheet" href="/css/landing-v4.css?v=v4-carousel-20260713" />
+
+    <!-- Footer preloaded -->
+    <link
+      rel="preload"
+      href="/css/footer.css?v=footer-gradient-20260717"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="/css/footer.css?v=footer-gradient-20260717" /></noscript>
+    <link rel="stylesheet" href="/css/browser-fixes.css?v=safari-20260611" />
   </head>
-  <body>
-    <div class="landing-age-modal" id="landingAgeModal">
-      <div class="landing-age-box">
-        <h2>Age Verification</h2>
-        <p>You must be 18+ to enter this website.</p>
-        <div class="landing-age-buttons">
-          <button type="button" id="landingEnterSite">I am over 18</button>
-          <button type="button" id="landingExitSite">I am under 18</button>
+
+  <body class="age-modal-open">
+
+    <!-- Age verification modal (unchanged) -->
+    <div class="age-modal is-visible" id="ageModal" aria-hidden="false">
+      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
+        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+        <span class="age-pill">18+ age restricted store</span>
+        <h2 id="ageModalTitle">Confirm your age</h2>
+        <p>Snus Village sells age-restricted nicotine products. Enter your date of birth to continue. Formal age verification may still be required at checkout.</p>
+        <label class="age-dob-field" for="ageDob">
+          Date of birth
+          <input id="ageDob" type="date" autocomplete="bday" required />
+        </label>
+        <p class="age-error" id="ageError" hidden>Please enter a valid date of birth showing you are 18 or over.</p>
+        <div class="age-points">
+          <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Adults 18+ only</span>
+          <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Checkout age verification</span>
+        </div>
+        <div class="age-buttons">
+          <button id="enterSite" type="button">Enter Site</button>
+          <button id="exitSite" type="button">I am under 18</button>
         </div>
       </div>
     </div>
 
-    <div class="page-shell">
-      <div class="topbar">
-        <div class="container topbar__inner">
-          <div class="topbar__pill">Premium brands - authentic stock - fast UK delivery</div>
-          <div class="topbar__pill">Camden Town - Oxford Street - Edgware Road - 18+ only</div>
+    <%- include("../partials/header") %>
+
+    <main id="home">
+
+      <%
+        /* ── V4 data setup ── */
+
+        /* Hero carousel: up to 5 best sellers, fallback to featured */
+        const v4CarouselProds = (bestSellerProducts && bestSellerProducts.length
+          ? bestSellerProducts
+          : (featuredProducts && featuredProducts.length ? featuredProducts : [])
+        ).slice(0, 5);
+
+        /* Strength → CSS suffix */
+        const v4sc = (s) => {
+          const n = ((s || '').toLowerCase()).replace(/[\s\-]/g, '');
+          if (n === 'low')    return 'low';
+          if (n === 'medium') return 'medium';
+          if (n === 'strong') return 'strong';
+          if (n === 'xstrong') return 'xstrong';
+          return 'extreme';
+        };
+
+        /* Collections */
+        const svCollections    = homepageContent?.collections || {};
+        const svCollectionCards = svCollections.cards && svCollections.cards.length
+          ? svCollections.cards
+          : [
+              { number:"01", title:"Mint & Ice Flavours",   text:"Clean, cool and reliable. The most popular flavour category across all brands.", linkText:"Shop Mint",    linkUrl:"/shop?flavour=mint",             imageSrc:"/images/social/s-1.jpeg"  },
+              { number:"02", title:"Strong Selections",     text:"",                                                                                linkText:"Shop Strong", linkUrl:"/shop?strength=STRONG",          imageSrc:"/images/social/s-6.jpeg"  },
+              { number:"03", title:"Fruity Flavours",       text:"",                                                                                linkText:"Shop Fruit",  linkUrl:"/shop",                          imageSrc:"/images/social/s-10.jpeg" },
+              { number:"04", title:"Tobacco-Free Pouches",  text:"",                                                                                linkText:"Shop Pouches",linkUrl:"/shop?category=Nicotine%20Pouches",imageSrc:"/images/social/s-4.jpeg" },
+            ];
+
+        /* Remove vapes from collection cards */
+        const unavailableCollPath = "/collections/" + "va" + "pes";
+        const v4CollCards = svCollectionCards
+          .filter(c => !String(c.linkUrl || '').includes(unavailableCollPath))
+          .slice(0, 4);
+        const v4CollColors = ['v4-coll-c1','v4-coll-c2','v4-coll-c3','v4-coll-c4'];
+
+        /* Locations */
+        const svLocations     = homepageContent?.locations || {};
+        const svLocationCards = svLocations.cards && svLocations.cards.length
+          ? svLocations.cards
+          : [
+              { label:"London Branch", title:"Camden Town",   description:"Central North London access with a strong range of best-selling products.",  mapUrl:"https://www.google.com/maps?q=Camden+Town+London&output=embed",        mapTitle:"Camden Town",   buttonText:"Ask About Stock", buttonLink:"/contact" },
+              { label:"London Branch", title:"Oxford Street",  description:"Easy access for shoppers near one of London's busiest retail destinations.", mapUrl:"https://www.google.com/maps?q=Oxford+Street+London&output=embed",       mapTitle:"Oxford Street", buttonText:"Ask About Stock", buttonLink:"/contact" },
+              { label:"London Branch", title:"Edgware Road",   description:"Convenient West London area for quick visits and product enquiries.",        mapUrl:"https://www.google.com/maps?q=89+Edgware+Road+London&output=embed",    mapTitle:"Edgware Road",  buttonText:"Ask About Stock", buttonLink:"/contact" },
+            ];
+
+        /* Distro */
+        const svDistro       = homepageContent?.distro || {};
+        const svDistroBadges = svDistro.badges && svDistro.badges.length
+          ? svDistro.badges
+          : ["Stock Support","Trade Enquiries","Southall","18+ Only"];
+
+        /* Social */
+        const svSocial      = homepageContent?.social || {};
+        const svSocialSlides = svSocial.slides && svSocial.slides.length
+          ? svSocial.slides
+          : [
+              { videoSrc:"/videos/social/social-1.mp4", posterSrc:"/images/header/h-1.jpeg",       title:"New Stock Arrival",   subtitle:"Latest Product Highlights From Snus Village" },
+              { videoSrc:"/videos/social/social-2.mp4", posterSrc:"/images/header/h-2.webp",       title:"In-Store Content",    subtitle:"Store Moments, Promotions, And Customer Favourites" },
+              { videoSrc:"/videos/social/social-3.mp4", posterSrc:"/images/delivery/delivery.webp", title:"London Updates",      subtitle:"See What Is Happening Across Our Locations" },
+            ];
+      %>
+
+      <!-- ========================
+           HERO — split two-column
+           ======================== -->
+      <section class="v4-hero">
+
+        <!-- Left copy -->
+        <div class="v4-hero__copy">
+          <span class="v4-hero__tag">London's Nicotine Pouch Specialist</span>
+          <h1>Premium<br>Nicotine<br><span>Pouches</span><br>UK-Wide</h1>
+          <p class="v4-hero__lead">100+ products from the world's most trusted brands. Age-verified checkout, three London stores and fast UK delivery from &pound;1.99.</p>
+          <div class="v4-hero__btns">
+            <a href="<%= (homepageContent?.hero?.slides?.[0]?.buttonLink) || '/shop' %>" class="v4-btn-red">
+              <%= (homepageContent?.hero?.slides?.[0]?.buttonText) || 'Shop Now' %> <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="#shops" class="v4-btn-navy">Find a Store</a>
+          </div>
+          <div class="v4-hero__trust">
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-shield-halved"></i> Age Verified</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-truck-fast"></i> Delivery &pound;1.99+</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-map-pin"></i> 3 London Stores</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-certificate"></i> Authentic Stock</div>
+          </div>
         </div>
-      </div>
 
-      <header class="nav">
-        <div class="container nav__inner">
-          <a class="brand" href="/" aria-label="Snus Village home">
-            <img class="brand__logo" src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
-            <span class="brand__text">
-              <strong>Snus Village</strong>
-              <span>London's premium snus store</span>
-            </span>
-          </a>
-
-          <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">Menu</button>
-
-          <nav class="nav__links" id="navLinks">
-            <a href="/shop">All Products</a>
-            <a href="/wholesale">Wholesale</a>
-            <a href="/about">About Us</a>
-            <a href="/contact">Contact Us</a>
-          </nav>
-
-          <div class="nav__actions">
-            <% if (user) { %>
-              <a class="ghost-btn nav-auth" href="/auth/dashboard">Account</a>
-              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/logout">Logout</a>
+        <!-- Right product panel — animated carousel -->
+        <div class="v4-hero__products">
+          <div class="v4-carousel" id="heroCarousel">
+            <% if (v4CarouselProds.length) { %>
+              <% v4CarouselProds.forEach((p, idx) => { %>
+                <%
+                  const cImg = p.images && p.images.length ? p.images[0] : null;
+                  const cSc  = v4sc(p.strength);
+                %>
+                <div class="v4-carousel__slide <%= idx === 0 ? 'is-active' : '' %>" data-idx="<%= idx %>">
+                  <% if (p.strength) { %>
+                    <div class="v4-carousel__strength-badge v4-badge--<%= cSc %>"><%= p.strength %></div>
+                  <% } %>
+                  <div class="v4-carousel__img">
+                    <% if (cImg) { %>
+                      <img
+                        src="<%= optimiseImageUrl(cImg, { width: 500 }) %>"
+                        alt="<%= p.name %>"
+                        loading="<%= idx === 0 ? 'eager' : 'lazy' %>"
+                        decoding="async"
+                      />
+                    <% } else { %>
+                      <div class="v4-carousel__no-img"><i class="fa-solid fa-box-open"></i></div>
+                    <% } %>
+                  </div>
+                  <a href="/products/<%= p.slug || p._id %>" class="v4-carousel__info">
+                    <div class="v4-carousel__brand"><%= p.brand || 'Snus Village' %></div>
+                    <div class="v4-carousel__name"><%= p.name %></div>
+                    <% if (p.flavour) { %>
+                      <div class="v4-carousel__flavour"><%= p.flavour %></div>
+                    <% } %>
+                    <div class="v4-carousel__cta">View Product <i class="fa-solid fa-arrow-right"></i></div>
+                  </a>
+                </div>
+              <% }) %>
             <% } else { %>
-              <a class="ghost-btn nav-auth nav-auth--quiet" href="/auth/register">Register</a>
-              <a class="btn nav-auth" href="/auth/login">Login</a>
+              <div class="v4-carousel__slide is-active v4-carousel__empty">
+                <div class="v4-carousel__img"><i class="fa-solid fa-box-open"></i></div>
+                <div class="v4-carousel__info">
+                  <div class="v4-carousel__brand">Snus Village</div>
+                  <div class="v4-carousel__name">Products Coming Soon</div>
+                </div>
+              </div>
+            <% } %>
+            <% if (v4CarouselProds.length > 1) { %>
+              <div class="v4-carousel__dots">
+                <% v4CarouselProds.forEach((p, idx) => { %>
+                  <button class="v4-carousel__dot <%= idx === 0 ? 'is-active' : '' %>" aria-label="Slide <%= idx + 1 %>"></button>
+                <% }) %>
+              </div>
             <% } %>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main id="home">
-        <section class="hero">
-          <div class="container">
-            <div class="hero__wrap">
-              <div class="hero__slides" id="heroSlider">
-                <article class="hero__slide is-active" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.18), rgba(201,31,54,0.12)), url('/images/header/h-1.jpeg');">
-                  <div class="hero__content">
-                    <span class="eyebrow">Snus Village</span>
-                    <h1>Premium snus, stocked in London</h1>
-                    <p class="hero__lead">
-                      Shop trusted nicotine pouch brands, strong flavours, and best-selling products with fast UK delivery and support from a specialist team.
-                    </p>
-                    <div class="hero__cta">
-                      <a class="btn" href="/shop">Shop products</a>
-                      <a class="ghost-btn" href="/wholesale">Wholesale access</a>
+      <!-- ========================
+           ANNOUNCEMENT STRIP
+           ======================== -->
+      <div class="v4-strip" aria-hidden="true">
+        <div class="v4-strip__track">
+          <div class="v4-strip__item"><i class="fa-solid fa-shield-halved"></i> Age-Verified Checkout</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-truck-fast"></i> UK Delivery from &pound;1.99</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-map-pin"></i> Camden &middot; Oxford Street &middot; Edgware Road</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-certificate"></i> 100% Authentic Stock</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-box-open"></i> 100+ Products In Stock</div>
+          <!-- duplicated for seamless loop -->
+          <div class="v4-strip__item"><i class="fa-solid fa-shield-halved"></i> Age-Verified Checkout</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-truck-fast"></i> UK Delivery from &pound;1.99</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-map-pin"></i> Camden &middot; Oxford Street &middot; Edgware Road</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-certificate"></i> 100% Authentic Stock</div>
+          <div class="v4-strip__item"><i class="fa-solid fa-box-open"></i> 100+ Products In Stock</div>
+        </div>
+      </div>
+
+      <!-- ========================
+           BEST SELLERS
+           ======================== -->
+      <section class="v4-products" id="bestsellers">
+        <div class="v4-wrap">
+          <div class="v4-section-head">
+            <div>
+              <div class="v4-eyebrow">Customer Favourites</div>
+              <h2>Best Sellers</h2>
+            </div>
+            <a href="/shop" class="v4-section-link">View all products</a>
+          </div>
+
+          <% if (bestSellerProducts && bestSellerProducts.length) { %>
+            <div class="v4-products-grid">
+              <% bestSellerProducts.forEach((p) => { %>
+                <%
+                  const bsFinalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+                  const bsSc = v4sc(p.strength);
+                %>
+                <a class="v4-product-card" href="/products/<%= p.slug || p._id %>">
+                  <div class="v4-product-card__img">
+                    <span class="v4-badge v4-badge--<%= bsSc %>"><%= p.strength || 'Medium' %></span>
+                    <% if (p.discountPrice && p.discountPrice > 0) { %>
+                      <span class="v4-sale-badge">Sale</span>
+                    <% } %>
+                    <% if (p.images && p.images.length) { %>
+                      <img src="<%= optimiseImageUrl(p.images[0], { width: 400 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async" />
+                    <% } else { %>
+                      <span class="v4-product-card__img-none">No Image</span>
+                    <% } %>
+                    <div class="v4-sbar v4-sbar--<%= bsSc %>"></div>
+                  </div>
+                  <div class="v4-product-card__body">
+                    <div class="v4-product-card__brand"><%= p.brand || 'Snus Village' %></div>
+                    <div class="v4-product-card__name"><%= p.name %></div>
+                    <div class="v4-product-card__foot">
+                      <div class="v4-product-card__price">
+                        <% if (p.discountPrice && p.discountPrice > 0) { %>
+                          <span class="v4-product-card__price-old">&pound;<%= Number(p.price || 0).toFixed(2) %></span>
+                        <% } %>
+                        &pound;<%= Number(bsFinalPrice || 0).toFixed(2) %>
+                      </div>
+                      <span class="v4-product-card__btn">View</span>
                     </div>
                   </div>
-                </article>
-
-                <article class="hero__slide" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.15), rgba(201,31,54,0.15)), url('/images/header/h-2.jpeg');">
-                  <div class="hero__content">
-                    <span class="eyebrow">Best sellers</span>
-                    <h1>Brands customers ask for first</h1>
-                    <p class="hero__lead">
-                      Explore White Fox, Pablo, Killa, Velo, Loop, Iceberg, Siberia, Odens, and more from one focused store.
-                    </p>
-                    <div class="hero__cta">
-                      <a class="btn" href="#bestsellers">View best sellers</a>
-                      <a class="ghost-btn" href="/shop">Browse all</a>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="hero__slide" style="background-image: linear-gradient(135deg, rgba(21,63,184,0.12), rgba(201,31,54,0.18)), url('/images/delivery/delivery.jpg');">
-                  <div class="hero__content">
-                    <span class="eyebrow">London stores</span>
-                    <h1>Visit us or order online</h1>
-                    <p class="hero__lead">
-                      Find Snus Village in key London locations or order online for a fast, straightforward shopping experience.
-                    </p>
-                    <div class="hero__cta">
-                      <a class="btn" href="#shops">Store locations</a>
-                      <a class="ghost-btn" href="/contact">Contact us</a>
-                    </div>
-                  </div>
-                </article>
-              </div>
-
-              <div class="hero__floating">
-                <div class="hero-card">
-                  <strong>Trader approved wholesale</strong>
-                  <p>Apply for wholesale access and create a dedicated trader login after review.</p>
-                </div>
-                <div class="hero-card">
-                  <strong>Fast UK delivery</strong>
-                  <p>Order online with a curated range built for speed, strength, and flavour choice.</p>
-                </div>
-              </div>
-
-              <div class="hero__stats">
-                <div class="hero__stat">
-                  <strong>12+</strong>
-                  <span>Popular brands available across the shop.</span>
-                </div>
-                <div class="hero__stat">
-                  <strong>3</strong>
-                  <span>London locations: Camden Town, Oxford Street, and Edgware Road.</span>
-                </div>
-                <div class="hero__stat">
-                  <strong>18+</strong>
-                  <span>Age restricted products for adults only.</span>
-                </div>
+                </a>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="v4-products-grid">
+              <div class="v4-empty-products">
+                <p>Best sellers coming soon. <a href="/shop">Browse the full shop</a>.</p>
               </div>
             </div>
+          <% } %>
+        </div>
+      </section>
+
+      <!-- ========================
+           RED CTA BAND
+           ======================== -->
+      <div class="v4-cta-band">
+        <div class="v4-wrap">
+          <div class="v4-cta-band__inner">
+            <div>
+              <h2>Shop Over 100 Premium Nicotine Pouches</h2>
+              <p>Browse trusted brands, filter by strength or flavour, and order with age-verified checkout.</p>
+            </div>
+            <a href="/shop" class="v4-btn-white">Browse All Products <i class="fa-solid fa-arrow-right"></i></a>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <section class="section" id="collections">
-          <div class="container">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow dark">Collections</span>
-                <h2>Shop by strength, flavour, and brand</h2>
-                <p>Move quickly from the flavours you like to the nicotine strength and brand range that fits your preference.</p>
-              </div>
-              <a class="ghost-btn" href="/shop">Open shop</a>
-            </div>
-
-            <div class="collection-grid">
-              <article class="collection-card" style="--bg-image:url('/images/social/s-1.jpeg');">
-                <span class="pill light">Collection 01</span>
-                <h3>Mint favourites</h3>
-                <p>Clean, cool, and reliable flavour profiles from leading nicotine pouch brands.</p>
-                <a class="ghost-btn light-btn" href="/shop">Shop mint</a>
-              </article>
-              <article class="collection-card" style="--bg-image:url('/images/social/s-6.jpeg');">
-                <span class="pill light">Collection 02</span>
-                <h3>Strong selections</h3>
-                <p>Explore higher strength products for customers who know exactly what they want.</p>
-                <a class="ghost-btn light-btn" href="/shop">Shop strong</a>
-              </article>
-              <article class="collection-card" style="--bg-image:url('/images/social/s-10.jpeg');">
-                <span class="pill light">Collection 03</span>
-                <h3>Fruity flavours</h3>
-                <p>Bright flavour ranges including berry, citrus, cola, tropical, and sweet profiles.</p>
-                <a class="ghost-btn light-btn" href="/shop">Shop flavours</a>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="bestsellers">
-          <div class="container">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow dark">Best Sellers</span>
-                <h2>Customer favourites</h2>
-                <p>A focused selection of the products and brands that move fastest in store and online.</p>
-              </div>
-              <a class="ghost-btn" href="/shop">View all products</a>
-            </div>
-
-            <div class="product-grid">
-              <article class="product-card">
-                <div class="product-card__media"><img src="/images/shop/wf-1.png" alt="White Fox product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">White Fox</span><span class="product-card__tag">Strong</span></div>
-                <h3>White Fox range</h3>
-                <p>Popular mint-led cans with a clean profile and strong customer demand.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span></div>
-                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
-              </article>
-
-              <article class="product-card">
-                <div class="product-card__media"><img src="/images/shop/pablo-1.png" alt="Pablo product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Pablo</span><span class="product-card__tag">Extreme</span></div>
-                <h3>Pablo range</h3>
-                <p>High strength cans with bold flavours for experienced adult users.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span></div>
-                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
-              </article>
-
-              <article class="product-card">
-                <div class="product-card__media"><img src="/images/shop/velo-1.webp" alt="Velo product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Velo</span><span class="product-card__tag">Smooth</span></div>
-                <h3>Velo range</h3>
-                <p>Everyday pouches with familiar flavours and balanced strength options.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span class="is-on"></span><span></span><span></span></div>
-                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
-              </article>
-
-              <article class="product-card">
-                <div class="product-card__media"><img src="/images/shop/loop-1.webp" alt="Loop product" /></div>
-                <div class="product-card__top"><span class="product-card__tag">Loop</span><span class="product-card__tag">Flavour</span></div>
-                <h3>Loop range</h3>
-                <p>Modern pouch flavours with clean packaging and reliable popularity.</p>
-                <div class="strength"><span class="is-on"></span><span class="is-on"></span><span></span><span></span><span></span></div>
-                <div class="product-card__price"><strong>From the shop</strong><a class="ghost-btn" href="/shop">View</a></div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="shops">
-          <div class="container">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow dark">Location</span>
-                <h2>Find Snus Village in London</h2>
-                <p>Visit one of our London areas or contact the team before you travel for stock questions.</p>
-              </div>
-              <a class="ghost-btn" href="/contact">Contact us</a>
-            </div>
-
-            <div class="shops-grid">
-              <article class="shop-card">
-                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Camden+Town+London&output=embed" title="Camden Town"></iframe>
-                <div class="shop-card__body">
-                  <div class="shop-card__meta"><h3>Camden Town</h3><strong>London</strong></div>
-                  <p>Central north London access with a strong range of best-selling products.</p>
-                  <a class="ghost-btn" href="/contact">Ask about stock</a>
-                </div>
-              </article>
-
-              <article class="shop-card">
-                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Oxford+Street+London&output=embed" title="Oxford Street"></iframe>
-                <div class="shop-card__body">
-                  <div class="shop-card__meta"><h3>Oxford Street</h3><strong>London</strong></div>
-                  <p>Easy access for shoppers near one of London's busiest retail destinations.</p>
-                  <a class="ghost-btn" href="/contact">Ask about stock</a>
-                </div>
-              </article>
-
-              <article class="shop-card">
-                <iframe class="shop-card__map" loading="lazy" src="https://www.google.com/maps?q=Edgware+Road+London&output=embed" title="Edgware Road"></iframe>
-                <div class="shop-card__body">
-                  <div class="shop-card__meta"><h3>Edgware Road</h3><strong>London</strong></div>
-                  <p>Convenient west London area for quick visits and product enquiries.</p>
-                  <a class="ghost-btn" href="/contact">Ask about stock</a>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="info">
-          <div class="container">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow dark">Information</span>
-                <h2>Simple, reliable service</h2>
-                <p>Clear routes for retail customers, wholesale traders, and anyone who needs help choosing a product.</p>
-              </div>
-            </div>
-
-            <div class="info-grid">
-              <div class="info-card">
-                <span class="pill">Retail</span>
-                <h3>Shop online</h3>
-                <p>Browse products, view details, and build your basket through the main shop.</p>
-              </div>
-              <div class="info-card">
-                <span class="pill">Wholesale</span>
-                <h3>Trader review</h3>
-                <p>Wholesale access is restricted to approved traders with a separate trader login.</p>
-              </div>
-              <div class="info-card">
-                <span class="pill">Support</span>
-                <h3>Contact the team</h3>
-                <p>Use the contact page for store, stock, delivery, or wholesale questions.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="footer" id="footer">
-        <div class="container">
-          <div class="footer__panel">
-            <div class="footer__grid">
-              <div>
-                <div class="brand">
-                  <img class="brand__logo" src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
-                  <span class="brand__text">
-                    <strong>Snus Village</strong>
-                    <span>London's premium snus store</span>
-                  </span>
-                </div>
-                <p style="margin-top:16px; max-width:42ch;">Premium nicotine pouch and snus specialist with trusted brands, London stores, and fast UK delivery.</p>
-              </div>
-
-              <div>
-                <h4>Shop</h4>
-                <ul>
-                  <li><a href="/shop">All products</a></li>
-                  <li><a href="#bestsellers">Best Sellers</a></li>
-                  <li><a href="/wholesale">Wholesale</a></li>
-                  <li><a href="/about">About</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4>Stores</h4>
-                <ul>
-                  <li><a href="#shops">Camden Town</a></li>
-                  <li><a href="#shops">Oxford Street</a></li>
-                  <li><a href="#shops">Edgware Road</a></li>
-                  <li><a href="/contact">Store enquiries</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4>Contact</h4>
-                <ul>
-                  <li><a href="mailto:info@snusvillage.co.uk">info@snusvillage.co.uk</a></li>
-                  <li><a href="tel:+447777222771">+44 7777 222771</a></li>
-                  <li><a href="https://www.instagram.com/snusvillage.uk/">Instagram</a></li>
-                  <li><a href="/contact">Contact form</a></li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="footer__bottom">
-              <span>© 2026 Snus Village.</span>
-              <span>Adults only. Products are restricted to customers aged 18+.</span>
+      <!-- ========================
+           BRAND SHOWCASE
+           ======================== -->
+      <section class="v4-brands">
+        <div class="v4-wrap">
+          <div class="v4-section-head v4-brands-section-head">
+            <div>
+              <div class="v4-eyebrow">Available Brands</div>
+              <h2>Shop By Brand</h2>
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+        <div class="v4-wrap">
+          <div class="v4-brands-row">
+            <a href="/shop?brand=WHITE%20FOX" class="v4-brand-card">
+              <div class="v4-brand-card__name">White Fox</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=PABLO" class="v4-brand-card">
+              <div class="v4-brand-card__name">Pablo</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=SIBERIA" class="v4-brand-card">
+              <div class="v4-brand-card__name">Siberia</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=ICEBERG" class="v4-brand-card">
+              <div class="v4-brand-card__name">Iceberg</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=KILLA" class="v4-brand-card">
+              <div class="v4-brand-card__name">Killa</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=VELO" class="v4-brand-card">
+              <div class="v4-brand-card__name">Velo</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop?brand=ZYN" class="v4-brand-card">
+              <div class="v4-brand-card__name">Zyn</div>
+              <div class="v4-brand-card__sub">View Range &rarr;</div>
+            </a>
+            <a href="/shop" class="v4-brand-card v4-brand-card--dark">
+              <div class="v4-brand-card__name">All Brands</div>
+              <div class="v4-brand-card__sub">View All &rarr;</div>
+            </a>
+          </div>
+        </div>
+      </section>
 
-    <script src="/js/landing.js"></script>
+      <!-- ========================
+           COLLECTIONS
+           ======================== -->
+      <section class="v4-collections" id="collections">
+        <div class="v4-wrap">
+          <div class="v4-section-head">
+            <div>
+              <div class="v4-eyebrow"><%= svCollections.eyebrow || 'Shop By Category' %></div>
+              <h2><%= svCollections.heading || 'Find Your Perfect Pouch' %></h2>
+            </div>
+            <a href="<%= svCollections.buttonLink || '/shop' %>" class="v4-section-link"><%= svCollections.buttonText || 'Open Shop' %></a>
+          </div>
+        </div>
+        <div class="v4-wrap">
+          <div class="v4-coll-grid">
+            <% v4CollCards.forEach((card, idx) => { %>
+              <%
+                const isMainCard = idx === 0;
+                const collColorClass = v4CollColors[idx] || 'v4-coll-c1';
+                const collImgStyle = card.imageSrc
+                  ? `background-image:url('${optimiseImageUrl(card.imageSrc, { width: 1200 })}');`
+                  : '';
+              %>
+              <article class="v4-coll-card <%= isMainCard ? 'v4-coll-card--main' : '' %> <%= collColorClass %>">
+                <div class="v4-coll-card__bg" style="<%= collImgStyle %>"></div>
+                <div class="v4-coll-card__overlay"></div>
+                <div class="v4-coll-card__body">
+                  <div class="v4-coll-card__num"><%= card.number || ('0' + (idx + 1)) %> &rarr;</div>
+                  <h3><%= card.title || 'Collection' %></h3>
+                  <% if (card.text) { %>
+                    <p><%= card.text %></p>
+                  <% } %>
+                  <a href="<%= card.linkUrl || '/shop' %>" class="v4-coll-link"><%= card.linkText || 'Shop Now' %></a>
+                </div>
+              </article>
+            <% }) %>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================
+           LOCATIONS + DISTRO
+           ======================== -->
+      <section class="v4-locations" id="shops">
+        <div class="v4-wrap">
+          <div class="v4-section-head">
+            <div>
+              <div class="v4-eyebrow"><%= svLocations.eyebrow || 'London Stores' %></div>
+              <h2><%= svLocations.heading || 'Find Snus Village Near You' %></h2>
+            </div>
+            <a href="<%= svLocations.buttonLink || '/contact' %>" class="v4-section-link"><%= svLocations.buttonText || 'Contact Us' %></a>
+          </div>
+
+          <div class="v4-loc-grid">
+            <% svLocationCards.slice(0, 3).forEach((loc) => { %>
+              <div class="v4-loc-card">
+                <iframe
+                  class="v4-loc-card__map"
+                  loading="lazy"
+                  src="<%= loc.mapUrl || 'https://www.google.com/maps?q=London&output=embed' %>"
+                  title="<%= loc.mapTitle || loc.title || 'Snus Village' %>"
+                ></iframe>
+                <div class="v4-loc-card__body">
+                  <div class="v4-loc-card__label"><%= loc.label || 'London Branch' %></div>
+                  <h3><%= loc.title || 'Snus Village' %></h3>
+                  <p><%= loc.description || '' %></p>
+                  <a href="<%= loc.buttonLink || '/contact' %>" class="v4-loc-card__link"><%= loc.buttonText || 'Ask About Stock' %></a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <!-- Distro panel -->
+          <div class="v4-distro">
+            <div class="v4-distro__copy">
+              <div class="v4-distro__eyebrow"><%= svDistro.kicker || 'Distribution Hub' %></div>
+              <h3><%= svDistro.title || 'SVG Distro' %></h3>
+              <div class="v4-distro__addr"><%= svDistro.address || 'Snus Village Charles House, Southall' %></div>
+              <p><%= svDistro.description || 'Our Southall hub supports stock availability, trade enquiries, local distribution and product support for adult customers and approved traders.' %></p>
+              <div class="v4-distro__badges">
+                <% svDistroBadges.forEach((badge) => { %>
+                  <span class="v4-distro__badge"><%= badge %></span>
+                <% }) %>
+              </div>
+              <a href="<%= svDistro.buttonLink || '/contact' %>" class="v4-btn-red" style="width:fit-content;">
+                <%= svDistro.buttonText || 'Contact For Details' %> <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+            <div class="v4-distro__visual">
+              <div class="v4-distro__visual-inner">
+                <div class="v4-distro__visual-title">SVG<br>Distro</div>
+                <div class="v4-distro__visual-sub">Southall &middot; London</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================
+           SOCIAL SHOWCASE
+           ======================== -->
+      <section class="v4-social" id="social-showcase">
+        <div class="v4-wrap v4-social__inner">
+
+          <!-- Left copy -->
+          <div class="v4-social__copy">
+            <div class="v4-eyebrow"><%= svSocial.eyebrow || 'Social Media' %></div>
+            <h2>See Snus Village <span><%= svSocial.heading ? '' : 'In Action' %></span><%= svSocial.heading || '' %></h2>
+            <p><%= svSocial.description || 'Discover new stock, best sellers, promotions, branch updates and behind-the-scenes clips from Snus Village.' %></p>
+            <div class="v4-social__points">
+              <div class="v4-social__point">
+                <div class="v4-social__point-icon"><i class="fa-solid fa-box-open"></i></div>
+                <div>
+                  <strong>New Stock</strong>
+                  <span>See fresh arrivals and best-selling products as they land in store.</span>
+                </div>
+              </div>
+              <div class="v4-social__point">
+                <div class="v4-social__point-icon"><i class="fa-solid fa-map-pin"></i></div>
+                <div>
+                  <strong>Store Updates</strong>
+                  <span>Follow what's happening across our three London locations.</span>
+                </div>
+              </div>
+              <div class="v4-social__point">
+                <div class="v4-social__point-icon"><i class="fa-solid fa-tag"></i></div>
+                <div>
+                  <strong>Promotions</strong>
+                  <span>Spot limited offers, events and featured product drops.</span>
+                </div>
+              </div>
+            </div>
+            <div class="v4-social__actions">
+              <a href="<%= svSocial.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>" target="_blank" rel="noopener noreferrer" class="v4-btn-red">
+                <i class="fa-brands fa-instagram"></i> Open Instagram
+              </a>
+              <a href="/contact" class="v4-btn-navy">Contact Us</a>
+            </div>
+          </div>
+
+          <!-- Right: phone mockup with real video slides (existing sv-phone structure) -->
+          <div class="sv-phone-wrap">
+            <div class="sv-phone">
+              <div class="sv-phone__notch"></div>
+              <div class="sv-phone__screen">
+                <div class="sv-ig-top">
+                  <div class="sv-ig-profile">
+                    <div class="sv-ig-avatar">
+                      <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+                    </div>
+                    <div>
+                      <strong>snusvillage.uk</strong>
+                      <span>Snus Village</span>
+                    </div>
+                  </div>
+                  <div class="sv-ig-live">REELS</div>
+                </div>
+                <div class="sv-ig-stories">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="sv-social-reel" id="svSocialReel">
+                  <% svSocialSlides.slice(0, 3).forEach((slide, index) => { %>
+                    <div class="sv-social-slide <%= index === 0 ? 'is-active' : '' %>">
+                      <video
+                        src="<%= slide.videoSrc %>"
+                        muted
+                        <%= index === 0 ? 'autoplay' : '' %>
+                        loop
+                        playsinline
+                        poster="<%= optimiseImageUrl(slide.posterSrc || '/images/header/h-1.jpeg', { width: 900 }) %>"
+                      ></video>
+                      <div class="sv-social-caption">
+                        <strong><%= slide.title || 'Snus Village Update' %></strong>
+                        <span><%= slide.subtitle || 'Latest Content From Snus Village' %></span>
+                      </div>
+                    </div>
+                  <% }) %>
+                </div>
+                <div class="sv-social-controls">
+                  <button type="button" class="sv-social-arrow sv-social-prev" aria-label="Previous Social Slide">&#8249;</button>
+                  <div class="sv-social-dots">
+                    <button type="button" class="is-active" aria-label="Go To Slide 1"></button>
+                    <button type="button" aria-label="Go To Slide 2"></button>
+                    <button type="button" aria-label="Go To Slide 3"></button>
+                  </div>
+                  <button type="button" class="sv-social-arrow sv-social-next" aria-label="Next Social Slide">&#8250;</button>
+                </div>
+                <div class="sv-ig-bottom"><span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================
+           WHY US
+           ======================== -->
+      <section class="v4-why" id="info">
+        <div class="v4-wrap">
+          <div class="v4-section-head">
+            <div>
+              <div class="v4-eyebrow">Why Snus Village</div>
+              <h2>Trusted by Adult Customers Across the UK</h2>
+            </div>
+            <a href="/contact" class="v4-section-link">Get Support</a>
+          </div>
+          <div class="v4-why-grid">
+            <div class="v4-why-card v4-why-card--red">
+              <div class="v4-why-card__icon">18+</div>
+              <h3>Adults Only</h3>
+              <p>Age-restricted nicotine products for customers 18 and over, with clear messaging throughout.</p>
+            </div>
+            <div class="v4-why-card">
+              <div class="v4-why-card__icon"><i class="fa-solid fa-check"></i></div>
+              <h3>Authentic Brands</h3>
+              <p>Genuine nicotine pouch brands UK customers trust &mdash; mint, fruit, strong and beyond.</p>
+            </div>
+            <div class="v4-why-card">
+              <div class="v4-why-card__icon"><i class="fa-solid fa-truck-fast"></i></div>
+              <h3>Fast UK Delivery</h3>
+              <p>Order online for UK-wide delivery from &pound;1.99 with next-day options available.</p>
+            </div>
+            <div class="v4-why-card v4-why-card--navy">
+              <div class="v4-why-card__icon"><i class="fa-solid fa-map-pin"></i></div>
+              <h3>London Specialist</h3>
+              <p>Three London stores with knowledgeable staff and full product availability.</p>
+            </div>
+            <div class="v4-why-card">
+              <div class="v4-why-card__icon"><i class="fa-solid fa-leaf"></i></div>
+              <h3>Tobacco-Free</h3>
+              <p>Modern tobacco-free nicotine pouches and smoke-free alternatives for adult customers.</p>
+            </div>
+            <div class="v4-why-card">
+              <div class="v4-why-card__icon"><i class="fa-solid fa-id-card"></i></div>
+              <h3>Responsible Retail</h3>
+              <p>Checkout includes age verification, order confirmation and secure payment processing.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <%- include("../partials/footer") %>
+
+    <script src="/js/landing.js" defer></script>
+
+    <script>
+      (function () {
+        var ageModal = document.getElementById("ageModal");
+        var enterBtn = document.getElementById("enterSite");
+        var exitBtn  = document.getElementById("exitSite");
+        var ageDob   = document.getElementById("ageDob");
+        var ageError = document.getElementById("ageError");
+
+        if (!ageModal) {
+          document.body.classList.remove("age-modal-open");
+          document.documentElement.style.overflow = "";
+          document.body.style.overflow = "";
+          return;
+        }
+
+        function isAdultFromDob(value) {
+          if (!value) return false;
+          var dob = new Date(value + "T00:00:00");
+          if (Number.isNaN(dob.getTime())) return false;
+          var today = new Date();
+          var age = today.getFullYear() - dob.getFullYear();
+          var monthDiff = today.getMonth() - dob.getMonth();
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age -= 1;
+          return age >= 18;
+        }
+
+        function hasValidDob(value) {
+          if (!value) return false;
+          var dob = new Date(value + "T00:00:00");
+          return !Number.isNaN(dob.getTime());
+        }
+
+        function redirectUnderageVisitor() {
+          if (ageError) {
+            ageError.textContent = "You must be 18 or over to enter this website. You will now be redirected.";
+            ageError.hidden = false;
+          }
+          sessionStorage.removeItem("ageVerified");
+          window.setTimeout(function () { window.location.href = "https://www.google.com"; }, 1800);
+        }
+
+        function unlockPageScroll() {
+          document.body.classList.remove("age-modal-open");
+          document.documentElement.style.overflow = "";
+          document.body.style.overflow = "";
+          document.body.style.position = "";
+          document.body.style.height = "";
+          document.body.style.touchAction = "";
+        }
+
+        function lockPageScroll() {
+          document.body.classList.add("age-modal-open");
+          document.documentElement.style.overflow = "hidden";
+          document.body.style.overflow = "hidden";
+          document.body.style.touchAction = "none";
+        }
+
+        function hideAgeGate() {
+          ageModal.classList.remove("is-visible");
+          ageModal.setAttribute("aria-hidden", "true");
+          unlockPageScroll();
+        }
+
+        function showAgeGate() {
+          ageModal.classList.add("is-visible");
+          ageModal.setAttribute("aria-hidden", "false");
+          lockPageScroll();
+        }
+
+        if (sessionStorage.getItem("ageVerified") === "true") {
+          hideAgeGate();
+        } else {
+          showAgeGate();
+        }
+
+        if (enterBtn) enterBtn.addEventListener("click", function () {
+          var dobValue = (ageDob && ageDob.value) || "";
+          if (!hasValidDob(dobValue)) {
+            if (ageError) { ageError.textContent = "Please enter a valid date of birth showing you are 18 or over."; ageError.hidden = false; }
+            if (ageDob) ageDob.focus();
+            return;
+          }
+          if (!isAdultFromDob(dobValue)) { redirectUnderageVisitor(); return; }
+          sessionStorage.setItem("ageVerified", "true");
+          hideAgeGate();
+        });
+
+        if (exitBtn) exitBtn.addEventListener("click", function () {
+          sessionStorage.removeItem("ageVerified");
+          window.location.href = "https://www.google.com";
+        });
+
+        if (ageDob) ageDob.addEventListener("input", function () {
+          if (ageError) { ageError.textContent = ""; ageError.hidden = true; }
+        });
+      })();
+    </script>
+
+    <script>
+      (function () {
+        var carousel = document.getElementById('heroCarousel');
+        if (!carousel) return;
+        var slides = carousel.querySelectorAll('.v4-carousel__slide');
+        var dots   = carousel.querySelectorAll('.v4-carousel__dot');
+        if (slides.length < 2) return;
+        var current = 0;
+        var timer;
+
+        function goTo(n) {
+          slides[current].classList.remove('is-active');
+          slides[current].classList.add('is-leaving');
+          if (dots[current]) dots[current].classList.remove('is-active');
+          var leaving = slides[current];
+          setTimeout(function () { leaving.classList.remove('is-leaving'); }, 700);
+          current = (n + slides.length) % slides.length;
+          slides[current].classList.add('is-active');
+          if (dots[current]) dots[current].classList.add('is-active');
+        }
+
+        function start() { timer = setInterval(function () { goTo(current + 1); }, 4000); }
+        function stop()  { clearInterval(timer); }
+
+        dots.forEach(function (dot, i) {
+          dot.addEventListener('click', function () { stop(); goTo(i); start(); });
+        });
+
+        carousel.addEventListener('mouseenter', stop);
+        carousel.addEventListener('mouseleave', start);
+
+        start();
+      })();
+    </script>
+
   </body>
 </html>

@@ -4,7 +4,7 @@
   <div class="account-hero">
     <span class="auth-pill">Customer Account</span>
     <h1>Hi <%= user.firstName %>.</h1>
-    <p>Your customer login is active. Use this page to confirm your account status.</p>
+    <p>Your customer login is active. Use this page to confirm your account and identity status.</p>
   </div>
 
   <div class="account-grid">
@@ -15,8 +15,13 @@
     </div>
     <div class="account-card">
       <i class="fa-solid fa-circle-check"></i>
-      <span>Verification</span>
+      <span>Email Status</span>
       <strong><%= user.isVerified ? "Verified" : "Not verified" %></strong>
+    </div>
+    <div class="account-card">
+      <i class="fa-solid fa-id-card"></i>
+      <span>Identity</span>
+      <strong><%= user.didit && user.didit.verified ? "Approved" : ((user.didit && user.didit.status) || "Not Started") %></strong>
     </div>
     <div class="account-card">
       <i class="fa-solid fa-store"></i>
@@ -24,6 +29,36 @@
       <strong><%= user.traderStatus || "none" %></strong>
     </div>
   </div>
+
+  <section class="identity-panel">
+    <div>
+      <span class="auth-pill">Identity Check</span>
+      <h2>Verify your age and identity</h2>
+      <p>
+        You will be sent to Didit's secure hosted verification flow. Didit may process your
+        identity document, selfie/biometric checks, IP analysis, and the result of those checks
+        so Snus Village can confirm eligibility and keep restricted products protected.
+      </p>
+    </div>
+
+    <% if (user.didit && user.didit.verified) { %>
+      <div class="identity-status identity-status--approved">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Identity approved<% if (user.didit.verifiedAt) { %> on <%= new Date(user.didit.verifiedAt).toLocaleDateString("en-GB") %><% } %>.</span>
+      </div>
+    <% } else { %>
+      <form class="identity-form" action="/api/session" method="post">
+        <label class="identity-consent">
+          <input type="checkbox" name="consent" value="yes" required />
+          <span>I consent to Snus Village sending my account ID to Didit and receiving my verification decision.</span>
+        </label>
+        <button class="auth-btn account-action" type="submit">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Start verification
+        </button>
+      </form>
+    <% } %>
+  </section>
 
   <div class="account-actions">
     <a class="auth-btn account-action" href="/shop">Shop products</a>

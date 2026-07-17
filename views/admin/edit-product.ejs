@@ -1,133 +1,278 @@
-<link rel="stylesheet" href="/css/admin.css" />
+<link rel="stylesheet" href="/css/admin-add-product.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
 
+<section class="admin-product-editor-page">
+  <div class="admin-product-editor-head">
+    <div>
+      <span>Catalogue</span>
+      <h1>Edit Product</h1>
+      <p>Update product details, images, display controls, stock, and SEO fields.</p>
+    </div>
 
-  <!-- Flash Messages -->
-  <div id="flash-container">
-    <% if (error && error.length > 0) { %>
-      <div class="flash flash-error">
-        <span><%= error %></span>
-        <button onclick="closeFlash(this)">×</button>
-      </div>
-    <% } %>
-
-    <% if (success && success.length > 0) { %>
-      <div class="flash flash-success">
-        <span><%= success %></span>
-        <button onclick="closeFlash(this)">×</button>
-      </div>
-    <% } %>
+    <a href="/admin/products" class="admin-editor-back">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back To Products
+    </a>
   </div>
 
-
-  <!-- Form -->
   <form
     action="/admin/products/edit/<%= product._id %>"
     method="POST"
     enctype="multipart/form-data"
-    class="form-card"
+    class="admin-product-editor-card"
   >
-    <div class="grid">
-      
-      <input type="text" placeholder="Product Name" name="name" value="<%= product.name %>" required />
-      
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Product Details</h2>
+        <span>Main catalogue information</span>
+      </div>
 
-      <input
-        type="number"
-        placeholder="Price"
-        name="price"
-        step="0.01"
-        value="<%= product.price.toFixed(2) %>"
-        required
-      />
+      <div class="admin-editor-grid">
+        <label>
+          Product Name
+          <input type="text" name="name" value="<%= product.name || '' %>" required>
+        </label>
 
-      <input
-        type="number"
-        placeholder="Discount Price"
-        name="discountPrice"
-        step="0.01"
-        value="<%= product.discountPrice.toFixed(2) %>"
-      />
+        <label>
+          Brand
+          <input list="brandOptions" type="text" name="brand" value="<%= product.brand || '' %>" required>
+        </label>
 
-      <input
-        type="number"
-        placeholder="Stock"
-        name="stock"
-        value="<%= product.stock %>"
-        required
-      />
+        <label>
+          Category
+          <input list="categoryOptions" type="text" name="category" value="<%= product.category || '' %>">
+        </label>
 
-         <input
-        type="text"
-        placeholder="Brnad"
-        name="brand"
-        value="<%= product.brand %>"
-        required
-      />
+        <label>
+          SKU
+          <input type="text" name="sku" value="<%= product.sku || '' %>">
+        </label>
 
-        <input 
-        type="text"
-         name="flavour" 
-         placeholder="Flavour"
-          value="<%= product.flavour %>"
-        required />
+        <label>
+          Barcode / EAN
+          <input type="text" name="barcode" value="<%= product.barcode || '' %>">
+        </label>
 
-          <input
-            type="text"
-            name="nicotine"
-            placeholder="Amount of Nicotine (mg)"
-          value="<%= product.nicotine %>"
+        <label>
+          Supplier
+          <input type="text" name="supplier" value="<%= product.supplier || '' %>">
+        </label>
 
-          />
-        
+        <label>
+          Supplier Code
+          <input type="text" name="supplierCode" value="<%= product.supplierCode || '' %>">
+        </label>
 
-      <select name="strength" required>
-        <option value="">Select strength</option>
-        <option value="LOW" <%= product.strength === "LOW" ? "selected" : "" %>>LOW</option>
-        <option value="MEDIUM" <%= product.strength === "MEDIUM" ? "selected" : "" %>>MEDIUM</option>
-        <option value="STRONG" <%= product.strength === "STRONG" ? "selected" : "" %>>STRONG</option>
-        <option value="X-STRONG" <%= product.strength === "X-STRONG" ? "selected" : "" %>>X-STRONG</option>
-        <option value="EXTREME" <%= product.strength === "EXTREME" ? "selected" : "" %>>EXTREME</option>
-      </select>
+        <label>
+          Cost Price
+          <input type="number" name="costPrice" step="0.01" min="0" value="<%= product.costPrice || 0 %>">
+        </label>
 
-      <input type="text" placeholder="Category" name="category" value="<%= product.category %>" />
+        <label>
+          Flavour
+          <input type="text" name="flavour" value="<%= product.flavour || '' %>">
+        </label>
 
-    </div>
+        <label>
+          Strength
+          <select name="strength" required>
+            <option value="">Select strength</option>
+            <option value="LOW" <%= product.strength === "LOW" ? "selected" : "" %>>LOW</option>
+            <option value="MEDIUM" <%= product.strength === "MEDIUM" ? "selected" : "" %>>MEDIUM</option>
+            <option value="STRONG" <%= product.strength === "STRONG" ? "selected" : "" %>>STRONG</option>
+            <option value="X-STRONG" <%= product.strength === "X-STRONG" ? "selected" : "" %>>X-STRONG</option>
+            <option value="EXTREME" <%= product.strength === "EXTREME" ? "selected" : "" %>>EXTREME</option>
+          </select>
+        </label>
 
-    <textarea  name="description" placeholder="Description">
-<%= product.description %>
-    </textarea>
+        <label>
+          Nicotine
+          <input type="text" name="nicotine" value="<%= product.nicotine || '' %>">
+        </label>
 
-  <!-- IMAGE MANAGER -->
-<div class="image-manager">
+        <label>
+          Pouches Per Can
+          <input type="number" name="pouchesPerCan" min="0" step="1" value="<%= product.pouchesPerCan || 20 %>">
+        </label>
+      </div>
 
-  <% product.images.forEach((img, index) => { %>
-    <div class="image-box">
-      
-      <img src="<%= img %>" />
-
-      <label>
-        <input type="checkbox" name="removeImages" value="<%= img %>">
-        Remove
+      <label class="admin-editor-full">
+        Description
+        <textarea name="description" required><%= product.description || '' %></textarea>
       </label>
-
     </div>
-  <% }) %>
 
-</div>
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Pricing & Stock</h2>
+        <span>Control price, sale price and stock level</span>
+      </div>
 
-<!-- ADD NEW IMAGES -->
-<div class="upload-box">
-  <p>Add new images</p>
-  <input type="file" name="images" multiple />
-</div>
+      <div class="admin-editor-grid">
+        <label>
+          Price
+          <input type="number" name="price" step="0.01" min="0" value="<%= Number(product.price || 0).toFixed(2) %>" required>
+        </label>
 
+        <label>
+          Discount Price
+          <input type="number" name="discountPrice" step="0.01" min="0" value="<%= Number(product.discountPrice || 0).toFixed(2) %>">
+        </label>
 
-    <button type="submit" class="btn-primary">Update Product</button>
+        <label>
+          Stock
+          <input type="number" name="stock" min="0" value="<%= product.stock || 0 %>">
+        </label>
+      </div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Display Controls</h2>
+        <span>Choose how this product appears on homepage, shop and brand collection sections</span>
+      </div>
+
+      <div class="admin-toggle-grid">
+        <label>
+          <input type="checkbox" name="isActive" <%= product.isActive !== false ? "checked" : "" %>>
+          <span>
+            <strong>Active Product</strong>
+            <small>Show this product on the website.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="isFeatured" <%= product.isFeatured ? "checked" : "" %>>
+          <span>
+            <strong>Featured</strong>
+            <small>Prioritise this product in featured and same-brand product page collections.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="isBestSeller" <%= product.isBestSeller ? "checked" : "" %>>
+          <span>
+            <strong>Best Seller</strong>
+            <small>Show this in best seller areas and rank it higher in same-brand collections.</small>
+          </span>
+        </label>
+
+        <label>
+          <input type="checkbox" name="showSaleBadge" <%= product.showSaleBadge ? "checked" : "" %>>
+          <span>
+            <strong>Sale Badge</strong>
+            <small>Show sale badge when discount price is active.</small>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>Current Images</h2>
+        <span>Remove old images or upload new ones</span>
+      </div>
+
+      <div class="admin-current-image-grid">
+        <% if (product.images && product.images.length) { %>
+          <% product.images.forEach((img) => { %>
+            <label class="admin-current-image-card">
+              <img src="<%= img %>" alt="<%= product.name %>">
+              <span>
+                <input type="checkbox" name="removeImages" value="<%= img %>">
+                Remove image
+              </span>
+            </label>
+          <% }) %>
+        <% } else { %>
+          <p>No images uploaded yet.</p>
+        <% } %>
+      </div>
+
+      <div class="admin-upload-box">
+        <input id="productImages" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple>
+        <label for="productImages">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <strong>Add New Images</strong>
+          <span>JPG, PNG, WEBP or AVIF</span>
+        </label>
+      </div>
+
+      <div class="admin-image-preview-grid" id="imagePreviewGrid"></div>
+    </div>
+
+    <div class="admin-editor-section">
+      <div class="admin-editor-section-head">
+        <h2>SEO</h2>
+        <span>Optional Google search fields</span>
+      </div>
+
+      <div class="admin-editor-grid">
+        <label>
+          SEO Title
+          <input type="text" name="seoTitle" value="<%= product.seoTitle || '' %>">
+        </label>
+
+        <label class="admin-editor-full">
+          SEO Description
+          <textarea name="seoDescription"><%= product.seoDescription || '' %></textarea>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="admin-editor-submit">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Update Product
+    </button>
   </form>
+</section>
 
+<datalist id="brandOptions">
+  <option value="WHITE FOX">
+  <option value="SIBERIA">
+  <option value="VELO">
+  <option value="KILLA">
+  <option value="PABLO">
+  <option value="GARANT">
+  <option value="ICEBERG">
+  <option value="CUBA">
+  <option value="LOOP">
+  <option value="CAFERO">
+  <option value="HIT">
+  <option value="ODEN'S">
+</datalist>
+
+<datalist id="categoryOptions">
+  <option value="Nicotine Pouches">
+  <option value="Snus">
+  <option value="Vape">
+  <option value="Accessories">
+</datalist>
 
 <script>
-function closeFlash(btn) {
-  btn.parentElement.remove();
-}
+  const input = document.getElementById("productImages");
+  const previewGrid = document.getElementById("imagePreviewGrid");
+
+  input?.addEventListener("change", () => {
+    previewGrid.innerHTML = "";
+
+    Array.from(input.files || []).forEach((file) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const card = document.createElement("div");
+        card.className = "admin-preview-card";
+        card.innerHTML = `
+          <img src="${event.target.result}" alt="">
+          <span>${file.name}</span>
+        `;
+        previewGrid.appendChild(card);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  });
 </script>

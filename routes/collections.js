@@ -41,6 +41,86 @@ function productImage(value) {
   return value?.image || value?.images?.[0] || fallbackCollections[0].image;
 }
 
+
+router.get("/vapes", async (req, res) => {
+  try {
+    if (!res.locals.storeSettings || res.locals.storeSettings.hideVapesCategory !== false) {
+      req.flash("error", "Vapes are not available yet.");
+      return res.redirect("/shop");
+    }
+
+    const { brand, flavour, search, sort } = req.query;
+
+    function safeRegex(value) {
+      return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    const filter = {
+      isActive: { $ne: false },
+      category: { $regex: "^(vape|vapes)$", $options: "i" },
+    };
+
+    if (brand) {
+      filter.brand = {
+        $regex: "^" + safeRegex(brand) + "$",
+        $options: "i",
+      };
+    }
+
+    if (flavour) {
+      filter.flavour = {
+        $regex: safeRegex(flavour),
+        $options: "i",
+      };
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(safeRegex(search), "i");
+
+      filter.$or = [
+        { name: searchRegex },
+        { brand: searchRegex },
+        { flavour: searchRegex },
+        { description: searchRegex },
+        { nicotine: searchRegex },
+      ];
+    }
+
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "price-low") sortOption = { price: 1 };
+    if (sort === "price-high") sortOption = { price: -1 };
+    if (sort === "name") sortOption = { name: 1 };
+
+    const [products, brands, flavours] =
+      Product.db.readyState === 1
+        ? await Promise.all([
+            Product.find(filter).sort(sortOption).lean(),
+            Product.distinct("brand", {
+              isActive: { $ne: false },
+              category: { $regex: "^(vape|vapes)$", $options: "i" },
+            }),
+            Product.distinct("flavour", {
+              isActive: { $ne: false },
+              category: { $regex: "^(vape|vapes)$", $options: "i" },
+            }),
+          ])
+        : [[], [], []];
+
+    res.render("collections/vapes", {
+      products,
+      brands: brands.filter(Boolean).sort(),
+      flavours: flavours.filter(Boolean).sort(),
+      query: req.query,
+      totalProducts: products.length,
+    });
+  } catch (err) {
+    console.log("Vapes collection error:", err.message);
+    res.status(500).send("Error loading vapes collection");
+  }
+});
+
+
 router.get("/", async (req, res) => {
   let collections = fallbackCollections;
   let featuredProducts = [];

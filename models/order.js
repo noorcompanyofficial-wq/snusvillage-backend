@@ -26,6 +26,11 @@ const orderSchema = new mongoose.Schema(
       default: null,
     },
 
+    sessionId: {
+      type: String,
+      default: "",
+    },
+
     customer: {
       email: String,
       firstName: String,
@@ -40,6 +45,35 @@ const orderSchema = new mongoose.Schema(
       postcode: String,
     },
 
+    fulfilment: {
+      method: {
+        type: String,
+        enum: ["delivery", "click_collect"],
+        default: "delivery",
+      },
+      deliveryService: {
+        type: String,
+        enum: ["standard", "next_day", "collection"],
+        default: "standard",
+      },
+      deliveryServiceLabel: {
+        type: String,
+        default: "Standard Delivery",
+      },
+      deliveryCutoff: {
+        type: String,
+        default: "",
+      },
+      collectionBranch: {
+        type: String,
+        default: "",
+      },
+      collectionAddress: {
+        type: String,
+        default: "",
+      },
+    },
+
     items: [orderItemSchema],
 
     subtotal: {
@@ -50,6 +84,25 @@ const orderSchema = new mongoose.Schema(
     shipping: {
       type: Number,
       default: 0,
+    },
+
+    discount: {
+      code: {
+        type: String,
+        default: "",
+      },
+      type: {
+        type: String,
+        default: "",
+      },
+      value: {
+        type: Number,
+        default: 0,
+      },
+      amount: {
+        type: Number,
+        default: 0,
+      },
     },
 
     total: {
@@ -67,6 +120,92 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["new", "processing", "packed", "shipped", "completed", "cancelled"],
       default: "new",
+    },
+
+    sumup: {
+      checkoutId: {
+        type: String,
+        default: "",
+      },
+      checkoutReference: {
+        type: String,
+        default: "",
+      },
+      checkoutUrl: {
+        type: String,
+        default: "",
+      },
+      status: {
+        type: String,
+        default: "",
+      },
+      paidAt: {
+        type: Date,
+        default: null,
+      },
+      error: {
+        type: String,
+        default: "",
+      },
+      fulfilmentFinalised: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
+    adminNotes: {
+      type: String,
+      default: "",
+    },
+
+    fulfilmentChecklist: {
+      paymentChecked: {
+        type: Boolean,
+        default: false,
+      },
+      stockChecked: {
+        type: Boolean,
+        default: false,
+      },
+      packed: {
+        type: Boolean,
+        default: false,
+      },
+      labelReady: {
+        type: Boolean,
+        default: false,
+      },
+      customerNotified: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
+    emailNotifications: {
+      orderConfirmationSent: {
+        type: Boolean,
+        default: false,
+      },
+      orderConfirmationSentAt: {
+        type: Date,
+        default: null,
+      },
+      shippingEmailSent: {
+        type: Boolean,
+        default: false,
+      },
+      shippingEmailSentAt: {
+        type: Date,
+        default: null,
+      },
+      lastOrderEmailError: {
+        type: String,
+        default: "",
+      },
+      lastShippingEmailError: {
+        type: String,
+        default: "",
+      },
     },
 
     royalMail: {

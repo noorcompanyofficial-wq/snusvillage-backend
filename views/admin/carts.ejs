@@ -1,0 +1,106 @@
+<section class="admin-page">
+  <div class="admin-page-head">
+    <div>
+      <span>Carts</span>
+      <h1>Unfinished Customer Carts</h1>
+      <p>Track active and abandoned carts so you can understand missed orders, product interest, and checkout drop-off.</p>
+    </div>
+
+    <a class="admin-primary" href="/admin/dashboard">
+      <i class="fa-solid fa-chart-line"></i>
+      Back To Dashboard
+    </a>
+  </div>
+
+  <div class="admin-cart-filter-bar">
+    <a class="<%= status === 'all' ? 'is-active' : '' %>" href="/admin/carts">All Carts</a>
+    <a class="<%= status === 'active' ? 'is-active' : '' %>" href="/admin/carts?status=active">Active</a>
+    <a class="<%= status === 'abandoned' ? 'is-active' : '' %>" href="/admin/carts?status=abandoned">Abandoned</a>
+  </div>
+
+  <% if (!carts || carts.length === 0) { %>
+    <div class="admin-empty-state">
+      <h2>No Carts Found</h2>
+      <p>Carts with products will appear here once customers add items.</p>
+    </div>
+  <% } else { %>
+    <div class="admin-carts-summary">
+      <div>
+        <strong><%= carts.length %></strong>
+        <span>Cart<%= carts.length === 1 ? "" : "s" %> Showing</span>
+      </div>
+
+      <div>
+        <% const totalCartValue = carts.reduce((total, cart) => total + cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0), 0); %>
+        <strong>£<%= Number(totalCartValue || 0).toFixed(2) %></strong>
+        <span>Total Cart Value</span>
+      </div>
+    </div>
+
+    <div class="admin-carts-grid">
+      <% carts.forEach((cart) => { %>
+        <% const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0); %>
+        <% const isAbandoned = new Date(cart.updatedAt) < cartStaleCutoff; %>
+
+        <article class="admin-cart-card">
+          <div class="admin-cart-card__top">
+            <div>
+              <span class="<%= isAbandoned ? 'status-pill payment-failed' : 'status-pill order-processing' %>">
+                <%= isAbandoned ? "Abandoned" : "Active" %>
+              </span>
+
+              <h2><%= cart.user ? "Customer Cart" : "Guest Cart" %></h2>
+
+              <% if (cart.user) { %>
+                <p>
+                  <strong>
+                    <%= cart.user.firstName || "" %>
+                    <%= cart.user.lastName || "" %>
+                  </strong>
+                  <br>
+                  <%= cart.user.email || "No Email" %>
+                  <% if (cart.user.phone) { %>
+                    <br><%= cart.user.phone %>
+                  <% } %>
+                </p>
+              <% } else { %>
+                <p>Guest Session: <%= cart.sessionId ? cart.sessionId.slice(-10) : "N/A" %></p>
+              <% } %>
+
+              <p>Last Active: <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></p>
+            </div>
+
+            <strong>£<%= Number(cartTotal || 0).toFixed(2) %></strong>
+          </div>
+
+          <div class="admin-cart-items">
+            <% cart.items.forEach((item) => { %>
+              <div class="admin-cart-item">
+                <% if (item.product && item.product.images && item.product.images[0]) { %>
+                  <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
+                <% } else { %>
+                  <span>No Image</span>
+                <% } %>
+
+                <div>
+                  <strong><%= item.product?.name || "Deleted Product" %></strong>
+                  <small>
+                    Qty: <%= item.quantity %> × £<%= Number(item.priceAtTime || 0).toFixed(2) %>
+                  </small>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+          <div class="admin-cart-card__footer">
+            <span><%= cart.items.length %> Item<%= cart.items.length === 1 ? "" : "s" %></span>
+
+            <form action="/admin/carts/<%= cart._id %>/delete" method="POST" onsubmit="return confirm('Remove this cart from admin tracking?');">
+              <button type="submit">Remove Cart</button>
+            </form>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>

@@ -3,7 +3,6 @@
 
 <!-- ===== CART SIDEBAR ===== -->
 <div class="cart">
-  <!-- HEADER -->
   <div class="cart-header">
     <h3>YOUR BAG&nbsp;(<span id="cart-count">0</span>)</h3>
     <i class="fa-solid fa-xmark close-cart"></i>
@@ -11,12 +10,10 @@
 
   <hr />
 
-  <!-- ITEMS -->
   <div class="cart-items"></div>
 
   <hr />
 
-  <!-- FOOTER -->
   <div class="cart-footer">
     <div class="subtotal">
       <span>Subtotal</span>
@@ -28,5 +25,9 @@
         <i class="fa-solid fa-lock"></i>&nbsp;SECURE CHECKOUT
       </button>
     </a>
+
+    <button class="cart-clear-btn" id="cartClearBtn" style="display:none;">
+      <i class="fa-solid fa-trash-can"></i> Clear Cart
+    </button>
   </div>
 </div>

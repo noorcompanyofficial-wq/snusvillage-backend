@@ -1,52 +1,34 @@
-// ===== DROPDOWN FIX (MOBILE + DESKTOP PERFECT) =====
-const allDropdowns = document.querySelectorAll(".dropdown");
+document.addEventListener("DOMContentLoaded", () => {
+  const brandSections = document.querySelectorAll(".shop-brand-section");
 
-allDropdowns.forEach((dropdown) => {
-  const toggleBtn = dropdown.querySelector(".dropdown-toggle");
+  brandSections.forEach((section) => {
+    const carousel = section.querySelector("[data-brand-carousel]");
+    const prev = section.querySelector(".shop-brand-arrow--prev");
+    const next = section.querySelector(".shop-brand-arrow--next");
 
-  if (!toggleBtn) return; // safety
+    if (!carousel) return;
 
-  toggleBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
+    function updateArrowVisibility() {
+      const canScroll = carousel.scrollWidth > carousel.clientWidth + 8;
+      section.dataset.noScroll = canScroll ? "false" : "true";
+    }
 
-    // close other dropdowns
-    allDropdowns.forEach((d) => {
-      if (d !== dropdown) d.classList.remove("active");
-    });
+    function scrollCarousel(direction) {
+      const firstCard = carousel.querySelector(".shop-product-card");
+      const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 230;
+      const gap = 18;
+      const amount = (cardWidth + gap) * 2;
 
-    // toggle current
-    dropdown.classList.toggle("active");
+      carousel.scrollBy({
+        left: direction === "next" ? amount : -amount,
+        behavior: "smooth",
+      });
+    }
+
+    prev?.addEventListener("click", () => scrollCarousel("prev"));
+    next?.addEventListener("click", () => scrollCarousel("next"));
+
+    updateArrowVisibility();
+    window.addEventListener("resize", updateArrowVisibility);
   });
-});
-
-// close when clicking outside
-document.addEventListener("click", () => {
-  allDropdowns.forEach((d) => d.classList.remove("active"));
-});
-
-// ===== FILTER BUTTONS (WITHOUT BREAKING DROPDOWN) =====
-const normalFilters = document.querySelectorAll(".filter-btn:not(.dropdown-toggle)");
-
-normalFilters.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    normalFilters.forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-  });
-});
-
-// ===== FADE-IN ON SCROLL (SMOOTH OPACITY ONLY) =====
-const cardsObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("show");
-      }
-    });
-  },
-  { threshold: 0.2 }
-);
-
-document.querySelectorAll(".card").forEach((card) => {
-  card.classList.add("hidden");
-  cardsObserver.observe(card);
 });

@@ -1,5 +1,7 @@
 const User = require("../models/User");
 
+const ADMIN_ROLES = ["owner", "admin", "manager", "fulfilment", "support", "product_manager"];
+
 module.exports = async function isAdmin(req, res, next) {
   if (!req.session?.user) {
     return res.redirect("/auth/login");
@@ -15,8 +17,8 @@ module.exports = async function isAdmin(req, res, next) {
     req.session.user = user;
     res.locals.user = user;
 
-    if (user.role !== "admin") {
-      return res.status(403).send("403 Forbidden - Admins only");
+    if (!ADMIN_ROLES.includes(user.role)) {
+      return res.status(403).send("403 Forbidden - Admin access only");
     }
 
     next();

@@ -29,6 +29,12 @@ const productSchema = new mongoose.Schema(
       require: true,
     },
 
+    pouchesPerCan: {
+      type: Number,
+      default: 20,
+      min: 0,
+    },
+
     price: {
       type: Number,
       required: true,
@@ -55,6 +61,36 @@ const productSchema = new mongoose.Schema(
       default: "general",
     },
 
+    sku: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+
+    barcode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    supplier: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    supplierCode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    costPrice: {
+      type: Number,
+      default: 0,
+    },
+
     stock: {
       type: Number,
       default: 0,
@@ -63,6 +99,33 @@ const productSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+
+    isBestSeller: {
+      type: Boolean,
+      default: false,
+    },
+
+    showSaleBadge: {
+      type: Boolean,
+      default: false,
+    },
+
+    seoTitle: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    seoDescription: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   { timestamps: true }

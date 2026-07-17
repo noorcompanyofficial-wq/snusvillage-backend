@@ -1,0 +1,240 @@
+/* Cross-browser layout stability, especially Safari/iOS Safari. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+button,
+[type="button"],
+[type="submit"],
+[type="reset"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
+.header,
+.navbar,
+.nav-container,
+.nav-links,
+.header-tools,
+.header-search,
+.logo,
+.logo a,
+main,
+.page-shell,
+.footer,
+.footer-container,
+.footer-col,
+.shop-page,
+.shop-brand-products,
+.product-detail-page,
+.product-detail-redesign,
+.product-hero,
+.product-main,
+.product-info,
+.product-related-section,
+.cart,
+.checkout-page,
+.checkout-form-panel,
+.checkout-summary-panel,
+.auth-page,
+.contact-page,
+.legal-page,
+.customer-service-page {
+  min-width: 0;
+}
+
+.nav-links a,
+.header-cart,
+.customer-nav__link,
+.footer-col a,
+.product-card,
+.shop-product-card,
+.product-related-card,
+.checkout-item,
+.cart-item,
+.auth-box,
+.contact-card,
+.legal-card {
+  min-width: 0;
+}
+
+.product-card img,
+.shop-product-image img,
+.product-main-image img,
+.product-related-image img,
+.checkout-item-image img,
+.cart-item img,
+.footer-logo,
+.logo img {
+  display: block;
+  object-fit: contain;
+}
+
+.product-card h2,
+.shop-product-body h2,
+.product-related-card h3,
+.checkout-item h3,
+.checkout-item p,
+.cart-item h4,
+.cart-item p {
+  overflow-wrap: anywhere;
+}
+
+.sv-slide,
+.sv-collection-card,
+.sv-location-card,
+.product-card,
+.shop-product-card,
+.product-main-image,
+.product-related-image,
+.checkout-item-image {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+@supports not (overflow: clip) {
+  .page-shell,
+  .shop-page,
+  .product-detail-page,
+  .product-detail-redesign,
+  .sv-simple-carousel-hero,
+  .sv-carousel,
+  .sv-slide,
+  .sv-collection-card,
+  .sv-location-card {
+    overflow: hidden;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .header .navbar,
+  .navbar,
+  .footer,
+  .age-modal {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .cart {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+
+  .checkout-page,
+  .checkout-success-page,
+  .auth-page,
+  .account-page {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-container,
+  .product-main,
+  .product-detail-page,
+  .product-detail-redesign,
+  .checkout-page,
+  .auth-page,
+  .contact-page {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .header .nav-links,
+  .nav-links {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .header .navbar,
+  .navbar {
+    width: 100%;
+  }
+
+  .header .header-tools,
+  .header-tools {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .header .header-search,
+  .header-search {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .checkout-form-panel,
+  .checkout-summary-panel,
+  .product-detail-page,
+  .product-detail-redesign,
+  .shop-page,
+  .contact-page,
+  .legal-page,
+  .customer-service-page {
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+  }
+
+  .checkout-fulfilment-options,
+  .checkout-delivery-service-options,
+  .checkout-row,
+  .discount-row,
+  .footer-container {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}

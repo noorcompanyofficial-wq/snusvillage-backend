@@ -1,21 +1,56 @@
-const nodemailer = require("nodemailer");
+const transporter = require("../config/mailer");
 
 function getEmailTransporter() {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  const mailConfig = transporter.snusMailConfig || {};
+
+  if (!mailConfig.hasEmailUser || !mailConfig.hasEmailPass) {
     return null;
   }
 
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  return transporter;
+}
+
+function getFromAddress(label = "Snus Village") {
+  const mailConfig = transporter.snusMailConfig || {};
+  const fromEmail = mailConfig.emailFrom || mailConfig.emailUser || process.env.EMAIL_USER;
+
+  return `"${label}" <${fromEmail}>`;
 }
 
 function formatMoney(value) {
   return `£${Number(value || 0).toFixed(2)}`;
+}
+
+function getAdminEmails() {
+  const raw =
+    process.env.ADMIN_ORDER_EMAILS ||
+    process.env.USER_EMAIL ||
+    process.env.EMAIL_USER ||
+    "";
+
+  return raw
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+}
+
+function getOrderNumber(order) {
+  return order._id.toString().slice(-6).toUpperCase();
+}
+
+function isClickCollect(order) {
+  return order.fulfilment?.method === "click_collect";
+}
+
+function getDeliveryServiceText(order) {
+  if (isClickCollect(order)) return "Click & Collect";
+
+  const label = order.fulfilment?.deliveryServiceLabel || "Standard Delivery";
+  const cutoff = order.fulfilment?.deliveryService === "next_day"
+    ? ` Order before ${order.fulfilment?.deliveryCutoff || "4:30pm"} applies.`
+    : "";
+
+  return `${label}${cutoff}`;
 }
 
 function buildItemsText(order) {
@@ -26,6 +61,33 @@ function buildItemsText(order) {
     .join("\n");
 }
 
+function buildDeliveryText(order) {
+  if (isClickCollect(order)) {
+    return `
+Fulfilment:
+CLICK & COLLECT
+
+Collection branch:
+${order.fulfilment?.collectionBranch || "Edgware Road"}
+
+Collection address:
+${order.fulfilment?.collectionAddress || "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX"}
+
+Collection note:
+This is a Click & Collect order. Please bring your order confirmation and valid ID when collecting.
+`.trim();
+  }
+
+  return `
+Delivery:
+Service: ${getDeliveryServiceText(order)}
+${order.delivery?.address || ""}
+${order.delivery?.city || ""}
+${order.delivery?.postcode || ""}
+${order.delivery?.country || ""}
+`.trim();
+}
+
 async function sendCustomerOrderEmail(order) {
   const transporter = getEmailTransporter();
 
@@ -33,12 +95,29 @@ async function sendCustomerOrderEmail(order) {
     return { ok: false, skipped: true, message: "Email credentials or customer email missing" };
   }
 
-  const orderNumber = order._id.toString().slice(-6).toUpperCase();
+  const orderNumber = getOrderNumber(order);
+  const clickCollect = isClickCollect(order);
+
+  const intro = clickCollect
+    ? `Thank you for your order with Snus Village. Your Click & Collect order has been confirmed.`
+    : `Thank you for your order with Snus Village. Your delivery order has been confirmed.`;
+
+  const fulfilmentMessage = clickCollect
+    ? `
+Collection details:
+Your order is being prepared for collection at SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX.
+
+Please bring your order confirmation and valid ID when collecting. Products are age restricted and collection is for customers aged 18+ only.
+`.trim()
+    : `
+Delivery details:
+Your order has been received and will be processed for delivery. You will be contacted if any extra information is needed.
+`.trim();
 
   const text = `
 Hi ${order.customer.firstName || "Customer"},
 
-Thank you for your order with Snus Village.
+${intro}
 
 Order #${orderNumber}
 
@@ -47,20 +126,29 @@ ${buildItemsText(order)}
 
 Subtotal: ${formatMoney(order.subtotal)}
 Shipping: ${formatMoney(order.shipping)}
+Delivery service: ${getDeliveryServiceText(order)}
 Total: ${formatMoney(order.total)}
 
 Payment status: ${order.paymentStatus}
 Order status: ${order.orderStatus}
 
-Your order has been received. If payment is still pending, our team will contact you or process it once payment is confirmed.
+${fulfilmentMessage}
+
+${buildDeliveryText(order)}
 
 Snus Village
 `.trim();
 
+  const adminEmails = getAdminEmails();
+
   await transporter.sendMail({
-    from: `"Snus Village" <${process.env.EMAIL_USER}>`,
+    from: getFromAddress("Snus Village"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
     to: order.customer.email,
-    subject: `Snus Village Order Received #${orderNumber}`,
+    bcc: adminEmails.length ? adminEmails.join(",") : undefined,
+    subject: clickCollect
+      ? `Click & Collect Order Confirmed #${orderNumber}`
+      : `Snus Village Order Confirmed #${orderNumber}`,
     text,
   });
 
@@ -70,16 +158,31 @@ Snus Village
 async function sendAdminOrderEmail(order) {
   const transporter = getEmailTransporter();
 
-  const adminEmail = process.env.USER_EMAIL || process.env.EMAIL_USER;
+  const adminEmails = getAdminEmails();
 
-  if (!transporter || !adminEmail) {
+  if (!transporter || !adminEmails.length) {
     return { ok: false, skipped: true, message: "Email credentials or admin email missing" };
   }
 
-  const orderNumber = order._id.toString().slice(-6).toUpperCase();
+  const orderNumber = getOrderNumber(order);
+  const clickCollect = isClickCollect(order);
+
+  const adminWarning = clickCollect
+    ? `
+IMPORTANT:
+CLICK & COLLECT ORDER.
+DO NOT SEND TO ROYAL MAIL.
+CUSTOMER COLLECTS FROM EDGWARE ROAD ONLY.
+`.trim()
+    : `
+Delivery order.
+Royal Mail fulfilment applies.
+`.trim();
 
   const text = `
 New B2C order received.
+
+${adminWarning}
 
 Order #${orderNumber}
 
@@ -88,7 +191,74 @@ ${order.customer?.firstName || ""} ${order.customer?.lastName || ""}
 ${order.customer?.email || ""}
 ${order.customer?.phone || ""}
 
-Delivery:
+${buildDeliveryText(order)}
+
+Items:
+${buildItemsText(order)}
+
+Subtotal: ${formatMoney(order.subtotal)}
+Shipping: ${formatMoney(order.shipping)}
+Delivery service: ${getDeliveryServiceText(order)}
+Total: ${formatMoney(order.total)}
+
+Payment status: ${order.paymentStatus}
+Order status: ${order.orderStatus}
+
+SumUp:
+Status: ${order.sumup?.status || "N/A"}
+Checkout ID: ${order.sumup?.checkoutId || "N/A"}
+Reference: ${order.sumup?.checkoutReference || "N/A"}
+Paid at: ${order.sumup?.paidAt ? new Date(order.sumup.paidAt).toLocaleString("en-GB") : "N/A"}
+
+Royal Mail:
+Status: ${order.royalMail?.syncStatus || "not_sent"}
+ID: ${order.royalMail?.orderIdentifier || "N/A"}
+Reference: ${order.royalMail?.orderReference || "N/A"}
+Error: ${order.royalMail?.syncError || "N/A"}
+`.trim();
+
+  await transporter.sendMail({
+    from: getFromAddress("Snus Village Website"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
+    to: adminEmails.join(","),
+    subject: clickCollect
+      ? `CLICK & COLLECT Order #${orderNumber}`
+      : `New Delivery Order #${orderNumber}`,
+    text,
+  });
+
+  return { ok: true };
+}
+
+async function sendCustomerShippingEmail(order) {
+  const transporter = getEmailTransporter();
+
+  if (!transporter || !order.customer?.email) {
+    return { ok: false, skipped: true, message: "Email credentials or customer email missing" };
+  }
+
+  const orderNumber = getOrderNumber(order);
+  const trackingNumber = order.royalMail?.trackingNumber || "";
+  const royalMailReference = order.royalMail?.orderReference || "";
+
+  const trackingText = trackingNumber
+    ? `Tracking number: ${trackingNumber}`
+    : royalMailReference
+      ? `Royal Mail reference: ${royalMailReference}`
+      : "Tracking information is not available yet. If tracking is added later, we will update you where possible.";
+
+  const text = `
+Hi ${order.customer.firstName || "Customer"},
+
+Your Snus Village order has been shipped.
+
+Order #${orderNumber}
+
+${trackingText}
+
+Delivery service: ${getDeliveryServiceText(order)}
+
+Delivery address:
 ${order.delivery?.address || ""}
 ${order.delivery?.city || ""}
 ${order.delivery?.postcode || ""}
@@ -97,23 +267,14 @@ ${order.delivery?.country || ""}
 Items:
 ${buildItemsText(order)}
 
-Subtotal: ${formatMoney(order.subtotal)}
-Shipping: ${formatMoney(order.shipping)}
-Total: ${formatMoney(order.total)}
-
-Payment status: ${order.paymentStatus}
-Order status: ${order.orderStatus}
-
-Royal Mail:
-Status: ${order.royalMail?.syncStatus || "not_sent"}
-ID: ${order.royalMail?.orderIdentifier || "N/A"}
-Reference: ${order.royalMail?.orderReference || "N/A"}
+Thank you for shopping with Snus Village.
 `.trim();
 
   await transporter.sendMail({
-    from: `"Snus Village Website" <${process.env.EMAIL_USER}>`,
-    to: adminEmail,
-    subject: `New B2C Order #${orderNumber}`,
+    from: getFromAddress("Snus Village"),
+    replyTo: process.env.EMAIL_REPLY_TO || transporter.snusMailConfig?.emailFrom,
+    to: order.customer.email,
+    subject: `Your Snus Village order has shipped #${orderNumber}`,
     text,
   });
 
@@ -144,5 +305,6 @@ async function sendOrderEmails(order) {
 module.exports = {
   sendCustomerOrderEmail,
   sendAdminOrderEmail,
+  sendCustomerShippingEmail,
   sendOrderEmails,
 };

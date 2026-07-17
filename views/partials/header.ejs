@@ -1,40 +1,142 @@
 <header class="header">
   <nav class="navbar">
     <div class="nav-container">
+      <ul class="nav-links nav-links--primary" id="navLinks">
+        <li><a href="/">Home</a></li>
+
+        <li class="nav-mega-item">
+          <a href="/shop">Brands</a>
+
+          <div class="nav-mega">
+            <div class="nav-mega__inner">
+              <div class="nav-mega__intro">
+                <span>Shop By Brand</span>
+                <h3>Popular Nicotine Pouch Brands</h3>
+                <p>Browse trusted brands available from Snus Village.</p>
+                <a href="/shop">View All Brands</a>
+              </div>
+
+              <div class="nav-mega__grid">
+                <a href="/shop?brand=WHITE%20FOX">White Fox</a>
+                <a href="/shop?brand=PABLO">Pablo</a>
+                <a href="/shop?brand=KILLA">Killa</a>
+                <a href="/shop?brand=CUBA">Cuba</a>
+                <a href="/shop?brand=ICEBERG">Iceberg</a>
+                <a href="/shop?brand=GARANT">Garant</a>
+                <a href="/shop?brand=VELO">Velo</a>
+                <a href="/shop?brand=77">77</a>
+                <a href="/shop?brand=NORDIC%20SPIRIT">Nordic Spirit</a>
+                <a href="/shop?brand=SIBERIA">Siberia</a>
+                <a href="/shop?brand=LOOP">Loop</a>
+                <a href="/shop?brand=HIT">Hit</a>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-mega-item">
+          <a href="/shop">Flavours</a>
+
+          <div class="nav-mega">
+            <div class="nav-mega__inner">
+              <div class="nav-mega__intro">
+                <span>Shop By Flavour</span>
+                <h3>Find Your Favourite Flavour</h3>
+                <p>Search mint, fruit, cola, berry, ice and more.</p>
+                <a href="/shop">View All Flavours</a>
+              </div>
+
+              <div class="nav-mega__grid">
+                <a href="/shop?flavour=mint">Mint</a>
+                <a href="/shop?flavour=spearmint">Spearmint</a>
+                <a href="/shop?flavour=ice">Ice Mint</a>
+                <a href="/shop?flavour=blueberry">Blueberry</a>
+                <a href="/shop?flavour=berry">Berry</a>
+                <a href="/shop?flavour=cola">Cola</a>
+                <a href="/shop?flavour=lemon">Lemon</a>
+                <a href="/shop?flavour=pineapple">Pineapple</a>
+                <a href="/shop?flavour=mango">Mango</a>
+                <a href="/shop?flavour=watermelon">Watermelon</a>
+                <a href="/shop?flavour=grape">Grape</a>
+                <a href="/shop?flavour=cherry">Cherry</a>
+                <a href="/shop?flavour=tropical">Tropical</a>
+                <a href="/shop?flavour=fruit">Fruit</a>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-mega-item">
+          <a href="/shop?strength=STRONG">Strength</a>
+
+          <div class="nav-mega nav-mega--strength">
+            <div class="nav-mega__inner">
+              <div class="nav-mega__intro">
+                <span>Shop By Strength</span>
+                <h3>Choose Your Strength</h3>
+                <p>Filter by low, medium, strong, extra strong and extreme options.</p>
+                <a href="/shop">View All Strengths</a>
+              </div>
+
+              <div class="nav-mega__grid nav-mega__grid--strength">
+                <a href="/shop?strength=LOW">
+                  <strong>Low</strong>
+                  <small>Lighter strength options</small>
+                </a>
+
+                <a href="/shop?strength=MEDIUM">
+                  <strong>Medium</strong>
+                  <small>Balanced everyday strength</small>
+                </a>
+
+                <a href="/shop?strength=STRONG">
+                  <strong>Strong</strong>
+                  <small>Popular stronger products</small>
+                </a>
+
+                <a href="/shop?strength=X-STRONG">
+                  <strong>X-Strong</strong>
+                  <small>Extra strong range</small>
+                </a>
+
+                <a href="/shop?strength=EXTREME">
+                  <strong>Extreme</strong>
+                  <small>For experienced adult users</small>
+                </a>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <% if (currentPath !== "/" && (!storeSettings || storeSettings.hideVapesCategory === false)) { %>
+          <li><a href="/collections/vapes">Vapes</a></li>
+        <% } %>
+        <li><a href="/about">About</a></li>
+      </ul>
+
       <div class="logo">
         <a href="/">
-          <img src="/images/logo/snusvillage-logo.png" alt="Snus Village" />
+          <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
           <span>
             <strong>Snus Village</strong>
-            <small>London's premium snus store</small>
+            <small>Premium Snus Store</small>
           </span>
         </a>
       </div>
 
-      <ul class="nav-links" id="navLinks">
-        <li><a href="/shop">All Products</a></li>
-        <li><a href="/wholesale">Wholesale</a></li>
-        <li><a href="/about">About Us</a></li>
-        <li><a href="/contact">Contact Us</a></li>
-      </ul>
+      <div class="header-tools">
+        <form class="header-search" action="/shop" method="GET">
+          <label for="headerSearch">Search products</label>
+          <input id="headerSearch" type="search" name="search" placeholder="Search products" />
+          <button type="submit">Search</button>
+        </form>
 
-      <div class="customer-nav">
+        <a class="header-cart" href="/cart">Cart</a>
+
         <% if (user) { %>
-          <a class="customer-nav__link" href="/auth/dashboard">
-            <i class="fa-solid fa-user"></i>
-            Account
-          </a>
-          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/logout">
-            Logout
-          </a>
+          <a class="customer-nav__link" href="/auth/dashboard">Account</a>
         <% } else { %>
-          <a class="customer-nav__link customer-nav__link--ghost" href="/auth/register">
-            Register
-          </a>
-          <a class="customer-nav__link" href="/auth/login">
-            <i class="fa-solid fa-user"></i>
-            Login
-          </a>
+          <a class="customer-nav__link" href="/auth/login">Login</a>
         <% } %>
       </div>
 

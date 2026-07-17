@@ -1,15 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <%- include('../partials/google-tag') %>
     <meta charset="UTF-8" />
-    <title>Checkout - SNUS VILLAGE</title>
+    <% 
+      const pageTitle = typeof title !== "undefined" && title
+        ? title + " | Snus Village"
+        : "Checkout | Snus Village";
+
+      const pageDescription = typeof description !== "undefined" && description
+        ? description
+        : "Secure Snus Village checkout with age verification, delivery or click and collect, and SumUp payment.";
+
+      const pageUrl = typeof canonical !== "undefined" && canonical
+        ? canonical
+        : "https://www.snusvillage.com/checkout";
+    %>
+
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="<%= pageUrl %>">
+
+    <meta property="og:title" content="<%= pageTitle %>">
+    <meta property="og:description" content="<%= pageDescription %>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= pageUrl %>">
+
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
 
-    <link rel="stylesheet" href="/css/checkout.css" />
     <link rel="stylesheet" href="/css/site-theme.css" />
+    <link rel="stylesheet" href="/css/checkout.css?v=checkout-cross-browser-20260604" />
+    <link rel="stylesheet" href="/css/browser-fixes.css?v=safari-20260611" />
 
     <link
       rel="stylesheet"

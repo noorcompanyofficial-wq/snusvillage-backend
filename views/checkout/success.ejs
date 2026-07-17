@@ -1,12 +1,48 @@
 <div class="checkout-success-page">
+  <% const isPaymentPending = typeof paymentPending !== "undefined" && paymentPending; %>
+
+  <% if (!isPaymentPending) { %>
+    <!-- Event snippet for Purchase (1) conversion page -->
+    <script>
+      if (typeof gtag === "function") {
+        gtag("event", "conversion", {
+          send_to: "AW-18231402827/HqWeCKqutcUcEMvCtPVD",
+          value: <%= Number(order.total || 0).toFixed(2) %>,
+          currency: "GBP",
+          transaction_id: <%- JSON.stringify(String(order._id || "")) %>
+        });
+      }
+    </script>
+  <% } %>
+
   <div class="success-card">
     <span class="success-icon">✓</span>
 
-    <h1>Order received</h1>
+    <%
+      const isClickCollect = order.fulfilment && order.fulfilment.method === "click_collect";
+      const deliveryServiceLabel = order.fulfilment?.deliveryServiceLabel || "Standard Delivery";
+      const deliveryCutoff = order.fulfilment?.deliveryCutoff || "4:30pm";
+    %>
 
-    <p>
-      Thank you for your order. Your order has been saved and is now pending payment/processing.
-    </p>
+    <% if (isPaymentPending) { %>
+      <h1>Payment Pending</h1>
+
+      <p>
+        Your order has been saved, but payment has not been fully confirmed yet. If payment was completed, please wait a moment or contact us with your order ID.
+      </p>
+    <% } else if (isClickCollect) { %>
+      <h1>Collection Order Confirmed</h1>
+
+      <p>
+        Thank you for your order. Your payment has been confirmed and your order will be prepared for collection at our Edgware Road branch.
+      </p>
+    <% } else { %>
+      <h1>Order Confirmed</h1>
+
+      <p>
+        Thank you for your order. Your payment has been confirmed and your order is now being processed for delivery.
+      </p>
+    <% } %>
 
     <div class="success-order-box">
       <span>Order ID</span>
@@ -17,6 +53,32 @@
       <span>Total</span>
       <strong>£<%= order.total.toFixed(2) %></strong>
     </div>
+
+    <div class="success-order-box">
+      <span>Payment</span>
+      <strong><%= order.paymentStatus || "pending" %></strong>
+    </div>
+
+    <% if (isClickCollect) { %>
+      <div class="success-collection-box">
+        <span>Click & Collect</span>
+        <strong>SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX</strong>
+        <p>
+          Please bring your order confirmation and valid ID when collecting. This order will not be sent by Royal Mail.
+        </p>
+      </div>
+    <% } else { %>
+      <div class="success-collection-box">
+        <span><%= deliveryServiceLabel %></span>
+        <strong><%= order.delivery?.postcode || "United Kingdom" %></strong>
+        <p>
+          Your order will be processed for Royal Mail delivery.
+          <% if (order.fulfilment?.deliveryService === "next_day") { %>
+            Next day delivery applies for orders placed before <%= deliveryCutoff %>.
+          <% } %>
+        </p>
+      </div>
+    <% } %>
 
     <a href="/shop">Continue Shopping</a>
   </div>

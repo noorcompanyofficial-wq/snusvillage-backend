@@ -1,13 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <%- include('../partials/google-tag') %>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
 
-    <title>Snusvillage</title>
+    <% 
+      const pageTitle = typeof title !== "undefined" && title
+        ? title
+        : "Snus Village | Premium Nicotine Pouches UK";
+
+      const pageDescription = typeof description !== "undefined" && description
+        ? description
+        : "Shop premium nicotine pouches and smoke-free alternatives from Snus Village. London retail support, age-restricted checkout and fast UK delivery.";
+
+      const pageUrl = typeof canonical !== "undefined" && canonical
+        ? canonical
+        : "https://www.snusvillage.com";
+    %>
+
+    <title><%= pageTitle %></title>
+    <meta name="description" content="<%= pageDescription %>">
+    <%
+      const noindexPaths = [
+        "/cart",
+        "/auth/login",
+        "/auth/register",
+        "/auth/forgot",
+        "/auth/reset",
+        "/auth/reset-verify",
+        "/auth/verify",
+        "/auth/dashboard"
+      ];
+
+      const robotsContent = typeof robots !== "undefined" && robots
+        ? robots
+        : (typeof currentPath !== "undefined" && noindexPaths.includes(currentPath)
+          ? "noindex, nofollow"
+          : "index, follow");
+    %>
+    <meta name="robots" content="<%= robotsContent %>">
+    <link rel="canonical" href="<%= pageUrl %>">
+
+    <meta property="og:title" content="<%= pageTitle %>">
+    <meta property="og:description" content="<%= pageDescription %>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= pageUrl %>">
+    <meta property="og:image" content="https://www.snusvillage.com/images/logo/snusvillage-logo.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= pageTitle %>">
+    <meta name="twitter:description" content="<%= pageDescription %>">
 
     <!-- Fontawesome cdn link -->
     <link
@@ -15,47 +61,101 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
-    />
+    <!-- Core CSS Files -->
+    <link rel="stylesheet" href="/css/age-gate.css" />
+    <link rel="stylesheet" href="/css/style.css?v=light-theme-20260702" />
+    <link rel="stylesheet" href="/css/header.css?v=megamenu-fix-20260713" />
+    <link rel="stylesheet" href="/css/footer.css?v=footer-gradient-20260717" />
+    <link rel="stylesheet" href="/css/site-theme.css?v=blueRed-header-20260713c" />
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="/css/style.css" />
-    <link rel="stylesheet" href="/css/about.css" />
+    <% 
+      const pathNow = typeof currentPath !== "undefined" ? currentPath : "";
+      const isShopPage = pathNow.startsWith("/shop");
+      const isProductPage = pathNow.startsWith("/products");
+      const isCollectionPage = pathNow.startsWith("/collections");
+      const isCartPage = pathNow.startsWith("/cart");
+      const isAuthPage = pathNow.startsWith("/auth");
+      const isAboutPage = pathNow.startsWith("/about");
+      const isWholesalePage = pathNow.startsWith("/wholesale");
+    %>
 
-    <link rel="stylesheet" href="/css/shop.css" />
-    <link rel="stylesheet" href="/css/products.css" />
-    <link rel="stylesheet" href="/css/checkout.css" />
-    <link rel="stylesheet" href="/css/cart.css" />
-    <link rel="stylesheet" href="/css/auth.css" />
-    <link rel="stylesheet" href="/css/wholesale.css" />
-    <link rel="stylesheet" href="/css/collections.css" />
-    <link rel="stylesheet" href="/css/header.css" />
-    <link rel="stylesheet" href="/css/trust.css" />
-    <link rel="stylesheet" href="/css/brands.css" />
-    <link rel="stylesheet" href="/css/best-sellers.css" />
-    <link rel="stylesheet" href="/css/branches.css" />
-    <link rel="stylesheet" href="/css/delivery.css" />
-    <link rel="stylesheet" href="/css/social.css" />
-    <link rel="stylesheet" href="/css/footer.css" />
-    <link rel="stylesheet" href="/css/site-theme.css" />
-    <link rel="stylesheet" href="/css/cart.css">
+    <% if (isShopPage || isCollectionPage || isProductPage) { %>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/css/swiper.min.css"
+      />
+    <% } %>
+
+    <% if (isShopPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/shop.css?v=light-theme-20260702" />
+      <link rel="stylesheet" href="/css/brands.css" />
+      <link rel="stylesheet" href="/css/collections.css" />
+      <link rel="stylesheet" href="/css/best-sellers.css" />
+    <% } %>
+
+    <% if (isProductPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/products.css?v=product-page-light-theme-20260702" />
+    <% } %>
+
+    <% if (isProductPage) { %>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap">
+      <link rel="stylesheet" href="/css/products-v4.css?v=v4-scroll-fix-20260716" />
+    <% } %>
+
+    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage) { %>
+      <link rel="stylesheet" href="/css/cart.css?v=v4-cart-20260717" />
+    <% } %>
+
+    <% if (isCartPage) { %>
+      <style>main { width: 100% !important; max-width: none !important; padding-top: 138px; }</style>
+    <% } %>
+
+    <% if (isAuthPage) { %>
+      <link rel="stylesheet" href="/css/auth.css" />
+    <% } %>
+
+    <% if (isAboutPage) { %>
+      <link rel="stylesheet" href="/css/about.css" />
+      <link rel="stylesheet" href="/css/trust.css" />
+      <link rel="stylesheet" href="/css/branches.css" />
+      <link rel="stylesheet" href="/css/social.css" />
+    <% } %>
+
+    <% if (isWholesalePage) { %>
+      <link rel="stylesheet" href="/css/wholesale.css" />
+    <% } %>
+
+    <link rel="stylesheet" href="/css/browser-fixes.css?v=safari-20260611" />
 
     <!-- Web Icon -->
-    <link rel="icon" href="/images/logo/snusvillage-logo.png" />
+    <link rel="icon" href="/images/logo/snus-village-logo.webp" />
 
     <!-- Web title -->
   </head>
   <body>
-    <div class="age-modal" id="ageModal">
-      <div class="age-box">
-        <h2>Age Verification</h2>
-        <p>You must be 18+ to enter this website</p>
+    <div class="age-modal" id="ageModal" aria-hidden="true">
+      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
+        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+        <span class="age-pill">18+ age restricted store</span>
+        <h2 id="ageModalTitle">Confirm your age</h2>
+        <p>Snus Village sells age-restricted nicotine products. Enter your date of birth to continue. Formal age verification may still be required at checkout.</p>
+
+        <label class="age-dob-field" for="ageDob">
+          <span>Date of birth</span>
+          <input id="ageDob" type="date" autocomplete="bday" required />
+        </label>
+        <p class="age-error" id="ageError" hidden>Please enter a valid date of birth showing you are 18 or over.</p>
+
+        <div class="age-points">
+          <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Adult customers only</span>
+          <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Checkout age verification</span>
+        </div>
 
         <div class="age-buttons">
-          <button id="enterSite">I am over 18</button>
-          <button id="exitSite">I am under 18</button>
+          <button id="enterSite" type="button">Enter Site</button>
+          <button id="exitSite" type="button">I am under 18</button>
         </div>
       </div>
     </div>
@@ -71,16 +171,37 @@
 
     <main><%- body %></main>
 
-    <%- include('../partials/footer') %> <%- include('../partials/cart') %>
+    <%- include('../partials/footer') %>
+
+    <% if (typeof currentPath === "undefined" || currentPath !== "/cart") { %>
+      <%- include("../partials/cart") %>
+    <% } %>
 
     <script src="/js/main.js" defer></script>
-    <script src="/js/shop.js" defer></script>
-    <script src="/js/products.js" defer></script>
-    <script src="/js/cart.js" defer></script>
-    <script src="/js/auth.js" defer></script>
-    <script src="/js/about.js" defer></script>
-    <script src="/js/social.js" defer></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
+    <% if (isShopPage || isCollectionPage) { %>
+      <script src="/js/shop.js" defer></script>
+    <% } %>
+
+    <% if (isProductPage || isCollectionPage) { %>
+      <script src="/js/products.js" defer></script>
+    <% } %>
+
+    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage) { %>
+      <script src="/js/cart.js" defer></script>
+    <% } %>
+
+    <% if (isAuthPage) { %>
+      <script src="/js/auth.js" defer></script>
+    <% } %>
+
+    <% if (isAboutPage) { %>
+      <script src="/js/about.js" defer></script>
+      <script src="/js/social.js" defer></script>
+    <% } %>
+
+    <% if (isShopPage || isCollectionPage || isProductPage) { %>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.0.7/js/swiper.min.js"></script>
+    <% } %>
   </body>
 </html>

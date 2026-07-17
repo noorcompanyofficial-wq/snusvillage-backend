@@ -1,15 +1,93 @@
 const express = require("express");
 const helmet = require("helmet");
+const compression = require("compression");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
+const StoreSettings = require("./models/StoreSettings");
+const pageViewTracker = require("./middleware/pageViewTracker");
 
 require("dotenv").config();
 
 const app = express();
+
+const defaultStoreSettings = {
+  storeName: "Snus Village",
+  storeEmail: "info@snusvillage.co.uk",
+  storePhone: "+44 7777 222771",
+  instagramUrl: "https://www.instagram.com/snusvillage.uk/",
+  deliveryPrice: 0,
+  freeDeliveryThreshold: 0,
+  checkoutNotice: "You Will Be Redirected To SumUp To Complete Your Card Payment Securely.",
+  ageGateMessage: "You Must Be 18+ To Enter This Website.",
+  clickCollectBranch: "Edgware Road",
+  clickCollectAddress: "SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX",
+  clickCollectCity: "London",
+  clickCollectPostcode: "W2 2HX",
+  maintenanceMode: false,
+  hideVapesCategory: true,
+  maintenanceMessage: "Snus Village is currently updating the website. Please check back soon.",
+};
+
+let cachedStoreSettings = defaultStoreSettings;
+let cachedStoreSettingsAt = 0;
+const STORE_SETTINGS_CACHE_MS = 60 * 1000;
+
+async function getCachedStoreSettings() {
+  const cacheAge = Date.now() - cachedStoreSettingsAt;
+  const cacheBustAt = Number(global.__snusStoreSettingsCacheBust || 0);
+
+  if (cacheAge < STORE_SETTINGS_CACHE_MS && cacheBustAt <= cachedStoreSettingsAt) {
+    return cachedStoreSettings;
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    cachedStoreSettings = defaultStoreSettings;
+    cachedStoreSettingsAt = Date.now();
+    return cachedStoreSettings;
+  }
+
+  try {
+    const settings = await StoreSettings.findOneAndUpdate(
+      { key: "store" },
+      { $setOnInsert: { key: "store", ...defaultStoreSettings } },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
+    ).lean();
+
+    cachedStoreSettings = settings || defaultStoreSettings;
+    cachedStoreSettingsAt = Date.now();
+    return cachedStoreSettings;
+  } catch (err) {
+    console.log("Store settings load failed:", err.message);
+    return cachedStoreSettings || defaultStoreSettings;
+  }
+}
+
+function isMaintenanceBypass(req) {
+  const allowedPrefixes = [
+    "/admin",
+    "/auth",
+    "/css",
+    "/js",
+    "/images",
+    "/uploads",
+    "/api",
+    "/didit",
+  ];
+
+  return (
+    req.path === "/maintenance" ||
+    req.path === "/health" ||
+    req.path === "/health/db" ||
+    req.path === "/favicon.ico" ||
+    allowedPrefixes.some((prefix) => req.path.startsWith(prefix))
+  );
+}
+
+
 
 // ====== Security Headers ======
 app.use(
@@ -35,6 +113,11 @@ const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
+const verificationRoutes = require("./routes/verification");
+const diditRoutes = require("./routes/didit");
+const Product = require("./models/Products");
+const legalRoutes = require("./routes/legal");
+const newsletterRoutes = require("./routes/newsletter");
 
 const wholesaleRoutes = require("./routes/wholesale");
 
@@ -45,10 +128,96 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
+// ====== Compression ======
+app.use(compression());
+
 // ====== Basic Middleware ======
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      if (req.originalUrl === "/didit/webhook") {
+        req.rawBody = Buffer.from(buf);
+      }
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+
+function escapeXml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+app.get("/sitemap.xml", async (req, res) => {
+  try {
+    const baseUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
+
+    const staticUrls = [
+      { loc: "/", priority: "1.0" },
+      { loc: "/shop", priority: "0.9" },
+      { loc: "/about", priority: "0.6" },
+      { loc: "/contact", priority: "0.6" },
+      { loc: "/wholesale", priority: "0.7" },
+      { loc: "/terms-and-conditions", priority: "0.4" },
+      { loc: "/privacy-policy", priority: "0.4" },
+      { loc: "/shipping-policy", priority: "0.4" },
+      { loc: "/cookies-policy", priority: "0.4" },
+    ];
+
+    const products = await Product.find({ isActive: true })
+      .select("_id slug updatedAt createdAt")
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    const urls = [
+      ...staticUrls.map((page) => ({
+        loc: `${baseUrl}${page.loc}`,
+        lastmod: new Date().toISOString(),
+        changefreq: page.loc === "/" || page.loc === "/shop" ? "daily" : "monthly",
+        priority: page.priority,
+      })),
+      ...products.map((product) => ({
+        loc: `${baseUrl}/products/${product.slug || product._id}`,
+        lastmod: new Date(product.updatedAt || product.createdAt || Date.now()).toISOString(),
+        changefreq: "weekly",
+        priority: "0.8",
+      })),
+    ];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (url) => `  <url>
+    <loc>${escapeXml(url.loc)}</loc>
+    <lastmod>${escapeXml(url.lastmod)}</lastmod>
+    <changefreq>${escapeXml(url.changefreq)}</changefreq>
+    <priority>${escapeXml(url.priority)}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
+
+    res.type("application/xml");
+    return res.send(xml);
+  } catch (error) {
+    console.log("Sitemap error:", error.message);
+    res.type("application/xml");
+    return res.status(500).send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`);
+  }
+});
+
+app.use(
+  express.static(path.join(__dirname, "public"), {
+    maxAge: "30d",
+    etag: true,
+    lastModified: true,
+  })
+);
 
 app.use(cookieParser());
 
@@ -73,6 +242,9 @@ app.use(cartSession);
 // ====== Flash ======
 app.use(flash());
 
+// ====== Website View Analytics ======
+app.use(pageViewTracker);
+
 // ====== Auto Login via JWT  ======
 app.use(async (req, res, next) => {
   try {
@@ -94,11 +266,57 @@ app.use(async (req, res, next) => {
   next();
 });
 
+
+function optimiseImageUrl(url, options = {}) {
+  const imageUrl = String(url || "").trim();
+
+  if (!imageUrl) return "";
+
+  const width = Number(options.width || 600);
+  const quality = options.quality || "auto:good";
+  const crop = options.crop || "c_limit";
+
+  const localWebpMap = {
+    "/images/delivery/delivery.jpg": "/images/delivery/delivery.webp",
+    "/images/header/h-2.jpeg": "/images/header/h-2.webp",
+  };
+
+  if (localWebpMap[imageUrl]) {
+    return localWebpMap[imageUrl];
+  }
+
+  if (imageUrl.includes("res.cloudinary.com") && imageUrl.includes("/image/upload/")) {
+    if (
+      imageUrl.includes("/f_auto,") ||
+      imageUrl.includes("/q_auto,") ||
+      imageUrl.includes("/w_")
+    ) {
+      return imageUrl;
+    }
+
+    return imageUrl.replace(
+      "/image/upload/",
+      `/image/upload/f_auto,q_${quality},w_${width},${crop}/`
+    );
+  }
+
+  return imageUrl;
+}
+
 // ====== Global Variables ======
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+  const siteUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
+  const cleanPath = req.path === "/" ? "" : req.path;
+  const storeSettings = await getCachedStoreSettings();
+
   res.locals.user = req.session?.user || null;
+  res.locals.currentPath = req.path;
+  res.locals.canonical = `${siteUrl}${cleanPath}`;
   res.locals.error = req.flash("error");
   res.locals.success = req.flash("success");
+  res.locals.query = req.query || {};
+  res.locals.optimiseImageUrl = optimiseImageUrl;
+  res.locals.storeSettings = storeSettings;
   next();
 });
 
@@ -108,6 +326,30 @@ app.set("views", path.join(__dirname, "views"));
 app.set("layout", "layouts/layout");
 
 app.use(ejsLayouts);
+
+app.get("/maintenance", async (req, res) => {
+  const settings = await getCachedStoreSettings();
+
+  res.status(settings.maintenanceMode ? 503 : 200).render("maintenance/maintenance", {
+    layout: false,
+    title: "Snus Village Maintenance",
+    settings,
+  });
+});
+
+app.use((req, res, next) => {
+  const settings = res.locals.storeSettings || cachedStoreSettings;
+
+  if (settings?.maintenanceMode && !isMaintenanceBypass(req)) {
+    return res.status(503).render("maintenance/maintenance", {
+      layout: false,
+      title: "Snus Village Maintenance",
+      settings,
+    });
+  }
+
+  next();
+});
 
 // ====== Health Check ======
 app.get("/health", (req, res) => {
@@ -146,6 +388,10 @@ app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api", verificationRoutes);
+app.use("/didit", diditRoutes);
+app.use("/newsletter", newsletterRoutes);
+app.use("/", legalRoutes);
 
 app.use("/cart", cartRoutes);
 

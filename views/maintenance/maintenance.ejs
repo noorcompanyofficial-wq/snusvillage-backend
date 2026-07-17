@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include("../partials/google-tag") %>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snus Village Maintenance</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/images/logo/snus-village-logo.webp" />
+    <link rel="stylesheet" href="/css/maintenance.css" />
+  </head>
+
+  <body>
+    <main class="maintenance-page">
+      <section class="maintenance-card">
+        <div class="maintenance-logo-wrap">
+          <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
+        </div>
+
+        <span class="maintenance-kicker">Snus Village</span>
+
+        <h1>Maintenance Mode</h1>
+
+        <p>
+          <%= settings?.maintenanceMessage || "Snus Village is currently updating the website. Please check back soon." %>
+        </p>
+
+        <div class="maintenance-info">
+          <div>
+            <strong>18+</strong>
+            <span>Adults Only</span>
+          </div>
+
+          <div>
+            <strong>London</strong>
+            <span>Store Support</span>
+          </div>
+
+          <div>
+            <strong>Back Soon</strong>
+            <span>Website Update</span>
+          </div>
+        </div>
+
+        <a href="https://www.instagram.com/snusvillage.uk/" target="_blank" rel="noopener noreferrer">
+          Follow Us On Instagram
+        </a>
+      </section>
+    </main>
+  </body>
+</html>
