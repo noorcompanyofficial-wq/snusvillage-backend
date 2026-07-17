@@ -105,7 +105,11 @@
     <% } %>
 
     <% if (isCartPage || isShopPage || isProductPage || isCollectionPage) { %>
-      <link rel="stylesheet" href="/css/cart.css" />
+      <link rel="stylesheet" href="/css/cart.css?v=v4-cart-20260717" />
+    <% } %>
+
+    <% if (isCartPage) { %>
+      <style>main { width: 100% !important; max-width: none !important; padding-top: 138px; }</style>
     <% } %>
 
     <% if (isAuthPage) { %>
