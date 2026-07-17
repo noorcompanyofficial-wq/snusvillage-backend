@@ -2285,6 +2285,40 @@ router.get("/inventory", isAdmin, requireAdminRole(PERMISSIONS.products), async 
   }
 });
 
+router.post("/inventory/bulk-stock", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
+  try {
+    const updates = req.body.updates || {};
+    const entries = Object.entries(updates);
+
+    if (!entries.length) {
+      req.flash("error", "No stock values submitted.");
+      return res.redirect("/admin/inventory");
+    }
+
+    const operations = entries.map(([id, stock]) => ({
+      updateOne: {
+        filter: { _id: id },
+        update: { $set: { stock: Math.max(0, Number.parseInt(stock, 10) || 0) } },
+      },
+    }));
+
+    await Product.bulkWrite(operations);
+
+    await logAdminAction(req, "PRODUCT_STOCK_BULK_UPDATED", {
+      targetType: "Product",
+      summary: `Bulk stock update for ${entries.length} product${entries.length === 1 ? "" : "s"}`,
+      meta: { count: entries.length },
+    });
+
+    req.flash("success", `Stock saved for ${entries.length} product${entries.length === 1 ? "" : "s"}`);
+    res.redirect(req.get("Referrer") || "/admin/inventory");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to save stock changes");
+    res.redirect("/admin/inventory");
+  }
+});
+
 router.post("/inventory/:id/stock", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
     const stock = Math.max(0, Number.parseInt(req.body.stock, 10) || 0);

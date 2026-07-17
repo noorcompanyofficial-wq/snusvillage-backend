@@ -83,7 +83,14 @@
   <section class="admin-panel">
     <div class="admin-panel__head">
       <h2>Stock List</h2>
-      <span><%= products.length %> Product<%= products.length === 1 ? "" : "s" %></span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span><%= products.length %> Product<%= products.length === 1 ? "" : "s" %></span>
+        <% if (products.length) { %>
+          <button type="submit" form="bulkStockForm" class="admin-primary" style="margin:0;">
+            <i class="fa-solid fa-floppy-disk"></i> Save All Changes
+          </button>
+        <% } %>
+      </div>
     </div>
 
     <% if (!products.length) { %>
@@ -92,93 +99,100 @@
         <p>Try another stock filter or add products first.</p>
       </div>
     <% } else { %>
-      <div class="admin-inventory-table-wrap">
-        <table class="admin-inventory-table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Brand</th>
-              <th>SKU</th>
-              <th>Supplier</th>
-              <th>Strength</th>
-              <th>Cost</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Reorder Value</th>
-              <th>Status</th>
-              <th>Quick Update</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% products.forEach((product) => { %>
-              <% const productPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price; %>
+      <form id="bulkStockForm" action="/admin/inventory/bulk-stock" method="POST">
+        <div class="admin-inventory-table-wrap">
+          <table class="admin-inventory-table">
+            <thead>
               <tr>
-                <td>
-                  <div class="admin-inventory-product">
-                    <% if (product.images && product.images[0]) { %>
-                      <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-                    <% } else { %>
-                      <span>No Image</span>
-                    <% } %>
-
-                    <div>
-                      <strong><%= product.name %></strong>
-                      <small><%= product.flavour || product.category || "No Flavour" %></small>
-                    </div>
-                  </div>
-                </td>
-
-                <td><%= product.brand || "N/A" %></td>
-
-                <td>
-                  <strong><%= product.sku || "N/A" %></strong>
-                  <% if (product.barcode) { %>
-                    <small style="display:block;color:#64748b;margin-top:4px;"><%= product.barcode %></small>
-                  <% } %>
-                </td>
-
-                <td>
-                  <strong><%= product.supplier || "N/A" %></strong>
-                  <% if (product.supplierCode) { %>
-                    <small style="display:block;color:#64748b;margin-top:4px;"><%= product.supplierCode %></small>
-                  <% } %>
-                </td>
-
-                <td><%= product.strength || "N/A" %></td>
-                <td>£<%= Number(product.costPrice || 0).toFixed(2) %></td>
-                <td>£<%= Number(productPrice || 0).toFixed(2) %></td>
-
-                <td>
-                  <strong><%= product.stock || 0 %></strong>
-                </td>
-
-                <td>
-                  <strong>£<%= Number((product.costPrice || 0) * Math.max(0, 10 - (product.stock || 0))).toFixed(2) %></strong>
-                  <small style="display:block;color:#64748b;margin-top:4px;">To reach 10 units</small>
-                </td>
-
-                <td>
-                  <% if (product.stock <= 0) { %>
-                    <span class="status-pill payment-failed">Out</span>
-                  <% } else if (product.stock <= 5) { %>
-                    <span class="status-pill payment-pending">Low</span>
-                  <% } else { %>
-                    <span class="status-pill order-completed">In Stock</span>
-                  <% } %>
-                </td>
-
-                <td>
-                  <form class="admin-stock-form" action="/admin/inventory/<%= product._id %>/stock" method="POST">
-                    <input type="number" name="stock" min="0" value="<%= product.stock || 0 %>">
-                    <button type="submit">Update</button>
-                  </form>
-                </td>
+                <th>Product</th>
+                <th>Brand</th>
+                <th>SKU</th>
+                <th>Supplier</th>
+                <th>Strength</th>
+                <th>Cost</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Reorder Value</th>
+                <th>Status</th>
+                <th>New Stock</th>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+            </thead>
+
+            <tbody>
+              <% products.forEach((product) => { %>
+                <% const productPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price; %>
+                <tr>
+                  <td>
+                    <div class="admin-inventory-product">
+                      <% if (product.images && product.images[0]) { %>
+                        <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+                      <% } else { %>
+                        <span>No Image</span>
+                      <% } %>
+
+                      <div>
+                        <strong><%= product.name %></strong>
+                        <small><%= product.flavour || product.category || "No Flavour" %></small>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td><%= product.brand || "N/A" %></td>
+
+                  <td>
+                    <strong><%= product.sku || "N/A" %></strong>
+                    <% if (product.barcode) { %>
+                      <small style="display:block;color:#64748b;margin-top:4px;"><%= product.barcode %></small>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <strong><%= product.supplier || "N/A" %></strong>
+                    <% if (product.supplierCode) { %>
+                      <small style="display:block;color:#64748b;margin-top:4px;"><%= product.supplierCode %></small>
+                    <% } %>
+                  </td>
+
+                  <td><%= product.strength || "N/A" %></td>
+                  <td>£<%= Number(product.costPrice || 0).toFixed(2) %></td>
+                  <td>£<%= Number(productPrice || 0).toFixed(2) %></td>
+
+                  <td>
+                    <strong><%= product.stock || 0 %></strong>
+                  </td>
+
+                  <td>
+                    <strong>£<%= Number((product.costPrice || 0) * Math.max(0, 10 - (product.stock || 0))).toFixed(2) %></strong>
+                    <small style="display:block;color:#64748b;margin-top:4px;">To reach 10 units</small>
+                  </td>
+
+                  <td>
+                    <% if (product.stock <= 0) { %>
+                      <span class="status-pill payment-failed">Out</span>
+                    <% } else if (product.stock <= 5) { %>
+                      <span class="status-pill payment-pending">Low</span>
+                    <% } else { %>
+                      <span class="status-pill order-completed">In Stock</span>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <div class="admin-stock-form">
+                      <input type="number" name="updates[<%= product._id %>]" min="0" value="<%= product.stock || 0 %>">
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;padding:16px 0 4px;">
+          <button type="submit" class="admin-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Save All Changes
+          </button>
+        </div>
+      </form>
     <% } %>
   </section>
 </section>
