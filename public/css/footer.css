@@ -8,16 +8,16 @@
   position: relative;
   display: block !important;
   overflow: hidden;
-  background: #071225;
-  border-top: 3px solid #b41232;
+  background: linear-gradient(135deg, #123b8a 0%, #0d2a6e 45%, #8a1228 100%);
+  border-top: none;
   color: #ffffff;
 }
 
 /* ---- 18+ strip ---- */
 .footer-strip {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .footer-strip__inner {
