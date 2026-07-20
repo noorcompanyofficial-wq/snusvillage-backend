@@ -190,32 +190,36 @@
 .v4-carousel {
   position: relative; flex: 1; overflow: hidden;
   min-height: 480px; display: flex; flex-direction: column;
+  --slide-dir: 1; /* 1 = forward (right→left), -1 = backward */
 }
 
+/* ── Directional slide transition ── */
 .v4-carousel__slide {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 52px 48px 80px;
   opacity: 0;
-  transform: scale(0.94) translateY(16px);
-  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Default waiting state: off to the right (or left in prev mode) */
+  transform: translateX(calc(var(--slide-dir) * 52px));
+  transition: opacity 0.52s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.52s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
+  will-change: opacity, transform;
 }
 .v4-carousel__slide.is-active {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translateX(0);
   pointer-events: auto;
   z-index: 1;
 }
 .v4-carousel__slide.is-leaving {
   opacity: 0;
-  transform: scale(1.06) translateY(-10px);
+  transform: translateX(calc(var(--slide-dir) * -52px));
   z-index: 2;
 }
 
-/* Strength badge top-right of slide */
+/* ── Strength badge ── */
 .v4-carousel__strength-badge {
   position: absolute; top: 24px; right: 24px;
   font-family: var(--v4-sans); font-size: 9px; font-weight: 800;
@@ -223,46 +227,94 @@
   color: #fff; padding: 5px 12px;
 }
 
-/* Product image */
+/* ── Slide counter ── */
+.v4-carousel__counter {
+  position: absolute; top: 24px; left: 28px; z-index: 4;
+  font-family: var(--v4-sans); font-size: 11px; font-weight: 800;
+  letter-spacing: 0.18em; color: rgba(7,18,37,0.28);
+}
+
+/* ── Progress bar ── */
+.v4-carousel__progress {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: rgba(7,18,37,0.06); z-index: 6;
+  overflow: hidden;
+}
+.v4-carousel__progress-fill {
+  height: 100%; width: 0; background: var(--v4-red);
+  transition: none;
+}
+
+/* ── Product image — 3D tilt wrapper ── */
 .v4-carousel__img {
   flex: 1; display: flex; align-items: center; justify-content: center;
   width: 100%; max-height: 340px;
+  perspective: 700px;
 }
 .v4-carousel__img img {
   max-height: 300px; width: auto; max-width: 75%;
   object-fit: contain;
   filter: drop-shadow(0 20px 48px rgba(7, 18, 37, 0.18));
-  transition: transform 0.7s ease;
+  transition: transform 0.6s ease, filter 0.4s ease;
+  transform-origin: center center;
+  will-change: transform;
 }
+/* Floating idle animation — only when not being hovered (JS removes it on hover) */
 .v4-carousel__slide.is-active .v4-carousel__img img {
-  animation: v4HeroFloat 3.6s ease-in-out infinite;
+  animation: v4HeroFloat 4s ease-in-out infinite;
+}
+.v4-carousel__img img.is-tilting {
+  animation: none !important;
+  filter: drop-shadow(0 32px 64px rgba(7, 18, 37, 0.28));
 }
 @keyframes v4HeroFloat {
   0%, 100% { transform: translateY(0) scale(1); }
-  50%       { transform: translateY(-10px) scale(1.02); }
+  50%       { transform: translateY(-12px) scale(1.025); }
 }
+
+/* ── Image entrance per slide ── */
+@keyframes v4ImgIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(4px) drop-shadow(0 8px 24px rgba(7,18,37,0.1)); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) drop-shadow(0 20px 48px rgba(7,18,37,0.18)); }
+}
+.v4-carousel__slide.is-active .v4-carousel__img img {
+  animation: v4HeroFloat 4s ease-in-out infinite, v4ImgIn 0.6s ease-out both;
+}
+
 .v4-carousel__no-img {
   font-size: 48px; color: var(--v4-muted); opacity: 0.4;
 }
 
-/* Info strip below image */
+/* ── Info strip — staggered text entrance ── */
 .v4-carousel__info {
   text-align: center; padding-top: 20px; text-decoration: none;
   display: block; width: 100%;
   border-top: 1px solid var(--v4-border);
   margin-top: 20px;
-  padding-top: 20px;
+}
+@keyframes v4TextUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .v4-carousel__brand {
   font-family: var(--v4-sans); font-size: 10px; font-weight: 800;
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--v4-red); margin-bottom: 6px;
 }
+.v4-carousel__slide.is-active .v4-carousel__brand {
+  animation: v4TextUp 0.45s 0.1s both ease-out;
+}
 .v4-carousel__name {
   font-family: var(--v4-sans); font-size: 20px; font-weight: 800;
   color: var(--v4-navy); line-height: 1.15; margin-bottom: 6px;
 }
+.v4-carousel__slide.is-active .v4-carousel__name {
+  animation: v4TextUp 0.45s 0.2s both ease-out;
+}
 .v4-carousel__flavour {
   font-size: 12px; color: var(--v4-muted); font-weight: 500; margin-bottom: 12px;
+}
+.v4-carousel__slide.is-active .v4-carousel__flavour {
+  animation: v4TextUp 0.45s 0.3s both ease-out;
 }
 .v4-carousel__cta {
   font-family: var(--v4-sans); font-size: 10px; font-weight: 800;
@@ -270,21 +322,24 @@
   color: var(--v4-red); display: inline-flex; align-items: center; gap: 6px;
   transition: gap 0.2s;
 }
+.v4-carousel__slide.is-active .v4-carousel__cta {
+  animation: v4TextUp 0.45s 0.4s both ease-out;
+}
 .v4-carousel__info:hover .v4-carousel__cta { gap: 12px; }
 
-/* Dot indicators */
+/* ── Dot indicators ── */
 .v4-carousel__dots {
-  position: absolute; bottom: 20px; left: 0; right: 0;
+  position: absolute; bottom: 14px; left: 0; right: 0;
   display: flex; justify-content: center; gap: 8px; z-index: 5;
 }
 .v4-carousel__dot {
-  width: 7px; height: 7px; border-radius: 50%; border: none; padding: 0;
-  background: rgba(7, 18, 37, 0.18); cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease, width 0.3s ease;
+  width: 6px; height: 6px; border-radius: 50%; border: none; padding: 0;
+  background: rgba(7, 18, 37, 0.15); cursor: pointer;
+  transition: background 0.3s ease, width 0.3s ease;
 }
 .v4-carousel__dot.is-active {
-  background: #123b8a;
-  width: 22px; border-radius: 4px;
+  background: #b41232;
+  width: 20px; border-radius: 3px;
 }
 .v4-carousel__empty { gap: 16px; }
 .v4-carousel__empty .v4-carousel__img { font-size: 48px; color: var(--v4-muted); opacity: 0.4; }
