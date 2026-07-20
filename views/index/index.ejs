@@ -72,26 +72,34 @@
 
   <body class="age-modal-open">
 
-    <!-- Age verification modal (unchanged) -->
-    <div class="age-modal is-visible" id="ageModal" aria-hidden="false">
-      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
-        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
-        <span class="age-pill">18+ age restricted store</span>
-        <h2 id="ageModalTitle">Confirm your age</h2>
-        <p>Snus Village sells age-restricted nicotine products. Enter your date of birth to continue. Formal age verification may still be required at checkout.</p>
-        <label class="age-dob-field" for="ageDob">
-          Date of birth
-          <input id="ageDob" type="date" autocomplete="bday" required />
+    <!-- Age gate -->
+    <div class="age-gate is-visible" id="ageModal" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle" aria-hidden="false">
+      <div class="age-gate__brand" aria-hidden="true">
+        <div class="age-gate__brand-top">
+          <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" class="age-gate__logo" />
+          <div class="age-gate__brand-name">Snus Village</div>
+          <p class="age-gate__brand-sub">Premium nicotine pouches for adult customers across London and the UK.</p>
+        </div>
+        <div class="age-gate__trust">
+          <div class="age-gate__trust-item"><i class="fa-solid fa-shield-halved"></i> Age-restricted products only</div>
+          <div class="age-gate__trust-item"><i class="fa-solid fa-truck-fast"></i> Fast UK delivery</div>
+          <div class="age-gate__trust-item"><i class="fa-solid fa-store"></i> London retail locations</div>
+        </div>
+      </div>
+      <div class="age-gate__form">
+        <div class="age-gate__badge">18+ Only</div>
+        <h1 class="age-gate__heading" id="ageModalTitle">Confirm<br>your <em>age.</em></h1>
+        <p class="age-gate__desc">Snus Village sells age-restricted nicotine products. You must be 18 or over to browse and purchase. Formal age verification is required at checkout.</p>
+        <label class="age-gate__dob-label" for="ageDob">
+          <span>Date of birth</span>
+          <input id="ageDob" class="age-gate__dob-input" type="date" autocomplete="bday" required />
         </label>
-        <p class="age-error" id="ageError" hidden>Please enter a valid date of birth showing you are 18 or over.</p>
-        <div class="age-points">
-          <span><i class="fa-solid fa-lock" aria-hidden="true"></i> Adults 18+ only</span>
-          <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Checkout age verification</span>
+        <p class="age-gate__error" id="ageError" aria-live="polite"></p>
+        <div class="age-gate__actions">
+          <button id="enterSite" class="age-gate__enter" type="button">Enter Site <i class="fa-solid fa-arrow-right"></i></button>
+          <button id="exitSite" class="age-gate__exit" type="button">I am under 18 — exit</button>
         </div>
-        <div class="age-buttons">
-          <button id="enterSite" type="button">Enter Site</button>
-          <button id="exitSite" type="button">I am under 18</button>
-        </div>
+        <p class="age-gate__note">Your age is verified once every 24 hours. We do not store your date of birth.</p>
       </div>
     </div>
 
@@ -643,13 +651,23 @@
         var exitBtn  = document.getElementById("exitSite");
         var ageDob   = document.getElementById("ageDob");
         var ageError = document.getElementById("ageError");
+        var AGE_KEY  = "sv_age_verified";
+        var AGE_TTL  = 24 * 60 * 60 * 1000;
 
-        if (!ageModal) {
-          document.body.classList.remove("age-modal-open");
-          document.documentElement.style.overflow = "";
-          document.body.style.overflow = "";
-          return;
+        function isAgeVerified() {
+          try {
+            var raw = localStorage.getItem(AGE_KEY);
+            if (!raw) return false;
+            var obj = JSON.parse(raw);
+            return obj.verified === true && Date.now() < obj.expires;
+          } catch(e) { return false; }
         }
+
+        function setAgeVerified() {
+          localStorage.setItem(AGE_KEY, JSON.stringify({ verified: true, expires: Date.now() + AGE_TTL }));
+        }
+
+        function clearAgeVerified() { localStorage.removeItem(AGE_KEY); }
 
         function isAdultFromDob(value) {
           if (!value) return false;
@@ -657,79 +675,58 @@
           if (Number.isNaN(dob.getTime())) return false;
           var today = new Date();
           var age = today.getFullYear() - dob.getFullYear();
-          var monthDiff = today.getMonth() - dob.getMonth();
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age -= 1;
+          var md = today.getMonth() - dob.getMonth();
+          if (md < 0 || (md === 0 && today.getDate() < dob.getDate())) age -= 1;
           return age >= 18;
         }
 
         function hasValidDob(value) {
-          if (!value) return false;
-          var dob = new Date(value + "T00:00:00");
-          return !Number.isNaN(dob.getTime());
-        }
-
-        function redirectUnderageVisitor() {
-          if (ageError) {
-            ageError.textContent = "You must be 18 or over to enter this website. You will now be redirected.";
-            ageError.hidden = false;
-          }
-          sessionStorage.removeItem("ageVerified");
-          window.setTimeout(function () { window.location.href = "https://www.google.com"; }, 1800);
-        }
-
-        function unlockPageScroll() {
-          document.body.classList.remove("age-modal-open");
-          document.documentElement.style.overflow = "";
-          document.body.style.overflow = "";
-          document.body.style.position = "";
-          document.body.style.height = "";
-          document.body.style.touchAction = "";
-        }
-
-        function lockPageScroll() {
-          document.body.classList.add("age-modal-open");
-          document.documentElement.style.overflow = "hidden";
-          document.body.style.overflow = "hidden";
-          document.body.style.touchAction = "none";
+          return value && !Number.isNaN(new Date(value + "T00:00:00").getTime());
         }
 
         function hideAgeGate() {
+          if (!ageModal) return;
           ageModal.classList.remove("is-visible");
           ageModal.setAttribute("aria-hidden", "true");
-          unlockPageScroll();
+          document.body.classList.remove("age-modal-open");
         }
 
         function showAgeGate() {
+          if (!ageModal) return;
           ageModal.classList.add("is-visible");
           ageModal.setAttribute("aria-hidden", "false");
-          lockPageScroll();
+          document.body.classList.add("age-modal-open");
         }
 
-        if (sessionStorage.getItem("ageVerified") === "true") {
-          hideAgeGate();
-        } else {
-          showAgeGate();
-        }
+        /* Allow ?age=reset to force gate (testing) */
+        if (new URLSearchParams(window.location.search).get("age") === "reset") clearAgeVerified();
+
+        if (isAgeVerified()) { hideAgeGate(); } else { showAgeGate(); }
 
         if (enterBtn) enterBtn.addEventListener("click", function () {
-          var dobValue = (ageDob && ageDob.value) || "";
-          if (!hasValidDob(dobValue)) {
-            if (ageError) { ageError.textContent = "Please enter a valid date of birth showing you are 18 or over."; ageError.hidden = false; }
+          var dob = (ageDob && ageDob.value) || "";
+          if (!hasValidDob(dob)) {
+            if (ageError) ageError.textContent = "Please enter a valid date of birth.";
             if (ageDob) ageDob.focus();
             return;
           }
-          if (!isAdultFromDob(dobValue)) { redirectUnderageVisitor(); return; }
-          sessionStorage.setItem("ageVerified", "true");
+          if (!isAdultFromDob(dob)) {
+            if (ageError) ageError.textContent = "You must be 18 or over. Redirecting…";
+            clearAgeVerified();
+            setTimeout(function() { window.location.href = "https://www.google.com"; }, 1800);
+            return;
+          }
+          setAgeVerified();
           hideAgeGate();
         });
 
         if (exitBtn) exitBtn.addEventListener("click", function () {
-          sessionStorage.removeItem("ageVerified");
+          clearAgeVerified();
           window.location.href = "https://www.google.com";
         });
 
         if (ageDob) ageDob.addEventListener("input", function () {
-          if (ageError) { ageError.textContent = ""; ageError.hidden = true; }
+          if (ageError) ageError.textContent = "";
         });
       })();
     </script>

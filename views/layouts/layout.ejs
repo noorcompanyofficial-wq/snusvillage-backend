@@ -133,28 +133,35 @@
     <!-- Web title -->
   </head>
   <body>
-    <div class="age-modal" id="ageModal" aria-hidden="true">
-      <div class="age-box" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle">
-        <img class="age-logo" src="/images/logo/snus-village-logo.webp" alt="Snus Village" />
-        <span class="age-pill">18+ age restricted store</span>
-        <h2 id="ageModalTitle">Confirm your age</h2>
-        <p>Snus Village sells age-restricted nicotine products. Enter your date of birth to continue. Formal age verification may still be required at checkout.</p>
-
-        <label class="age-dob-field" for="ageDob">
+    <div class="age-gate" id="ageModal" role="dialog" aria-modal="true" aria-labelledby="ageModalTitle" aria-hidden="true">
+      <!-- Brand panel -->
+      <div class="age-gate__brand" aria-hidden="true">
+        <div class="age-gate__brand-top">
+          <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" class="age-gate__logo" />
+          <div class="age-gate__brand-name">Snus Village</div>
+          <p class="age-gate__brand-sub">Premium nicotine pouches for adult customers across London and the UK.</p>
+        </div>
+        <div class="age-gate__trust">
+          <div class="age-gate__trust-item"><i class="fa-solid fa-shield-halved"></i> Age-restricted products only</div>
+          <div class="age-gate__trust-item"><i class="fa-solid fa-truck-fast"></i> Fast UK delivery</div>
+          <div class="age-gate__trust-item"><i class="fa-solid fa-store"></i> London retail locations</div>
+        </div>
+      </div>
+      <!-- Form panel -->
+      <div class="age-gate__form">
+        <div class="age-gate__badge">18+ Only</div>
+        <h1 class="age-gate__heading" id="ageModalTitle">Confirm<br>your <em>age.</em></h1>
+        <p class="age-gate__desc">Snus Village sells age-restricted nicotine products. You must be 18 or over to browse and purchase. Formal age verification is required at checkout.</p>
+        <label class="age-gate__dob-label" for="ageDob">
           <span>Date of birth</span>
-          <input id="ageDob" type="date" autocomplete="bday" required />
+          <input id="ageDob" class="age-gate__dob-input" type="date" autocomplete="bday" required />
         </label>
-        <p class="age-error" id="ageError" hidden>Please enter a valid date of birth showing you are 18 or over.</p>
-
-        <div class="age-points">
-          <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Adult customers only</span>
-          <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Checkout age verification</span>
+        <p class="age-gate__error" id="ageError" aria-live="polite"></p>
+        <div class="age-gate__actions">
+          <button id="enterSite" class="age-gate__enter" type="button">Enter Site <i class="fa-solid fa-arrow-right"></i></button>
+          <button id="exitSite" class="age-gate__exit" type="button">I am under 18 — exit</button>
         </div>
-
-        <div class="age-buttons">
-          <button id="enterSite" type="button">Enter Site</button>
-          <button id="exitSite" type="button">I am under 18</button>
-        </div>
+        <p class="age-gate__note">Your age is verified once every 24 hours. We do not store your date of birth.</p>
       </div>
     </div>
     <div class="cookie-banner" id="cookieBanner">

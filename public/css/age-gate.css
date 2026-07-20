@@ -1,214 +1,278 @@
-.age-modal {
+/* ==============================================
+   AGE GATE — V4 design system
+   Full-screen split: brand panel left, form right
+   Navy #071225, Red #b41232, Montserrat, sharp
+   ============================================== */
+
+.age-gate {
   position: fixed;
   inset: 0;
+  z-index: 9999;
   display: grid;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(201, 31, 54, 0.2), transparent 34%),
-    rgba(5, 10, 22, 0.82);
-  backdrop-filter: blur(6px);
+  grid-template-columns: 2fr 3fr;
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  z-index: 9999;
-  transition: opacity 180ms ease, visibility 180ms ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.age-modal.is-visible {
+.age-gate.is-visible {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
 }
 
-body.age-modal-open {
-  overflow: hidden;
-}
+body.age-modal-open { overflow: hidden; }
 
-.age-box {
+/* ── Left brand panel ── */
+.age-gate__brand {
+  background: #071225;
+  padding: 64px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   position: relative;
   overflow: hidden;
-  width: min(100%, 460px);
-  padding: 34px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
-  color: #fff;
-  background:
-    linear-gradient(145deg, rgba(13, 30, 72, 0.96), rgba(29, 42, 80, 0.94) 55%, rgba(150, 28, 61, 0.94)),
-    #0d1e48;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
-  transform: translateY(10px) scale(0.98);
-  transition: transform 180ms ease;
 }
 
-.age-modal.is-visible .age-box {
-  transform: translateY(0) scale(1);
-}
-
-.age-box::before {
+/* Subtle grid texture */
+.age-gate__brand::before {
+  content: '';
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 34px 34px;
-  content: "";
-  opacity: 0.16;
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
 }
 
-.age-box > * {
-  position: relative;
-  z-index: 1;
+/* Red accent line at top */
+.age-gate__brand::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #b41232 50%, #123b8a 50%);
 }
 
-.age-logo {
-  display: block;
-  width: 92px;
+.age-gate__brand-top {
+  position: relative; z-index: 1;
+}
+
+.age-gate__logo {
+  width: 72px;
   height: auto;
-  margin: 0 auto 12px;
-  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.22));
+  margin-bottom: 28px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.3));
 }
 
-.age-pill {
-  display: inline-flex;
+.age-gate__brand-name {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.age-gate__brand-sub {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.45);
+  max-width: 260px;
+  margin: 0;
+}
+
+.age-gate__trust {
+  position: relative; z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.age-gate__trust-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.age-gate__trust-item i {
+  width: 28px;
+  height: 28px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
-  padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  color: rgba(255, 255, 255, 0.86);
-  background: rgba(255, 255, 255, 0.08);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+  background: rgba(180,18,50,0.15);
+  color: #b41232;
+  flex-shrink: 0;
+  font-size: 11px;
 }
 
-.age-box h2 {
-  margin: 0 0 10px;
-  color: #fff;
-  font-size: clamp(30px, 5vw, 44px);
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
-.age-box p {
-  margin: 0 auto 22px;
-  max-width: 360px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-.age-dob-field {
-  display: grid;
-  gap: 8px;
-  margin: 0 auto 14px;
-  max-width: 310px;
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-align: left;
-  text-transform: uppercase;
-}
-
-.age-dob-field input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 14px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.age-dob-field input:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.45);
-  outline-offset: 2px;
-}
-
-.age-error {
-  margin: -4px auto 14px;
-  max-width: 310px;
-  color: #ffd7dc;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-.age-points {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.age-points span {
+/* ── Right form panel ── */
+.age-gate__form {
+  background: #ffffff;
+  padding: 64px 72px;
   display: flex;
-  min-height: 52px;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 14px;
-  color: rgba(255, 255, 255, 0.88);
-  background: rgba(255, 255, 255, 0.08);
-  font-size: 12px;
-  font-weight: 800;
-  text-align: left;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
 }
 
-.age-buttons {
-  display: grid;
-  grid-template-columns: 1fr;
+.age-gate__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 14px;
+  background: #b41232;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 28px;
+  align-self: flex-start;
+}
+
+.age-gate__heading {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #071225;
+  margin: 0 0 16px;
+}
+
+.age-gate__heading em {
+  font-style: normal;
+  color: #b41232;
+}
+
+.age-gate__desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #6b7a99;
+  margin: 0 0 36px;
+  max-width: 440px;
+}
+
+/* DOB field */
+.age-gate__dob-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.age-gate__dob-label span {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #071225;
+}
+
+.age-gate__dob-input {
+  width: 100%;
+  height: 54px;
+  padding: 0 18px;
+  border: 2px solid #e8ecf4;
+  border-radius: 0;
+  background: #f4f6fa;
+  color: #071225;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.age-gate__dob-input:focus {
+  border-color: #123b8a;
+  background: #fff;
+}
+
+.age-gate__dob-input::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* Error */
+.age-gate__error {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b41232;
+  margin: 8px 0 0;
+  min-height: 18px;
+}
+
+/* Buttons */
+.age-gate__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.age-gate__enter {
+  height: 56px;
+  background: #b41232;
+  color: #ffffff;
+  border: none;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
 }
+.age-gate__enter:hover { background: #8a0d24; }
 
-.age-buttons button {
-  width: 100%;
-  min-height: 48px;
-  padding: 13px 18px;
-  border: none;
+.age-gate__exit {
+  height: 48px;
+  background: transparent;
+  color: #6b7a99;
+  border: 1px solid #e8ecf4;
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  font-weight: 900;
-  border-radius: 999px;
-  transition: transform 160ms ease, filter 160ms ease, background 160ms ease;
+  transition: border-color 0.2s, color 0.2s;
+}
+.age-gate__exit:hover { border-color: #071225; color: #071225; }
+
+/* Note */
+.age-gate__note {
+  margin-top: 20px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #aab2c4;
 }
 
-.age-buttons button:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.04);
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .age-gate { grid-template-columns: 1fr; }
+  .age-gate__brand { display: none; }
+  .age-gate__form { padding: 48px 32px; justify-content: flex-start; padding-top: 72px; }
 }
 
-#enterSite {
-  background: linear-gradient(135deg, #c91f36, #233f8c);
-  color: white;
-  box-shadow: 0 14px 32px rgba(201, 31, 54, 0.28);
-}
-
-#exitSite {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-@media (max-width: 520px) {
-  .age-box {
-    padding: 26px 18px;
-  }
-
-  .age-logo {
-    width: 78px;
-  }
-
-  .age-points {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 480px) {
+  .age-gate__form { padding: 48px 24px; }
+  .age-gate__heading { font-size: 30px; }
 }
