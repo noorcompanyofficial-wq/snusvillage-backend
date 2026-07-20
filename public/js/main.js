@@ -3,124 +3,103 @@ const navbar = document.querySelector(".navbar");
 
 const navLinks = document.getElementById("navLinks");
 
-/* Age Verfication */
+/* ── Age Gate — 24-hour localStorage persistence ── */
 const ageModal = document.getElementById("ageModal");
 const enterBtn = document.getElementById("enterSite");
-const exitBtn = document.getElementById("exitSite");
-const ageDob = document.getElementById("ageDob");
+const exitBtn  = document.getElementById("exitSite");
+const ageDob   = document.getElementById("ageDob");
 const ageError = document.getElementById("ageError");
+
+const AGE_KEY  = "sv_age_verified";
+const AGE_TTL  = 24 * 60 * 60 * 1000; /* 24 hours in ms */
+
+function isAgeVerified() {
+  try {
+    const raw = localStorage.getItem(AGE_KEY);
+    if (!raw) return false;
+    const { verified, expires } = JSON.parse(raw);
+    return verified === true && Date.now() < expires;
+  } catch (e) {
+    return false;
+  }
+}
+
+function setAgeVerified() {
+  localStorage.setItem(AGE_KEY, JSON.stringify({ verified: true, expires: Date.now() + AGE_TTL }));
+}
+
+function clearAgeVerified() {
+  localStorage.removeItem(AGE_KEY);
+}
 
 function isAdultFromDob(value) {
   if (!value) return false;
-
   const dob = new Date(value + "T00:00:00");
   if (Number.isNaN(dob.getTime())) return false;
-
   const today = new Date();
   let age = today.getFullYear() - dob.getFullYear();
   const monthDelta = today.getMonth() - dob.getMonth();
-
-  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < dob.getDate())) {
-    age -= 1;
-  }
-
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < dob.getDate())) age -= 1;
   return age >= 18;
 }
 
 function hasValidDob(value) {
   if (!value) return false;
-  const dob = new Date(value + "T00:00:00");
-  return !Number.isNaN(dob.getTime());
+  return !Number.isNaN(new Date(value + "T00:00:00").getTime());
 }
 
-function redirectUnderageVisitor() {
-  if (ageError) {
-    ageError.textContent = "You must be 18 or over to enter this website. You will now be redirected.";
-    ageError.hidden = false;
-  }
-
-  sessionStorage.removeItem("ageVerified");
-  window.setTimeout(() => {
-    window.location.href = "https://www.google.com";
-  }, 1800);
-}
-
-if (new URLSearchParams(window.location.search).get("age") === "reset") {
-  sessionStorage.removeItem("ageVerified");
-}
-
-function isInternalReferrer() {
-  if (!document.referrer) return false;
-
-  try {
-    return new URL(document.referrer).origin === window.location.origin;
-  } catch (error) {
-    return false;
-  }
-}
-
-function isReloadNavigation() {
-  const navEntry = performance.getEntriesByType?.("navigation")?.[0];
-  return navEntry?.type === "reload";
-}
-
-function resetAgeGateOnFreshArrival() {
-  const forceAgeGate = ageModal?.dataset.forceAgeGate === "true";
-
-  if (forceAgeGate || (!isInternalReferrer() && !isReloadNavigation())) {
-    sessionStorage.removeItem("ageVerified");
-  }
-}
-
-function showAgeGate() {
+function hideAgeGate() {
   if (!ageModal) return;
-
-  const isAgeVerified = sessionStorage.getItem("ageVerified") === "true";
-  ageModal.classList.toggle("is-visible", !isAgeVerified);
-  ageModal.setAttribute("aria-hidden", isAgeVerified ? "true" : "false");
-  document.body.classList.toggle("age-modal-open", !isAgeVerified);
+  ageModal.classList.remove("is-visible");
+  ageModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("age-modal-open");
 }
 
-// check if already accepted during the current on-site visit
+function showAgeGateModal() {
+  if (!ageModal) return;
+  ageModal.classList.add("is-visible");
+  ageModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("age-modal-open");
+}
+
+function redirectUnderage() {
+  if (ageError) ageError.textContent = "You must be 18 or over to enter this site. Redirecting…";
+  clearAgeVerified();
+  setTimeout(() => { window.location.href = "https://www.google.com"; }, 1800);
+}
+
+/* Allow ?age=reset to force the gate (for testing) */
+if (new URLSearchParams(window.location.search).get("age") === "reset") {
+  clearAgeVerified();
+}
+
+/* Show or hide gate on load */
 if (ageModal) {
-  showAgeGate();
+  if (isAgeVerified()) { hideAgeGate(); } else { showAgeGateModal(); }
 }
 
-window.addEventListener("pageshow", (event) => {
-  if (event.persisted && !isInternalReferrer()) {
-    sessionStorage.removeItem("ageVerified");
-    showAgeGate();
-  }
-});
-
-// ENTER
+/* Enter site */
 enterBtn?.addEventListener("click", () => {
-  const dobValue = ageDob?.value || "";
-
-  if (!hasValidDob(dobValue)) {
-    if (ageError) {
-      ageError.textContent = "Please enter a valid date of birth showing you are 18 or over.";
-      ageError.hidden = false;
-    }
+  const dob = ageDob?.value || "";
+  if (!hasValidDob(dob)) {
+    if (ageError) ageError.textContent = "Please enter a valid date of birth.";
     ageDob?.focus();
     return;
   }
-
-  if (!isAdultFromDob(dobValue)) {
-    redirectUnderageVisitor();
-    return;
-  }
-
-  sessionStorage.setItem("ageVerified", "true");
-  if (ageModal) {
-    ageModal.classList.remove("is-visible");
-    ageModal.setAttribute("aria-hidden", "true");
-  }
-  document.body.classList.remove("age-modal-open");
+  if (!isAdultFromDob(dob)) { redirectUnderage(); return; }
+  setAgeVerified();
+  hideAgeGate();
 });
 
+/* Under 18 */
+exitBtn?.addEventListener("click", () => {
+  clearAgeVerified();
+  window.location.href = "https://www.google.com";
+});
+
+/* Clear error on input */
 ageDob?.addEventListener("input", () => {
-  if (ageError) ageError.hidden = true;
+  if (ageError) ageError.textContent = "";
 });
 
 const slides = document.querySelectorAll(".slide");
