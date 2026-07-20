@@ -1,51 +1,189 @@
-<section class="about-page">
-  <div class="about-hero">
-    <p class="about-eyebrow">About Us</p>
-    <h1>London's premium nicotine pouch specialist.</h1>
-    <p>
-      Snus Village brings trusted brands, fast-moving flavours, and focused
-      product support to adult customers across London and the UK.
-    </p>
-    <a class="about-cta" href="/shop">Shop all products</a>
+<%
+  const locations = [
+    {
+      label: "London Branch",
+      title: "Edgware Road",
+      desc:  "Our flagship store. Convenient West London access for adult customers near Marble Arch.",
+      map:   "https://www.google.com/maps?q=89+Edgware+Road+London+W2+2HX&output=embed",
+      link:  "/contact"
+    },
+    {
+      label: "London Branch",
+      title: "Camden Town",
+      desc:  "Central North London — well-stocked with popular flavours and brands across all strength levels.",
+      map:   "https://www.google.com/maps?q=Camden+Town+London&output=embed",
+      link:  "/contact"
+    },
+    {
+      label: "Distribution Hub",
+      title: "SVG Distro · Southall",
+      desc:  "Our wholesale and distribution centre. Trade enquiries and stock support for approved retailers.",
+      map:   "https://www.google.com/maps?q=Southall+London&output=embed",
+      link:  "/wholesale"
+    }
+  ];
+
+  const brands = [
+    "White Fox","Pablo","Killa","Velo","Loop","Iceberg",
+    "Siberia","Oden's","Lyft","Zyn","On!","Thunder"
+  ];
+
+  const pillars = [
+    { num:"01", head:"Curated brands",      body:"We stock well-known names trusted by adult customers — White Fox, Pablo, Killa, Velo, Loop, Iceberg, Siberia, Odens, and more." },
+    { num:"02", head:"London presence",     body:"Retail locations across London give customers and traders a physical point of contact alongside our online store." },
+    { num:"03", head:"Trader review",       body:"Wholesale access is reviewed manually. Approved traders receive a dedicated login and wholesale pricing for their business." },
+    { num:"04", head:"Age-restricted only", body:"Every sale is age-restricted. We follow UK regulations on nicotine product sales and verify age at checkout." }
+  ];
+%>
+
+<!-- ── Breadcrumb bar ── -->
+<div class="ab4-crumb">
+  <div class="ab4-wrap">
+    <nav class="ab4-crumb__nav" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      <span>About Us</span>
+    </nav>
   </div>
+</div>
 
-  <div class="about-grid">
-    <article>
-      <span>01</span>
-      <h2>Curated brands</h2>
-      <p>
-        We focus on well-known names including White Fox, Pablo, Killa, Velo,
-        Loop, Iceberg, Siberia, Odens, and more.
-      </p>
-    </article>
-
-    <article>
-      <span>02</span>
-      <h2>London presence</h2>
-      <p>
-        Our store areas include Camden Town, Oxford Street, and Edgware Road,
-        with online support for UK customers.
-      </p>
-    </article>
-
-    <article>
-      <span>03</span>
-      <h2>Trader review</h2>
-      <p>
-        Wholesale access is reviewed manually, then approved traders receive a
-        separate trader login for wholesale access.
-      </p>
-    </article>
+<!-- ── Hero ── -->
+<section class="ab4-hero">
+  <div class="ab4-wrap ab4-hero__inner">
+    <div class="ab4-hero__copy">
+      <div class="ab4-eyebrow">About Snus Village</div>
+      <h1>London's premium<br><em>nicotine pouch</em><br>specialist.</h1>
+      <p>Snus Village brings trusted brands, fast-moving flavours, and focused product support to adult customers across London and the UK.</p>
+      <div class="ab4-hero__btns">
+        <a href="/shop" class="ab4-btn ab4-btn--red">Shop All Products</a>
+        <a href="/wholesale" class="ab4-btn ab4-btn--outline">Wholesale Enquiry</a>
+      </div>
+    </div>
+    <div class="ab4-hero__panel">
+      <div class="ab4-stat-grid">
+        <div class="ab4-stat">
+          <span class="ab4-stat__num">500<em>+</em></span>
+          <span class="ab4-stat__label">Products listed</span>
+        </div>
+        <div class="ab4-stat">
+          <span class="ab4-stat__num">3</span>
+          <span class="ab4-stat__label">London locations</span>
+        </div>
+        <div class="ab4-stat">
+          <span class="ab4-stat__num">12<em>+</em></span>
+          <span class="ab4-stat__label">Brands stocked</span>
+        </div>
+        <div class="ab4-stat">
+          <span class="ab4-stat__num">18<em>+</em></span>
+          <span class="ab4-stat__label">Age-restricted only</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- ── Pillars ── -->
+<section class="ab4-pillars">
+  <div class="ab4-wrap">
+    <div class="ab4-section-head">
+      <div>
+        <div class="ab4-eyebrow ab4-eyebrow--dark">How We Operate</div>
+        <h2>What sets Snus Village apart</h2>
+      </div>
+    </div>
+    <div class="ab4-pillar-grid">
+      <% pillars.forEach(function(p) { %>
+        <div class="ab4-pillar">
+          <span class="ab4-pillar__num"><%= p.num %></span>
+          <h3><%= p.head %></h3>
+          <p><%= p.body %></p>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
 
-<section class="seo-support-copy">
-  <h2>About Snus Village London</h2>
-  <p>
-    Snus Village is built for adult customers who want clear access to trusted
-    nicotine pouches and smokeless nicotine products with reliable support online and through London
-    retail locations. The brand focuses on product availability, age-restricted sales,
-    customer support and a growing selection of recognised nicotine pouch brands.
-  </p>
+<!-- ── Mission banner ── -->
+<section class="ab4-mission">
+  <div class="ab4-wrap">
+    <div class="ab4-mission__eyebrow">Our Mission</div>
+    <blockquote class="ab4-mission__quote">
+      Built for adult customers who know<br>what they want — and deserve clear,<br>age-responsible access to it.
+    </blockquote>
+    <p class="ab4-mission__body">
+      We run a focused operation: a curated product catalogue, real London retail presence,
+      manual wholesale review, and transparent pricing. No gimmicks — just the brands
+      adult customers trust, available online and in store.
+    </p>
+    <a href="/shop" class="ab4-btn ab4-btn--white">Explore the range</a>
+  </div>
+</section>
+
+<!-- ── London locations ── -->
+<section class="ab4-locs">
+  <div class="ab4-wrap">
+    <div class="ab4-section-head">
+      <div>
+        <div class="ab4-eyebrow ab4-eyebrow--dark">London Stores</div>
+        <h2>Find Snus Village near you</h2>
+      </div>
+      <a href="/contact" class="ab4-section-link">Contact us <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="ab4-loc-grid">
+      <% locations.forEach(function(loc) { %>
+        <div class="ab4-loc-card">
+          <iframe
+            class="ab4-loc-card__map"
+            loading="lazy"
+            src="<%= loc.map %>"
+            title="<%= loc.title %>"
+          ></iframe>
+          <div class="ab4-loc-card__body">
+            <span class="ab4-loc-card__label"><%= loc.label %></span>
+            <h3><%= loc.title %></h3>
+            <p><%= loc.desc %></p>
+            <a href="<%= loc.link %>">Ask About Stock <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- ── Brands ── -->
+<section class="ab4-brands">
+  <div class="ab4-wrap">
+    <div class="ab4-eyebrow ab4-eyebrow--dark">Brands We Stock</div>
+    <div class="ab4-brand-grid">
+      <% brands.forEach(function(b) { %>
+        <a href="/shop?brand=<%= encodeURIComponent(b) %>" class="ab4-brand-chip"><%= b %></a>
+      <% }) %>
+    </div>
+    <p class="ab4-brands__note">All products are age-restricted nicotine items for adult customers only.</p>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="ab4-cta">
+  <div class="ab4-wrap ab4-cta__inner">
+    <div>
+      <div class="ab4-eyebrow">Ready to shop?</div>
+      <h2>Browse the full product range</h2>
+      <p>Fast UK delivery · Age-restricted · Trusted brands</p>
+    </div>
+    <a href="/shop" class="ab4-btn ab4-btn--white">Open Shop</a>
+  </div>
+</section>
+
+<!-- ── SEO copy ── -->
+<section class="ab4-seo">
+  <div class="ab4-wrap">
+    <h2>About Snus Village London</h2>
+    <p>
+      Snus Village is built for adult customers who want clear access to trusted nicotine pouches
+      and smokeless nicotine products with reliable support online and through London retail
+      locations. The brand focuses on product availability, age-restricted sales, customer support
+      and a growing selection of recognised nicotine pouch brands.
+    </p>
+  </div>
 </section>
