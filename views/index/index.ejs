@@ -57,7 +57,7 @@
     <!-- Core CSS: age-gate, landing (keeps header/nav/footer/mega-menu styles), v4 sections -->
     <link rel="stylesheet" href="/css/age-gate.css" />
     <link rel="stylesheet" href="/css/landing.css?v=megamenu-fix-20260713" />
-    <link rel="stylesheet" href="/css/landing-v4.css?v=v4-coll-imgfix-20260717" />
+    <link rel="stylesheet" href="/css/landing-v4.css?v=v4-carousel-animated-20260717" />
 
     <!-- Footer preloaded -->
     <link
@@ -190,6 +190,7 @@
         <!-- Right product panel — animated carousel -->
         <div class="v4-hero__products">
           <div class="v4-carousel" id="heroCarousel">
+            <div class="v4-carousel__counter" id="carouselCounter"></div>
             <% if (v4CarouselProds.length) { %>
               <% v4CarouselProds.forEach((p, idx) => { %>
                 <%
@@ -238,6 +239,9 @@
                 <% }) %>
               </div>
             <% } %>
+            <div class="v4-carousel__progress" id="carouselProgressWrap">
+              <div class="v4-carousel__progress-fill" id="carouselProgress"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -732,36 +736,97 @@
 
     <script>
       (function () {
-        var carousel = document.getElementById('heroCarousel');
+        var carousel    = document.getElementById('heroCarousel');
         if (!carousel) return;
-        var slides = carousel.querySelectorAll('.v4-carousel__slide');
-        var dots   = carousel.querySelectorAll('.v4-carousel__dot');
+        var slides   = Array.from(carousel.querySelectorAll('.v4-carousel__slide'));
+        var dots     = Array.from(carousel.querySelectorAll('.v4-carousel__dot'));
+        var counter  = document.getElementById('carouselCounter');
+        var progress = document.getElementById('carouselProgress');
         if (slides.length < 2) return;
-        var current = 0;
-        var timer;
 
+        var current  = 0;
+        var timer    = null;
+        var DURATION = 4200; /* ms between slides */
+        var total    = slides.length;
+
+        /* ── Counter ── */
+        function updateCounter(n) {
+          if (!counter) return;
+          var pad = function(x) { return String(x).padStart(2, '0'); };
+          counter.textContent = pad(n + 1) + ' / ' + pad(total);
+        }
+
+        /* ── Progress bar ── */
+        function startProgress() {
+          if (!progress) return;
+          progress.style.transition = 'none';
+          progress.style.width = '0%';
+          progress.offsetHeight; /* force reflow */
+          progress.style.transition = 'width ' + DURATION + 'ms linear';
+          progress.style.width = '100%';
+        }
+        function stopProgress() {
+          if (!progress) return;
+          progress.style.transition = 'none';
+          progress.style.width = '0%';
+        }
+
+        /* ── Slide change ── */
         function goTo(n) {
+          var next = (n + total) % total;
+          var dir  = (next > current || (current === total - 1 && next === 0)) ? 1 : -1;
+          carousel.style.setProperty('--slide-dir', dir);
+
+          /* outgoing */
           slides[current].classList.remove('is-active');
           slides[current].classList.add('is-leaving');
           if (dots[current]) dots[current].classList.remove('is-active');
           var leaving = slides[current];
-          setTimeout(function () { leaving.classList.remove('is-leaving'); }, 700);
-          current = (n + slides.length) % slides.length;
+          setTimeout(function() { leaving.classList.remove('is-leaving'); }, 550);
+
+          /* incoming */
+          current = next;
           slides[current].classList.add('is-active');
           if (dots[current]) dots[current].classList.add('is-active');
+          updateCounter(current);
+          startProgress();
         }
 
-        function start() { timer = setInterval(function () { goTo(current + 1); }, 4000); }
-        function stop()  { clearInterval(timer); }
+        /* ── Auto-advance ── */
+        function start() { timer = setInterval(function() { goTo(current + 1); }, DURATION); }
+        function stop()  { clearInterval(timer); stopProgress(); }
 
-        dots.forEach(function (dot, i) {
-          dot.addEventListener('click', function () { stop(); goTo(i); start(); });
+        /* ── Dot clicks ── */
+        dots.forEach(function(dot, i) {
+          dot.addEventListener('click', function() { stop(); goTo(i); start(); });
         });
 
-        carousel.addEventListener('mouseenter', stop);
-        carousel.addEventListener('mouseleave', start);
+        /* ── 3D image tilt on hover ── */
+        carousel.addEventListener('mousemove', function(e) {
+          var slide = slides[current];
+          if (!slide) return;
+          var img = slide.querySelector('.v4-carousel__img img');
+          if (!img) return;
+          img.classList.add('is-tilting');
+          var rect = carousel.getBoundingClientRect();
+          var xPct = (e.clientX - rect.left) / rect.width - 0.5;
+          var yPct = (e.clientY - rect.top)  / rect.height - 0.5;
+          img.style.transform = 'perspective(700px) rotateY(' + (xPct * 14) + 'deg) rotateX(' + (-yPct * 10) + 'deg) scale(1.04)';
+        });
 
+        carousel.addEventListener('mouseleave', function() {
+          var img = carousel.querySelector('.v4-carousel__slide.is-active .v4-carousel__img img');
+          if (img) { img.classList.remove('is-tilting'); img.style.transform = ''; }
+        });
+
+        /* ── Pause on hover ── */
+        carousel.addEventListener('mouseenter', stop);
+        carousel.addEventListener('mouseleave', function() { start(); startProgress(); });
+
+        /* ── Init ── */
+        updateCounter(0);
         start();
+        startProgress();
       })();
     </script>
 
