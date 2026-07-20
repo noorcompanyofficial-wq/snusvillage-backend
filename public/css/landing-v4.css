@@ -458,7 +458,7 @@
 }
 .v4-coll-card__bg {
   position: absolute; inset: 0;
-  background-size: cover; background-position: center;
+  background-size: cover !important; background-position: center !important;
   transition: transform .5s ease;
 }
 .v4-coll-card:hover .v4-coll-card__bg { transform: scale(1.04); }
@@ -486,10 +486,11 @@
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
 }
 /* Fallback colour gradients if no image provided */
-.v4-coll-c1 .v4-coll-card__bg { background: linear-gradient(135deg,#0a1f52,#153fb8 60%,#0d2f86); }
-.v4-coll-c2 .v4-coll-card__bg { background: linear-gradient(135deg,#1b5e20,#2e7d32); }
-.v4-coll-c3 .v4-coll-card__bg { background: linear-gradient(135deg,#4a0010,#b41232); }
-.v4-coll-c4 .v4-coll-card__bg { background: linear-gradient(135deg,#0c3347,#0d47a1); }
+/* Use background-image (not background shorthand) so background-size/position are not reset */
+.v4-coll-c1 .v4-coll-card__bg { background-image: linear-gradient(135deg,#0a1f52,#153fb8 60%,#0d2f86); }
+.v4-coll-c2 .v4-coll-card__bg { background-image: linear-gradient(135deg,#1b5e20,#2e7d32); }
+.v4-coll-c3 .v4-coll-card__bg { background-image: linear-gradient(135deg,#4a0010,#b41232); }
+.v4-coll-c4 .v4-coll-card__bg { background-image: linear-gradient(135deg,#0c3347,#0d47a1); }
 
 /* ========================
    LOCATIONS
