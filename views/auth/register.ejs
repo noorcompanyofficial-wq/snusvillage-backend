@@ -36,6 +36,7 @@
     <p class="auth-sub">Enter your details exactly as you want them saved.</p>
 
     <form action="/auth/register" method="post" class="auth-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="auth-grid">
         <label class="input-group">
           <i class="fa-solid fa-user"></i>

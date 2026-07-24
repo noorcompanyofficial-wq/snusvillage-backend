@@ -177,6 +177,7 @@
   </section>
 
   <form class="admin-panel admin-homepage-form" action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="admin-panel__head">
       <h2>Hero Carousel</h2>
       <span>Images, Text And Buttons</span>
@@ -299,6 +300,7 @@
 
 
   <form class="admin-panel admin-homepage-form" action="/admin/homepage/collections" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="admin-panel__head">
       <h2>Collections Section</h2>
       <span>Homepage Collection Cards</span>
@@ -392,6 +394,7 @@
 
 
   <form class="admin-panel admin-homepage-form" action="/admin/homepage/locations" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="admin-panel__head">
       <h2>Locations Section</h2>
       <span>Homepage Branch Cards</span>
@@ -484,6 +487,7 @@
   </form>
 
   <form class="admin-panel admin-homepage-form" action="/admin/homepage/social" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="admin-panel__head">
       <h2>Social Media Section</h2>
       <span>iPhone Reel Showcase</span>

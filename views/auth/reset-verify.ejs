@@ -25,6 +25,7 @@
     <h2>Enter Reset Code</h2>
    <h1>Verify Reset Code</h1>
 <form method="POST" action="/auth/reset-verify">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <div class="otp-container">
     <input maxlength="1" class="otp" />
     <input maxlength="1" class="otp" />
@@ -39,6 +40,7 @@
 </form>
 
 <form method="POST" action="/auth/resend-reset" id="resendForm">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <button type="submit" id="resendBtn" class="resend-link">
     Resend Code
   </button>

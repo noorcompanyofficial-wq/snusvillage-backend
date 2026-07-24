@@ -36,6 +36,7 @@
     <p class="auth-sub">Use the email and password from your customer account.</p>
 
     <form class="auth-form" method="post" action="/auth/login">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <label class="input-group">
         <i class="fa-solid fa-envelope"></i>
         <input type="email" autocomplete="email" name="email" placeholder="Email" required />

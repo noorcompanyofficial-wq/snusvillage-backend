@@ -103,10 +103,12 @@
 
               <% if (message.isRead) { %>
                 <form action="/admin/messages/<%= message._id %>/unread" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit">Mark Unread</button>
                 </form>
               <% } else { %>
                 <form action="/admin/messages/<%= message._id %>/read" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit">Mark Read</button>
                 </form>
               <% } %>
@@ -114,6 +116,7 @@
               <a href="/admin/messages/<%= message._id %>#adminReplyBox">Reply</a>
 
               <form action="/admin/messages/<%= message._id %>/delete" method="POST" onsubmit="return confirm('Delete this message?');">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="is-danger">Delete</button>
               </form>
             </div>

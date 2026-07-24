@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -83,6 +84,10 @@ router.get("/reset-verify", (req, res) => res.render("auth/reset-verify"));
 router.get("/reset", (req, res) => res.render("auth/reset"));
 
 // ================= HELPERS =================
+function generateSixDigitCode() {
+  return crypto.randomInt(100000, 1000000).toString();
+}
+
 function isStrongPassword(password) {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/.test(password);
 }
@@ -173,7 +178,7 @@ router.post("/register", authLimiter, async (req, res, next) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = generateSixDigitCode();
 
     const approvedWholesaleApplication =
       mongoose.connection.readyState === 1
@@ -228,7 +233,7 @@ router.post("/register", authLimiter, async (req, res, next) => {
 });
 
 // ================= RESEND VERIFY =================
-router.post("/resend-code", async (req, res) => {
+router.post("/resend-code", authLimiter, async (req, res) => {
   if (!req.session.verifyEmail) {
     req.flash("error", "Session expired");
     return res.redirect("/auth/register");
@@ -243,7 +248,7 @@ router.post("/resend-code", async (req, res) => {
     return res.redirect("/auth/verify");
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const code = generateSixDigitCode();
 
   user.verifyCode = code;
   user.verifyCodeExpire = Date.now() + 10 * 60 * 1000;
@@ -274,7 +279,7 @@ router.post("/resend-code", async (req, res) => {
 });
 
 // ================= RESEND RESET =================
-router.post("/resend-reset", async (req, res) => {
+router.post("/resend-reset", authLimiter, async (req, res) => {
   if (!req.session.resetEmail) {
     req.flash("error", "Session expired");
     return res.redirect("/auth/forgot");
@@ -289,7 +294,7 @@ router.post("/resend-reset", async (req, res) => {
     return res.redirect("/auth/reset-verify");
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const code = generateSixDigitCode();
 
   user.resetCode = code;
   user.resetCodeExpire = Date.now() + 10 * 60 * 1000;
@@ -320,7 +325,7 @@ router.post("/resend-reset", async (req, res) => {
 });
 
 // ================= VERIFY =================
-router.post("/verify", async (req, res) => {
+router.post("/verify", authLimiter, async (req, res) => {
   if (!req.session.verifyEmail) {
     req.flash("error", "Verification session expired. Please log in or register again.");
     return res.redirect("/auth/login");
@@ -433,7 +438,7 @@ router.post("/login", authLimiter, async (req, res, next) => {
   }
 });
 // ================= FORGOT =================
-router.post("/forgot", async (req, res) => {
+router.post("/forgot", authLimiter, async (req, res) => {
   const user = await User.findOne({ email: normalizeEmail(req.body.email) });
 
   if (!user) {
@@ -441,7 +446,7 @@ router.post("/forgot", async (req, res) => {
     return res.redirect("/auth/forgot");
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const code = generateSixDigitCode();
 
   user.resetCode = code;
   user.resetCodeExpire = Date.now() + 10 * 60 * 1000;
@@ -472,7 +477,7 @@ router.post("/forgot", async (req, res) => {
 });
 
 // ================= RESET VERIFY =================
-router.post("/reset-verify", async (req, res) => {
+router.post("/reset-verify", authLimiter, async (req, res) => {
   const user = await User.findOne({ email: normalizeEmail(req.session.resetEmail) });
 
   if (!user || user.resetCode !== req.body.code) {
@@ -489,7 +494,7 @@ router.post("/reset-verify", async (req, res) => {
 });
 
 // ================= RESET =================
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", authLimiter, async (req, res) => {
   const { password, confirm } = req.body;
 
   if (password !== confirm) {

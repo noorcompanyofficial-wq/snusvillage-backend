@@ -11,6 +11,10 @@ function getFinalPrice(p) {
   return p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
 }
 
+function getCsrfToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content || "";
+}
+
 // ========================
 // LOAD CART (uses JSON endpoint, not the HTML page)
 // ========================
@@ -41,7 +45,11 @@ document.addEventListener("click", async (e) => {
     btn.disabled = true;
     await fetch(`/cart/add/${id}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": getCsrfToken(),
+      },
       body: JSON.stringify({ quantity: 1 }),
     });
 
@@ -136,7 +144,11 @@ async function updateQty(id, action) {
   try {
     await fetch("/cart/update", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": getCsrfToken(),
+      },
       body: JSON.stringify({ productId: id, action }),
     });
     loadCart();
@@ -152,7 +164,11 @@ async function removeItem(id) {
   try {
     await fetch("/cart/remove", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": getCsrfToken(),
+      },
       body: JSON.stringify({ productId: id }),
     });
     loadCart();
@@ -168,7 +184,11 @@ async function clearCart() {
   try {
     await fetch("/cart/clear", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": getCsrfToken(),
+      },
     });
     loadCart();
   } catch (err) {

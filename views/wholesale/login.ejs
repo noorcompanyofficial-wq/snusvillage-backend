@@ -13,6 +13,7 @@
     <% } %>
 
     <form class="wholesale-auth__form" method="post" action="/wholesale/login">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <label>
         Trader email
         <input type="email" name="email" required />

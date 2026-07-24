@@ -100,6 +100,7 @@
       </div>
     <% } else { %>
       <form id="bulkStockForm" action="/admin/inventory/bulk-stock" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="admin-inventory-table-wrap">
           <table class="admin-inventory-table">
             <thead>

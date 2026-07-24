@@ -4,6 +4,7 @@ const compression = require("compression");
 const path = require("path");
 const ejsLayouts = require("express-ejs-layouts");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
@@ -211,11 +212,26 @@ app.use(
 app.use(cookieParser());
 
 // ====== Session ======
+if (!process.env.MONGO_URI) {
+  console.warn(
+    "MONGO_URI is missing. Falling back to the in-memory session store (not suitable for production)."
+  );
+}
+
+const sessionStore = process.env.MONGO_URI
+  ? MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      ttl: 14 * 24 * 60 * 60, // 14 days
+      autoRemove: "native",
+    })
+  : undefined;
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev_fallback_secret_change_later",
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -230,6 +246,10 @@ app.use(cartSession);
 
 // ====== Flash ======
 app.use(flash());
+
+// ====== CSRF token issuance ======
+const { ensureCsrfToken, verifyCsrfToken } = require("./middleware/csrf");
+app.use(ensureCsrfToken);
 
 // ====== Website View Analytics ======
 app.use(pageViewTracker);
@@ -315,6 +335,9 @@ app.set("views", path.join(__dirname, "views"));
 app.set("layout", "layouts/layout");
 
 app.use(ejsLayouts);
+
+// ====== CSRF token verification (after res.locals + ejsLayouts so a 403 render gets the full site layout) ======
+app.use(verifyCsrfToken);
 
 app.get("/maintenance", async (req, res) => {
   const settings = await getCachedStoreSettings();

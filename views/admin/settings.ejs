@@ -19,6 +19,7 @@
   </div>
 
   <form class="admin-panel admin-settings-form" action="/admin/settings" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="admin-panel__head">
       <h2>Store Details</h2>
       <span>Public Contact Information</span>

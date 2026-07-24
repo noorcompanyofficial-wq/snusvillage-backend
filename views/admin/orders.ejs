@@ -198,6 +198,7 @@
             <a class="admin-primary" href="/admin/orders/<%= order._id %>">View Details</a>
 
             <form class="admin-order-status-form compact" action="/admin/orders/<%= order._id %>/status" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
               <label>
                 Payment
                 <select name="paymentStatus">
@@ -224,6 +225,7 @@
 
             <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
               <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button class="admin-secondary" type="submit">Send Royal Mail</button>
               </form>
             <% } %>

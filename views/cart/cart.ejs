@@ -32,6 +32,7 @@
         <div class="cv4-items-head">
           <span class="cv4-items-count"><%= cart.items.length %> item<%= cart.items.length === 1 ? "" : "s" %></span>
           <form action="/cart/clear" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit" class="cv4-clear-btn">
               <i class="fa-solid fa-trash-can"></i> Clear Cart
             </button>
@@ -59,12 +60,14 @@
                 <div class="cv4-item__controls">
                   <div class="cv4-qty">
                     <form action="/cart/update" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <input type="hidden" name="productId" value="<%= item.product._id %>">
                       <input type="hidden" name="action" value="minus">
                       <button type="submit" class="cv4-qty__btn" <%= item.quantity <= 1 ? 'disabled' : '' %>>−</button>
                     </form>
                     <span class="cv4-qty__num"><%= item.quantity %></span>
                     <form action="/cart/update" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <input type="hidden" name="productId" value="<%= item.product._id %>">
                       <input type="hidden" name="action" value="plus">
                       <button type="submit" class="cv4-qty__btn">+</button>
@@ -72,6 +75,7 @@
                   </div>
                   <div class="cv4-item__line-price">£<%= (item.priceAtTime * item.quantity).toFixed(2) %></div>
                   <form action="/cart/remove" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <input type="hidden" name="productId" value="<%= item.product._id %>">
                     <button type="submit" class="cv4-remove-btn" title="Remove item">
                       <i class="fa-solid fa-xmark"></i>

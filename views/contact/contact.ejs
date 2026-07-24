@@ -46,6 +46,7 @@
 
   <div class="contact-grid">
     <form class="contact-form-panel" action="/contact" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="contact-form-head">
         <span class="contact-pill">Message</span>
         <h2>Send an enquiry</h2>

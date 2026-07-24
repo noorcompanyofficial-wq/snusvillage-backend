@@ -75,6 +75,7 @@
         <% } %>
 
         <form class="newsletter" action="/newsletter/subscribe" method="POST" aria-label="Newsletter signup">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <div class="newsletter-input-row">
             <label for="newsletterEmail">Email address</label>
             <input id="newsletterEmail" name="email" type="email" placeholder="hello@example.com" autocomplete="email" required />

@@ -134,6 +134,7 @@
 
           <% if (inStock) { %>
             <form action="/cart/add/<%= product._id %>" method="POST" class="pd-buybox__form" id="pdAddForm">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
               <% if (bundleQuantities.length > 1) { %>
                 <fieldset class="pd-qty-options">
                   <legend>Choose quantity</legend>

@@ -12,6 +12,7 @@
     <h1>SNUS VILLAGE</h1>
 
     <form action="/checkout/place-order" method="POST" id="checkoutForm">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
 
@@ -143,11 +144,13 @@
           </div>
 
           <form action="/checkout/remove-discount" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit">Remove</button>
           </form>
         </div>
       <% } else { %>
         <form action="/checkout/apply-discount" method="POST" class="discount-row">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <input type="text" name="discountCode" placeholder="Discount Code">
           <button type="submit">Apply</button>
         </form>

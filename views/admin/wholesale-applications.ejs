@@ -59,12 +59,14 @@
                 <div class="admin-actions">
                   <% if (application.status !== "approved") { %>
                     <form method="post" action="/admin/wholesale/<%= application._id %>/approve">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button class="admin-action admin-action--approve" type="submit">Approve</button>
                     </form>
                   <% } %>
 
                   <% if (application.status !== "rejected") { %>
                     <form method="post" action="/admin/wholesale/<%= application._id %>/reject">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button class="admin-action admin-action--reject" type="submit">Reject</button>
                     </form>
                   <% } %>

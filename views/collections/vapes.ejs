@@ -195,6 +195,7 @@
 
                       <% if (p.stock > 0) { %>
                         <form action="/cart/add/<%= p._id %>" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                           <input type="hidden" name="quantity" value="1">
                           <button type="submit">Add To Cart</button>
                         </form>

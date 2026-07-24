@@ -109,6 +109,7 @@
           </div>
         <% } else { %>
           <form action="/admin/users/<%= account._id %>/role" method="POST" class="admin-notes-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <label>
               Account Role
               <select name="role">
@@ -137,6 +138,7 @@
       </div>
 
       <form action="/admin/users/<%= account._id %>/notes" method="POST" class="admin-notes-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <label>
           Notes
           <textarea name="adminNotes" placeholder="Add private notes about this customer..."><%= account.adminNotes || "" %></textarea>

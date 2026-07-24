@@ -1,12 +1,23 @@
 const rateLimit = require("express-rate-limit");
 
-//  AUTH (login/register)
+//  AUTH (login/register/verify/reset)
+const AUTH_REDIRECT_BY_PATH = {
+  "/auth/register": "/auth/register",
+  "/auth/login": "/auth/login",
+  "/auth/verify": "/auth/verify",
+  "/auth/resend-code": "/auth/verify",
+  "/auth/forgot": "/auth/forgot",
+  "/auth/reset-verify": "/auth/reset-verify",
+  "/auth/resend-reset": "/auth/reset-verify",
+  "/auth/reset-password": "/auth/reset",
+};
+
 exports.authLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 min
   max: 5,
   handler: (req, res) => {
     req.flash("error", "Too many attempts. Please wait a minute and try again.");
-    return res.redirect(req.originalUrl.includes("/register") ? "/auth/register" : "/auth/login");
+    return res.redirect(AUTH_REDIRECT_BY_PATH[req.path] || "/auth/login");
   },
 });
 

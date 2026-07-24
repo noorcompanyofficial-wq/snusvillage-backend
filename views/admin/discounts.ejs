@@ -21,6 +21,7 @@
     </div>
 
     <form class="admin-discount-form" action="/admin/discounts" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <label>
         Code
         <input name="code" placeholder="WELCOME10" required>
@@ -162,12 +163,14 @@
 
             <div class="admin-discount-actions">
               <form action="/admin/discounts/<%= discount._id %>/toggle" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit">
                   <%= discount.isActive ? "Disable" : "Enable" %>
                 </button>
               </form>
 
               <form action="/admin/discounts/<%= discount._id %>/delete" method="POST" onsubmit="return confirm('Delete this discount code?');">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="is-danger">Delete</button>
               </form>
             </div>

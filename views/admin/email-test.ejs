@@ -57,6 +57,7 @@
 
   <section class="admin-panel">
     <form class="admin-email-test-form" method="POST" action="/admin/email-test">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <label>
         Send test to
         <input type="email" name="to" placeholder="customer@example.com" required />

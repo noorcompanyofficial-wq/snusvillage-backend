@@ -84,6 +84,7 @@
       </p>
 
       <form class="wholesale-form" method="post" action="/wholesale/apply">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <label>
           Business name
           <input type="text" name="businessName" required />

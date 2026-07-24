@@ -160,6 +160,7 @@
       </div>
 
       <form class="admin-order-status-form" action="/admin/orders/<%= order._id %>/status" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <label>
           Payment
           <select name="paymentStatus">
@@ -350,12 +351,14 @@
       <div class="admin-order-action-row">
         <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
           <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit">Send To Royal Mail</button>
           </form>
         <% } %>
 
         <% if (!isClickCollect && order.royalMail?.syncStatus === "sent" && !order.royalMail?.labelGenerated) { %>
           <form action="/admin/orders/<%= order._id %>/generate-label" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit">Generate Label</button>
           </form>
         <% } %>
@@ -372,6 +375,7 @@
       </div>
 
       <form class="admin-order-admin-form" action="/admin/orders/<%= order._id %>/admin-update" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="admin-checklist-grid">
           <label><input type="checkbox" name="paymentChecked" <%= checklist.paymentChecked ? "checked" : "" %>> Payment Checked</label>
           <label><input type="checkbox" name="stockChecked" <%= checklist.stockChecked ? "checked" : "" %>> Stock Checked</label>

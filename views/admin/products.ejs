@@ -183,6 +183,7 @@
     </div>
 
     <form class="admin-bulk-price-form" action="/admin/products/bulk-prices" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <input type="hidden" name="search" value="<%= query.search || '' %>">
       <input type="hidden" name="brand" value="<%= query.brand || '' %>">
       <input type="hidden" name="strength" value="<%= query.strength || '' %>">
@@ -357,6 +358,7 @@
               </a>
 
               <form action="/admin/products/<%= p._id %>/toggle-active" method="POST" class="admin-product-inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="admin-product-visibility">
                   <i class="fa-solid <%= p.isActive === false ? 'fa-eye' : 'fa-eye-slash' %>"></i>
                   <%= p.isActive === false ? "Activate" : "Hide" %>
@@ -387,6 +389,7 @@
     <div class="delete-actions">
       <button id="cancelDelete" type="button">Cancel</button>
       <form id="deleteForm" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <button type="submit" class="confirm-delete">Yes, Delete</button>
       </form>
     </div>
@@ -521,6 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </a>
 
               <form action="/admin/products/${p._id}/toggle-active" method="POST" class="admin-product-inline-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="admin-product-visibility">
                   <i class="fa-solid ${p.isActive === false ? "fa-eye" : "fa-eye-slash"}"></i>
                   ${p.isActive === false ? "Activate" : "Hide"}
