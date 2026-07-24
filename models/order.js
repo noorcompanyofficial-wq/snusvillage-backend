@@ -127,6 +127,10 @@ const orderSchema = new mongoose.Schema(
         type: String,
         default: "",
       },
+      clearCartOnPayment: {
+        type: Boolean,
+        default: true,
+      },
       checkoutId: {
         type: String,
         default: "",

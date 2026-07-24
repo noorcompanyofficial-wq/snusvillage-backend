@@ -284,19 +284,57 @@ async function refreshCartForExpressCheckout(cart) {
   return cart;
 }
 
-async function createExpressQuote(req, deliveryService = "standard") {
+async function createExpressQuote(
+  req,
+  deliveryService = "standard",
+  productId = "",
+  requestedQuantity = 1
+) {
   if (!["standard", "next_day"].includes(deliveryService)) {
     throw new CheckoutError("Please select a valid delivery service.");
   }
 
-  const cart = await getCart(req);
+  let cart;
+  let totals;
 
-  if (!cart?.items?.length) {
-    throw new CheckoutError("Your cart is empty.", 409, "/cart");
+  if (productId) {
+    const product = await Product.findById(productId);
+    const quantity = Number.parseInt(requestedQuantity, 10);
+
+    if (!product || product.isActive === false) {
+      throw new CheckoutError("This product is no longer available.", 409);
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > product.stock) {
+      throw new CheckoutError("The selected quantity is no longer available.", 409);
+    }
+
+    const price =
+      product.discountPrice && product.discountPrice > 0
+        ? product.discountPrice
+        : product.price;
+    cart = { items: [{ product, quantity, priceAtTime: price }] };
+    const cartTotals = calculateCartTotals(cart, "delivery", deliveryService);
+    totals = {
+      ...cartTotals,
+      discountAmount: 0,
+      discountResult: {
+        ok: true,
+        code: "",
+        discount: null,
+        discountAmount: 0,
+      },
+    };
+  } else {
+    cart = await getCart(req);
+
+    if (!cart?.items?.length) {
+      throw new CheckoutError("Your cart is empty.", 409, "/cart");
+    }
+
+    await refreshCartForExpressCheckout(cart);
+    totals = await calculateCheckoutTotals(req, cart, "delivery", deliveryService);
   }
-
-  await refreshCartForExpressCheckout(cart);
-  const totals = await calculateCheckoutTotals(req, cart, "delivery", deliveryService);
 
   if (!totals.discountResult.ok) {
     throw new CheckoutError(totals.discountResult.message);
@@ -521,7 +559,9 @@ async function finalisePaidOrder(order) {
     await order.save();
   }
 
-  await clearCartForPaidOrder(order);
+  if (order.sumup?.clearCartOnPayment !== false) {
+    await clearCartForPaidOrder(order);
+  }
 
   order.sumup = {
     ...order.sumup,
@@ -736,7 +776,9 @@ router.post("/express/quote", async (req, res) => {
 
     const quote = await createExpressQuote(
       req,
-      req.body.deliveryService || "standard"
+      req.body.deliveryService || "standard",
+      req.body.productId || "",
+      req.body.quantity || 1
     );
     return res.json(quote.response);
   } catch (error) {
@@ -775,7 +817,13 @@ router.post("/express/create-order", async (req, res) => {
       throw new CheckoutError("Express delivery is currently available only in the United Kingdom.");
     }
 
-    const quote = await createExpressQuote(req, req.body.deliveryService || "standard");
+    const productId = String(req.body.productId || "").trim();
+    const quote = await createExpressQuote(
+      req,
+      req.body.deliveryService || "standard",
+      productId,
+      req.body.quantity || 1
+    );
     const { cart, totals, deliveryService } = quote;
     const attemptId = String(req.body.attemptId || "").trim();
 
@@ -841,6 +889,7 @@ router.post("/express/create-order", async (req, res) => {
       orderStatus: "new",
       sumup: {
         expressAttemptId: attemptId,
+        clearCartOnPayment: !productId,
         fulfilmentFinalised: false,
       },
     });

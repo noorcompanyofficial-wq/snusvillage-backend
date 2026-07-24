@@ -116,6 +116,8 @@ router.get("/:id", async (req, res) => {
       schema,
       product,
       related,
+      sumupPublicKey: process.env.SUMUP_PUBLIC_KEY || "",
+      googlePayMerchantId: process.env.GOOGLE_PAY_MERCHANT_ID || "",
     });
   } catch (err) {
     console.log(err);

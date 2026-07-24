@@ -159,6 +159,23 @@
                 Add to Cart
               </button>
             </form>
+
+            <div
+              class="pd-express"
+              id="pdExpressCheckout"
+              data-product-id="<%= product._id %>"
+              data-sumup-public-key="<%= sumupPublicKey || "" %>"
+              data-google-pay-merchant-id="<%= googlePayMerchantId || "" %>"
+              hidden
+            >
+              <div class="pd-express__title">Buy this product now</div>
+              <div id="pdExpressCheckoutContainer"></div>
+              <p class="pd-express__note">
+                Express payment purchases only this product in your selected quantity.
+                For multiple products, use <a href="/cart">cart express checkout</a>.
+              </p>
+              <p id="pdExpressCheckoutError" class="pd-express__error" role="alert" aria-live="polite" hidden></p>
+            </div>
           <% } else { %>
             <button class="pd-disabled-button" disabled>Out of Stock</button>
           <% } %>
@@ -293,6 +310,10 @@
   </div>
 </div>
 
+<% if (sumupPublicKey && inStock) { %>
+  <script src="https://js.sumup.com/swift-checkout/v1/sdk.js"></script>
+<% } %>
+
 <script>
   (function () {
     const mainImage = document.getElementById("pdMainImage");
@@ -337,6 +358,11 @@
       quantityChips.forEach((chip) => {
         chip.classList.toggle("is-active", Number(chip.dataset.quantity) === quantity);
       });
+
+      if (expressSection && !expressProcessing) {
+        window.clearTimeout(expressRefreshTimer);
+        expressRefreshTimer = window.setTimeout(initialiseProductExpress, 200);
+      }
     }
 
     quantityChips.forEach((chip) => {
@@ -344,6 +370,182 @@
     });
 
     quantityInput?.addEventListener("input", () => setQuantity(quantityInput.value));
+
+    const expressSection = document.getElementById("pdExpressCheckout");
+    const expressContainer = document.getElementById("pdExpressCheckoutContainer");
+    const expressError = document.getElementById("pdExpressCheckoutError");
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+    let expressClient;
+    let expressRequest;
+    let expressButtons;
+    let expressProcessing = false;
+    let expressDeliveryService = "standard";
+    let expressRefreshTimer;
+
+    function expressMessage(message) {
+      if (!expressError) return;
+      expressError.textContent = message || "";
+      expressError.hidden = !message;
+    }
+
+    async function expressPost(url, body) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
+        body: JSON.stringify(body),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Express checkout is unavailable.");
+      }
+      return result;
+    }
+
+    function productRequestBody(extra = {}) {
+      return {
+        productId: expressSection?.dataset.productId || "",
+        quantity: Number(quantityInput?.value || 1),
+        deliveryService: expressDeliveryService,
+        ...extra,
+      };
+    }
+
+    async function productQuote(extra) {
+      return expressPost("/checkout/express/quote", productRequestBody(extra));
+    }
+
+    function configureProductShipping(request) {
+      request.onShippingAddressChange(async (address) => {
+        const countryCode =
+          address?.countryCode || address?.country || address?.country_code || "GB";
+        const quote = await productQuote({ countryCode });
+        return { total: quote.total, shippingOptions: quote.shippingOptions };
+      });
+      request.onShippingOptionsChange(async (option) => {
+        expressDeliveryService = option?.id || option?.shippingOption || option || "standard";
+        const quote = await productQuote({ countryCode: "GB" });
+        return { total: quote.total, shippingOptions: quote.shippingOptions };
+      });
+    }
+
+    function walletOrderDetails(response) {
+      const details = response?.details || {};
+      const contact = details.contactInformation || details.contact || details.payer || {};
+      const address = details.shippingAddress || details.shipping_address || {};
+      const fullName = String(
+        contact.name || contact.fullName || address.recipient || address.name || ""
+      ).trim().split(/\s+/);
+      const lines = address.addressLine || address.addressLines || address.address_line || [];
+      const selected =
+        details.shippingOption?.id ||
+        details.shippingOption ||
+        details.shippingOptions?.id ||
+        details.shippingOptions?.[0]?.id ||
+        expressDeliveryService;
+
+      return {
+        customer: {
+          email: contact.email || details.payerEmail || "",
+          phone: contact.phone || contact.phoneNumber || details.payerPhone || "",
+          firstName: contact.firstName || contact.givenName || fullName.shift() || "",
+          lastName: contact.lastName || contact.familyName || fullName.join(" "),
+        },
+        delivery: {
+          address: Array.isArray(lines) ? lines.filter(Boolean).join(", ") : String(lines || ""),
+          city: address.city || address.locality || address.town || "",
+          postcode: address.postalCode || address.postcode || address.postal_code || "",
+          countryCode: String(
+            address.countryCode || address.country || address.country_code || ""
+          ).toUpperCase(),
+        },
+        deliveryService: selected === "next-day" ? "next_day" : selected,
+      };
+    }
+
+    async function submitProductWallet(event) {
+      if (expressProcessing || !expressRequest) return;
+      expressProcessing = true;
+      expressSection.classList.add("is-processing");
+      expressMessage("");
+      let returnUrl = "";
+
+      try {
+        const paymentResponse = await expressRequest.show(event);
+        const attemptId = window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : `wallet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const order = await expressPost(
+          "/checkout/express/create-order",
+          productRequestBody({ ...walletOrderDetails(paymentResponse), attemptId })
+        );
+        returnUrl = order.returnUrl;
+        await expressClient.processCheckout(order.checkoutId, paymentResponse);
+        window.location.assign(returnUrl);
+      } catch (error) {
+        const cancelled =
+          window.SumUp?.SwiftCheckout?.Errors?.PaymentRequestCancelledError;
+        if (returnUrl) {
+          window.location.assign(returnUrl);
+          return;
+        }
+        expressMessage(
+          cancelled && error instanceof cancelled
+            ? "Express checkout was cancelled. You have not been charged."
+            : error?.message || "Use cart express checkout or the normal checkout."
+        );
+        expressProcessing = false;
+        expressSection.classList.remove("is-processing");
+      }
+    }
+
+    async function initialiseProductExpress() {
+      const publicKey = expressSection?.dataset.sumupPublicKey || "";
+      if (!publicKey || !window.SumUp?.SwiftCheckout || !expressContainer) return;
+
+      try {
+        expressButtons?.unmount?.();
+        expressContainer.replaceChildren();
+        expressSection.hidden = true;
+        const quote = await productQuote({ countryCode: "GB" });
+        expressClient = new window.SumUp.SwiftCheckout(publicKey);
+        const options = {
+          countryCode: "GB",
+          locale: "en-GB",
+          total: quote.total,
+          shippingOptions: quote.shippingOptions,
+        };
+        const googleMerchantId = expressSection.dataset.googlePayMerchantId;
+        if (googleMerchantId) {
+          options.methodData = [{
+            supportedMethods: "google_pay",
+            data: { merchantInfo: { merchantId: googleMerchantId, merchantName: "Snus Village" } },
+          }];
+        }
+        expressRequest = expressClient.paymentRequest(options);
+        configureProductShipping(expressRequest);
+        if (!(await expressRequest.canMakePayment())) return;
+        let methods = await expressRequest.availablePaymentMethods();
+        const demoMode = window.location.hash === "#sumup:google-pay-demo-mode";
+        if (!googleMerchantId && !demoMode) {
+          methods = methods.filter((method) => method.id !== "google_pay");
+        }
+        if (!methods.length) return;
+        expressButtons = expressClient.elements({ label: "buy" });
+        expressButtons.onSubmit(submitProductWallet).mount({
+          paymentMethods: methods,
+          container: expressContainer,
+        });
+        expressSection.hidden = false;
+      } catch (error) {
+        console.warn("Product express checkout unavailable:", error?.message || error);
+      }
+    }
+
+    initialiseProductExpress();
 
     const relatedTrack = document.getElementById("pdRelatedTrack");
     const relatedPrev = document.querySelector(".pd-related__nav--prev");
