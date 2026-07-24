@@ -8,12 +8,19 @@ const MongoStore = require("connect-mongo").default;
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
+const fs = require("fs");
 const StoreSettings = require("./models/StoreSettings");
 const pageViewTracker = require("./middleware/pageViewTracker");
 
 require("dotenv").config();
 
 const app = express();
+const applePayAssociationFile = path.join(
+  __dirname,
+  "public",
+  ".well-known",
+  "apple-developer-merchantid-domain-association"
+);
 
 const defaultStoreSettings = {
   storeName: "Snus Village",
@@ -200,6 +207,21 @@ ${urls
     return res.status(500).send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`);
   }
 });
+
+app.get(
+  "/.well-known/apple-developer-merchantid-domain-association",
+  (req, res, next) => {
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.sendFile(
+      applePayAssociationFile,
+      { dotfiles: "allow" },
+      (error) => {
+        if (error) return next(error);
+      }
+    );
+  }
+);
 
 app.use(
   express.static(path.join(__dirname, "public"), {
@@ -426,6 +448,12 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   try {
+    if (fs.existsSync(applePayAssociationFile)) {
+      console.log(`Apple Pay association file found: ${applePayAssociationFile}`);
+    } else {
+      console.warn(`WARNING: Apple Pay association file is missing: ${applePayAssociationFile}`);
+    }
+
     if (!process.env.MONGO_URI) {
       console.warn("MONGO_URI is missing. Database-backed features will not save.");
     } else {
