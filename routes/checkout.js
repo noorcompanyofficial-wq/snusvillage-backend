@@ -4,7 +4,6 @@ const router = express.Router();
 const Cart = require("../models/cart");
 const Order = require("../models/order");
 const Product = require("../models/Products");
-const User = require("../models/User");
 const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
@@ -36,34 +35,6 @@ async function getCheckoutStoreSettings() {
 
 function getUserId(req) {
   return req.session?.user?._id || req.user?._id || null;
-}
-
-function sessionIsAgeVerified(req) {
-  return req.session?.diditVerified === true || req.session?.isAgeVerified === true;
-}
-
-function userIsAgeVerified(user) {
-  return Boolean(user && (user.isAgeVerified || user.didit?.verified));
-}
-
-async function getCheckoutUser(req) {
-  const userId = getUserId(req);
-  if (!userId) return null;
-  return User.findById(userId).lean();
-}
-
-async function checkoutVerificationRequired(req) {
-  const user = await getCheckoutUser(req);
-
-  if (getUserId(req) && !user) {
-    return { missingUser: true, required: true };
-  }
-
-  return {
-    missingUser: false,
-    required: !(userIsAgeVerified(user) || sessionIsAgeVerified(req)),
-    user,
-  };
 }
 
 async function getCart(req) {
@@ -484,15 +455,6 @@ router.get("/", async (req, res, next) => {
     const { subtotal, shipping, discountAmount, total, discountResult, freeShippingThreshold, standardShippingFee, nextDayShippingFee, nextDayDeliveryCutoff } =
       await calculateCheckoutTotals(req, cart, "delivery");
 
-    const verification = await checkoutVerificationRequired(req);
-
-    if (verification.missingUser) {
-      req.flash("error", "Please log in again before checkout.");
-      return res.redirect("/auth/login");
-    }
-
-    const verificationRequired = verification.required;
-
     res.render("checkout/checkout", {
       layout: "layouts/checkout-layout",
       title: "Checkout",
@@ -504,7 +466,6 @@ router.get("/", async (req, res, next) => {
       discountResult,
       appliedDiscountCode: req.session.checkoutDiscountCode || "",
       checkoutSettings: settings,
-      verificationRequired,
       freeShippingThreshold,
       standardShippingFee,
       nextDayShippingFee,
@@ -558,18 +519,6 @@ router.post("/place-order", async (req, res, next) => {
 
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.redirect("/cart");
-    }
-
-    const verification = await checkoutVerificationRequired(req);
-
-    if (verification.missingUser) {
-      req.flash("error", "Please log in again before checkout.");
-      return res.redirect("/auth/login");
-    }
-
-    if (verification.required) {
-      req.flash("error", "Age verification is required before checkout.");
-      return res.redirect("/checkout");
     }
 
     if (req.body.ageConfirm !== "yes") {

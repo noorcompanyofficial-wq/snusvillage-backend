@@ -5,8 +5,6 @@
   "scripts": {
     "start": "node app.js",
     "nodemon": "nodemon app.js",
-    "didit:account": "node scripts/didit-account.js",
-    "didit:setup": "node scripts/didit-setup.js",
     "images:migrate-cloudinary": "node scripts/migrate-product-images-to-cloudinary.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

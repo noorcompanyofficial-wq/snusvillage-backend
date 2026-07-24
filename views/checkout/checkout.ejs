@@ -11,8 +11,6 @@
   <section class="checkout-form-panel">
     <h1>SNUS VILLAGE</h1>
 
-    <form action="/didit/start" method="POST" id="checkoutDiditForm"></form>
-
     <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <h3>Contact</h3>
       <input type="email" name="email" placeholder="Email" required>
@@ -102,26 +100,13 @@
         <strong>Debit/Credit Cards</strong>
       </div>
 
-      <% if (verificationRequired) { %>
-        <div class="checkout-verification-inline">
-          <div>
-            <strong>Age Verification Required</strong>
-            <span>Please complete age verification before paying with SumUp.</span>
-          </div>
-
-          <button type="submit" form="checkoutDiditForm">
-            Start Verification
-          </button>
-        </div>
-      <% } %>
-
       <label class="checkout-age-confirm">
         <input type="checkbox" name="ageConfirm" value="yes" required>
-        <span>I confirm I am 18+ and understand age verification may be required before receiving my order.</span>
+        <span>I confirm I am 18 or over.</span>
       </label>
 
-      <button type="submit" class="pay-now-btn" <%= verificationRequired ? "disabled" : "" %>>
-        <%= verificationRequired ? "Complete Verification First" : "Pay Securely With SumUp" %>
+      <button type="submit" class="pay-now-btn">
+        Pay Securely With SumUp
       </button>
     </form>
   </section>

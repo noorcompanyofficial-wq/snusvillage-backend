@@ -75,7 +75,6 @@ function isMaintenanceBypass(req) {
     "/images",
     "/uploads",
     "/api",
-    "/didit",
   ];
 
   return (
@@ -113,8 +112,6 @@ const productsRoutes = require("./routes/products");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const cartRoutes = require("./routes/cart");
-const verificationRoutes = require("./routes/verification");
-const diditRoutes = require("./routes/didit");
 const Product = require("./models/Products");
 const legalRoutes = require("./routes/legal");
 const newsletterRoutes = require("./routes/newsletter");
@@ -132,15 +129,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(compression());
 
 // ====== Basic Middleware ======
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      if (req.originalUrl === "/didit/webhook") {
-        req.rawBody = Buffer.from(buf);
-      }
-    },
-  })
-);
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 function escapeXml(value) {
@@ -388,8 +377,6 @@ app.use("/products", productsRoutes);
 app.use("/auth", authRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/admin", adminRoutes);
-app.use("/api", verificationRoutes);
-app.use("/didit", diditRoutes);
 app.use("/newsletter", newsletterRoutes);
 app.use("/", legalRoutes);
 
