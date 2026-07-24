@@ -20,6 +20,7 @@ const AdminAuditLog = require("../models/AdminAuditLog");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
+const { verifyCsrfToken } = require("../middleware/csrf");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
 const { sendOrderEmails, sendCustomerShippingEmail } = require("../utils/orderEmails");
@@ -335,6 +336,7 @@ router.post(
     { name: "heroImage3", maxCount: 1 },
     { name: "distroImage1", maxCount: 1 },
   ]),
+  verifyCsrfToken,
   async (req, res) => {
     try {
       const body = req.body || {};
@@ -417,6 +419,7 @@ router.post(
     { name: "collectionImage3", maxCount: 1 },
     { name: "collectionImage4", maxCount: 1 },
   ]),
+  verifyCsrfToken,
   async (req, res) => {
     try {
       const body = req.body || {};
@@ -533,6 +536,7 @@ router.post(
     { name: "posterImage2", maxCount: 1 },
     { name: "posterImage3", maxCount: 1 },
   ]),
+  verifyCsrfToken,
   async (req, res) => {
     try {
       async function imagePath(fieldName, fallbackPath) {
@@ -2676,7 +2680,7 @@ router.post("/products/bulk-prices", isAdmin, requireAdminRole(PERMISSIONS.produ
 
 //  Create Product
 
-router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), async (req, res) => {
+router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), verifyCsrfToken, async (req, res) => {
   try {
     const {
       name,
@@ -2803,7 +2807,7 @@ router.get("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products)
   });
 });
 
-router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), async (req, res) => {
+router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products), upload.array("images", 5), verifyCsrfToken, async (req, res) => {
   try {
     const {
       name,

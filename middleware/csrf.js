@@ -15,6 +15,13 @@ function ensureCsrfToken(req, res, next) {
 
 function verifyCsrfToken(req, res, next) {
   if (SAFE_METHODS.has(req.method)) return next();
+
+  // Multer parses multipart bodies at the route level, after this
+  // global middleware runs, so req.body is still empty here for file
+  // uploads. Routes using multer must apply verifyCsrfToken again
+  // themselves, after their upload middleware, once req.body is populated.
+  if (req.is("multipart/form-data")) return next();
+
   const sessionToken = req.session?.csrfToken;
   const suppliedToken = (req.body && req.body._csrf) || req.get("x-csrf-token");
 
