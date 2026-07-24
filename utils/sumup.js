@@ -25,7 +25,7 @@ function requireSumUpConfig() {
   return { apiKey, merchantCode };
 }
 
-async function createHostedCheckout(order, req) {
+async function createCheckout(order, req, { hosted = false } = {}) {
   const { apiKey, merchantCode } = requireSumUpConfig();
 
   const baseUrl = getBaseUrl(req);
@@ -44,9 +44,7 @@ async function createHostedCheckout(order, req) {
       merchant_code: merchantCode,
       description: `Snus Village Order ${order._id.toString().slice(-6).toUpperCase()}`,
       redirect_url: `${baseUrl}/checkout/sumup/return/${order._id}`,
-      hosted_checkout: {
-        enabled: true,
-      },
+      ...(hosted ? { hosted_checkout: { enabled: true } } : {}),
     }),
   });
 
@@ -61,7 +59,7 @@ async function createHostedCheckout(order, req) {
     );
   }
 
-  if (!data.hosted_checkout_url) {
+  if (hosted && !data.hosted_checkout_url) {
     throw new Error("SumUp did not return hosted_checkout_url");
   }
 
@@ -70,6 +68,14 @@ async function createHostedCheckout(order, req) {
     data,
     checkoutReference,
   };
+}
+
+async function createHostedCheckout(order, req) {
+  return createCheckout(order, req, { hosted: true });
+}
+
+async function createExpressCheckout(order, req) {
+  return createCheckout(order, req);
 }
 
 async function getCheckoutStatus(checkoutId) {
@@ -99,5 +105,6 @@ async function getCheckoutStatus(checkoutId) {
 
 module.exports = {
   createHostedCheckout,
+  createExpressCheckout,
   getCheckoutStatus,
 };

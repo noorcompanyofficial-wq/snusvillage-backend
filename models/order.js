@@ -123,6 +123,10 @@ const orderSchema = new mongoose.Schema(
     },
 
     sumup: {
+      expressAttemptId: {
+        type: String,
+        default: "",
+      },
       checkoutId: {
         type: String,
         default: "",

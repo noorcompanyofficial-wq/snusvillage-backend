@@ -31,6 +31,8 @@ router.get("/", async (req, res, next) => {
     res.render("cart/cart", {
       title: "Your Cart",
       cart: cart || { items: [] },
+      sumupPublicKey: process.env.SUMUP_PUBLIC_KEY || "",
+      googlePayMerchantId: process.env.GOOGLE_PAY_MERCHANT_ID || "",
     });
   } catch (error) {
     next(error);

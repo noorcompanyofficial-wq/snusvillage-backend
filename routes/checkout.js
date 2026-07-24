@@ -8,7 +8,11 @@ const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
 const { sendOrderEmails } = require("../utils/orderEmails");
-const { createHostedCheckout, getCheckoutStatus } = require("../utils/sumup");
+const {
+  createHostedCheckout,
+  createExpressCheckout,
+  getCheckoutStatus,
+} = require("../utils/sumup");
 
 const defaultCheckoutSettings = {
   deliveryPrice: 0,
@@ -255,6 +259,92 @@ async function calculateCheckoutTotals(req, cart, fulfilmentMethod = "delivery",
     standardShippingFee,
     nextDayShippingFee,
     nextDayDeliveryCutoff,
+  };
+}
+
+async function refreshCartForExpressCheckout(cart) {
+  for (const item of cart.items) {
+    if (!item.product?._id) {
+      throw new CheckoutError("One of your cart items is no longer available.", 409, "/cart");
+    }
+
+    const freshProduct = await Product.findById(item.product._id);
+
+    if (!freshProduct || freshProduct.stock < item.quantity) {
+      throw new CheckoutError("One of your cart items is out of stock.", 409, "/cart");
+    }
+
+    item.product = freshProduct;
+    item.priceAtTime =
+      freshProduct.discountPrice && freshProduct.discountPrice > 0
+        ? freshProduct.discountPrice
+        : freshProduct.price;
+  }
+
+  return cart;
+}
+
+async function createExpressQuote(req, deliveryService = "standard") {
+  if (!["standard", "next_day"].includes(deliveryService)) {
+    throw new CheckoutError("Please select a valid delivery service.");
+  }
+
+  const cart = await getCart(req);
+
+  if (!cart?.items?.length) {
+    throw new CheckoutError("Your cart is empty.", 409, "/cart");
+  }
+
+  await refreshCartForExpressCheckout(cart);
+  const totals = await calculateCheckoutTotals(req, cart, "delivery", deliveryService);
+
+  if (!totals.discountResult.ok) {
+    throw new CheckoutError(totals.discountResult.message);
+  }
+
+  const standardShipping =
+    totals.subtotal >= totals.freeShippingThreshold ? 0 : totals.standardShippingFee;
+  const baseAfterDiscount = Math.max(0, totals.subtotal - totals.discountAmount);
+  const shippingOptions = [
+    {
+      id: "standard",
+      label: "Standard delivery",
+      description: standardShipping === 0 ? "Free UK delivery" : "Standard UK delivery",
+      amount: { currency: "GBP", value: standardShipping.toFixed(2) },
+      selected: deliveryService === "standard",
+    },
+    {
+      id: "next_day",
+      label: "Royal Mail Next Day",
+      description: `Order before ${totals.nextDayDeliveryCutoff}`,
+      amount: { currency: "GBP", value: totals.nextDayShippingFee.toFixed(2) },
+      selected: deliveryService === "next_day",
+    },
+  ];
+
+  return {
+    cart,
+    totals,
+    deliveryService,
+    response: {
+      success: true,
+      currency: "GBP",
+      subtotal: totals.subtotal.toFixed(2),
+      discount: totals.discountAmount.toFixed(2),
+      shippingOptions,
+      total: {
+        label: "Snus Village",
+        amount: {
+          currency: "GBP",
+          value: (
+            baseAfterDiscount +
+            (deliveryService === "next_day"
+              ? totals.nextDayShippingFee
+              : standardShipping)
+          ).toFixed(2),
+        },
+      },
+    },
   };
 }
 
@@ -634,6 +724,166 @@ router.post("/remove-discount", (req, res) => {
   req.session.checkoutDiscountCode = "";
   req.flash("success", "Discount code removed.");
   res.redirect("/checkout");
+});
+
+router.post("/express/quote", async (req, res) => {
+  try {
+    const countryCode = String(req.body.countryCode || "GB").toUpperCase();
+
+    if (!["GB", "GBR"].includes(countryCode)) {
+      throw new CheckoutError("Express delivery is currently available only in the United Kingdom.");
+    }
+
+    const quote = await createExpressQuote(
+      req,
+      req.body.deliveryService || "standard"
+    );
+    return res.json(quote.response);
+  } catch (error) {
+    console.log("Express checkout quote error:", error.message);
+    return res.status(error.status || 500).json({
+      success: false,
+      message:
+        error instanceof CheckoutError
+          ? error.message
+          : "The cart total could not be calculated. Please continue to checkout.",
+    });
+  }
+});
+
+router.post("/express/create-order", async (req, res) => {
+  let order;
+
+  try {
+    if (!process.env.SUMUP_PUBLIC_KEY) {
+      throw new CheckoutError("Express checkout is not configured.", 503);
+    }
+
+    const customer = req.body.customer || {};
+    const delivery = req.body.delivery || {};
+    const countryCode = String(delivery.countryCode || "").toUpperCase();
+
+    requireCheckoutField(customer.email, "Your wallet did not provide an email address.");
+    requireCheckoutField(customer.firstName, "Your wallet did not provide a first name.");
+    requireCheckoutField(customer.lastName, "Your wallet did not provide a last name.");
+    requireCheckoutField(customer.phone, "Your wallet did not provide a telephone number.");
+    requireCheckoutField(delivery.address, "Your wallet did not provide a delivery address.");
+    requireCheckoutField(delivery.city, "Your wallet did not provide a delivery city.");
+    requireCheckoutField(delivery.postcode, "Your wallet did not provide a delivery postcode.");
+
+    if (!["GB", "GBR"].includes(countryCode)) {
+      throw new CheckoutError("Express delivery is currently available only in the United Kingdom.");
+    }
+
+    const quote = await createExpressQuote(req, req.body.deliveryService || "standard");
+    const { cart, totals, deliveryService } = quote;
+    const attemptId = String(req.body.attemptId || "").trim();
+
+    if (!/^[a-zA-Z0-9-]{16,80}$/.test(attemptId)) {
+      throw new CheckoutError("The express checkout attempt was invalid.");
+    }
+
+    const existingOrder = await Order.findOne({
+      "sumup.expressAttemptId": attemptId,
+      paymentStatus: "pending",
+    });
+
+    if (existingOrder?.sumup?.checkoutId) {
+      return res.json({
+        success: true,
+        checkoutId: existingOrder.sumup.checkoutId,
+        orderId: existingOrder._id.toString(),
+        returnUrl: `/checkout/sumup/return/${existingOrder._id}`,
+      });
+    }
+
+    const orderItems = cart.items.map((item) => ({
+      product: item.product._id,
+      name: item.product.name,
+      brand: item.product.brand,
+      image: item.product.images?.[0] || "",
+      quantity: item.quantity,
+      price: item.priceAtTime,
+    }));
+
+    order = await Order.create({
+      user: getUserId(req),
+      sessionId: req.session?.cartId || "",
+      customer: {
+        email: String(customer.email).trim(),
+        firstName: String(customer.firstName).trim(),
+        lastName: String(customer.lastName).trim(),
+        phone: String(customer.phone).trim(),
+      },
+      delivery: {
+        country: "United Kingdom",
+        address: String(delivery.address).trim(),
+        city: String(delivery.city).trim(),
+        postcode: String(delivery.postcode).trim(),
+      },
+      fulfilment: {
+        method: "delivery",
+        deliveryService,
+        deliveryServiceLabel: getDeliveryServiceLabel("delivery", deliveryService),
+        deliveryCutoff: deliveryService === "next_day" ? getNextDayDeliveryCutoff() : "",
+      },
+      items: orderItems,
+      subtotal: totals.subtotal,
+      shipping: totals.shipping,
+      discount: {
+        code: totals.discountResult.discount ? totals.discountResult.code : "",
+        type: totals.discountResult.discount ? totals.discountResult.discount.type : "",
+        value: totals.discountResult.discount ? totals.discountResult.discount.value : 0,
+        amount: totals.discountAmount,
+      },
+      total: totals.total,
+      paymentStatus: "pending",
+      orderStatus: "new",
+      sumup: {
+        expressAttemptId: attemptId,
+        fulfilmentFinalised: false,
+      },
+    });
+
+    const sumupResult = await createExpressCheckout(order, req);
+    const checkout = sumupResult.data;
+
+    order.sumup = {
+      ...order.sumup,
+      checkoutId: checkout.id || "",
+      checkoutReference: sumupResult.checkoutReference,
+      checkoutUrl: "",
+      status: checkout.status || "PENDING",
+      error: "",
+    };
+    await order.save();
+
+    return res.status(201).json({
+      success: true,
+      checkoutId: checkout.id,
+      orderId: order._id.toString(),
+      returnUrl: `/checkout/sumup/return/${order._id}`,
+    });
+  } catch (error) {
+    if (order && !order.sumup?.checkoutId) {
+      order.paymentStatus = "failed";
+      order.sumup = {
+        ...order.sumup,
+        status: "failed",
+        error: error.message,
+      };
+      await order.save();
+    }
+
+    console.log("Express order error:", error.message);
+    return res.status(error.status || 502).json({
+      success: false,
+      message:
+        error instanceof CheckoutError
+          ? `${error.message} Please continue to checkout.`
+          : "Express payment could not be started. Please continue to checkout.",
+    });
+  }
 });
 
 router.post("/place-order", async (req, res, next) => {

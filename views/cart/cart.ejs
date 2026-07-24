@@ -124,6 +124,25 @@
           <strong>£<%= cartTotal.toFixed(2) %></strong>
         </div>
 
+        <div
+          class="cv4-express"
+          id="cartExpressCheckout"
+          data-sumup-public-key="<%= sumupPublicKey || "" %>"
+          data-google-pay-merchant-id="<%= googlePayMerchantId || "" %>"
+          hidden
+        >
+          <p class="cv4-express__title">Express checkout</p>
+          <div id="cartExpressCheckoutContainer"></div>
+          <p
+            class="cv4-express__error"
+            id="cartExpressCheckoutError"
+            role="alert"
+            aria-live="polite"
+            hidden
+          ></p>
+          <div class="cv4-express__divider"><span>Or continue to checkout</span></div>
+        </div>
+
         <a href="/checkout" class="cv4-btn cv4-btn--primary cv4-btn--full">
           <i class="fa-solid fa-lock"></i> Secure Checkout
         </a>
@@ -146,3 +165,221 @@
     </div>
   <% } %>
 </div>
+
+<% if (sumupPublicKey) { %>
+  <script src="https://js.sumup.com/swift-checkout/v1/sdk.js"></script>
+  <script>
+    (function () {
+      const section = document.getElementById("cartExpressCheckout");
+      const container = document.getElementById("cartExpressCheckoutContainer");
+      const errorArea = document.getElementById("cartExpressCheckoutError");
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+      const publicKey = section?.dataset.sumupPublicKey || "";
+      const googlePayMerchantId = section?.dataset.googlePayMerchantId || "";
+      const googlePayDemoMode = window.location.hash === "#sumup:google-pay-demo-mode";
+      let client;
+      let paymentRequest;
+      let walletButtons;
+      let processing = false;
+      let selectedDeliveryService = "standard";
+
+      function showError(message) {
+        if (!errorArea) return;
+        errorArea.textContent = message || "";
+        errorArea.hidden = !message;
+      }
+
+      async function postJson(url, body) {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-CSRF-Token": csrfToken,
+          },
+          body: JSON.stringify(body),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Express checkout is unavailable.");
+        }
+
+        return result;
+      }
+
+      function paymentRequestOptions(quote) {
+        const options = {
+          countryCode: "GB",
+          locale: "en-GB",
+          total: quote.total,
+          shippingOptions: quote.shippingOptions,
+        };
+
+        if (googlePayMerchantId) {
+          options.methodData = [{
+            supportedMethods: "google_pay",
+            data: {
+              merchantInfo: {
+                merchantId: googlePayMerchantId,
+                merchantName: "Snus Village",
+              },
+            },
+          }];
+        }
+
+        return options;
+      }
+
+      async function getQuote(deliveryService, countryCode) {
+        return postJson("/checkout/express/quote", {
+          deliveryService: deliveryService || selectedDeliveryService,
+          countryCode: countryCode || "GB",
+        });
+      }
+
+      function configureShippingCallbacks(request) {
+        request.onShippingAddressChange(async (address) => {
+          const countryCode =
+            address?.countryCode || address?.country || address?.country_code || "GB";
+          const quote = await getQuote(selectedDeliveryService, countryCode);
+          return { total: quote.total, shippingOptions: quote.shippingOptions };
+        });
+
+        request.onShippingOptionsChange(async (shippingOption) => {
+          selectedDeliveryService =
+            shippingOption?.id || shippingOption?.shippingOption || shippingOption || "standard";
+          const quote = await getQuote(selectedDeliveryService, "GB");
+          return { total: quote.total, shippingOptions: quote.shippingOptions };
+        });
+      }
+
+      function splitName(name) {
+        const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+        return {
+          firstName: parts.shift() || "",
+          lastName: parts.join(" "),
+        };
+      }
+
+      function normaliseWalletDetails(paymentResponse) {
+        const details = paymentResponse?.details || {};
+        const contact =
+          details.contactInformation || details.contact || details.payer || {};
+        const address =
+          details.shippingAddress || details.shipping_address || {};
+        const contactName = splitName(
+          contact.name || contact.fullName || address.recipient || address.name
+        );
+        const addressLines =
+          address.addressLine || address.addressLines || address.address_line || [];
+        const selectedOption =
+          details.shippingOption?.id ||
+          details.shippingOption ||
+          details.shippingOptions?.id ||
+          details.shippingOptions?.[0]?.id ||
+          selectedDeliveryService;
+
+        return {
+          customer: {
+            email: contact.email || details.payerEmail || "",
+            phone: contact.phone || contact.phoneNumber || details.payerPhone || "",
+            firstName: contact.firstName || contact.givenName || contactName.firstName,
+            lastName: contact.lastName || contact.familyName || contactName.lastName,
+          },
+          delivery: {
+            address: Array.isArray(addressLines)
+              ? addressLines.filter(Boolean).join(", ")
+              : String(addressLines || ""),
+            city: address.city || address.locality || address.town || "",
+            postcode: address.postalCode || address.postcode || address.postal_code || "",
+            countryCode: (
+              address.countryCode || address.country || address.country_code || ""
+            ).toUpperCase(),
+          },
+          deliveryService:
+            selectedOption === "next-day" ? "next_day" : selectedOption,
+        };
+      }
+
+      function createAttemptId() {
+        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+        return `wallet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      }
+
+      async function handleWalletSubmit(paymentMethodEvent) {
+        if (processing || !paymentRequest) return;
+
+        processing = true;
+        showError("");
+        section.classList.add("is-processing");
+        let returnUrl = "";
+
+        try {
+          const paymentResponse = await paymentRequest.show(paymentMethodEvent);
+          const orderDetails = normaliseWalletDetails(paymentResponse);
+          const orderResult = await postJson("/checkout/express/create-order", {
+            ...orderDetails,
+            attemptId: createAttemptId(),
+          });
+
+          returnUrl = orderResult.returnUrl;
+          await client.processCheckout(orderResult.checkoutId, paymentResponse);
+          window.location.assign(returnUrl);
+        } catch (error) {
+          const cancelledError =
+            window.SumUp?.SwiftCheckout?.Errors?.PaymentRequestCancelledError;
+
+          if (returnUrl) {
+            window.location.assign(returnUrl);
+            return;
+          }
+
+          if (cancelledError && error instanceof cancelledError) {
+            showError("Express checkout was cancelled. You have not been charged.");
+          } else {
+            showError(
+              error?.message ||
+                "Express checkout is unavailable. Please continue to the normal checkout."
+            );
+          }
+
+          processing = false;
+          section.classList.remove("is-processing");
+        }
+      }
+
+      async function initialiseExpressCheckout() {
+        if (!section || !container || !publicKey || !window.SumUp?.SwiftCheckout) return;
+
+        try {
+          const quote = await getQuote("standard", "GB");
+          client = new window.SumUp.SwiftCheckout(publicKey);
+          paymentRequest = client.paymentRequest(paymentRequestOptions(quote));
+          configureShippingCallbacks(paymentRequest);
+
+          if (!(await paymentRequest.canMakePayment())) return;
+
+          let paymentMethods = await paymentRequest.availablePaymentMethods();
+
+          if (!googlePayMerchantId && !googlePayDemoMode) {
+            paymentMethods = paymentMethods.filter((method) => method.id !== "google_pay");
+          }
+
+          if (!paymentMethods.length) return;
+
+          walletButtons = client.elements({ label: "buy" });
+          walletButtons.onSubmit(handleWalletSubmit).mount({
+            paymentMethods,
+            container,
+          });
+          section.hidden = false;
+        } catch (error) {
+          console.warn("Cart express checkout unavailable:", error?.message || error);
+        }
+      }
+
+      initialiseExpressCheckout();
+    })();
+  </script>
+<% } %>

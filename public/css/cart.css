@@ -801,3 +801,50 @@ body > .cart .checkout-btn {
   .checkout-fulfilment-options,
   .checkout-delivery-service-options { grid-template-columns: 1fr; }
 }
+.cv4-express {
+  margin: 0 0 18px;
+}
+
+.cv4-express__title {
+  margin: 0 0 10px;
+  color: #071225;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#cartExpressCheckoutContainer {
+  min-height: 48px;
+}
+
+.cv4-express.is-processing {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.cv4-express__error {
+  margin: 10px 0 0;
+  color: #b41232;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cv4-express__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  color: #6b7a99;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cv4-express__divider::before,
+.cv4-express__divider::after {
+  height: 1px;
+  flex: 1;
+  background: #d9dfeb;
+  content: "";
+}

@@ -108,19 +108,6 @@
         <span><%= checkoutSettings?.checkoutNotice || "You Will Be Redirected To SumUp To Complete Your Card Payment Securely." %></span>
       </div>
 
-      <div
-        class="checkout-express"
-        id="checkoutExpress"
-        data-sumup-public-key="<%= sumupPublicKey || "" %>"
-        data-google-pay-merchant-id="<%= googlePayMerchantId || "" %>"
-        hidden
-      >
-        <div class="checkout-express__label">Express checkout</div>
-        <div id="expressCheckoutContainer"></div>
-        <div class="checkout-wallet-error" id="checkoutWalletError" role="alert" aria-live="polite"></div>
-        <div class="checkout-payment-separator"><span>Or pay securely by card</span></div>
-      </div>
-
       <div class="payment-methods checkout-payment-methods" aria-label="Accepted payment methods">
         <span>Accepted via SumUp</span>
         <strong>Visa</strong>
@@ -218,10 +205,6 @@
   </aside>
 </div>
 
-<% if (sumupPublicKey) { %>
-  <script src="https://js.sumup.com/swift-checkout/v1/sdk.js"></script>
-<% } %>
-
 <script>
   (function () {
     const checkoutPage = document.querySelector(".checkout-page");
@@ -237,22 +220,12 @@
     const shippingAmount = document.getElementById("checkoutShippingAmount");
     const grandTotal = document.getElementById("checkoutGrandTotal");
     const shippingNote = document.getElementById("checkoutShippingNote");
-    const checkoutForm = document.getElementById("checkoutForm");
-    const expressArea = document.getElementById("checkoutExpress");
-    const expressContainer = document.getElementById("expressCheckoutContainer");
-    const walletError = document.getElementById("checkoutWalletError");
-    const cardButton = checkoutForm?.querySelector(".pay-now-btn");
-
     const subtotal = Number(checkoutPage?.dataset.subtotal || 0);
     const discount = Number(checkoutPage?.dataset.discount || 0);
     const freeShippingThreshold = Number(checkoutPage?.dataset.freeShippingThreshold || 10);
     const standardShippingFee = Number(checkoutPage?.dataset.standardShippingFee || 1.99);
     const nextDayShippingFee = Number(checkoutPage?.dataset.nextDayShippingFee || 4.99);
     const nextDayCutoff = checkoutPage?.dataset.nextDayCutoff || "4:30pm";
-    let currentTotal = Number(checkoutPage?.dataset.total || 0);
-    let walletPaymentRequest = null;
-    let walletButtons = null;
-    let walletProcessing = false;
 
     function formatMoney(value) {
       return "£" + Number(value || 0).toFixed(2);
@@ -270,7 +243,6 @@
             ? 0
             : standardShippingFee;
       const total = Math.max(0, subtotal + shipping - discount);
-      currentTotal = total;
 
       if (shippingAmount) {
         shippingAmount.textContent = shipping === 0 ? "Free" : formatMoney(shipping);
@@ -292,133 +264,6 @@
           shippingNote.textContent =
             "Spend " + formatMoney(freeShippingThreshold - subtotal) + " more to get free delivery.";
         }
-      }
-
-      refreshWalletPaymentRequest();
-    }
-
-    function createWalletPaymentRequest() {
-      if (!window.SumUp?.SwiftCheckout || !expressArea?.dataset.sumupPublicKey) {
-        return null;
-      }
-
-      const client = window.checkoutSwiftClient;
-      const request = {
-        countryCode: "GB",
-        locale: "en-GB",
-        total: {
-          label: "Snus Village",
-          amount: { currency: "GBP", value: currentTotal.toFixed(2) },
-        },
-      };
-
-      if (expressArea.dataset.googlePayMerchantId) {
-        request.methodData = [{
-          supportedMethods: "google_pay",
-          data: {
-            merchantInfo: {
-              merchantId: expressArea.dataset.googlePayMerchantId,
-              merchantName: "Snus Village",
-            },
-          },
-        }];
-      }
-
-      return client.paymentRequest(request);
-    }
-
-    function refreshWalletPaymentRequest() {
-      if (window.checkoutSwiftClient) {
-        walletPaymentRequest = createWalletPaymentRequest();
-      }
-    }
-
-    function showWalletError(message) {
-      if (walletError) walletError.textContent = message || "";
-    }
-
-    function setPaymentProcessing(processing) {
-      walletProcessing = processing;
-      if (cardButton) cardButton.disabled = processing;
-      if (expressArea) expressArea.classList.toggle("is-processing", processing);
-    }
-
-    async function startWalletPayment(paymentMethodEvent) {
-      if (walletProcessing || !checkoutForm || !walletPaymentRequest) return;
-
-      showWalletError("");
-
-      if (!checkoutForm.reportValidity()) {
-        checkoutForm.querySelector(":invalid")?.focus();
-        return;
-      }
-
-      setPaymentProcessing(true);
-      let returnUrl = "";
-
-      try {
-        const paymentResponse = await walletPaymentRequest.show(paymentMethodEvent);
-        const formData = new FormData(checkoutForm);
-        formData.set("paymentFlow", "wallet");
-
-        const response = await fetch(checkoutForm.action, {
-          method: "POST",
-          body: new URLSearchParams(formData),
-          headers: { Accept: "application/json" },
-        });
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok || !result.success || !result.checkoutId || !result.returnUrl) {
-          throw new Error(result.message || "Express checkout could not be started.");
-        }
-
-        returnUrl = result.returnUrl;
-        await window.checkoutSwiftClient.processCheckout(result.checkoutId, paymentResponse);
-        window.location.assign(returnUrl);
-      } catch (error) {
-        const cancelledError = window.SumUp?.SwiftCheckout?.Errors?.PaymentRequestCancelledError;
-
-        if (returnUrl) {
-          window.location.assign(returnUrl);
-          return;
-        }
-
-        if (cancelledError && error instanceof cancelledError) {
-          showWalletError("Express checkout was cancelled. You have not been charged.");
-        } else {
-          showWalletError(error?.message || "Express checkout is unavailable. Please pay securely by card.");
-        }
-        setPaymentProcessing(false);
-      }
-    }
-
-    async function initialiseExpressCheckout() {
-      const publicKey = expressArea?.dataset.sumupPublicKey;
-
-      if (!publicKey || !window.SumUp?.SwiftCheckout || !expressContainer) return;
-
-      try {
-        window.checkoutSwiftClient = new window.SumUp.SwiftCheckout(publicKey);
-        refreshWalletPaymentRequest();
-
-        if (!walletPaymentRequest || !(await walletPaymentRequest.canMakePayment())) return;
-
-        let paymentMethods = await walletPaymentRequest.availablePaymentMethods();
-
-        if (!expressArea.dataset.googlePayMerchantId) {
-          paymentMethods = paymentMethods.filter((method) => method.id !== "google_pay");
-        }
-
-        if (!paymentMethods.length) return;
-
-        walletButtons = window.checkoutSwiftClient.elements({ label: "buy" });
-        walletButtons.onSubmit(startWalletPayment).mount({
-          paymentMethods,
-          container: expressContainer,
-        });
-        expressArea.hidden = false;
-      } catch (error) {
-        console.warn("SumUp express checkout unavailable:", error?.message || error);
       }
     }
 
@@ -472,6 +317,5 @@
     });
 
     updateFulfilment();
-    initialiseExpressCheckout();
   })();
 </script>
