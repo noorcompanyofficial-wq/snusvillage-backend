@@ -74,9 +74,9 @@ async function getCart(req) {
     return null;
   }
 
-  return Cart.findOne({
-    $or: [{ user: userId }, { sessionId }],
-  }).populate("items.product");
+  const query = userId ? { user: userId } : { sessionId };
+
+  return Cart.findOne(query).populate("items.product");
 }
 
 function getFreeShippingThreshold() {
@@ -387,9 +387,9 @@ async function reduceStockForPaidOrder(order) {
 async function clearCartForPaidOrder(order) {
   if (!order.user && !order.sessionId) return;
 
-  const cart = await Cart.findOne({
-    $or: [{ user: order.user }, { sessionId: order.sessionId }],
-  });
+  const cart = await Cart.findOne(
+    order.user ? { user: order.user } : { sessionId: order.sessionId }
+  );
 
   if (cart) {
     cart.items = [];
