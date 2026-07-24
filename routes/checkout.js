@@ -443,6 +443,127 @@ async function finalisePaidOrder(order) {
   return order;
 }
 
+class CheckoutError extends Error {
+  constructor(message, status = 400, redirectTo = "/checkout") {
+    super(message);
+    this.status = status;
+    this.redirectTo = redirectTo;
+  }
+}
+
+function requireCheckoutField(value, message) {
+  if (!String(value || "").trim()) {
+    throw new CheckoutError(message);
+  }
+}
+
+async function prepareOrder(req) {
+  const cart = await getCart(req);
+
+  if (!cart || !cart.items || cart.items.length === 0) {
+    throw new CheckoutError("Your cart is empty.", 409, "/cart");
+  }
+
+  if (req.body.ageConfirm !== "yes") {
+    throw new CheckoutError("You must confirm you are 18+ before placing an order.");
+  }
+
+  requireCheckoutField(req.body.email, "Please enter your email address.");
+  requireCheckoutField(req.body.firstName, "Please enter your first name.");
+  requireCheckoutField(req.body.lastName, "Please enter your last name.");
+  requireCheckoutField(req.body.phone, "Please enter your phone number.");
+
+  for (const item of cart.items) {
+    if (!item.product || !item.product._id) {
+      throw new CheckoutError("One of your cart items is no longer available.", 409, "/cart");
+    }
+
+    const freshProduct = await Product.findById(item.product._id);
+
+    if (!freshProduct || freshProduct.stock < item.quantity) {
+      throw new CheckoutError("One of your cart items is out of stock.", 409, "/cart");
+    }
+  }
+
+  if (!["delivery", "click_collect"].includes(req.body.fulfilmentMethod)) {
+    throw new CheckoutError("Please select a valid fulfilment method.");
+  }
+
+  const fulfilmentMethod = req.body.fulfilmentMethod;
+  const isClickCollect = fulfilmentMethod === "click_collect";
+
+  if (!isClickCollect && !["standard", "next_day"].includes(req.body.deliveryService)) {
+    throw new CheckoutError("Please select a valid delivery service.");
+  }
+
+  const deliveryService = isClickCollect ? "standard" : req.body.deliveryService;
+  const settings = await getCheckoutStoreSettings();
+  const { subtotal, shipping, discountAmount, total, discountResult } =
+    await calculateCheckoutTotals(req, cart, fulfilmentMethod, deliveryService);
+
+  if (!discountResult.ok) {
+    throw new CheckoutError(discountResult.message);
+  }
+
+  if (!isClickCollect) {
+    requireCheckoutField(req.body.address, "Please enter your delivery address.");
+    requireCheckoutField(req.body.city, "Please enter your delivery city.");
+    requireCheckoutField(req.body.postcode, "Please enter your delivery postcode.");
+  }
+
+  const orderItems = cart.items
+    .filter((item) => item.product)
+    .map((item) => {
+      const price = item.priceAtTime || item.product.price || 0;
+
+      return {
+        product: item.product._id,
+        name: item.product.name,
+        brand: item.product.brand,
+        image: item.product.images?.[0] || "",
+        quantity: item.quantity,
+        price,
+      };
+    });
+
+  return Order.create({
+    user: getUserId(req),
+    sessionId: req.session?.cartId || "",
+    customer: {
+      email: String(req.body.email).trim(),
+      firstName: String(req.body.firstName).trim(),
+      lastName: String(req.body.lastName).trim(),
+      phone: String(req.body.phone).trim(),
+    },
+    delivery: {
+      country: "United Kingdom",
+      address: isClickCollect ? settings.clickCollectAddress : String(req.body.address).trim(),
+      city: isClickCollect ? settings.clickCollectCity : String(req.body.city).trim(),
+      postcode: isClickCollect ? settings.clickCollectPostcode : String(req.body.postcode).trim(),
+    },
+    fulfilment: {
+      method: fulfilmentMethod,
+      deliveryService: isClickCollect ? "collection" : deliveryService,
+      deliveryServiceLabel: getDeliveryServiceLabel(fulfilmentMethod, deliveryService),
+      deliveryCutoff: deliveryService === "next_day" ? getNextDayDeliveryCutoff() : "",
+      collectionBranch: isClickCollect ? settings.clickCollectBranch : "",
+      collectionAddress: isClickCollect ? settings.clickCollectAddress : "",
+    },
+    items: orderItems,
+    subtotal,
+    shipping,
+    discount: {
+      code: discountResult.discount ? discountResult.code : "",
+      type: discountResult.discount ? discountResult.discount.type : "",
+      value: discountResult.discount ? discountResult.discount.value : 0,
+      amount: discountAmount,
+    },
+    total,
+    paymentStatus: "pending",
+    orderStatus: "new",
+  });
+}
+
 router.get("/", async (req, res, next) => {
   try {
     const cart = await getCart(req);
@@ -470,6 +591,8 @@ router.get("/", async (req, res, next) => {
       standardShippingFee,
       nextDayShippingFee,
       nextDayDeliveryCutoff,
+      sumupPublicKey: process.env.SUMUP_PUBLIC_KEY || "",
+      googlePayMerchantId: process.env.GOOGLE_PAY_MERCHANT_ID || "",
     });
   } catch (error) {
     next(error);
@@ -514,139 +637,70 @@ router.post("/remove-discount", (req, res) => {
 });
 
 router.post("/place-order", async (req, res, next) => {
+  const isWallet = req.body.paymentFlow === "wallet";
+  let order;
+
   try {
-    const cart = await getCart(req);
-
-    if (!cart || !cart.items || cart.items.length === 0) {
-      return res.redirect("/cart");
+    if (isWallet && !process.env.SUMUP_PUBLIC_KEY) {
+      throw new CheckoutError("Express checkout is not configured. Please pay securely by card.", 503);
     }
 
-    if (req.body.ageConfirm !== "yes") {
-      req.flash("error", "You must confirm you are 18+ before placing an order.");
-      return res.redirect("/checkout");
-    }
+    order = await prepareOrder(req);
+    const sumupResult = await createHostedCheckout(order, req);
+    const checkout = sumupResult.data;
 
-    for (const item of cart.items) {
-      if (!item.product || !item.product._id) {
-        req.flash("error", "One of your cart items is no longer available.");
-        return res.redirect("/cart");
-      }
+    order.sumup = {
+      checkoutId: checkout.id || "",
+      checkoutReference: sumupResult.checkoutReference,
+      checkoutUrl: checkout.hosted_checkout_url || "",
+      status: checkout.status || "PENDING",
+      paidAt: null,
+      error: "",
+      fulfilmentFinalised: false,
+    };
 
-      const freshProduct = await Product.findById(item.product._id);
+    await order.save();
 
-      if (!freshProduct || freshProduct.stock < item.quantity) {
-        req.flash("error", "One of your cart items is out of stock.");
-        return res.redirect("/cart");
-      }
-    }
-
-    const fulfilmentMethod =
-      req.body.fulfilmentMethod === "click_collect" ? "click_collect" : "delivery";
-
-    const isClickCollect = fulfilmentMethod === "click_collect";
-    const deliveryService =
-      !isClickCollect && req.body.deliveryService === "next_day" ? "next_day" : "standard";
-
-    const settings = await getCheckoutStoreSettings();
-    const { subtotal, shipping, discountAmount, total, discountResult } =
-      await calculateCheckoutTotals(req, cart, fulfilmentMethod, deliveryService);
-
-    if (!isClickCollect) {
-      if (!req.body.address || !req.body.city || !req.body.postcode) {
-        req.flash("error", "Please enter your delivery address.");
-        return res.redirect("/checkout");
-      }
-    }
-
-    const orderItems = cart.items
-      .filter((item) => item.product)
-      .map((item) => {
-        const price = item.priceAtTime || item.product.price || 0;
-
-        return {
-          product: item.product._id,
-          name: item.product.name,
-          brand: item.product.brand,
-          image:
-            item.product.images && item.product.images.length > 0
-              ? item.product.images[0]
-              : "",
-          quantity: item.quantity,
-          price,
-        };
+    if (isWallet) {
+      return res.status(201).json({
+        success: true,
+        checkoutId: checkout.id,
+        orderId: order._id.toString(),
+        returnUrl: `/checkout/sumup/return/${order._id}`,
       });
+    }
 
-    const order = await Order.create({
-      user: getUserId(req),
-      sessionId: req.session?.cartId || "",
-      customer: {
-        email: req.body.email,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phone: req.body.phone,
-      },
-      delivery: {
-        country: "United Kingdom",
-        address: isClickCollect ? settings.clickCollectAddress : req.body.address,
-        city: isClickCollect ? settings.clickCollectCity : req.body.city,
-        postcode: isClickCollect ? settings.clickCollectPostcode : req.body.postcode,
-      },
-      fulfilment: {
-        method: fulfilmentMethod,
-        deliveryService: isClickCollect ? "collection" : deliveryService,
-        deliveryServiceLabel: getDeliveryServiceLabel(fulfilmentMethod, deliveryService),
-        deliveryCutoff: deliveryService === "next_day" ? getNextDayDeliveryCutoff() : "",
-        collectionBranch: isClickCollect ? settings.clickCollectBranch : "",
-        collectionAddress: isClickCollect ? settings.clickCollectAddress : "",
-      },
-      items: orderItems,
-      subtotal,
-      shipping,
-      discount: {
-        code: discountResult.ok && discountResult.discount ? discountResult.code : "",
-        type: discountResult.ok && discountResult.discount ? discountResult.discount.type : "",
-        value: discountResult.ok && discountResult.discount ? discountResult.discount.value : 0,
-        amount: discountAmount,
-      },
-      total,
-      paymentStatus: "pending",
-      orderStatus: "new",
-    });
-
-    try {
-      const sumupResult = await createHostedCheckout(order, req);
-      const checkout = sumupResult.data;
-
-      order.sumup = {
-        checkoutId: checkout.id || "",
-        checkoutReference: sumupResult.checkoutReference,
-        checkoutUrl: checkout.hosted_checkout_url || "",
-        status: checkout.status || "PENDING",
-        paidAt: null,
-        error: "",
-        fulfilmentFinalised: false,
-      };
-
-      await order.save();
-
-      return res.redirect(checkout.hosted_checkout_url);
-    } catch (sumupError) {
+    return res.redirect(checkout.hosted_checkout_url);
+  } catch (error) {
+    if (order && !order.sumup?.checkoutId) {
       order.paymentStatus = "failed";
       order.sumup = {
         ...order.sumup,
         status: "failed",
-        error: sumupError.message,
+        error: error.message,
         fulfilmentFinalised: false,
       };
-
       await order.save();
-
-      console.log("SumUp checkout error:", sumupError.message);
-      req.flash("error", "Payment could not be started. Please try again.");
-      return res.redirect("/checkout");
     }
-  } catch (error) {
-    next(error);
+
+    console.log("SumUp checkout error:", error.message);
+
+    if (isWallet) {
+      return res.status(error.status || 502).json({
+        success: false,
+        message: error instanceof CheckoutError
+          ? error.message
+          : "Payment could not be started. Please try again.",
+      });
+    }
+
+    if (error instanceof CheckoutError) {
+      req.flash("error", error.message);
+      return res.redirect(error.redirectTo);
+    }
+
+    req.flash("error", "Payment could not be started. Please try again.");
+    return res.redirect("/checkout");
   }
 });
 

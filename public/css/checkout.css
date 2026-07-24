@@ -563,6 +563,59 @@ body {
   color: #15803d;
 }
 
+/* ── Express checkout ── */
+.checkout-express {
+  margin: 18px 0;
+}
+
+.checkout-express__label {
+  margin-bottom: 10px;
+  color: var(--ck-navy);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#expressCheckoutContainer {
+  min-height: 48px;
+}
+
+.checkout-express.is-processing {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.checkout-wallet-error {
+  margin-top: 10px;
+  color: var(--ck-red);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.checkout-wallet-error:empty {
+  display: none;
+}
+
+.checkout-payment-separator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 4px;
+  color: var(--ck-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.checkout-payment-separator::before,
+.checkout-payment-separator::after {
+  height: 1px;
+  flex: 1;
+  background: var(--ck-border);
+  content: "";
+}
+
 /* ── Totals ── */
 .checkout-total-row,
 .checkout-grand-total {
