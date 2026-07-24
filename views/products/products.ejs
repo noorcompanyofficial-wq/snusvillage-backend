@@ -529,8 +529,13 @@
         configureProductShipping(expressRequest);
         if (!(await expressRequest.canMakePayment())) return;
         let methods = await expressRequest.availablePaymentMethods();
-        const demoMode = window.location.hash === "#sumup:google-pay-demo-mode";
-        if (!googleMerchantId && !demoMode) {
+        const demoMode = [
+          "#sumup:google-pay-demo-mode",
+          "#sumup-widget:google-pay-demo-mode",
+        ].includes(window.location.hash);
+        if (demoMode && !methods.some((method) => method.id === "google_pay")) {
+          methods.push({ id: "google_pay" });
+        } else if (!googleMerchantId) {
           methods = methods.filter((method) => method.id !== "google_pay");
         }
         if (!methods.length) return;

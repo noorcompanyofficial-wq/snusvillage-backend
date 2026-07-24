@@ -176,7 +176,10 @@
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
       const publicKey = section?.dataset.sumupPublicKey || "";
       const googlePayMerchantId = section?.dataset.googlePayMerchantId || "";
-      const googlePayDemoMode = window.location.hash === "#sumup:google-pay-demo-mode";
+      const googlePayDemoMode = [
+        "#sumup:google-pay-demo-mode",
+        "#sumup-widget:google-pay-demo-mode",
+      ].includes(window.location.hash);
       let client;
       let paymentRequest;
       let walletButtons;
@@ -362,7 +365,12 @@
 
           let paymentMethods = await paymentRequest.availablePaymentMethods();
 
-          if (!googlePayMerchantId && !googlePayDemoMode) {
+          if (
+            googlePayDemoMode &&
+            !paymentMethods.some((method) => method.id === "google_pay")
+          ) {
+            paymentMethods.push({ id: "google_pay" });
+          } else if (!googlePayMerchantId) {
             paymentMethods = paymentMethods.filter((method) => method.id !== "google_pay");
           }
 
