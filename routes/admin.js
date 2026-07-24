@@ -164,10 +164,6 @@ function buildAdminProductFilter(source = {}) {
   return filter;
 }
 
-function roundMoney(value) {
-  return Math.round(Number(value || 0) * 100) / 100;
-}
-
 function orderItemsText(order) {
   return (order.items || [])
     .map((item) => `${item.quantity} x ${item.name} (£${Number(item.price || 0).toFixed(2)})`)
@@ -2598,64 +2594,53 @@ router.post("/products/bulk-prices", isAdmin, requireAdminRole(PERMISSIONS.produ
       return res.redirect(backToProducts());
     }
 
-    const priceField = req.body.priceField === "discountPrice" ? "discountPrice" : "price";
-    const updateMode = String(req.body.updateMode || "");
-    const updateValue = Number(req.body.updateValue);
+    const rawPrice = String(req.body.price ?? "").trim();
+    const rawDiscountPrice = String(req.body.discountPrice ?? "").trim();
+    const setPrice = rawPrice !== "";
+    const setDiscountPrice = rawDiscountPrice !== "";
 
-    if (!["set", "increase-percent", "decrease-percent", "increase-fixed", "decrease-fixed", "clear-discount"].includes(updateMode)) {
-      req.flash("error", "Choose a valid bulk price action.");
+    if (!setPrice && !setDiscountPrice) {
+      req.flash("error", "Enter a new price and/or a new discount price to apply.");
       return res.redirect(backToProducts());
     }
 
-    if (updateMode !== "clear-discount" && (!Number.isFinite(updateValue) || updateValue < 0)) {
-      req.flash("error", "Enter a valid positive price value.");
+    const priceValue = setPrice ? Number(rawPrice) : null;
+    const discountPriceValue = setDiscountPrice ? Number(rawDiscountPrice) : null;
+
+    if (setPrice && (!Number.isFinite(priceValue) || priceValue < 0)) {
+      req.flash("error", "Enter a valid positive main price.");
       return res.redirect(backToProducts());
     }
 
-    if (updateMode === "clear-discount" && priceField !== "discountPrice") {
-      req.flash("error", "Clear discount can only be used with Discount Price.");
+    if (setDiscountPrice && (!Number.isFinite(discountPriceValue) || discountPriceValue < 0)) {
+      req.flash("error", "Enter a valid positive discount price.");
       return res.redirect(backToProducts());
     }
 
     const filter = buildAdminProductFilter(req.body);
-    const products = await Product.find(filter).select("_id name brand price discountPrice").lean();
+    const products = await Product.find(filter).select("_id").lean();
 
     if (!products.length) {
       req.flash("error", "No matching products found for bulk price update.");
       return res.redirect(backToProducts());
     }
 
-    const operations = products.map((product) => {
-      const current = Number(product[priceField] || 0);
-      let nextValue = current;
+    const update = {};
+    if (setPrice) update.price = priceValue;
+    if (setDiscountPrice) update.discountPrice = discountPriceValue;
 
-      if (updateMode === "set") nextValue = updateValue;
-      if (updateMode === "increase-percent") nextValue = current * (1 + updateValue / 100);
-      if (updateMode === "decrease-percent") nextValue = current * (1 - updateValue / 100);
-      if (updateMode === "increase-fixed") nextValue = current + updateValue;
-      if (updateMode === "decrease-fixed") nextValue = current - updateValue;
-      if (updateMode === "clear-discount") nextValue = 0;
-
-      nextValue = Math.max(0, roundMoney(nextValue));
-
-      return {
-        updateOne: {
-          filter: { _id: product._id },
-          update: { $set: { [priceField]: nextValue } },
-        },
-      };
-    });
-
-    await Product.bulkWrite(operations);
+    await Product.updateMany(
+      { _id: { $in: products.map((product) => product._id) } },
+      { $set: update }
+    );
 
     await logAdminAction(req, "PRODUCT_BULK_PRICE_UPDATED", {
       targetType: "Product",
-      summary: `Bulk updated ${products.length} product ${priceField}`,
+      summary: `Bulk updated ${products.length} product price(s)`,
       meta: {
         productCount: products.length,
-        priceField,
-        updateMode,
-        updateValue: Number.isFinite(updateValue) ? updateValue : null,
+        price: priceValue,
+        discountPrice: discountPriceValue,
         filters: {
           search: req.body.search || "",
           brand: req.body.brand || "",

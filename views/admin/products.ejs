@@ -195,28 +195,13 @@
       <input type="hidden" name="saleBadge" value="<%= query.saleBadge || '' %>">
 
       <label>
-        Field
-        <select name="priceField">
-          <option value="price">Main Price</option>
-          <option value="discountPrice">Discount Price</option>
-        </select>
+        New Price (£)
+        <input type="number" name="price" min="0" step="0.01" placeholder="Leave blank to keep">
       </label>
 
       <label>
-        Action
-        <select name="updateMode">
-          <option value="set">Set to exact amount</option>
-          <option value="increase-percent">Increase by %</option>
-          <option value="decrease-percent">Decrease by %</option>
-          <option value="increase-fixed">Increase by £</option>
-          <option value="decrease-fixed">Decrease by £</option>
-          <option value="clear-discount">Clear discount price</option>
-        </select>
-      </label>
-
-      <label>
-        Value
-        <input type="number" name="updateValue" min="0" step="0.01" placeholder="3.99 or 10">
+        New Discount Price (£)
+        <input type="number" name="discountPrice" min="0" step="0.01" placeholder="Leave blank to keep, 0 to clear">
       </label>
 
       <label>
@@ -231,7 +216,7 @@
     </form>
 
     <p class="admin-bulk-price-note">
-      Tip: filter by brand, strength, stock or best seller first. The update applies to all matching products, not only the products visible on this page.
+      Tip: filter by brand, strength, stock or best seller first. Fill in a new price and/or a new discount price — whatever you leave blank stays unchanged. This applies to all matching products, not only the products visible on this page.
     </p>
   </section>
 

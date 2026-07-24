@@ -596,7 +596,7 @@
 
 .admin-bulk-price-form {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   gap: 14px;
   align-items: end;
   margin-top: 18px;
