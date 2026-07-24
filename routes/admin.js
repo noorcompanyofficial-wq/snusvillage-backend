@@ -929,23 +929,26 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
         {
           $group: {
             _id: {
-              $dateToString: {
-                format: "%Y-%m-%d",
-                date: "$createdAt",
+              day: {
+                $dateToString: {
+                  format: "%Y-%m-%d",
+                  date: "$createdAt",
+                },
               },
+              visitorId: "$visitorId",
             },
             views: { $sum: 1 },
-            visitors: { $addToSet: "$visitorId" },
           },
         },
         {
-          $project: {
-            views: 1,
-            uniqueVisitors: { $size: "$visitors" },
+          $group: {
+            _id: "$_id.day",
+            views: { $sum: "$views" },
+            uniqueVisitors: { $sum: 1 },
           },
         },
         { $sort: { _id: 1 } },
-      ]),
+      ]).allowDiskUse(true),
 
       PageView.aggregate([
         {
@@ -955,22 +958,25 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
         },
         {
           $group: {
-            _id: "$path",
+            _id: {
+              path: "$path",
+              visitorId: "$visitorId",
+            },
             views: { $sum: 1 },
-            uniqueVisitors: { $addToSet: "$visitorId" },
             lastViewedAt: { $max: "$createdAt" },
           },
         },
         {
-          $project: {
-            views: 1,
-            uniqueVisitors: { $size: "$uniqueVisitors" },
-            lastViewedAt: 1,
+          $group: {
+            _id: "$_id.path",
+            views: { $sum: "$views" },
+            uniqueVisitors: { $sum: 1 },
+            lastViewedAt: { $max: "$lastViewedAt" },
           },
         },
         { $sort: { views: -1, uniqueVisitors: -1 } },
         { $limit: 10 },
-      ]),
+      ]).allowDiskUse(true),
 
       PageView.find()
         .sort({ createdAt: -1 })
