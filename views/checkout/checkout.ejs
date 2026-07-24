@@ -1,3 +1,14 @@
+<!-- ── Breadcrumb bar ── -->
+<div class="ck4-crumb">
+  <div class="ck4-wrap">
+    <nav class="ck4-crumb__nav" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      <span>Checkout</span>
+    </nav>
+  </div>
+</div>
+
 <div
   class="checkout-page"
   data-subtotal="<%= subtotal.toFixed(2) %>"
@@ -9,11 +20,13 @@
   data-next-day-cutoff="<%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>"
 >
   <section class="checkout-form-panel">
-    <h1>SNUS VILLAGE</h1>
+    <div class="ck4-eyebrow">Secure Checkout</div>
+    <h1>Complete your <em>order.</em></h1>
 
     <form action="/checkout/place-order" method="POST" id="checkoutForm">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <h3>Contact</h3>
+
+      <div class="ck4-section-label"><span>01</span>Contact</div>
       <input type="email" name="email" placeholder="Email" required>
 
       <div class="checkout-row">
@@ -23,7 +36,7 @@
 
       <input type="text" name="phone" placeholder="Phone" required>
 
-      <h3>Fulfilment</h3>
+      <div class="ck4-section-label"><span>02</span>Fulfilment</div>
 
       <div class="checkout-fulfilment-options">
         <label class="checkout-fulfilment-card is-active" data-fulfilment-card="delivery">
@@ -50,7 +63,7 @@
       </div>
 
       <div id="deliveryFields">
-        <h3>Delivery</h3>
+        <div class="ck4-section-label"><span>03</span>Delivery</div>
 
         <div class="checkout-delivery-service-options" id="deliveryServiceOptions">
           <label class="checkout-delivery-service-card is-active" data-delivery-service-card="standard">
@@ -88,7 +101,7 @@
         </div>
       </div>
 
-      <h3>Payment</h3>
+      <div class="ck4-section-label"><span>04</span>Payment</div>
       <div class="checkout-sumup-notice">
         <strong>Secure SumUp Payment</strong>
         <span><%= checkoutSettings?.checkoutNotice || "You Will Be Redirected To SumUp To Complete Your Card Payment Securely." %></span>
@@ -113,6 +126,8 @@
   </section>
 
   <aside class="checkout-summary-panel">
+    <div class="ck4-summary-label">Order Summary</div>
+
     <% cart.items.forEach(item => { %>
       <% if (item.product) { %>
         <div class="checkout-item">
