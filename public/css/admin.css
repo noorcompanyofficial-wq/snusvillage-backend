@@ -2832,6 +2832,81 @@ textarea:focus {
   cursor: pointer;
 }
 
+.admin-inventory-bulk-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid rgba(9, 31, 77, 0.08);
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.admin-inventory-selection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.admin-inventory-selection button {
+  border: 0;
+  padding: 0;
+  color: #123b8a;
+  background: transparent;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-inventory-bulk-actions {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-inventory-bulk-actions label {
+  display: grid;
+  gap: 5px;
+  color: #123b8a;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-inventory-bulk-actions input {
+  width: 130px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(9, 31, 77, 0.14);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #061633;
+  font-weight: 850;
+}
+
+.admin-bulk-button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #123b8a;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-bulk-button--danger {
+  background: #b41232;
+}
+
+.admin-bulk-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .admin-inventory-table-wrap {
   overflow-x: auto;
   border-radius: 18px;
@@ -2864,6 +2939,23 @@ textarea:focus {
 .admin-inventory-table td {
   color: #061633;
   font-weight: 750;
+}
+
+.admin-inventory-table tbody tr.is-selected {
+  background: #eef4ff;
+}
+
+.admin-inventory-select-cell {
+  width: 44px;
+  padding-right: 4px !important;
+  text-align: center !important;
+}
+
+.admin-inventory-select-cell input {
+  width: 18px;
+  height: 18px;
+  accent-color: #123b8a;
+  cursor: pointer;
 }
 
 .admin-inventory-product {
@@ -2912,6 +3004,16 @@ textarea:focus {
 
   .admin-inventory-filters {
     grid-template-columns: 1fr;
+  }
+
+  .admin-inventory-bulk-bar,
+  .admin-inventory-bulk-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-inventory-bulk-actions input {
+    width: 100%;
   }
 }
 

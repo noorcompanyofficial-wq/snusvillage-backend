@@ -2287,6 +2287,60 @@ router.get("/inventory", isAdmin, requireAdminRole(PERMISSIONS.products), async 
 
 router.post("/inventory/bulk-stock", isAdmin, requireAdminRole(PERMISSIONS.products), async (req, res) => {
   try {
+    const bulkAction = String(req.body.bulkAction || "").trim();
+    const selectedProducts = (Array.isArray(req.body.selectedProducts)
+      ? req.body.selectedProducts
+      : [req.body.selectedProducts]
+    ).filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+    if (bulkAction) {
+      if (!selectedProducts.length) {
+        req.flash("error", "Select at least one product first.");
+        return res.redirect(req.get("Referrer") || "/admin/inventory");
+      }
+
+      let stock;
+
+      if (bulkAction === "out_of_stock") {
+        stock = 0;
+      } else if (bulkAction === "set_stock") {
+        const submittedStock = String(req.body.bulkStockValue ?? "").trim();
+
+        if (!/^\d+$/.test(submittedStock)) {
+          req.flash("error", "Enter a valid stock quantity for the selected products.");
+          return res.redirect(req.get("Referrer") || "/admin/inventory");
+        }
+
+        stock = Number.parseInt(submittedStock, 10);
+      } else {
+        req.flash("error", "Unknown bulk stock action.");
+        return res.redirect(req.get("Referrer") || "/admin/inventory");
+      }
+
+      const result = await Product.updateMany(
+        { _id: { $in: selectedProducts } },
+        { $set: { stock } }
+      );
+      const updatedCount = result.modifiedCount ?? result.matchedCount ?? 0;
+
+      await logAdminAction(req, "PRODUCT_STOCK_BULK_UPDATED", {
+        targetType: "Product",
+        summary: `Set stock to ${stock} for ${selectedProducts.length} selected product${selectedProducts.length === 1 ? "" : "s"}`,
+        meta: {
+          selectedCount: selectedProducts.length,
+          updatedCount,
+          newStock: stock,
+          productIds: selectedProducts,
+        },
+      });
+
+      req.flash(
+        "success",
+        `${selectedProducts.length} selected product${selectedProducts.length === 1 ? "" : "s"} set to ${stock === 0 ? "out of stock" : `${stock} in stock`}.`
+      );
+      return res.redirect(req.get("Referrer") || "/admin/inventory");
+    }
+
     const updates = req.body.updates || {};
     const entries = Object.entries(updates);
 

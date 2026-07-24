@@ -101,10 +101,33 @@
     <% } else { %>
       <form id="bulkStockForm" action="/admin/inventory/bulk-stock" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="admin-inventory-bulk-bar">
+          <div class="admin-inventory-selection">
+            <strong><span id="inventorySelectedCount">0</span> selected</strong>
+            <button type="button" id="inventoryClearSelection">Clear</button>
+          </div>
+
+          <div class="admin-inventory-bulk-actions">
+            <label>
+              Set selected stock to
+              <input type="number" name="bulkStockValue" min="0" inputmode="numeric" placeholder="Quantity">
+            </label>
+            <button type="submit" name="bulkAction" value="set_stock" class="admin-bulk-button" disabled>
+              <i class="fa-solid fa-layer-group"></i> Apply Quantity
+            </button>
+            <button type="submit" name="bulkAction" value="out_of_stock" class="admin-bulk-button admin-bulk-button--danger" disabled>
+              <i class="fa-solid fa-box-open"></i> Mark Out Of Stock
+            </button>
+          </div>
+        </div>
+
         <div class="admin-inventory-table-wrap">
           <table class="admin-inventory-table">
             <thead>
               <tr>
+                <th class="admin-inventory-select-cell">
+                  <input type="checkbox" id="inventorySelectAll" aria-label="Select all visible products">
+                </th>
                 <th>Product</th>
                 <th>Brand</th>
                 <th>SKU</th>
@@ -123,6 +146,15 @@
               <% products.forEach((product) => { %>
                 <% const productPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price; %>
                 <tr>
+                  <td class="admin-inventory-select-cell">
+                    <input
+                      type="checkbox"
+                      name="selectedProducts"
+                      value="<%= product._id %>"
+                      class="inventory-product-checkbox"
+                      aria-label="Select <%= product.name %>"
+                    >
+                  </td>
                   <td>
                     <div class="admin-inventory-product">
                       <% if (product.images && product.images[0]) { %>
