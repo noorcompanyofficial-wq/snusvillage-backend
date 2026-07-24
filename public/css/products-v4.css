@@ -299,6 +299,31 @@ main {
 }
 .pdv4 .pd-service span { color: #6b7a99; }
 
+/* Express (Apple Pay / Google Pay) checkout */
+.pdv4 .pd-express {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 0;
+  border: 1px solid #e8ecf4;
+  background: #ffffff;
+}
+
+.pdv4 .pd-express__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
+
+.pdv4 .pd-express__title i {
+  color: #b41232;
+}
+
+.pdv4 .pd-express__container {
+  min-height: 48px;
+  display: flex;
+}
+
 /* ========================
    DETAIL SECTIONS
    ======================== */
