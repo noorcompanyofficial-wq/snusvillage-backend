@@ -206,93 +206,91 @@
 
         <!-- Left copy -->
         <div class="v4-hero__left">
-          <div class="v4-hero__pill"><i class="fa-solid fa-map-pin"></i> London's Premier Nicotine Pouch Store</div>
+          <div class="v4-hero__eyebrow">London's Nicotine Pouch Specialist</div>
           <h1>Premium<br>Nicotine<br><span>Pouches</span></h1>
           <p class="v4-hero__lead">100+ products from the world's most trusted brands. Age-verified checkout, three London stores and fast UK delivery from &pound;1.99.</p>
           <div class="v4-hero__btns">
             <a href="<%= (homepageContent?.hero?.slides?.[0]?.buttonLink) || '/shop' %>" class="v4-btn-red">
               <%= (homepageContent?.hero?.slides?.[0]?.buttonText) || 'Shop Now' %> <i class="fa-solid fa-arrow-right"></i>
             </a>
-            <a href="#shops" class="v4-hero__btn-ghost">Find a Store</a>
+            <a href="#shops" class="v4-btn-navy">Find a Store</a>
           </div>
-          <div class="v4-hero__stats">
-            <div><div class="v4-hero__stat-num">100+</div><div class="v4-hero__stat-lbl">Products</div></div>
-            <div><div class="v4-hero__stat-num">3</div><div class="v4-hero__stat-lbl">London Stores</div></div>
-            <div><div class="v4-hero__stat-num">&pound;1.99</div><div class="v4-hero__stat-lbl">Delivery From</div></div>
+          <div class="v4-hero__trust">
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-shield-halved"></i> Age Verified</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-truck-fast"></i> From &pound;1.99</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-map-pin"></i> 3 Stores</div>
+            <div class="v4-hero__trust-item"><i class="fa-solid fa-certificate"></i> Authentic</div>
           </div>
         </div>
 
-        <!-- Right product panel — animated slideshow -->
+        <!-- Right visual panel — three-can slideshow -->
         <div class="v4-hero__right">
           <div class="v4-hero__progress-track"><div class="v4-hero__progress-fill" id="carouselProgress"></div></div>
-
-          <div class="v4-hero__rings" aria-hidden="true">
-            <div class="v4-hero__ring v4-hero__ring--1"></div>
-            <div class="v4-hero__ring v4-hero__ring--2"></div>
-          </div>
 
           <div class="v4-hero__slides" id="heroCarousel">
             <% if (v4CarouselProds.length) { %>
               <% v4CarouselProds.forEach((p, idx) => { %>
                 <%
-                  const cImg = p.images && p.images.length ? p.images[0] : null;
+                  const total = v4CarouselProds.length;
+                  const prevP = v4CarouselProds[(idx - 1 + total) % total];
+                  const nextP = v4CarouselProds[(idx + 1) % total];
+                  const cImg  = p.images && p.images.length ? p.images[0] : null;
+                  const prevImg = prevP?.images && prevP.images.length ? prevP.images[0] : null;
+                  const nextImg = nextP?.images && nextP.images.length ? nextP.images[0] : null;
                   const cSc  = v4sc(p.strength);
                   const cFinalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
                 %>
                 <div class="v4-hero__slide <%= idx === 0 ? 'is-active' : '' %>" data-idx="<%= idx %>">
-                  <div class="v4-hero__badge v4-hero__badge--tl">
-                    <div class="v4-hero__badge-label">Brand</div>
-                    <div class="v4-hero__badge-value"><%= p.brand || 'Snus Village' %></div>
-                    <div class="v4-hero__badge-sub">Premium Pouches</div>
+                  <div class="v4-hero__cans">
+                    <div class="v4-hero__can v4-hero__can--side">
+                      <% if (prevImg && total > 1) { %>
+                        <img src="<%= optimiseImageUrl(prevImg, { width: 200 }) %>" alt="" />
+                      <% } %>
+                    </div>
+
+                    <div class="v4-hero__can v4-hero__can--main">
+                      <% if (p.strength) { %>
+                        <span class="v4-hero__can-badge v4-badge--<%= cSc %>"><%= p.strength %></span>
+                      <% } %>
+                      <a href="/products/<%= p.slug || p._id %>" aria-label="View <%= p.name %>">
+                        <% if (cImg) { %>
+                          <img src="<%= optimiseImageUrl(cImg, { width: 500 }) %>" alt="<%= p.name %>" loading="<%= idx === 0 ? 'eager' : 'lazy' %>" decoding="async" />
+                        <% } else { %>
+                          <div class="v4-hero__no-img"><i class="fa-solid fa-box-open"></i></div>
+                        <% } %>
+                      </a>
+                      <div class="v4-hero__can-label"><%= p.brand || 'Snus Village' %></div>
+                      <div class="v4-hero__can-bar v4-badge--<%= cSc %>"></div>
+                      <div class="v4-hero__can-price">&pound;<%= Number(cFinalPrice || 0).toFixed(2) %></div>
+                    </div>
+
+                    <div class="v4-hero__can v4-hero__can--side">
+                      <% if (nextImg && total > 1) { %>
+                        <img src="<%= optimiseImageUrl(nextImg, { width: 200 }) %>" alt="" />
+                      <% } %>
+                    </div>
                   </div>
 
-                  <% if (p.strength) { %>
-                    <div class="v4-hero__badge v4-hero__badge--tr">
-                      <div class="v4-hero__badge-label">Strength</div>
-                      <div class="v4-hero__badge-value"><%= p.strength %></div>
-                      <% if (p.nicotine) { %><div class="v4-hero__badge-sub"><%= p.nicotine %>mg nicotine</div><% } %>
+                  <div class="v4-hero__slide-card">
+                    <div class="v4-hero__slide-card-brand"><%= p.brand || 'Snus Village' %></div>
+                    <div class="v4-hero__slide-card-name"><%= p.name %></div>
+                    <div class="v4-hero__slide-card-row">
+                      <span class="v4-hero__slide-card-price">&pound;<%= Number(cFinalPrice || 0).toFixed(2) %></span>
+                      <a href="/products/<%= p.slug || p._id %>" class="v4-hero__slide-card-link">View <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
-                  <% } %>
-
-                  <a href="/products/<%= p.slug || p._id %>" class="v4-hero__slide-imglink" aria-label="View <%= p.name %>">
-                    <% if (cImg) { %>
-                      <img
-                        class="v4-hero__slide-img"
-                        src="<%= optimiseImageUrl(cImg, { width: 500 }) %>"
-                        alt="<%= p.name %>"
-                        loading="<%= idx === 0 ? 'eager' : 'lazy' %>"
-                        decoding="async"
-                      />
-                    <% } else { %>
-                      <div class="v4-hero__slide-img v4-hero__no-img"><i class="fa-solid fa-box-open"></i></div>
-                    <% } %>
-                  </a>
-
-                  <% if (p.flavour) { %>
-                    <div class="v4-hero__badge v4-hero__badge--bl">
-                      <div class="v4-hero__badge-label">Flavour</div>
-                      <div class="v4-hero__badge-value"><%= p.flavour %></div>
-                      <div class="v4-hero__badge-sub"><%= p.name %></div>
-                    </div>
-                  <% } %>
-
-                  <a href="/products/<%= p.slug || p._id %>" class="v4-hero__badge v4-hero__badge--br">
-                    <div class="v4-hero__badge-label">Price</div>
-                    <div class="v4-hero__badge-value">&pound;<%= Number(cFinalPrice || 0).toFixed(2) %></div>
-                    <div class="v4-hero__badge-sub"><%= p.pouchesPerCan || 20 %> pouches per can</div>
-                  </a>
-
-                  <div class="v4-hero__slide-bar v4-badge--<%= cSc %>"></div>
+                  </div>
                 </div>
               <% }) %>
             <% } else { %>
               <div class="v4-hero__slide is-active">
-                <a href="/shop" class="v4-hero__slide-imglink">
-                  <div class="v4-hero__slide-img v4-hero__no-img"><i class="fa-solid fa-box-open"></i></div>
-                </a>
-                <div class="v4-hero__badge v4-hero__badge--bl">
-                  <div class="v4-hero__badge-label">Snus Village</div>
-                  <div class="v4-hero__badge-value">Products Coming Soon</div>
+                <div class="v4-hero__cans">
+                  <div class="v4-hero__can v4-hero__can--main">
+                    <a href="/shop"><div class="v4-hero__no-img"><i class="fa-solid fa-box-open"></i></div></a>
+                    <div class="v4-hero__can-label">Snus Village</div>
+                  </div>
+                </div>
+                <div class="v4-hero__slide-card">
+                  <div class="v4-hero__slide-card-name">Products Coming Soon</div>
                 </div>
               </div>
             <% } %>
