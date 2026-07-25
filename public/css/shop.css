@@ -1626,4 +1626,26 @@ body {
 
 /* ===== LIGHT THEME OVERRIDES END ===== */
 
+/* ===== MOBILE TAP TARGET FIX START =====
+   Several rounds of "compact tile" edits above progressively shrank the
+   Add to Cart / View Product button down to a 32px-tall, 7px-font pill —
+   well under the ~44px minimum recommended for a comfortable tap target.
+   Restoring a readable, tappable size without touching the rest of the
+   compact card layout. */
+.shop-brand-products .shop-product-bottom button,
+.shop-brand-products .shop-view-btn {
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 860px) {
+  .shop-brand-products .shop-product-bottom button,
+  .shop-brand-products .shop-view-btn {
+    min-height: 44px !important;
+    font-size: 11px !important;
+  }
+}
+/* ===== MOBILE TAP TARGET FIX END ===== */
+
 /* ===== SHOP PRODUCT ADMIN BADGES END ===== */
