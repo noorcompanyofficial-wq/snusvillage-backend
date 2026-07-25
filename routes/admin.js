@@ -24,6 +24,7 @@ const { verifyCsrfToken } = require("../middleware/csrf");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
 const { sendOrderEmails, sendCustomerShippingEmail } = require("../utils/orderEmails");
+const { refundCheckout } = require("../utils/sumup");
 const { storeProductImages } = require("../utils/productImages");
 const { storeHomepageVideo, storeHomepageImage } = require("../utils/homepageMedia");
 
@@ -1610,7 +1611,7 @@ router.get("/orders", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req,
       }
     }
 
-    if (["pending", "paid", "failed"].includes(paymentStatus)) {
+    if (["pending", "paid", "failed", "refunded"].includes(paymentStatus)) {
       filter.paymentStatus = paymentStatus;
     }
 
@@ -1783,6 +1784,90 @@ router.post("/orders/:id/status", isAdmin, requireAdminRole(PERMISSIONS.orders),
     console.log(err);
     req.flash("error", "Unable to update order status");
     res.redirect(req.get("Referrer") || "/admin/orders");
+  }
+});
+
+router.post("/orders/:id/cancel-refund", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
+  const redirectTo = req.get("Referrer") || `/admin/orders/${req.params.id}`;
+
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      req.flash("error", "Order not found");
+      return res.redirect("/admin/orders");
+    }
+
+    if (order.paymentStatus !== "paid") {
+      req.flash("error", `Only paid orders can be cancelled and refunded (this order is "${order.paymentStatus}").`);
+      return res.redirect(redirectTo);
+    }
+
+    if (order.sumup?.refunded) {
+      req.flash("error", "This order has already been refunded.");
+      return res.redirect(redirectTo);
+    }
+
+    let refundResult;
+
+    try {
+      refundResult = await refundCheckout(order.sumup?.checkoutId, null);
+    } catch (refundError) {
+      order.sumup = {
+        ...order.sumup,
+        refundError: refundError.message,
+      };
+      await order.save();
+
+      await logAdminAction(req, "ORDER_REFUND_FAILED", {
+        targetType: "Order",
+        targetId: req.params.id,
+        summary: `SumUp refund failed for order ${String(req.params.id).slice(-6).toUpperCase()}: ${refundError.message}`,
+      });
+
+      req.flash("error", `SumUp refund failed: ${refundError.message}`);
+      return res.redirect(redirectTo);
+    }
+
+    // Refund succeeded with SumUp — now reflect it locally.
+    order.paymentStatus = "refunded";
+    order.orderStatus = "cancelled";
+    order.sumup = {
+      ...order.sumup,
+      refunded: true,
+      refundedAt: new Date(),
+      refundAmount: order.total,
+      refundTransactionId: refundResult.transactionId,
+      refundError: "",
+      refundedBy: req.session?.user?.email || "",
+    };
+
+    await order.save();
+
+    // Return items to stock since the sale has been reversed.
+    for (const item of order.items) {
+      if (item.product) {
+        await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } });
+      }
+    }
+
+    await logAdminAction(req, "ORDER_CANCELLED_REFUNDED", {
+      targetType: "Order",
+      targetId: req.params.id,
+      summary: `Cancelled and refunded order ${String(req.params.id).slice(-6).toUpperCase()} via SumUp (£${Number(order.total || 0).toFixed(2)})`,
+      meta: {
+        refundAmount: order.total,
+        refundTransactionId: refundResult.transactionId,
+        refundTransactionCode: refundResult.transactionCode,
+      },
+    });
+
+    req.flash("success", `Order refunded via SumUp and cancelled. £${Number(order.total || 0).toFixed(2)} returned to the customer.`);
+    res.redirect(redirectTo);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to cancel and refund this order");
+    res.redirect(redirectTo);
   }
 });
 

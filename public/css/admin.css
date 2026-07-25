@@ -1553,6 +1553,11 @@ textarea:focus {
   background: #fee2e2;
 }
 
+.payment-refunded {
+  color: #5b21b6;
+  background: #ede9fe;
+}
+
 .order-processing {
   color: #1e3a8a;
   background: #dbeafe;
@@ -2167,6 +2172,11 @@ textarea:focus {
 .status-pill--rejected {
   color: #b91c1c;
   background: rgba(239, 68, 68, 0.14);
+}
+
+.payment-refunded {
+  color: #6d28d9;
+  background: rgba(139, 92, 246, 0.14);
 }
 
 .order-packed,
@@ -3647,6 +3657,19 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.admin-danger-btn {
+  gap: 8px;
+  background: #b91c1c !important;
+}
+
+.admin-danger-btn:hover {
+  background: #991b1b !important;
+}
+
+.admin-refund-error-text {
+  color: #b91c1c;
 }
 
 .admin-checklist-grid {

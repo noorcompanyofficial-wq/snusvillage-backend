@@ -103,8 +103,64 @@ async function getCheckoutStatus(checkoutId) {
   return data;
 }
 
+async function refundCheckout(checkoutId, amount) {
+  const { apiKey } = requireSumUpConfig();
+
+  if (!checkoutId) {
+    throw new Error("No SumUp checkout ID on this order.");
+  }
+
+  // Refunds are issued against the transaction, not the checkout, so look
+  // up the transaction ID tied to this checkout first.
+  const checkout = await getCheckoutStatus(checkoutId);
+
+  if (checkout.status !== "PAID") {
+    throw new Error(
+      `SumUp checkout is not in a PAID state (status: ${checkout.status || "unknown"}), cannot refund.`
+    );
+  }
+
+  const transactionId = checkout.transaction_id || checkout.transactions?.[0]?.id;
+
+  if (!transactionId) {
+    throw new Error("Could not find a SumUp transaction ID for this checkout.");
+  }
+
+  const body = {};
+  if (amount != null) {
+    body.amount = Number(amount);
+  }
+
+  const response = await fetch(`${SUMUP_API_BASE}/v0.1/me/refund/${transactionId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (response.status === 204) {
+    return { ok: true, transactionId, transactionCode: checkout.transaction_code || "", data: null };
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ||
+      data?.detail ||
+      JSON.stringify(data) ||
+      "Unable to refund SumUp transaction"
+    );
+  }
+
+  return { ok: true, transactionId, transactionCode: checkout.transaction_code || "", data };
+}
+
 module.exports = {
   createHostedCheckout,
   createExpressCheckout,
   getCheckoutStatus,
+  refundCheckout,
 };

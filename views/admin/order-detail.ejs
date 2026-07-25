@@ -218,7 +218,54 @@
             <strong><%= order.sumup.error %></strong>
           </div>
         <% } %>
+
+        <% if (order.sumup?.refunded) { %>
+          <div>
+            <span>Refunded At</span>
+            <strong><%= new Date(order.sumup.refundedAt).toLocaleString("en-GB") %></strong>
+          </div>
+
+          <div>
+            <span>Refund Amount</span>
+            <strong>£<%= Number(order.sumup.refundAmount || 0).toFixed(2) %></strong>
+          </div>
+
+          <div>
+            <span>Refund Transaction</span>
+            <strong><%= order.sumup.refundTransactionId || "N/A" %></strong>
+          </div>
+
+          <% if (order.sumup.refundedBy) { %>
+            <div>
+              <span>Refunded By</span>
+              <strong><%= order.sumup.refundedBy %></strong>
+            </div>
+          <% } %>
+        <% } %>
+
+        <% if (order.sumup?.refundError && !order.sumup?.refunded) { %>
+          <div>
+            <span>Last Refund Attempt</span>
+            <strong class="admin-refund-error-text"><%= order.sumup.refundError %></strong>
+          </div>
+        <% } %>
       </div>
+
+      <% if (order.paymentStatus === "paid" && !order.sumup?.refunded) { %>
+        <div class="admin-order-action-row">
+          <form
+            action="/admin/orders/<%= order._id %>/cancel-refund"
+            method="POST"
+            onsubmit="return confirm('Cancel this order and refund £<%= Number(order.total || 0).toFixed(2) %> to the customer via SumUp? This cannot be undone.');"
+          >
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="admin-danger-btn">
+              <i class="fa-solid fa-rotate-left"></i>
+              Cancel &amp; Refund Via SumUp
+            </button>
+          </form>
+        </div>
+      <% } %>
     </section>
   </div>
 
