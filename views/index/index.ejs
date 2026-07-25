@@ -57,6 +57,7 @@
 
     <!-- Core CSS: age-gate, landing (keeps header/nav/footer/mega-menu styles), v4 sections -->
     <link rel="stylesheet" href="/css/age-gate.css?v=v4-split-20260717" />
+    <link rel="stylesheet" href="/css/promo-popup.css?v=v4-20260725" />
     <link rel="stylesheet" href="/css/landing.css?v=megamenu-fix-20260713" />
     <link rel="stylesheet" href="/css/landing-v4.css?v=v4-carousel-animated-20260717" />
 
@@ -103,6 +104,32 @@
         <p class="age-gate__note">Your age is verified once every 24 hours. We do not store your date of birth.</p>
       </div>
     </div>
+
+    <% if (storeSettings && storeSettings.promoPopupEnabled !== false) { %>
+      <div
+        class="promo-popup"
+        id="promoPopup"
+        data-delay-seconds="<%= Number(storeSettings.promoPopupDelaySeconds != null ? storeSettings.promoPopupDelaySeconds : 20) %>"
+        role="dialog"
+        aria-labelledby="promoPopupHeading"
+        aria-hidden="true"
+        hidden
+      >
+        <button class="promo-popup__close" id="promoPopupClose" type="button" aria-label="Close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <div class="promo-popup__badge">10% Off</div>
+        <h2 class="promo-popup__heading" id="promoPopupHeading"><%= storeSettings.promoPopupHeading || "Welcome to Snus Village!" %></h2>
+        <p class="promo-popup__body"><%= storeSettings.promoPopupBody || "Enjoy 10% off your first order, on us." %></p>
+        <button class="promo-popup__code" id="promoPopupCode" type="button" title="Click to copy">
+          <span><%= storeSettings.promoPopupCode || "WELCOME10" %></span>
+          <i class="fa-regular fa-copy" aria-hidden="true"></i>
+        </button>
+        <a class="promo-popup__cta" href="<%= storeSettings.promoPopupButtonLink || '/shop' %>">
+          <%= storeSettings.promoPopupButtonText || "Shop Now" %>
+        </a>
+      </div>
+    <% } %>
 
     <%- include("../partials/header") %>
 
@@ -654,6 +681,10 @@
         var ageError = document.getElementById("ageError");
         var AGE_KEY  = "sv_age_verified";
         var AGE_TTL  = 24 * 60 * 60 * 1000;
+        var promoPopup = document.getElementById("promoPopup");
+        var promoPopupClose = document.getElementById("promoPopupClose");
+        var promoPopupCode = document.getElementById("promoPopupCode");
+        var PROMO_SEEN_KEY = "sv_promo_seen";
 
         function isAgeVerified() {
           try {
@@ -702,7 +733,7 @@
         /* Allow ?age=reset to force gate (testing) */
         if (new URLSearchParams(window.location.search).get("age") === "reset") clearAgeVerified();
 
-        if (isAgeVerified()) { hideAgeGate(); } else { showAgeGate(); }
+        if (isAgeVerified()) { hideAgeGate(); schedulePromoPopup(); } else { showAgeGate(); }
 
         if (enterBtn) enterBtn.addEventListener("click", function () {
           var dob = (ageDob && ageDob.value) || "";
@@ -719,6 +750,7 @@
           }
           setAgeVerified();
           hideAgeGate();
+          schedulePromoPopup();
         });
 
         if (exitBtn) exitBtn.addEventListener("click", function () {
@@ -728,6 +760,68 @@
 
         if (ageDob) ageDob.addEventListener("input", function () {
           if (ageError) ageError.textContent = "";
+        });
+
+        /* ── Welcome Discount Popup — shows N seconds after age verification ── */
+        function schedulePromoPopup() {
+          if (!promoPopup) return;
+
+          var verifiedAt;
+          try {
+            var ageObj = JSON.parse(localStorage.getItem(AGE_KEY));
+            verifiedAt = ageObj.expires - AGE_TTL;
+          } catch (e) {
+            return;
+          }
+          if (!verifiedAt) return;
+
+          try {
+            var seen = JSON.parse(localStorage.getItem(PROMO_SEEN_KEY));
+            if (seen && Date.now() < seen.expires) return;
+          } catch (e) {
+            /* no valid seen record, continue */
+          }
+
+          var delaySeconds = Number(promoPopup.dataset.delaySeconds || 20);
+          var remaining = Math.max(0, verifiedAt + delaySeconds * 1000 - Date.now());
+          setTimeout(showPromoPopup, remaining);
+        }
+
+        function showPromoPopup() {
+          if (!promoPopup || (ageModal && ageModal.classList.contains("is-visible"))) return;
+
+          promoPopup.hidden = false;
+          requestAnimationFrame(function () { promoPopup.classList.add("is-visible"); });
+          promoPopup.setAttribute("aria-hidden", "false");
+
+          var expires = Date.now() + AGE_TTL;
+          try {
+            expires = JSON.parse(localStorage.getItem(AGE_KEY)).expires || expires;
+          } catch (e) {
+            /* keep default */
+          }
+          localStorage.setItem(PROMO_SEEN_KEY, JSON.stringify({ seen: true, expires: expires }));
+        }
+
+        function hidePromoPopup() {
+          if (!promoPopup) return;
+          promoPopup.classList.remove("is-visible");
+          promoPopup.setAttribute("aria-hidden", "true");
+          setTimeout(function () { promoPopup.hidden = true; }, 350);
+        }
+
+        if (promoPopupClose) promoPopupClose.addEventListener("click", hidePromoPopup);
+
+        if (promoPopupCode) promoPopupCode.addEventListener("click", function () {
+          var codeSpan = this.querySelector("span");
+          var codeText = codeSpan ? codeSpan.textContent.trim() : "";
+          if (!codeText || !navigator.clipboard || !navigator.clipboard.writeText) return;
+
+          var self = this;
+          navigator.clipboard.writeText(codeText).then(function () {
+            self.classList.add("is-copied");
+            setTimeout(function () { self.classList.remove("is-copied"); }, 2000);
+          }).catch(function () {});
         });
       })();
     </script>

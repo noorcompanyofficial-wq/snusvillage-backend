@@ -85,6 +85,42 @@ const storeSettingsSchema = new mongoose.Schema(
       type: String,
       default: "Snus Village is currently updating the website. Please check back soon.",
     },
+
+    promoPopupEnabled: {
+      type: Boolean,
+      default: true,
+    },
+
+    promoPopupDelaySeconds: {
+      type: Number,
+      default: 20,
+      min: 0,
+    },
+
+    promoPopupHeading: {
+      type: String,
+      default: "Welcome to Snus Village!",
+    },
+
+    promoPopupBody: {
+      type: String,
+      default: "Enjoy 10% off your first order, on us.",
+    },
+
+    promoPopupCode: {
+      type: String,
+      default: "WELCOME10",
+    },
+
+    promoPopupButtonText: {
+      type: String,
+      default: "Shop Now",
+    },
+
+    promoPopupButtonLink: {
+      type: String,
+      default: "/shop",
+    },
   },
   { timestamps: true }
 );

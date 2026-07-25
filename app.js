@@ -38,6 +38,13 @@ const defaultStoreSettings = {
   maintenanceMode: false,
   hideVapesCategory: true,
   maintenanceMessage: "Snus Village is currently updating the website. Please check back soon.",
+  promoPopupEnabled: true,
+  promoPopupDelaySeconds: 20,
+  promoPopupHeading: "Welcome to Snus Village!",
+  promoPopupBody: "Enjoy 10% off your first order, on us.",
+  promoPopupCode: "WELCOME10",
+  promoPopupButtonText: "Shop Now",
+  promoPopupButtonLink: "/shop",
 };
 
 let cachedStoreSettings = defaultStoreSettings;

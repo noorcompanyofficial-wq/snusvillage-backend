@@ -3739,6 +3739,23 @@ textarea:focus {
   letter-spacing: normal;
 }
 
+.admin-settings-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(18, 59, 138, 0.06);
+  color: #465a7a;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.admin-settings-note a {
+  color: #123b8a;
+  font-weight: 900;
+}
+
 @media (max-width: 760px) {
   .admin-settings-grid {
     grid-template-columns: 1fr;

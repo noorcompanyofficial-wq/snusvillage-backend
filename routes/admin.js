@@ -1452,6 +1452,13 @@ router.post("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (
         maintenanceMode: req.body.maintenanceMode === "on",
         hideVapesCategory: req.body.hideVapesCategory === "on",
         maintenanceMessage: String(req.body.maintenanceMessage || "").trim(),
+        promoPopupEnabled: req.body.promoPopupEnabled === "on",
+        promoPopupDelaySeconds: Math.max(0, Number(req.body.promoPopupDelaySeconds || 20)),
+        promoPopupHeading: String(req.body.promoPopupHeading || "").trim(),
+        promoPopupBody: String(req.body.promoPopupBody || "").trim(),
+        promoPopupCode: String(req.body.promoPopupCode || "").trim().toUpperCase(),
+        promoPopupButtonText: String(req.body.promoPopupButtonText || "").trim(),
+        promoPopupButtonLink: String(req.body.promoPopupButtonLink || "").trim() || "/shop",
       },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     );

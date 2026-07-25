@@ -13,6 +13,10 @@ const ageError = document.getElementById("ageError");
 const AGE_KEY  = "sv_age_verified";
 const AGE_TTL  = 24 * 60 * 60 * 1000; /* 24 hours in ms */
 
+/* ── Welcome Discount Popup elements (used by schedulePromoPopup below) ── */
+const promoPopup = document.getElementById("promoPopup");
+const PROMO_SEEN_KEY = "sv_promo_seen";
+
 function isAgeVerified() {
   try {
     const raw = localStorage.getItem(AGE_KEY);
@@ -75,7 +79,7 @@ if (new URLSearchParams(window.location.search).get("age") === "reset") {
 
 /* Show or hide gate on load */
 if (ageModal) {
-  if (isAgeVerified()) { hideAgeGate(); } else { showAgeGateModal(); }
+  if (isAgeVerified()) { hideAgeGate(); schedulePromoPopup(); } else { showAgeGateModal(); }
 }
 
 /* Enter site */
@@ -89,6 +93,67 @@ enterBtn?.addEventListener("click", () => {
   if (!isAdultFromDob(dob)) { redirectUnderage(); return; }
   setAgeVerified();
   hideAgeGate();
+  schedulePromoPopup();
+});
+
+/* ── Welcome Discount Popup — shows N seconds after age verification ── */
+function schedulePromoPopup() {
+  if (!promoPopup) return;
+
+  let verifiedAt;
+  try {
+    const { expires } = JSON.parse(localStorage.getItem(AGE_KEY));
+    verifiedAt = expires - AGE_TTL;
+  } catch (e) {
+    return;
+  }
+  if (!verifiedAt) return;
+
+  try {
+    const seen = JSON.parse(localStorage.getItem(PROMO_SEEN_KEY));
+    if (seen && Date.now() < seen.expires) return; /* already shown this verification cycle */
+  } catch (e) {
+    /* no valid seen record, continue */
+  }
+
+  const delaySeconds = Number(promoPopup.dataset.delaySeconds || 20);
+  const remaining = Math.max(0, verifiedAt + delaySeconds * 1000 - Date.now());
+  window.setTimeout(showPromoPopup, remaining);
+}
+
+function showPromoPopup() {
+  if (!promoPopup || ageModal?.classList.contains("is-visible")) return;
+
+  promoPopup.hidden = false;
+  requestAnimationFrame(() => promoPopup.classList.add("is-visible"));
+  promoPopup.setAttribute("aria-hidden", "false");
+
+  let expires = Date.now() + AGE_TTL;
+  try {
+    expires = JSON.parse(localStorage.getItem(AGE_KEY)).expires || expires;
+  } catch (e) {
+    /* keep default */
+  }
+  localStorage.setItem(PROMO_SEEN_KEY, JSON.stringify({ seen: true, expires }));
+}
+
+function hidePromoPopup() {
+  if (!promoPopup) return;
+  promoPopup.classList.remove("is-visible");
+  promoPopup.setAttribute("aria-hidden", "true");
+  window.setTimeout(() => { promoPopup.hidden = true; }, 350);
+}
+
+document.getElementById("promoPopupClose")?.addEventListener("click", hidePromoPopup);
+
+document.getElementById("promoPopupCode")?.addEventListener("click", function copyPromoCode() {
+  const codeText = this.querySelector("span")?.textContent.trim() || "";
+  if (!codeText || !navigator.clipboard?.writeText) return;
+
+  navigator.clipboard.writeText(codeText).then(() => {
+    this.classList.add("is-copied");
+    window.setTimeout(() => this.classList.remove("is-copied"), 2000);
+  }).catch(() => {});
 });
 
 /* Under 18 */

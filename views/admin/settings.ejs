@@ -114,6 +114,53 @@
     </div>
 
     <div class="admin-panel__head">
+      <h2>Welcome Discount Popup</h2>
+      <span>Shown a few seconds after a visitor passes the age gate</span>
+    </div>
+
+    <div class="admin-settings-grid">
+      <label class="admin-checkbox-label">
+        <input type="checkbox" name="promoPopupEnabled" <%= s.promoPopupEnabled !== false ? "checked" : "" %>>
+        Show Welcome Discount Popup
+      </label>
+
+      <label>
+        Delay After Age Verification (seconds)
+        <input type="number" step="1" min="0" name="promoPopupDelaySeconds" value="<%= Number(s.promoPopupDelaySeconds != null ? s.promoPopupDelaySeconds : 20) %>">
+      </label>
+
+      <label>
+        Discount Code
+        <input name="promoPopupCode" value="<%= s.promoPopupCode || 'WELCOME10' %>">
+      </label>
+
+      <label class="is-wide">
+        Heading
+        <input name="promoPopupHeading" value="<%= s.promoPopupHeading || 'Welcome to Snus Village!' %>">
+      </label>
+
+      <label class="is-wide">
+        Body Text
+        <textarea name="promoPopupBody"><%= s.promoPopupBody || 'Enjoy 10% off your first order, on us.' %></textarea>
+      </label>
+
+      <label>
+        Button Text
+        <input name="promoPopupButtonText" value="<%= s.promoPopupButtonText || 'Shop Now' %>">
+      </label>
+
+      <label>
+        Button Link
+        <input name="promoPopupButtonLink" value="<%= s.promoPopupButtonLink || '/shop' %>">
+      </label>
+
+      <p class="admin-settings-note">
+        This only displays the code — create a matching discount code under
+        <a href="/admin/discounts">Discount Codes</a> so it actually works at checkout.
+      </p>
+    </div>
+
+    <div class="admin-panel__head">
       <h2>Maintenance Mode</h2>
       <span>Emergency Website Notice</span>
     </div>

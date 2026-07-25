@@ -1,0 +1,146 @@
+/* ==============================================
+   WELCOME DISCOUNT POPUP — V4 design system
+   Navy #071225, Red #b41232, Montserrat, sharp
+   ============================================== */
+
+.promo-popup {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9500;
+  width: min(360px, calc(100vw - 32px));
+  padding: 28px 26px 26px;
+  background: #ffffff;
+  border: 1px solid #e8ecf4;
+  border-top: 3px solid #b41232;
+  box-shadow: 0 24px 60px rgba(7, 18, 37, 0.22);
+  font-family: "Montserrat", system-ui, sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(24px);
+  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+}
+
+.promo-popup.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.promo-popup__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e8ecf4;
+  background: #ffffff;
+  color: #6b7a99;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+
+.promo-popup__close:hover {
+  color: #b41232;
+  border-color: #b41232;
+}
+
+.promo-popup__badge {
+  display: inline-flex;
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  background: #b41232;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.promo-popup__heading {
+  margin: 0 0 8px;
+  padding-right: 24px;
+  color: #071225;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.promo-popup__body {
+  margin: 0 0 18px;
+  color: #6b7a99;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.promo-popup__code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px dashed #123b8a;
+  background: rgba(18, 59, 138, 0.05);
+  color: #123b8a;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.promo-popup__code:hover {
+  background: rgba(18, 59, 138, 0.1);
+}
+
+.promo-popup__code span {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.promo-popup__code i {
+  font-size: 13px;
+}
+
+.promo-popup__code.is-copied span::after {
+  content: " \2014 Copied!";
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: normal;
+}
+
+.promo-popup__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  background: #b41232;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.promo-popup__cta:hover {
+  background: #8a0d24;
+  color: #ffffff;
+}
+
+@media (max-width: 560px) {
+  .promo-popup {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    width: auto;
+    padding: 24px 20px 22px;
+  }
+}

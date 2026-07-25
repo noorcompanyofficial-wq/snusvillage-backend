@@ -62,8 +62,13 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap">
+
     <!-- Core CSS Files -->
     <link rel="stylesheet" href="/css/age-gate.css?v=v4-split-20260717" />
+    <link rel="stylesheet" href="/css/promo-popup.css?v=v4-20260725" />
     <link rel="stylesheet" href="/css/style.css?v=light-theme-20260702" />
     <link rel="stylesheet" href="/css/header.css?v=megamenu-fix-20260713" />
     <link rel="stylesheet" href="/css/footer.css?v=footer-gradient-20260717" />
@@ -99,9 +104,6 @@
     <% } %>
 
     <% if (isProductPage) { %>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap">
       <link rel="stylesheet" href="/css/products-v4.css?v=v4-scroll-fix-20260716" />
     <% } %>
 
@@ -173,6 +175,33 @@
         <button id="rejectCookies">Reject</button>
       </div>
     </div>
+
+    <% if (storeSettings && storeSettings.promoPopupEnabled !== false) { %>
+      <div
+        class="promo-popup"
+        id="promoPopup"
+        data-delay-seconds="<%= Number(storeSettings.promoPopupDelaySeconds != null ? storeSettings.promoPopupDelaySeconds : 20) %>"
+        role="dialog"
+        aria-labelledby="promoPopupHeading"
+        aria-hidden="true"
+        hidden
+      >
+        <button class="promo-popup__close" id="promoPopupClose" type="button" aria-label="Close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <div class="promo-popup__badge">10% Off</div>
+        <h2 class="promo-popup__heading" id="promoPopupHeading"><%= storeSettings.promoPopupHeading || "Welcome to Snus Village!" %></h2>
+        <p class="promo-popup__body"><%= storeSettings.promoPopupBody || "Enjoy 10% off your first order, on us." %></p>
+        <button class="promo-popup__code" id="promoPopupCode" type="button" title="Click to copy">
+          <span><%= storeSettings.promoPopupCode || "WELCOME10" %></span>
+          <i class="fa-regular fa-copy" aria-hidden="true"></i>
+        </button>
+        <a class="promo-popup__cta" href="<%= storeSettings.promoPopupButtonLink || '/shop' %>">
+          <%= storeSettings.promoPopupButtonText || "Shop Now" %>
+        </a>
+      </div>
+    <% } %>
+
     <%- include('../partials/header') %>
 
     <main><%- body %></main>
