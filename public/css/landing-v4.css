@@ -135,8 +135,10 @@
   position: relative;
   width: 100%;
   /* body has padding-top: 138px for the fixed navbar (landing.css) — subtract
-     it so the hero + navbar together fill exactly one viewport. */
-  height: calc(100vh - 138px);
+     it so the hero + navbar together fill exactly one viewport, but cap it so
+     the 1fr gaps around the (fixed-size) content don't balloon on tall/large
+     monitors. */
+  height: min(calc(100vh - 138px), 780px);
   min-height: 620px;
   overflow: hidden;
   background: #ffffff;
