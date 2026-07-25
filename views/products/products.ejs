@@ -361,7 +361,7 @@
 
       if (expressSection && !expressProcessing) {
         window.clearTimeout(expressRefreshTimer);
-        expressRefreshTimer = window.setTimeout(initialiseProductExpress, 200);
+        expressRefreshTimer = window.setTimeout(initialiseProductExpress, 400);
       }
     }
 
@@ -502,16 +502,32 @@
       }
     }
 
-    async function initialiseProductExpress() {
+    let expressGeneration = 0;
+    let expressRetryTimer;
+
+    async function initialiseProductExpress(isRetry) {
       const publicKey = expressSection?.dataset.sumupPublicKey || "";
       if (!publicKey || !window.SumUp?.SwiftCheckout || !expressContainer) return;
 
+      const myGeneration = ++expressGeneration;
+      const hadWorkingButton = !expressSection.hidden;
+
+      function giveUp() {
+        // Keep showing the last working button rather than leaving the
+        // customer with nothing. Only retry-and-hide on a first load that
+        // never had a button to fall back to (e.g. a slow network on
+        // initial page load), not on every failed quantity-change rebuild.
+        if (myGeneration === expressGeneration && !hadWorkingButton && !isRetry) {
+          window.clearTimeout(expressRetryTimer);
+          expressRetryTimer = window.setTimeout(() => initialiseProductExpress(true), 1500);
+        }
+      }
+
       try {
-        expressButtons?.unmount?.();
-        expressContainer.replaceChildren();
-        expressSection.hidden = true;
         const quote = await productQuote({ countryCode: "GB" });
-        expressClient = new window.SumUp.SwiftCheckout(publicKey);
+        if (myGeneration !== expressGeneration) return; // superseded by a newer quantity change
+
+        const nextClient = new window.SumUp.SwiftCheckout(publicKey);
         const options = {
           countryCode: "GB",
           locale: "en-GB",
@@ -525,10 +541,12 @@
             data: { merchantInfo: { merchantId: googleMerchantId, merchantName: "Snus Village" } },
           }];
         }
-        expressRequest = expressClient.paymentRequest(options);
-        configureProductShipping(expressRequest);
-        if (!(await expressRequest.canMakePayment())) return;
-        let methods = await expressRequest.availablePaymentMethods();
+        const nextRequest = nextClient.paymentRequest(options);
+        configureProductShipping(nextRequest);
+        if (!(await nextRequest.canMakePayment())) return giveUp();
+        if (myGeneration !== expressGeneration) return;
+
+        let methods = await nextRequest.availablePaymentMethods();
         const demoMode = [
           "#sumup:google-pay-demo-mode",
           "#sumup-widget:google-pay-demo-mode",
@@ -538,15 +556,28 @@
         } else if (!googleMerchantId) {
           methods = methods.filter((method) => method.id !== "google_pay");
         }
-        if (!methods.length) return;
-        expressButtons = expressClient.elements({ label: "buy" });
+        if (!methods.length) return giveUp();
+        if (myGeneration !== expressGeneration) return;
+
+        const nextButtons = nextClient.elements({ label: "buy" });
+
+        // Only tear down the previous (working) button once the replacement
+        // is fully ready to mount, so a slow/failed rebuild never leaves the
+        // customer looking at an empty box.
+        expressButtons?.unmount?.();
+        expressContainer.replaceChildren();
+        expressClient = nextClient;
+        expressRequest = nextRequest;
+        expressButtons = nextButtons;
         expressButtons.onSubmit(submitProductWallet).mount({
           paymentMethods: methods,
           container: expressContainer,
         });
         expressSection.hidden = false;
+        expressMessage("");
       } catch (error) {
         console.warn("Product express checkout unavailable:", error?.message || error);
+        giveUp();
       }
     }
 
