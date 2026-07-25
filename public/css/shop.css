@@ -1649,3 +1649,128 @@ body {
 /* ===== MOBILE TAP TARGET FIX END ===== */
 
 /* ===== SHOP PRODUCT ADMIN BADGES END ===== */
+
+/* ===== BALANCED PRODUCT SHELF ===== */
+.shop-brand-products {
+  gap: 20px !important;
+  padding: 8px 44px 20px 2px !important;
+  scroll-padding-inline: 2px 44px;
+}
+
+.shop-brand-products .shop-product-card {
+  display: flex !important;
+  flex: 0 0 clamp(238px, 15.5vw, 276px) !important;
+  width: clamp(238px, 15.5vw, 276px) !important;
+  min-height: 430px !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+}
+
+.shop-brand-products .shop-product-image {
+  height: 222px !important;
+  min-height: 222px !important;
+  margin-bottom: 12px !important;
+  border-radius: 14px !important;
+}
+
+.shop-brand-products .shop-product-image img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  padding: 16px !important;
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+.shop-brand-products .shop-product-card:hover .shop-product-image img {
+  transform: scale(1.045) !important;
+}
+
+.shop-brand-products .shop-product-top {
+  top: 18px !important;
+  left: 18px !important;
+  right: 18px !important;
+}
+
+.shop-brand-products .strength-badge,
+.shop-brand-products .shop-stock {
+  min-height: 25px !important;
+  padding: 0 9px !important;
+  font-size: 8px !important;
+}
+
+.shop-brand-products .shop-product-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.shop-brand-products .shop-product-body h2 {
+  min-height: 45px !important;
+  font-size: 1rem !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.shop-brand-products .shop-product-meta {
+  margin-top: 10px !important;
+  padding-top: 10px !important;
+  font-size: 0.72rem !important;
+}
+
+.shop-brand-products .shop-product-meta span:first-child {
+  max-width: 125px !important;
+}
+
+.shop-brand-products .shop-product-bottom {
+  display: grid !important;
+  grid-template-columns: minmax(58px, auto) minmax(116px, 1fr);
+  align-items: end !important;
+  gap: 12px !important;
+  margin-top: auto !important;
+  padding-top: 12px !important;
+}
+
+.shop-brand-products .shop-price-wrap {
+  min-width: 0;
+}
+
+.shop-brand-products .shop-price-wrap strong {
+  font-size: 1rem !important;
+  white-space: nowrap;
+}
+
+.shop-brand-products .shop-product-bottom form {
+  width: 100%;
+}
+
+.shop-brand-products .shop-product-bottom button,
+.shop-brand-products .shop-view-btn {
+  width: 100%;
+  min-height: 44px !important;
+  padding: 0 14px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .shop-brand-products {
+    gap: 14px !important;
+    padding-right: 24px !important;
+  }
+
+  .shop-brand-products .shop-product-card {
+    flex-basis: min(76vw, 248px) !important;
+    width: min(76vw, 248px) !important;
+    min-height: 408px !important;
+  }
+
+  .shop-brand-products .shop-product-image {
+    height: 204px !important;
+    min-height: 204px !important;
+  }
+}
+/* ===== BALANCED PRODUCT SHELF END ===== */
