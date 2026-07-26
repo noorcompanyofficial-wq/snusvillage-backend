@@ -1,103 +1,151 @@
-<footer class="footer sv-footer">
+<footer class="svf">
 
-  <!-- 18+ strip -->
-  <div class="footer-strip">
-    <div class="footer-strip__inner">
-      <div>
-        <span>18+ only</span>
-        <strong>Premium nicotine pouches and smoke-free alternatives for adult customers.</strong>
+  <!-- Newsletter band -->
+  <div class="svf__nl-band">
+    <div class="svf__nl-band-inner">
+
+      <div class="svf__nl-left">
+        <div class="svf__nl-kicker">Stay Informed</div>
+        <h2 class="svf__nl-heading">New stock.<br>Real updates.</h2>
+        <p class="svf__nl-sub">Drops, restocks, delivery changes and store news &mdash; direct to your inbox. Adult customers only.</p>
       </div>
-      <a href="/shop">Shop Products</a>
-    </div>
-  </div>
 
-  <!-- Main columns -->
-  <div class="footer-container">
-
-    <!-- Brand -->
-    <div class="footer-col footer-brand-col">
-      <img src="/images/logo/snus-village-logo.webp" class="footer-logo" alt="Snus Village" />
-      <p>London's premium nicotine pouch store for trusted brands, clear support, and fast UK delivery.</p>
-      <div class="footer-socials">
-        <a href="https://www.instagram.com/snusvillage.uk/" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-instagram" aria-hidden="true"></i>
-        </a>
-        <a href="https://www.youtube.com/@SnusVillage" class="social-icon" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
-          <i class="fa-brands fa-youtube" aria-hidden="true"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- Legal -->
-    <div class="footer-col">
-      <h4>Legal</h4>
-      <a href="/terms-and-conditions">Terms &amp; Conditions</a>
-      <a href="/privacy-policy">Privacy Policy</a>
-      <a href="/cookies-policy">Cookies Policy</a>
-      <a href="/shipping-policy">Shipping Policy</a>
-    </div>
-
-    <!-- Office -->
-    <div class="footer-col">
-      <h4>Our Office</h4>
-      <p class="footer-addr">Snus Village<br>89 Edgware Road<br>London, W2 2HX</p>
-    </div>
-
-    <!-- Help -->
-    <div class="footer-col footer-service-col">
-      <h4>Help &amp; FAQ</h4>
-      <a href="/customer-service">FAQ &amp; Customer Service</a>
-      <a href="/customer-service#orders">Orders &amp; Payments</a>
-      <a href="/customer-service#delivery">Delivery &amp; Tracking</a>
-      <a href="/customer-service#returns">Returns &amp; Damaged Items</a>
-      <a href="/contact">Contact Form</a>
-    </div>
-
-    <!-- Newsletter -->
-    <div class="footer-col footer-contact-col" id="newsletter">
-      <div class="newsletter-card">
-        <span class="newsletter-eyebrow">Snus Village Updates</span>
-        <h4>Join The Newsletter</h4>
-        <p>Receive new stock alerts, product drops, delivery updates, and store notices for adult customers.</p>
-
+      <div class="svf__nl-right" id="newsletter">
         <% if (typeof query !== "undefined" && query.newsletter === "joined") { %>
-          <p class="newsletter-message newsletter-message--success">You are subscribed to Snus Village updates.</p>
+          <div class="svf__nl-msg svf__nl-msg--ok"><i class="fa-solid fa-circle-check"></i> You are subscribed to Snus Village updates.</div>
         <% } else if (typeof query !== "undefined" && query.newsletter === "already") { %>
-          <p class="newsletter-message newsletter-message--success">You are already on the Snus Village newsletter list.</p>
+          <div class="svf__nl-msg svf__nl-msg--ok"><i class="fa-solid fa-circle-check"></i> You are already on the Snus Village newsletter list.</div>
         <% } else if (typeof query !== "undefined" && query.newsletter === "invalid") { %>
-          <p class="newsletter-message newsletter-message--error">Please enter a valid email address.</p>
+          <div class="svf__nl-msg svf__nl-msg--err"><i class="fa-solid fa-triangle-exclamation"></i> Please enter a valid email address.</div>
         <% } else if (typeof query !== "undefined" && query.newsletter === "consent") { %>
-          <p class="newsletter-message newsletter-message--error">Please tick the marketing consent box to subscribe.</p>
+          <div class="svf__nl-msg svf__nl-msg--err"><i class="fa-solid fa-triangle-exclamation"></i> Please tick the marketing consent box to subscribe.</div>
         <% } else if (typeof query !== "undefined" && query.newsletter === "limited") { %>
-          <p class="newsletter-message newsletter-message--error">Too many signup attempts. Please try again shortly.</p>
+          <div class="svf__nl-msg svf__nl-msg--err"><i class="fa-solid fa-triangle-exclamation"></i> Too many signup attempts. Please try again shortly.</div>
         <% } else if (typeof query !== "undefined" && query.newsletter === "error") { %>
-          <p class="newsletter-message newsletter-message--error">We could not save your signup right now. Please try again.</p>
+          <div class="svf__nl-msg svf__nl-msg--err"><i class="fa-solid fa-triangle-exclamation"></i> We could not save your signup right now. Please try again.</div>
         <% } %>
 
-        <form class="newsletter" action="/newsletter/subscribe" method="POST" aria-label="Newsletter signup">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <div class="newsletter-input-row">
-            <label for="newsletterEmail">Email address</label>
-            <input id="newsletterEmail" name="email" type="email" placeholder="hello@example.com" autocomplete="email" required />
-            <button type="submit" aria-label="Join newsletter">→</button>
+        <form class="svf__nl-form" action="/newsletter/subscribe" method="POST" aria-label="Newsletter signup">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="svf__nl-input-row">
+            <label for="svfEmail" class="svf__sr-only">Email address</label>
+            <input id="svfEmail" name="email" type="email" placeholder="your@email.com" autocomplete="email" required>
+            <button type="submit" aria-label="Subscribe">Subscribe <i class="fa-solid fa-arrow-right"></i></button>
           </div>
-          <label class="newsletter-consent">
+          <label class="svf__nl-consent">
             <input type="checkbox" name="marketingConsent" required>
-            <span>I am 18+ and agree to receive Snus Village marketing emails. I understand I can unsubscribe at any time.</span>
+            <span>I am 18+ and agree to receive marketing emails. Unsubscribe anytime.</span>
           </label>
-          <small class="newsletter-privacy">
-            We handle your data under our <a href="/privacy-policy">Privacy Policy</a>.
-          </small>
         </form>
-      </div>
-    </div>
 
+        <p class="svf__nl-privacy">Your data is handled under our <a href="/privacy-policy">Privacy Policy</a>.</p>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Bottom bar -->
-  <div class="footer-bottom">
-    <p>© 2026 Snus Village. All rights reserved.</p>
-    <p>Premium Brands · London Locations · Fast UK Delivery</p>
+  <!-- Divider -->
+  <div class="svf__rule">
+    <div class="svf__rule-inner">
+      <div class="svf__rule-line"></div>
+      <img src="/images/logo/snus-village-logo.webp" alt="Snus Village" class="svf__rule-img">
+      <div class="svf__rule-line"></div>
+    </div>
+  </div>
+
+  <!-- Link columns -->
+  <div class="svf__cols">
+    <div class="svf__cols-inner">
+
+      <div class="svf__col">
+        <div class="svf__col-num">01</div>
+        <div class="svf__col-head">Shop</div>
+        <a href="/shop">All Products</a>
+        <a href="/shop?brand=WHITE%20FOX">White Fox</a>
+        <a href="/shop?brand=SIBERIA">Siberia</a>
+        <a href="/shop?brand=PABLO">Pablo</a>
+        <a href="/shop?strength=STRONG">Strong Pouches</a>
+        <a href="/shop?strength=X-STRONG">X-Strong Pouches</a>
+        <a href="/shop?strength=EXTREME">Extreme Pouches</a>
+        <a href="/wholesale">Wholesale</a>
+      </div>
+
+      <div class="svf__col">
+        <div class="svf__col-num">02</div>
+        <div class="svf__col-head">Help &amp; FAQ</div>
+        <a href="/customer-service">FAQ &amp; Support</a>
+        <a href="/customer-service#orders">Orders &amp; Payments</a>
+        <a href="/customer-service#delivery">Delivery &amp; Tracking</a>
+        <a href="/customer-service#returns">Returns &amp; Damaged</a>
+        <a href="/contact">Contact Form</a>
+      </div>
+
+      <div class="svf__col">
+        <div class="svf__col-num">03</div>
+        <div class="svf__col-head">Legal</div>
+        <a href="/terms-and-conditions">Terms &amp; Conditions</a>
+        <a href="/privacy-policy">Privacy Policy</a>
+        <a href="/cookies-policy">Cookies Policy</a>
+        <a href="/shipping-policy">Shipping Policy</a>
+      </div>
+
+      <div class="svf__col">
+        <div class="svf__col-num">04</div>
+        <div class="svf__col-head">About</div>
+        <p class="svf__about-text">London's home for premium nicotine pouches. Trusted brands, clear advice, and fast UK delivery.</p>
+        <div class="svf__socials">
+          <a href="<%= typeof storeSettings !== "undefined" && storeSettings?.instagramUrl ? storeSettings.instagramUrl : 'https://www.instagram.com/snusvillage.uk/' %>" class="svf__social" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.youtube.com/@SnusVillage" class="svf__social" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+        <div class="svf__badges">
+          <div class="svf__badge"><i class="fa-solid fa-truck-fast"></i> Fast UK Delivery</div>
+          <div class="svf__badge"><i class="fa-solid fa-lock"></i> Secure Checkout</div>
+          <div class="svf__badge"><i class="fa-solid fa-shield-halved"></i> Age Verified</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stores row -->
+  <div class="svf__stores">
+    <div class="svf__stores-inner">
+      <div class="svf__stores-label">Find Us In London</div>
+      <div class="svf__store">
+        <i class="fa-solid fa-location-dot"></i>
+        <div><strong>Camden</strong><span>Camden Town, London</span></div>
+      </div>
+      <div class="svf__store-sep"></div>
+      <div class="svf__store">
+        <i class="fa-solid fa-location-dot"></i>
+        <div><strong>Oxford Street</strong><span>Oxford Street, London</span></div>
+      </div>
+      <div class="svf__store-sep"></div>
+      <div class="svf__store">
+        <i class="fa-solid fa-location-dot"></i>
+        <div><strong>Edgware Road</strong><span>89 Edgware Road, W2 2HX</span></div>
+      </div>
+      <div class="svf__store-sep"></div>
+      <div class="svf__store">
+        <i class="fa-solid fa-globe"></i>
+        <div><strong>Online</strong><span>snusvillage.com</span></div>
+      </div>
+      <a href="/shop" class="svf__stores-btn">Shop Now</a>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="svf__bottom">
+    <div class="svf__bottom-inner">
+      <div class="svf__age-pill">18+</div>
+      <p class="svf__copyright">&copy; 2026 Snus Village. All rights reserved.</p>
+      <div class="svf__pay">
+        <i class="fa-brands fa-cc-visa"></i>
+        <i class="fa-brands fa-cc-mastercard"></i>
+        <i class="fa-brands fa-apple-pay"></i>
+        <i class="fa-brands fa-google-pay"></i>
+      </div>
+    </div>
   </div>
 
 </footer>
