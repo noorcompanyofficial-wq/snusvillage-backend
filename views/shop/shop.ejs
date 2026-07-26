@@ -30,11 +30,6 @@
           <div class="ch-stat"><strong>3</strong><span>London Stores</span></div>
         </div>
       </div>
-      <div class="ch-img-strip">
-        <% products.slice(0, 3).forEach((p) => { if (p.images && p.images[0]) { %>
-          <img src="<%= optimiseImageUrl(p.images[0], { width: 140 }) %>" alt="">
-        <% } }) %>
-      </div>
     </div>
   </div>
 
