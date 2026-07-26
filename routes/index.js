@@ -10,7 +10,9 @@ router.get("/", async (req, res) => {
 
   try {
     if (HomepageContent.db.readyState === 1) {
-      homepageContent = await HomepageContent.findOne({ key: "homepage" }).lean();
+      homepageContent = await HomepageContent.findOne({ key: "homepage" })
+        .populate("hero.slides.product")
+        .lean();
 
       bestSellerProducts = await Product.find({
         isActive: { $ne: false },

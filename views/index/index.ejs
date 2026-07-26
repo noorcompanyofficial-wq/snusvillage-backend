@@ -59,7 +59,7 @@
     <link rel="stylesheet" href="/css/age-gate.css?v=v4-split-20260717" />
     <link rel="stylesheet" href="/css/promo-popup.css?v=v4-20260725" />
     <link rel="stylesheet" href="/css/landing.css?v=megamenu-fix-20260713" />
-    <link rel="stylesheet" href="/css/landing-v4.css?v=v4-hero-centered-20260726e" />
+    <link rel="stylesheet" href="/css/landing-v4.css?v=v4-hero-admin-bg-20260726" />
 
     <!-- Footer preloaded -->
     <link
@@ -138,11 +138,18 @@
       <%
         /* ── V4 data setup ── */
 
-        /* Hero carousel: up to 5 best sellers, fallback to featured */
-        const v4CarouselProds = (bestSellerProducts && bestSellerProducts.length
-          ? bestSellerProducts
-          : (featuredProducts && featuredProducts.length ? featuredProducts : [])
-        ).slice(0, 5);
+        /* Hero carousel: admin-curated slides (product + background photo), falling
+           back to best sellers / featured products when none have been set up yet */
+        const heroDbSlides = (homepageContent?.hero?.slides || [])
+          .filter((s) => s.product && s.bgImageSrc)
+          .map((s) => Object.assign({}, s.product, { heroBgImage: s.bgImageSrc }));
+
+        const v4CarouselProds = heroDbSlides.length
+          ? heroDbSlides
+          : (bestSellerProducts && bestSellerProducts.length
+              ? bestSellerProducts
+              : (featuredProducts && featuredProducts.length ? featuredProducts : [])
+            ).slice(0, 5);
 
         /* Strength → CSS suffix */
         const v4sc = (s) => {
@@ -226,6 +233,10 @@
                 : "Trusted by adult customers across London and the UK, with fast delivery and age-verified checkout on every order.";
             %>
               <div class="v4-hero__slide <%= idx === 0 ? 'is-active' : '' %>" data-idx="<%= idx %>">
+                <% if (p.heroBgImage) { %>
+                  <div class="v4-hero__bg" style="background-image:url('<%= optimiseImageUrl(p.heroBgImage, { width: 1600 }) %>')"></div>
+                  <div class="v4-hero__bg-overlay"></div>
+                <% } %>
                 <div class="v4-hero__ring v4-hero__ring--1"></div>
                 <div class="v4-hero__ring v4-hero__ring--2"></div>
 

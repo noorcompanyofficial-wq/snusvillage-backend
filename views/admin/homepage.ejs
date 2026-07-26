@@ -1,31 +1,4 @@
 <%
-  const hero = homepageContent?.hero || {};
-  const heroSlides = hero.slides && hero.slides.length
-    ? hero.slides
-    : [
-        {
-          kicker: "Featured Collection",
-          title: "White Fox",
-          buttonText: "Shop White Fox",
-          buttonLink: "/shop?brand=White%20Fox",
-          imageSrc: "/images/header/h-1.jpeg",
-        },
-        {
-          kicker: "Best Sellers",
-          title: "Premium Brands",
-          buttonText: "Browse Brands",
-          buttonLink: "/shop",
-          imageSrc: "/images/header/h-2.jpeg",
-        },
-        {
-          kicker: "London Retail",
-          title: "Visit Our Stores",
-          buttonText: "Find Branches",
-          buttonLink: "#shops",
-          imageSrc: "/images/delivery/delivery.jpg",
-        },
-      ];
-
   const distro = homepageContent?.distro || {};
   const distroImages = distro.images && distro.images.length
     ? distro.images
@@ -176,56 +149,22 @@
     </div>
   </section>
 
+  <section class="admin-panel admin-homepage-form">
+    <div class="admin-panel__head">
+      <h2>Hero Banner</h2>
+      <span>Products And Background Photos</span>
+    </div>
+
+    <p>The homepage hero slideshow is now managed on its own page — choose which products appear and upload a background photo for each slide.</p>
+
+    <a class="admin-primary" href="/admin/homepage/hero">
+      <i class="fa-solid fa-images"></i>
+      Manage Hero Banner
+    </a>
+  </section>
+
   <form class="admin-panel admin-homepage-form" action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>Hero Carousel</h2>
-      <span>Images, Text And Buttons</span>
-    </div>
-
-    <div class="admin-homepage-slides">
-      <% [0, 1, 2].forEach((index) => { %>
-        <% const slide = heroSlides[index] || {}; %>
-
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Hero Slide <%= index + 1 %></strong>
-            <span>Main Homepage Carousel</span>
-          </div>
-
-          <label>
-            Current Image Path
-            <input name="heroImageSrc<%= index + 1 %>" value="<%= slide.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
-          </label>
-
-          <label>
-            Upload New Hero Image
-            <input type="file" name="heroImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
-          </label>
-
-          <label>
-            Small Text
-            <input name="heroKicker<%= index + 1 %>" value="<%= slide.kicker || '' %>">
-          </label>
-
-          <label>
-            Main Title
-            <input name="heroTitle<%= index + 1 %>" value="<%= slide.title || '' %>">
-          </label>
-
-          <label>
-            Button Text
-            <input name="heroButtonText<%= index + 1 %>" value="<%= slide.buttonText || '' %>">
-          </label>
-
-          <label>
-            Button Link
-            <input name="heroButtonLink<%= index + 1 %>" value="<%= slide.buttonLink || '' %>">
-          </label>
-        </div>
-      <% }) %>
-    </div>
-
     <div class="admin-panel__head">
       <h2>SVG Distro Section</h2>
       <span>Text, Badges And Main Image</span>

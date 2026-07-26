@@ -151,26 +151,26 @@
       <% } %>
     <% }) %>
 
-    <div class="checkout-discount-box">
-      <% if (appliedDiscountCode) { %>
-        <div class="checkout-applied-discount">
-          <div>
-            <span>Discount Applied</span>
-            <strong><%= appliedDiscountCode %></strong>
-          </div>
-
-          <form action="/checkout/remove-discount" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit">Remove</button>
-          </form>
+    <div class="checkout-discount-box" id="checkoutDiscountBox">
+      <div class="checkout-applied-discount" id="checkoutAppliedDiscount" <%= appliedDiscountCode ? "" : "hidden" %>>
+        <div>
+          <span>Discount Applied</span>
+          <strong id="checkoutAppliedDiscountCode"><%= appliedDiscountCode %></strong>
         </div>
-      <% } else { %>
-        <form action="/checkout/apply-discount" method="POST" class="discount-row">
+
+        <form id="checkoutRemoveDiscountForm" action="/checkout/remove-discount" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <input type="text" name="discountCode" placeholder="Discount Code">
-          <button type="submit">Apply</button>
+          <button type="submit">Remove</button>
         </form>
-      <% } %>
+      </div>
+
+      <form id="checkoutApplyDiscountForm" action="/checkout/apply-discount" method="POST" class="discount-row" <%= appliedDiscountCode ? "hidden" : "" %>>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="text" name="discountCode" placeholder="Discount Code">
+        <button type="submit">Apply</button>
+      </form>
+
+      <div class="checkout-discount-error" id="checkoutDiscountError" hidden></div>
     </div>
 
     <div class="checkout-total-row">
@@ -183,12 +183,10 @@
       <strong id="checkoutShippingAmount"><%= shipping === 0 ? "Free" : "£" + shipping.toFixed(2) %></strong>
     </div>
 
-    <% if (discountAmount && discountAmount > 0) { %>
-      <div class="checkout-total-row checkout-discount-total">
-        <span>Discount</span>
-        <strong>-£<%= discountAmount.toFixed(2) %></strong>
-      </div>
-    <% } %>
+    <div class="checkout-total-row checkout-discount-total" id="checkoutDiscountRow" <%= discountAmount && discountAmount > 0 ? "" : "hidden" %>>
+      <span>Discount</span>
+      <strong id="checkoutDiscountAmount">-£<%= discountAmount.toFixed(2) %></strong>
+    </div>
 
     <div class="checkout-free-shipping-note" id="checkoutShippingNote">
       <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
@@ -221,7 +219,7 @@
     const grandTotal = document.getElementById("checkoutGrandTotal");
     const shippingNote = document.getElementById("checkoutShippingNote");
     const subtotal = Number(checkoutPage?.dataset.subtotal || 0);
-    const discount = Number(checkoutPage?.dataset.discount || 0);
+    let discount = Number(checkoutPage?.dataset.discount || 0);
     const freeShippingThreshold = Number(checkoutPage?.dataset.freeShippingThreshold || 10);
     const standardShippingFee = Number(checkoutPage?.dataset.standardShippingFee || 1.99);
     const nextDayShippingFee = Number(checkoutPage?.dataset.nextDayShippingFee || 4.99);
@@ -317,5 +315,101 @@
     });
 
     updateFulfilment();
+
+    const applyDiscountForm = document.getElementById("checkoutApplyDiscountForm");
+    const removeDiscountForm = document.getElementById("checkoutRemoveDiscountForm");
+    const appliedDiscountBox = document.getElementById("checkoutAppliedDiscount");
+    const appliedDiscountCode = document.getElementById("checkoutAppliedDiscountCode");
+    const discountRow = document.getElementById("checkoutDiscountRow");
+    const discountAmountEl = document.getElementById("checkoutDiscountAmount");
+    const discountError = document.getElementById("checkoutDiscountError");
+
+    function currentFulfilment() {
+      return document.querySelector('input[name="fulfilmentMethod"]:checked')?.value || "delivery";
+    }
+
+    function setDiscountError(message) {
+      if (!discountError) return;
+      if (message) {
+        discountError.textContent = message;
+        discountError.hidden = false;
+      } else {
+        discountError.textContent = "";
+        discountError.hidden = true;
+      }
+    }
+
+    function applyDiscountUiState(applied, code, amount) {
+      discount = Number(amount || 0);
+
+      if (applied) {
+        if (appliedDiscountCode) appliedDiscountCode.textContent = code;
+        if (appliedDiscountBox) appliedDiscountBox.hidden = false;
+        if (applyDiscountForm) applyDiscountForm.hidden = true;
+      } else {
+        if (appliedDiscountBox) appliedDiscountBox.hidden = true;
+        if (applyDiscountForm) applyDiscountForm.hidden = false;
+      }
+
+      if (discountRow) {
+        discountRow.hidden = !(discount > 0);
+      }
+
+      if (discountAmountEl) {
+        discountAmountEl.textContent = "-" + formatMoney(discount);
+      }
+
+      updateShipping(currentFulfilment());
+    }
+
+    async function submitDiscountForm(form, { clearInputOnSuccess } = {}) {
+      const submitBtn = form.querySelector("button[type='submit']");
+      const csrfToken = form.querySelector('[name="_csrf"]')?.value || "";
+      const codeInput = form.querySelector('[name="discountCode"]');
+
+      if (submitBtn) submitBtn.disabled = true;
+      setDiscountError("");
+
+      try {
+        const response = await fetch(form.getAttribute("action"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "x-csrf-token": csrfToken,
+          },
+          body: JSON.stringify({ discountCode: codeInput ? codeInput.value : undefined }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!data.success) {
+          setDiscountError(data.message || "Unable to apply this discount code.");
+          return;
+        }
+
+        applyDiscountUiState(Boolean(data.appliedDiscountCode), data.appliedDiscountCode || "", data.discountAmount || 0);
+
+        if (clearInputOnSuccess && codeInput) codeInput.value = "";
+      } catch (error) {
+        setDiscountError("Something went wrong. Please try again.");
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+
+    if (applyDiscountForm) {
+      applyDiscountForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitDiscountForm(applyDiscountForm, { clearInputOnSuccess: true });
+      });
+    }
+
+    if (removeDiscountForm) {
+      removeDiscountForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitDiscountForm(removeDiscountForm);
+      });
+    }
   })();
 </script>

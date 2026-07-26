@@ -319,8 +319,19 @@ body {
 .checkout-collect-notice[hidden],
 #clickCollectNotice[hidden],
 .checkout-delivery-service-options[hidden],
-#deliveryServiceOptions[hidden] {
+#deliveryServiceOptions[hidden],
+#checkoutApplyDiscountForm[hidden],
+#checkoutAppliedDiscount[hidden],
+#checkoutDiscountRow[hidden],
+.checkout-discount-error[hidden] {
   display: none !important;
+}
+
+.checkout-discount-error {
+  margin-top: 8px;
+  color: var(--ck-red);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 @media (max-width: 760px) {

@@ -322,15 +322,191 @@ router.get("/homepage", isAdmin, requireAdminRole(PERMISSIONS.website), async (r
   }
 });
 
+router.get("/homepage/hero", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
+  try {
+    const homepageContent = await HomepageContent.findOneAndUpdate(
+      { key: "homepage" },
+      { $setOnInsert: { key: "homepage" } },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
+    )
+      .populate("hero.slides.product")
+      .lean();
+
+    const products = await Product.find({ isActive: { $ne: false } })
+      .select("name brand images slug")
+      .sort({ name: 1 })
+      .lean();
+
+    res.render("admin/homepage-hero", {
+      layout: "layouts/admin-layout",
+      heroSlides: homepageContent?.hero?.slides || [],
+      products,
+    });
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to load hero banner controls");
+    res.redirect("/admin/homepage");
+  }
+});
+
+router.post(
+  "/homepage/hero/slides",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  upload.single("bgImage"),
+  verifyCsrfToken,
+  async (req, res) => {
+    try {
+      const productId = String(req.body.product || "").trim();
+
+      if (!productId) {
+        req.flash("error", "Please choose a product for the new hero slide.");
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const product = await Product.findById(productId).select("_id").lean();
+
+      if (!product) {
+        req.flash("error", "That product could not be found.");
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      if (!req.file) {
+        req.flash("error", "Please upload a background image for this hero slide.");
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const [bgImageSrc] = await storeProductImages([req.file]);
+
+      await HomepageContent.findOneAndUpdate(
+        { key: "homepage" },
+        {
+          $push: {
+            "hero.slides": { product: product._id, bgImageSrc: bgImageSrc || "" },
+          },
+        },
+        { upsert: true }
+      );
+
+      req.flash("success", "Hero slide added.");
+      res.redirect("/admin/homepage/hero");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to add hero slide: " + err.message);
+      res.redirect("/admin/homepage/hero");
+    }
+  }
+);
+
+router.post(
+  "/homepage/hero/slides/:slideId",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  upload.single("bgImage"),
+  verifyCsrfToken,
+  async (req, res) => {
+    try {
+      const { slideId } = req.params;
+      const productId = String(req.body.product || "").trim();
+
+      if (!productId) {
+        req.flash("error", "Please choose a product for this hero slide.");
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const product = await Product.findById(productId).select("_id").lean();
+
+      if (!product) {
+        req.flash("error", "That product could not be found.");
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const update = {
+        "hero.slides.$.product": product._id,
+      };
+
+      if (req.file) {
+        const [bgImageSrc] = await storeProductImages([req.file]);
+        update["hero.slides.$.bgImageSrc"] = bgImageSrc || "";
+      }
+
+      await HomepageContent.updateOne(
+        { key: "homepage", "hero.slides._id": slideId },
+        { $set: update }
+      );
+
+      req.flash("success", "Hero slide updated.");
+      res.redirect("/admin/homepage/hero");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to update hero slide: " + err.message);
+      res.redirect("/admin/homepage/hero");
+    }
+  }
+);
+
+router.post(
+  "/homepage/hero/slides/:slideId/delete",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  async (req, res) => {
+    try {
+      await HomepageContent.updateOne(
+        { key: "homepage" },
+        { $pull: { "hero.slides": { _id: req.params.slideId } } }
+      );
+
+      req.flash("success", "Hero slide removed.");
+      res.redirect("/admin/homepage/hero");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to remove hero slide: " + err.message);
+      res.redirect("/admin/homepage/hero");
+    }
+  }
+);
+
+router.post(
+  "/homepage/hero/slides/:slideId/move",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.website),
+  async (req, res) => {
+    try {
+      const direction = req.body.direction === "up" ? -1 : 1;
+      const homepageContent = await HomepageContent.findOne({ key: "homepage" });
+
+      if (!homepageContent) {
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const slides = homepageContent.hero.slides;
+      const index = slides.findIndex((slide) => String(slide._id) === req.params.slideId);
+      const targetIndex = index + direction;
+
+      if (index === -1 || targetIndex < 0 || targetIndex >= slides.length) {
+        return res.redirect("/admin/homepage/hero");
+      }
+
+      const [moved] = slides.splice(index, 1);
+      slides.splice(targetIndex, 0, moved);
+
+      await homepageContent.save();
+
+      res.redirect("/admin/homepage/hero");
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to reorder hero slides: " + err.message);
+      res.redirect("/admin/homepage/hero");
+    }
+  }
+);
+
 
 router.post(
   "/homepage/hero-distro",
   isAdmin,
   requireAdminRole(PERMISSIONS.website),
   upload.fields([
-    { name: "heroImage1", maxCount: 1 },
-    { name: "heroImage2", maxCount: 1 },
-    { name: "heroImage3", maxCount: 1 },
     { name: "distroImage1", maxCount: 1 },
   ]),
   verifyCsrfToken,
@@ -350,19 +526,6 @@ router.post(
         return storedPath || String(fallbackPath || "").trim();
       }
 
-      const heroSlides = await Promise.all(
-        [1, 2, 3].map(async (number) => ({
-          kicker: String(body[`heroKicker${number}`] || "").trim(),
-          title: String(body[`heroTitle${number}`] || "").trim(),
-          buttonText: String(body[`heroButtonText${number}`] || "").trim(),
-          buttonLink: String(body[`heroButtonLink${number}`] || "").trim(),
-          imageSrc: await imagePath(
-            `heroImage${number}`,
-            body[`heroImageSrc${number}`]
-          ),
-        }))
-      );
-
       const distroImages = [
         {
           imageSrc: await imagePath("distroImage1", body.distroImageSrc1),
@@ -380,7 +543,6 @@ router.post(
         {
           $set: {
             key: "homepage",
-            "hero.slides": heroSlides,
             "distro.kicker": String(body.distroKicker || "").trim(),
             "distro.title": String(body.distroTitle || "").trim(),
             "distro.address": String(body.distroAddress || "").trim(),
@@ -394,11 +556,11 @@ router.post(
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       );
 
-      req.flash("success", "Homepage hero and SVG Distro section updated");
+      req.flash("success", "SVG Distro section updated");
       res.redirect("/admin/homepage");
     } catch (err) {
       console.log(err);
-      req.flash("error", "Unable to update homepage hero and distro section: " + err.message);
+      req.flash("error", "Unable to update SVG Distro section: " + err.message);
       res.redirect("/admin/homepage");
     }
   }

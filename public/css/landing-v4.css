@@ -178,6 +178,16 @@
 }
 .v4-hero__slide.is-active { opacity: 1; pointer-events: auto; }
 
+/* Admin-uploaded background photo, stretched full-bleed behind the slide content */
+.v4-hero__bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+}
+.v4-hero__bg-overlay {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.82) 55%, #ffffff 100%);
+}
+
 /* Decorative ring behind image */
 .v4-hero__ring {
   position: absolute; border-radius: 50%;
@@ -187,7 +197,7 @@
 .v4-hero__ring--1 { width: 500px; height: 500px; border: 1px solid rgba(18,59,138,0.06); }
 .v4-hero__ring--2 { width: 360px; height: 360px; border: 1px solid rgba(180,18,50,0.09); }
 
-.v4-hero__top { text-align: center; align-self: end; padding-bottom: 24px; }
+.v4-hero__top { position: relative; z-index: 1; text-align: center; align-self: end; padding-bottom: 24px; }
 
 .v4-hero__eyebrow {
   font-family: var(--v4-sans); font-size: 10px; font-weight: 800;
@@ -241,7 +251,7 @@
   opacity: 0; transition: none;
 }
 
-.v4-hero__bottom { text-align: center; align-self: start; padding-top: 24px; }
+.v4-hero__bottom { position: relative; z-index: 1; text-align: center; align-self: start; padding-top: 24px; }
 
 .v4-hero__desc {
   font-size: 13px; line-height: 1.6; color: rgba(7,18,37,0.55);

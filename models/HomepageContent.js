@@ -1,30 +1,15 @@
 const mongoose = require("mongoose");
 
-const heroSlideSchema = new mongoose.Schema(
-  {
-    kicker: {
-      type: String,
-      default: "",
-    },
-    title: {
-      type: String,
-      default: "",
-    },
-    buttonText: {
-      type: String,
-      default: "",
-    },
-    buttonLink: {
-      type: String,
-      default: "",
-    },
-    imageSrc: {
-      type: String,
-      default: "",
-    },
+const heroSlideSchema = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
   },
-  { _id: false }
-);
+  bgImageSrc: {
+    type: String,
+    default: "",
+  },
+});
 
 
 const collectionCardSchema = new mongoose.Schema(
@@ -144,29 +129,7 @@ const homepageContentSchema = new mongoose.Schema(
     hero: {
       slides: {
         type: [heroSlideSchema],
-        default: [
-          {
-            kicker: "Featured Collection",
-            title: "White Fox",
-            buttonText: "Shop White Fox",
-            buttonLink: "/shop?brand=White%20Fox",
-            imageSrc: "/images/header/h-1.jpeg",
-          },
-          {
-            kicker: "Best Sellers",
-            title: "Premium Brands",
-            buttonText: "Browse Brands",
-            buttonLink: "/shop",
-            imageSrc: "/images/header/h-2.jpeg",
-          },
-          {
-            kicker: "London Retail",
-            title: "Visit Our Stores",
-            buttonText: "Find Branches",
-            buttonLink: "#shops",
-            imageSrc: "/images/delivery/delivery.jpg",
-          },
-        ],
+        default: [],
       },
     },
 

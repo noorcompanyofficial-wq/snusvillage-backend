@@ -730,16 +730,20 @@ router.get("/", async (req, res, next) => {
 });
 
 router.post("/apply-discount", async (req, res, next) => {
+  const wantsJson = (req.get("Accept") || "").includes("application/json");
+
   try {
     const cart = await getCart(req);
 
     if (!cart || !cart.items || cart.items.length === 0) {
+      if (wantsJson) return res.status(409).json({ success: false, message: "Your cart is empty." });
       return res.redirect("/cart");
     }
 
     const code = String(req.body.discountCode || "").trim().toUpperCase();
 
     if (!code) {
+      if (wantsJson) return res.status(400).json({ success: false, message: "Please enter a discount code." });
       req.flash("error", "Please enter a discount code.");
       return res.redirect("/checkout");
     }
@@ -748,20 +752,39 @@ router.post("/apply-discount", async (req, res, next) => {
 
     if (!discountResult.ok) {
       req.session.checkoutDiscountCode = "";
+      if (wantsJson) return res.json({ success: false, message: discountResult.message });
       req.flash("error", discountResult.message);
       return res.redirect("/checkout");
     }
 
     req.session.checkoutDiscountCode = code;
+
+    if (wantsJson) {
+      return res.json({
+        success: true,
+        message: `Discount code ${code} applied.`,
+        appliedDiscountCode: code,
+        discountAmount: discountResult.discountAmount,
+      });
+    }
+
     req.flash("success", `Discount code ${code} applied.`);
     res.redirect("/checkout");
   } catch (error) {
+    if (wantsJson) {
+      return res.status(500).json({ success: false, message: "Something went wrong applying the discount code." });
+    }
     next(error);
   }
 });
 
 router.post("/remove-discount", (req, res) => {
   req.session.checkoutDiscountCode = "";
+
+  if ((req.get("Accept") || "").includes("application/json")) {
+    return res.json({ success: true, message: "Discount code removed." });
+  }
+
   req.flash("success", "Discount code removed.");
   res.redirect("/checkout");
 });
