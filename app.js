@@ -342,6 +342,19 @@ function optimiseImageUrl(url, options = {}) {
   return imageUrl;
 }
 
+function relTime(date) {
+  if (!date) return "";
+  const d = new Date(date);
+  const diffMs = Date.now() - d.getTime();
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffDays <= 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 30) return `${diffDays} days ago`;
+
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 // ====== Global Variables ======
 app.use(async (req, res, next) => {
   const siteUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
@@ -355,6 +368,7 @@ app.use(async (req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.query = req.query || {};
   res.locals.optimiseImageUrl = optimiseImageUrl;
+  res.locals.relTime = relTime;
   res.locals.storeSettings = storeSettings;
   next();
 });

@@ -66,6 +66,25 @@
       <div id="deliveryFields">
         <div class="ck4-section-label"><span>03</span>Delivery</div>
 
+        <% if (typeof savedAddresses !== "undefined" && savedAddresses.length) { %>
+          <select id="checkoutSavedAddress" data-saved-address-select>
+            <option value="">Use a saved address&hellip;</option>
+            <% savedAddresses.forEach(function(addr) { %>
+              <option
+                value="<%= addr._id %>"
+                data-first-name="<%= addr.firstName %>"
+                data-last-name="<%= addr.lastName %>"
+                data-phone="<%= addr.phone %>"
+                data-address="<%= addr.addressLine1 %><%= addr.addressLine2 ? ', ' + addr.addressLine2 : '' %>"
+                data-city="<%= addr.city %>"
+                data-postcode="<%= addr.postcode %>"
+                data-country="<%= addr.country %>"
+                <%= addr.isDefault ? "selected" : "" %>
+              ><%= addr.label %> &mdash; <%= addr.addressLine1 %>, <%= addr.postcode %></option>
+            <% }); %>
+          </select>
+        <% } %>
+
         <div class="checkout-delivery-service-options" id="deliveryServiceOptions">
           <label class="checkout-delivery-service-card is-active" data-delivery-service-card="standard">
             <input type="radio" name="deliveryService" value="standard" checked>
@@ -410,6 +429,36 @@
         event.preventDefault();
         submitDiscountForm(removeDiscountForm);
       });
+    }
+
+    const savedAddressSelect = document.querySelector("[data-saved-address-select]");
+    const checkoutForm = document.getElementById("checkoutForm");
+
+    function fillSavedAddress(option) {
+      if (!option || !option.value || !checkoutForm) return;
+      const map = {
+        firstName: option.dataset.firstName,
+        lastName: option.dataset.lastName,
+        phone: option.dataset.phone,
+        address: option.dataset.address,
+        city: option.dataset.city,
+        postcode: option.dataset.postcode,
+        country: option.dataset.country,
+      };
+      Object.keys(map).forEach((name) => {
+        const field = checkoutForm.querySelector('[name="' + name + '"]');
+        if (field && map[name]) field.value = map[name];
+      });
+    }
+
+    if (savedAddressSelect) {
+      savedAddressSelect.addEventListener("change", () => {
+        fillSavedAddress(savedAddressSelect.selectedOptions[0]);
+      });
+
+      if (savedAddressSelect.value) {
+        fillSavedAddress(savedAddressSelect.selectedOptions[0]);
+      }
     }
   })();
 </script>

@@ -5,12 +5,90 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const WholesaleApplication = require("../models/WholesaleApplication");
+const Order = require("../models/order");
+const Cart = require("../models/cart");
+const Product = require("../models/Products");
+const Address = require("../models/Address");
+const NewsletterSubscriber = require("../models/NewsletterSubscriber");
 const transporter = require("../config/mailer");
 const { isGuest, isAuth } = require("../middleware/authMiddleware");
 const { authLimiter } = require("../middleware/rateLimit");
 const { generateRefreshToken } = require("../utils/jwt");
 const UAParser = require("ua-parser-js");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
+
+function dashboardLayout(req) {
+  return req.get("X-Dashboard-Spa") === "1" ? false : "layouts/dashboard-layout";
+}
+
+function orderStageInfo(order) {
+  const isClickCollect = order.fulfilment?.method === "click_collect";
+  const status = order.orderStatus || "new";
+
+  if (status === "cancelled") {
+    return { cancelled: true, stages: [] };
+  }
+
+  const stageDefs = isClickCollect
+    ? [
+        { key: "placed", label: "Order\nPlaced", icon: "fa-check" },
+        { key: "paid", label: "Payment\nConfirmed", icon: "fa-check" },
+        { key: "packed", label: "Packed", icon: "fa-box" },
+        { key: "ready", label: "Ready For\nCollection", icon: "fa-store" },
+        { key: "collected", label: "Collected", icon: "fa-house" },
+      ]
+    : [
+        { key: "placed", label: "Order\nPlaced", icon: "fa-check" },
+        { key: "paid", label: "Payment\nConfirmed", icon: "fa-check" },
+        { key: "packed", label: "Packed &\nDispatched", icon: "fa-box" },
+        { key: "shipped", label: "In\nTransit", icon: "fa-truck" },
+        { key: "delivered", label: "Delivered", icon: "fa-house" },
+      ];
+
+  const doneOrder = ["placed", "paid", "packed", isClickCollect ? "ready" : "shipped", isClickCollect ? "collected" : "delivered"];
+  const isPaid = order.paymentStatus === "paid";
+  const isPackedOrLater = ["packed", "shipped", "completed"].includes(status);
+  const isShippedOrLater = status === "shipped" || status === "completed" || order.royalMail?.syncStatus === "sent";
+  const isDelivered = status === "completed";
+
+  const doneMap = { placed: true, paid: isPaid, packed: isPackedOrLater, shipped: isShippedOrLater, ready: isShippedOrLater, collected: isDelivered, delivered: isDelivered };
+
+  let currentIndex = stageDefs.findIndex((s) => !doneMap[s.key]);
+  if (currentIndex === -1) currentIndex = stageDefs.length - 1;
+
+  const stages = stageDefs.map((s, i) => ({
+    ...s,
+    done: doneMap[s.key] && i !== currentIndex,
+    current: i === currentIndex && !doneMap[s.key],
+  }));
+
+  // if everything is done, mark the last stage as done (not "current")
+  if (doneMap[stageDefs[stageDefs.length - 1].key]) {
+    stages[stages.length - 1].done = true;
+    stages[stages.length - 1].current = false;
+  }
+
+  return { cancelled: false, stages };
+}
+
+async function getCustomerOrderQuery(req) {
+  const userId = req.session.user._id;
+  const email = String(req.session.user.email || "").toLowerCase();
+  return { $or: [{ user: userId }, { "customer.email": email }] };
+}
+
+function orderPillInfo(order) {
+  if (order.orderStatus === "cancelled") return { cls: "dsh-p-canc", label: "Cancelled" };
+  if (order.orderStatus === "completed") return { cls: "dsh-p-del", label: "Delivered" };
+  if (order.orderStatus === "shipped") return { cls: "dsh-p-ship", label: "In Transit" };
+  if (order.paymentStatus === "pending") return { cls: "dsh-p-pend", label: "Payment Pending" };
+  if (order.paymentStatus === "failed") return { cls: "dsh-p-canc", label: "Payment Failed" };
+  return { cls: "dsh-p-ship", label: "Processing" };
+}
+
+function orderItemsSummary(order) {
+  return (order.items || []).map((item) => `${item.name} ×${item.quantity}`).join(", ");
+}
 
 async function safeSendMail(mailOptions, label = "auth email") {
   try {
@@ -530,6 +608,21 @@ router.post("/reset-password", authLimiter, async (req, res) => {
 });
 
 // ================= DASHBOARD =================
+router.use("/dashboard", isAuth, async (req, res, next) => {
+  try {
+    const orderQuery = await getCustomerOrderQuery(req);
+    const [activeOrders, wishlistCount] = await Promise.all([
+      Order.countDocuments({ ...orderQuery, orderStatus: { $nin: ["completed", "cancelled"] } }),
+      User.findById(req.session.user._id).select("wishlist").lean().then((u) => (u?.wishlist || []).length),
+    ]);
+    res.locals.dashboardActiveOrders = activeOrders;
+    res.locals.dashboardWishlistCount = wishlistCount;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/dashboard", isAuth, async (req, res, next) => {
   try {
     const user = await User.findById(req.session.user._id).lean();
@@ -540,7 +633,423 @@ router.get("/dashboard", isAuth, async (req, res, next) => {
     }
 
     req.session.user = user;
-    res.render("dashboard/dashboard", { user });
+
+    const orderQuery = await getCustomerOrderQuery(req);
+    const allOrders = await Order.find(orderQuery).sort({ createdAt: -1 }).lean();
+    const paidOrders = allOrders.filter((o) => o.paymentStatus === "paid");
+
+    const stats = {
+      totalOrders: allOrders.length,
+      totalSpent: paidOrders.reduce((sum, o) => sum + Number(o.total || 0), 0),
+      activeOrders: allOrders.filter((o) => !["completed", "cancelled"].includes(o.orderStatus)).length,
+    };
+
+    const brandCounts = new Map();
+    const productCounts = new Map();
+    paidOrders.forEach((order) => {
+      const brandsInOrder = new Set();
+      const productsInOrder = new Set();
+      (order.items || []).forEach((item) => {
+        if (item.brand && !brandsInOrder.has(item.brand)) {
+          brandsInOrder.add(item.brand);
+          brandCounts.set(item.brand, (brandCounts.get(item.brand) || 0) + 1);
+        }
+        const key = String(item.product || item.name);
+        if (!productsInOrder.has(key)) {
+          productsInOrder.add(key);
+          const existing = productCounts.get(key) || { name: item.name, brand: item.brand, image: item.image, product: item.product, count: 0 };
+          existing.count += 1;
+          productCounts.set(key, existing);
+        }
+      });
+    });
+
+    let favouriteBrand = null;
+    brandCounts.forEach((count, brand) => {
+      if (!favouriteBrand || count > favouriteBrand.count) favouriteBrand = { brand, count };
+    });
+
+    let usualProduct = null;
+    productCounts.forEach((entry) => {
+      if (!usualProduct || entry.count > usualProduct.count) usualProduct = entry;
+    });
+
+    if (usualProduct?.product) {
+      const liveProduct = await Product.findById(usualProduct.product).select("price discountPrice strength nicotine stock slug images").lean();
+      if (liveProduct) usualProduct.live = liveProduct;
+    }
+
+    // Real, order-derived activity feed (no invented events/timestamps)
+    const activity = [];
+    allOrders.slice(0, 6).forEach((order) => {
+      const shortId = order._id.toString().slice(-6).toUpperCase();
+      activity.push({ icon: "fa-check", tone: "ok", text: `Order #${shortId} placed`, time: order.createdAt, amount: order.total });
+      if (order.paymentStatus === "paid") {
+        activity.push({ icon: "fa-check", tone: "ok", text: `Order #${shortId} payment confirmed`, time: order.updatedAt });
+      }
+      if (order.royalMail?.syncedAt) {
+        activity.push({ icon: "fa-truck", tone: "blue", text: `Order #${shortId} dispatched`, time: order.royalMail.syncedAt });
+      }
+      if (order.orderStatus === "completed") {
+        activity.push({ icon: "fa-box", tone: "ok", text: `Order #${shortId} delivered`, time: order.updatedAt });
+      }
+      if (order.orderStatus === "cancelled") {
+        activity.push({ icon: "fa-xmark", tone: "muted", text: `Order #${shortId} cancelled`, time: order.updatedAt });
+      }
+    });
+    activity.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+    res.render("dashboard/dashboard", {
+      layout: dashboardLayout(req),
+      user,
+      stats,
+      favouriteBrand,
+      usualProduct,
+      recentOrders: allOrders.slice(0, 4).map((order) => ({ ...order, pill: orderPillInfo(order), itemsSummary: orderItemsSummary(order) })),
+      activity: activity.slice(0, 6),
+      memberSince: user._id.getTimestamp(),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/dashboard/orders", isAuth, async (req, res, next) => {
+  try {
+    const orderQuery = await getCustomerOrderQuery(req);
+    const orders = await Order.find(orderQuery).sort({ createdAt: -1 }).lean();
+    const withStages = orders.map((order) => ({
+      ...order,
+      stageInfo: orderStageInfo(order),
+      pill: orderPillInfo(order),
+    }));
+
+    res.render("dashboard/orders", {
+      layout: dashboardLayout(req),
+      user: req.session.user,
+      orders: withStages,
+      stats: {
+        total: orders.length,
+        active: orders.filter((o) => !["completed", "cancelled"].includes(o.orderStatus)).length,
+        delivered: orders.filter((o) => o.orderStatus === "completed").length,
+        cancelled: orders.filter((o) => o.orderStatus === "cancelled").length,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/orders/:id/reorder", isAuth, async (req, res, next) => {
+  try {
+    const orderQuery = await getCustomerOrderQuery(req);
+    const order = await Order.findOne({ _id: req.params.id, ...orderQuery }).lean();
+
+    if (!order) {
+      req.flash("error", "Order not found.");
+      return res.redirect("/auth/dashboard/orders");
+    }
+
+    const userId = req.session.user._id;
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) cart = new Cart({ user: userId, sessionId: req.session.cartId });
+
+    let addedCount = 0;
+    let skippedCount = 0;
+
+    for (const item of order.items || []) {
+      if (!item.product) { skippedCount++; continue; }
+      const product = await Product.findById(item.product);
+      if (!product || product.isActive === false || product.stock <= 0) { skippedCount++; continue; }
+
+      const finalPrice = product.discountPrice && product.discountPrice > 0 ? product.discountPrice : product.price;
+      const quantity = Math.min(item.quantity, product.stock);
+      const existingIndex = cart.items.findIndex((i) => String(i.product) === String(product._id));
+
+      if (existingIndex > -1) {
+        cart.items[existingIndex].quantity = Math.min(cart.items[existingIndex].quantity + quantity, product.stock);
+      } else {
+        cart.items.push({ product: product._id, quantity, priceAtTime: finalPrice });
+      }
+      addedCount++;
+    }
+
+    await cart.save();
+
+    if (addedCount === 0) {
+      req.flash("error", "None of the items from that order are available to reorder right now.");
+    } else if (skippedCount > 0) {
+      req.flash("success", `Added ${addedCount} item(s) to your cart. ${skippedCount} item(s) were unavailable and skipped.`);
+    } else {
+      req.flash("success", `Added ${addedCount} item(s) to your cart.`);
+    }
+
+    res.redirect("/cart");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/dashboard/wishlist", isAuth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.user._id).populate("wishlist").lean();
+    res.render("dashboard/wishlist", {
+      layout: dashboardLayout(req),
+      user: req.session.user,
+      products: (user?.wishlist || []).filter(Boolean),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/dashboard/addresses", isAuth, async (req, res, next) => {
+  try {
+    const addresses = await Address.find({ user: req.session.user._id }).sort({ isDefault: -1, createdAt: -1 }).lean();
+    res.render("dashboard/addresses", { layout: dashboardLayout(req), user: req.session.user, addresses });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/addresses", isAuth, async (req, res, next) => {
+  try {
+    const { label, firstName, lastName, phone, addressLine1, addressLine2, city, postcode, country } = req.body;
+
+    if (!firstName || !lastName || !addressLine1 || !city || !postcode) {
+      req.flash("error", "Please fill in all required address fields.");
+      return res.redirect("/auth/dashboard/addresses");
+    }
+
+    const existingCount = await Address.countDocuments({ user: req.session.user._id });
+
+    await Address.create({
+      user: req.session.user._id,
+      label: String(label || "Home").trim(),
+      firstName: String(firstName).trim(),
+      lastName: String(lastName).trim(),
+      phone: String(phone || "").trim(),
+      addressLine1: String(addressLine1).trim(),
+      addressLine2: String(addressLine2 || "").trim(),
+      city: String(city).trim(),
+      postcode: String(postcode).trim(),
+      country: String(country || "United Kingdom").trim(),
+      isDefault: existingCount === 0,
+    });
+
+    req.flash("success", "Address added.");
+    res.redirect("/auth/dashboard/addresses");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/addresses/:id", isAuth, async (req, res, next) => {
+  try {
+    const address = await Address.findOne({ _id: req.params.id, user: req.session.user._id });
+    if (!address) {
+      req.flash("error", "Address not found.");
+      return res.redirect("/auth/dashboard/addresses");
+    }
+
+    const { label, firstName, lastName, phone, addressLine1, addressLine2, city, postcode, country } = req.body;
+    Object.assign(address, {
+      label: String(label || address.label).trim(),
+      firstName: String(firstName || address.firstName).trim(),
+      lastName: String(lastName || address.lastName).trim(),
+      phone: String(phone || "").trim(),
+      addressLine1: String(addressLine1 || address.addressLine1).trim(),
+      addressLine2: String(addressLine2 || "").trim(),
+      city: String(city || address.city).trim(),
+      postcode: String(postcode || address.postcode).trim(),
+      country: String(country || address.country).trim(),
+    });
+    await address.save();
+
+    req.flash("success", "Address updated.");
+    res.redirect("/auth/dashboard/addresses");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/addresses/:id/delete", isAuth, async (req, res, next) => {
+  try {
+    const address = await Address.findOneAndDelete({ _id: req.params.id, user: req.session.user._id });
+
+    if (address?.isDefault) {
+      const nextDefault = await Address.findOne({ user: req.session.user._id }).sort({ createdAt: 1 });
+      if (nextDefault) {
+        nextDefault.isDefault = true;
+        await nextDefault.save();
+      }
+    }
+
+    req.flash("success", "Address removed.");
+    res.redirect("/auth/dashboard/addresses");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/addresses/:id/default", isAuth, async (req, res, next) => {
+  try {
+    await Address.updateMany({ user: req.session.user._id }, { $set: { isDefault: false } });
+    await Address.updateOne({ _id: req.params.id, user: req.session.user._id }, { $set: { isDefault: true } });
+    req.flash("success", "Default address updated.");
+    res.redirect("/auth/dashboard/addresses");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/dashboard/profile", isAuth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.user._id).lean();
+    const orderQuery = await getCustomerOrderQuery(req);
+    const orders = await Order.find(orderQuery).lean();
+    const paidOrders = orders.filter((o) => o.paymentStatus === "paid");
+
+    res.render("dashboard/profile", {
+      layout: dashboardLayout(req),
+      user,
+      stats: {
+        totalOrders: orders.length,
+        totalSpent: paidOrders.reduce((sum, o) => sum + Number(o.total || 0), 0),
+      },
+      memberSince: user._id.getTimestamp(),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/profile", isAuth, async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, phone } = req.body;
+    const user = await User.findById(req.session.user._id);
+
+    if (!user) {
+      req.flash("error", "Please log in again.");
+      return res.redirect("/auth/login");
+    }
+
+    const cleanEmail = String(email || "").trim().toLowerCase();
+
+    if (cleanEmail && cleanEmail !== user.email) {
+      const existing = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });
+      if (existing) {
+        req.flash("error", "That email address is already in use.");
+        return res.redirect("/auth/dashboard/profile");
+      }
+      user.email = cleanEmail;
+    }
+
+    if (firstName) user.firstName = String(firstName).trim();
+    if (lastName) user.lastName = String(lastName).trim();
+    user.phone = String(phone || "").trim();
+
+    await user.save();
+    req.session.user = user;
+
+    req.flash("success", "Profile updated.");
+    res.redirect("/auth/dashboard/profile");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/password", isAuth, async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const user = await User.findById(req.session.user._id);
+
+    if (!user?.password) {
+      req.flash("error", "Password change is not available for this account.");
+      return res.redirect("/auth/dashboard/profile");
+    }
+
+    const matches = await bcrypt.compare(String(currentPassword || ""), user.password);
+    if (!matches) {
+      req.flash("error", "Your current password is incorrect.");
+      return res.redirect("/auth/dashboard/profile");
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+      req.flash("error", "New password must be at least 8 characters.");
+      return res.redirect("/auth/dashboard/profile");
+    }
+
+    if (newPassword !== confirmPassword) {
+      req.flash("error", "New passwords do not match.");
+      return res.redirect("/auth/dashboard/profile");
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    req.flash("success", "Password updated.");
+    res.redirect("/auth/dashboard/profile");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/delete-request", isAuth, async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(req.session.user._id, { deletionRequestedAt: new Date() });
+    req.flash("success", "Your account deletion request has been submitted. Our team will action it and confirm by email.");
+    res.redirect("/auth/dashboard/profile");
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/dashboard/preferences", isAuth, async (req, res, next) => {
+  try {
+    const user = await User.findById(req.session.user._id).lean();
+    const subscriber = await NewsletterSubscriber.findOne({ email: String(user.email || "").toLowerCase() }).lean();
+
+    res.render("dashboard/preferences", {
+      layout: dashboardLayout(req),
+      user,
+      orderUpdates: user.notificationPrefs?.orderUpdates !== false,
+      marketingEmails: Boolean(subscriber?.isActive),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/dashboard/preferences", isAuth, async (req, res, next) => {
+  try {
+    const orderUpdates = req.body.orderUpdates === "on";
+    const marketingEmails = req.body.marketingEmails === "on";
+
+    const user = await User.findById(req.session.user._id);
+    user.notificationPrefs = { orderUpdates, marketingEmails };
+    await user.save();
+    req.session.user = user;
+
+    const email = String(user.email || "").toLowerCase();
+    const existingSub = await NewsletterSubscriber.findOne({ email });
+
+    if (marketingEmails) {
+      if (existingSub) {
+        existingSub.isActive = true;
+        existingSub.unsubscribedAt = null;
+        await existingSub.save();
+      } else {
+        await NewsletterSubscriber.create({ email, isActive: true, source: "account", consentAt: new Date(), ip: req.ip || "" });
+      }
+    } else if (existingSub && existingSub.isActive) {
+      existingSub.isActive = false;
+      existingSub.unsubscribedAt = new Date();
+      await existingSub.save();
+    }
+
+    req.flash("success", "Preferences saved.");
+    res.redirect("/auth/dashboard/preferences");
   } catch (error) {
     next(error);
   }

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account | Snus Village</title>
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/dashboard.css?v=1" />
+    <link rel="icon" href="/images/logo/snus-village-logo.webp" />
+  </head>
+
+  <body class="dsh-body">
+    <%
+      const initials = (user?.firstName?.[0] || user?.email?.[0] || "A").toUpperCase();
+      const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "My Account";
+      const navItems = [
+        { href: "/auth/dashboard", icon: "fa-house", label: "Overview", key: "overview" },
+        { href: "/auth/dashboard/orders", icon: "fa-receipt", label: "My Orders", key: "orders", badge: typeof dashboardActiveOrders !== "undefined" ? dashboardActiveOrders : 0 },
+        { href: "/auth/dashboard/wishlist", icon: "fa-heart", label: "Wishlist", key: "wishlist", badge: typeof dashboardWishlistCount !== "undefined" ? dashboardWishlistCount : 0, badgeStyle: "navy" },
+        { divider: true },
+        { href: "/auth/dashboard/addresses", icon: "fa-location-dot", label: "Addresses", key: "addresses" },
+        { href: "/auth/dashboard/profile", icon: "fa-user", label: "Profile", key: "profile" },
+        { href: "/auth/dashboard/preferences", icon: "fa-sliders", label: "Preferences", key: "preferences" },
+      ];
+      const crumbTitles = { overview: "My Account", orders: "My Orders", wishlist: "Wishlist", addresses: "Addresses", profile: "Profile", preferences: "Preferences" };
+      const path = typeof currentPath !== "undefined" ? currentPath : "/auth/dashboard";
+      let activeKey = "overview";
+      if (path.startsWith("/auth/dashboard/orders")) activeKey = "orders";
+      else if (path.startsWith("/auth/dashboard/wishlist")) activeKey = "wishlist";
+      else if (path.startsWith("/auth/dashboard/addresses")) activeKey = "addresses";
+      else if (path.startsWith("/auth/dashboard/profile")) activeKey = "profile";
+      else if (path.startsWith("/auth/dashboard/preferences")) activeKey = "preferences";
+    %>
+
+    <div class="dsh-shell" id="dshShell">
+      <aside class="dsh-sidebar">
+        <div class="dsh-sb-user">
+          <div class="dsh-avatar"><%= initials %><div class="dsh-avatar-ring"></div></div>
+          <div class="dsh-name"><%= fullName %></div>
+          <div class="dsh-email"><%= user?.email || "" %></div>
+        </div>
+
+        <nav class="dsh-sb-nav" id="dshNav">
+          <% navItems.forEach(function(item) { %>
+            <% if (item.divider) { %>
+              <div class="dsh-sb-divider"></div>
+            <% } else { %>
+              <a class="dsh-sb-link<%= activeKey === item.key ? ' active' : '' %>" href="<%= item.href %>" data-key="<%= item.key %>">
+                <i class="fa-solid <%= item.icon %>"></i> <%= item.label %>
+                <% if (item.badge) { %><span class="dsh-sb-badge" <% if (item.badgeStyle === 'navy') { %>style="background:var(--dsh-navy2);"<% } %>><%= item.badge %></span><% } %>
+              </a>
+            <% } %>
+          <% }); %>
+        </nav>
+
+        <div class="dsh-sb-foot">
+          <a href="/shop" class="dsh-sb-foot-link" data-no-spa><i class="fa-solid fa-arrow-up-right-from-square"></i> Back to Shop</a>
+          <a href="/auth/logout" class="dsh-sb-foot-link" data-no-spa><i class="fa-solid fa-right-from-bracket"></i> Sign out</a>
+        </div>
+      </aside>
+
+      <div class="dsh-main">
+        <header class="dsh-topbar">
+          <div class="dsh-tb-logo">SNUS<span>VILLAGE</span></div>
+          <div class="dsh-tb-crumb">
+            <i class="fa-solid fa-chevron-right"></i>
+            <strong id="dshCrumb"><%= crumbTitles[activeKey] || "My Account" %></strong>
+          </div>
+          <div class="dsh-tb-right">
+            <a href="/shop" class="dsh-tb-shop" data-no-spa><i class="fa-solid fa-bag-shopping"></i> Shop</a>
+            <a class="dsh-tb-icon" href="/cart" data-no-spa><i class="fa-solid fa-bag-shopping"></i></a>
+          </div>
+        </header>
+
+        <div class="dsh-content" id="dshContent">
+          <% if (error && error.length) { %><div class="dsh-flash dsh-flash-error"><%= error[0] %></div><% } %>
+          <% if (success && success.length) { %><div class="dsh-flash dsh-flash-success"><%= success[0] %></div><% } %>
+          <%- body %>
+        </div>
+      </div>
+    </div>
+
+    <nav class="dsh-mobile-nav">
+      <div class="dsh-mn-inner">
+        <a class="dsh-mn-item<%= activeKey === 'overview' ? ' active' : '' %>" href="/auth/dashboard" data-key="overview"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="dsh-mn-item<%= activeKey === 'orders' ? ' active' : '' %>" href="/auth/dashboard/orders" data-key="orders"><i class="fa-solid fa-receipt"></i>Orders</a>
+        <a class="dsh-mn-item<%= activeKey === 'wishlist' ? ' active' : '' %>" href="/auth/dashboard/wishlist" data-key="wishlist"><i class="fa-regular fa-heart"></i>Saved</a>
+        <a class="dsh-mn-item<%= activeKey === 'addresses' ? ' active' : '' %>" href="/auth/dashboard/addresses" data-key="addresses"><i class="fa-solid fa-location-dot"></i>Addresses</a>
+        <a class="dsh-mn-item<%= activeKey === 'profile' ? ' active' : '' %>" href="/auth/dashboard/profile" data-key="profile"><i class="fa-solid fa-user"></i>Profile</a>
+      </div>
+    </nav>
+
+    <script src="/js/dashboard-shell.js?v=1"></script>
+  </body>
+</html>

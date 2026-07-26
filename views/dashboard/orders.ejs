@@ -1,0 +1,87 @@
+<div class="dsh-ph">
+  <div>
+    <div class="dsh-ph-eye">Account</div>
+    <h1>My Orders</h1>
+    <p><%= stats.total %> order<%= stats.total === 1 ? "" : "s" %> placed.</p>
+  </div>
+</div>
+
+<div class="dsh-card" style="margin-bottom:16px;">
+  <div class="dsh-tabs">
+    <div class="dsh-tab active" data-status="all">All<span class="dsh-tab-n"><%= stats.total %></span></div>
+    <div class="dsh-tab" data-status="active">Active<span class="dsh-tab-n"><%= stats.active %></span></div>
+    <div class="dsh-tab" data-status="delivered">Delivered<span class="dsh-tab-n"><%= stats.delivered %></span></div>
+    <div class="dsh-tab" data-status="cancelled">Cancelled<span class="dsh-tab-n"><%= stats.cancelled %></span></div>
+  </div>
+</div>
+
+<% if (!orders.length) { %>
+  <div class="dsh-card"><div class="dsh-empty"><i class="fa-solid fa-receipt"></i>You haven't placed any orders yet.</div></div>
+<% } %>
+
+<div id="dshOrderList">
+  <% orders.forEach(function(order) { %>
+    <%
+      const tabStatus = order.orderStatus === "cancelled" ? "cancelled" : (order.orderStatus === "completed" ? "delivered" : "active");
+      const shortId = order._id.toString().slice(-4).toUpperCase();
+      const canReorder = order.orderStatus !== "cancelled";
+    %>
+    <div class="dsh-order-card" data-status="<%= tabStatus %>">
+      <div class="dsh-oc-head">
+        <div>
+          <div class="dsh-oc-id">#<%= shortId %></div>
+          <div class="dsh-oc-date"><%= relTime(order.createdAt) %></div>
+        </div>
+        <span class="dsh-pill <%= order.pill.cls %>" style="margin-left:8px;"><%= order.pill.label %></span>
+        <div class="dsh-oc-amt">&pound;<%= Number(order.total).toFixed(2) %></div>
+        <i class="fa-solid fa-chevron-down dsh-oc-chevron"></i>
+      </div>
+      <div class="dsh-oc-expand">
+        <% if (order.stageInfo.cancelled) { %>
+          <div class="dsh-oc-cancelled"><i class="fa-solid fa-circle-xmark"></i> This order was cancelled.</div>
+        <% } else { %>
+          <div class="dsh-order-timeline">
+            <% order.stageInfo.stages.forEach(function(stage) { %>
+              <div class="dsh-ot-step <%= stage.done ? 'done' : (stage.current ? 'current' : '') %>">
+                <div class="dsh-ot-dot <%= stage.done ? 'done' : (stage.current ? 'current' : '') %>"><i class="fa-solid <%= stage.icon %>"></i></div>
+                <div class="dsh-ot-label"><%- stage.label.replace('\n', '<br/>') %></div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+
+        <% if (order.royalMail && order.royalMail.trackingNumber) { %>
+          <div class="dsh-oc-track">
+            <i class="fa-solid fa-truck"></i>
+            <div>
+              <div class="dsh-oc-track-num">Royal Mail Tracked &mdash; <%= order.royalMail.trackingNumber %></div>
+            </div>
+          </div>
+        <% } %>
+
+        <div class="dsh-oc-items">
+          <% (order.items || []).forEach(function(item) { %>
+            <div class="dsh-oc-item">
+              <img class="dsh-oc-item-img" src="<%= optimiseImageUrl(item.image, { width: 80 }) %>" alt="" />
+              <div>
+                <div class="dsh-oc-item-name"><%= item.name %></div>
+                <div class="dsh-oc-item-meta"><%= item.brand %> &middot; &times;<%= item.quantity %></div>
+              </div>
+              <div class="dsh-oc-item-price">&pound;<%= (item.price * item.quantity).toFixed(2) %></div>
+            </div>
+          <% }); %>
+        </div>
+
+        <div class="dsh-oc-actions">
+          <% if (canReorder) { %>
+            <form action="/auth/dashboard/orders/<%= order._id %>/reorder" method="POST" data-no-spa>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button type="submit" class="dsh-btn dsh-btn-ghost dsh-btn-sm"><i class="fa-solid fa-rotate-right"></i> Reorder</button>
+            </form>
+          <% } %>
+          <a href="/contact" class="dsh-btn dsh-btn-ghost dsh-btn-sm" data-no-spa><i class="fa-solid fa-envelope"></i> Contact Support</a>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>

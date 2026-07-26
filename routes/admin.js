@@ -2274,6 +2274,19 @@ router.post("/users/:id/notes", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin
 });
 
 
+router.post("/users/:id/dismiss-deletion-request", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.params.id, { deletionRequestedAt: null });
+
+    req.flash("success", "Deletion request dismissed");
+    res.redirect(`/admin/users/${req.params.id}`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to dismiss deletion request");
+    res.redirect(`/admin/users/${req.params.id}`);
+  }
+});
+
 router.get("/audit-logs", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (req, res) => {
   try {
     const logs =

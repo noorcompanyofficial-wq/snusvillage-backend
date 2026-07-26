@@ -1,0 +1,85 @@
+<div class="dsh-ph">
+  <div>
+    <div class="dsh-ph-eye">Account</div>
+    <h1>Addresses</h1>
+    <p>Manage your saved delivery addresses.</p>
+  </div>
+  <div class="dsh-ph-right">
+    <button type="button" id="dshAddAddressBtn" class="dsh-btn dsh-btn-navy"><i class="fa-solid fa-plus"></i> Add address</button>
+  </div>
+</div>
+
+<div class="dsh-card">
+  <div class="dsh-addr-grid">
+    <% addresses.forEach(function(addr) { %>
+      <div id="dsh-addr-view-<%= addr._id %>" class="dsh-addr-card<%= addr.isDefault ? " default" : "" %>">
+        <% if (addr.isDefault) { %><div class="dsh-addr-default-badge">Default</div><% } %>
+        <div class="dsh-addr-name"><%= addr.firstName %> <%= addr.lastName %><% if (addr.label) { %> (<%= addr.label %>)<% } %></div>
+        <div class="dsh-addr-lines">
+          <%= addr.addressLine1 %><br/>
+          <% if (addr.addressLine2) { %><%= addr.addressLine2 %><br/><% } %>
+          <%= addr.city %><br/>
+          <%= addr.postcode %><br/>
+          <%= addr.country %>
+        </div>
+        <div class="dsh-addr-actions">
+          <button type="button" class="dsh-btn dsh-btn-ghost dsh-btn-sm" data-address-edit="<%= addr._id %>"><i class="fa-solid fa-pen"></i> Edit</button>
+          <% if (!addr.isDefault) { %>
+            <form action="/auth/dashboard/addresses/<%= addr._id %>/default" method="POST" data-no-spa>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button type="submit" class="dsh-btn dsh-btn-ghost dsh-btn-sm"><i class="fa-solid fa-star"></i> Set default</button>
+            </form>
+          <% } %>
+          <form action="/auth/dashboard/addresses/<%= addr._id %>/delete" method="POST" data-no-spa data-address-delete-form>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="dsh-btn dsh-btn-ghost dsh-btn-sm" style="color:var(--dsh-mu);"><i class="fa-solid fa-trash"></i></button>
+          </form>
+        </div>
+      </div>
+
+      <div id="dsh-addr-edit-<%= addr._id %>" class="dsh-addr-card dsh-addr-edit-card dsh-hidden">
+        <form action="/auth/dashboard/addresses/<%= addr._id %>" method="POST" data-no-spa>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="dsh-fgrid">
+            <div class="dsh-fld"><label>Label</label><input type="text" name="label" value="<%= addr.label %>" /></div>
+            <div class="dsh-fld"><label>Phone</label><input type="tel" name="phone" value="<%= addr.phone %>" /></div>
+            <div class="dsh-fld"><label>First name</label><input type="text" name="firstName" value="<%= addr.firstName %>" required /></div>
+            <div class="dsh-fld"><label>Last name</label><input type="text" name="lastName" value="<%= addr.lastName %>" required /></div>
+            <div class="dsh-fld dsh-fspan"><label>Address line 1</label><input type="text" name="addressLine1" value="<%= addr.addressLine1 %>" required /></div>
+            <div class="dsh-fld dsh-fspan"><label>Address line 2</label><input type="text" name="addressLine2" value="<%= addr.addressLine2 %>" /></div>
+            <div class="dsh-fld"><label>City</label><input type="text" name="city" value="<%= addr.city %>" required /></div>
+            <div class="dsh-fld"><label>Postcode</label><input type="text" name="postcode" value="<%= addr.postcode %>" required /></div>
+            <div class="dsh-fld dsh-fspan"><label>Country</label><input type="text" name="country" value="<%= addr.country %>" /></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="submit" class="dsh-btn dsh-btn-navy"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button type="button" class="dsh-btn dsh-btn-ghost" data-address-cancel="<%= addr._id %>">Cancel</button>
+          </div>
+        </form>
+      </div>
+    <% }); %>
+
+    <div id="dshNewAddressPrompt" class="dsh-addr-new">
+      <i class="fa-solid fa-location-dot"></i>
+      <span>Add a new address</span>
+    </div>
+
+    <div id="dshNewAddressFormWrap" class="dsh-card dsh-addr-form-card dsh-hidden">
+      <form action="/auth/dashboard/addresses" method="POST" data-no-spa>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="dsh-fgrid">
+          <div class="dsh-fld"><label>Label</label><input type="text" name="label" placeholder="Home, Work..." /></div>
+          <div class="dsh-fld"><label>Phone (optional)</label><input type="tel" name="phone" placeholder="+44 7700 000000" /></div>
+          <div class="dsh-fld"><label>First name</label><input type="text" name="firstName" required /></div>
+          <div class="dsh-fld"><label>Last name</label><input type="text" name="lastName" required /></div>
+          <div class="dsh-fld dsh-fspan"><label>Address line 1</label><input type="text" name="addressLine1" required /></div>
+          <div class="dsh-fld dsh-fspan"><label>Address line 2</label><input type="text" name="addressLine2" /></div>
+          <div class="dsh-fld"><label>City</label><input type="text" name="city" required /></div>
+          <div class="dsh-fld"><label>Postcode</label><input type="text" name="postcode" required /></div>
+          <div class="dsh-fld dsh-fspan"><label>Country</label><input type="text" name="country" value="United Kingdom" /></div>
+        </div>
+        <button type="submit" class="dsh-btn dsh-btn-navy"><i class="fa-solid fa-plus"></i> Add address</button>
+      </form>
+    </div>
+  </div>
+</div>

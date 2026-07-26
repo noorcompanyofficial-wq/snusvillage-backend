@@ -1,0 +1,31 @@
+<div class="dsh-ph">
+  <div>
+    <div class="dsh-ph-eye">Account</div>
+    <h1>Preferences</h1>
+    <p>Control which emails we send you.</p>
+  </div>
+</div>
+
+<form action="/auth/dashboard/preferences" method="POST" data-no-spa class="dsh-card" style="max-width:600px;">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <div class="dsh-card-head"><h2>Email Notifications</h2></div>
+  <div style="padding:16px 20px;">
+    <div class="dsh-toggle-row">
+      <div class="dsh-toggle-info">
+        <strong>Order updates</strong>
+        <span>Confirmation, dispatch, and delivery emails</span>
+      </div>
+      <label class="dsh-tog"><input type="checkbox" name="orderUpdates" <%= orderUpdates ? "checked" : "" %> /><span class="dsh-tog-sl"></span></label>
+    </div>
+    <div class="dsh-toggle-row">
+      <div class="dsh-toggle-info">
+        <strong>Marketing emails</strong>
+        <span>Product drops, restocks, and promotions</span>
+      </div>
+      <label class="dsh-tog"><input type="checkbox" name="marketingEmails" <%= marketingEmails ? "checked" : "" %> /><span class="dsh-tog-sl"></span></label>
+    </div>
+  </div>
+  <div style="padding:0 20px 20px;">
+    <button type="submit" class="dsh-btn dsh-btn-navy"><i class="fa-solid fa-floppy-disk"></i> Save preferences</button>
+  </div>
+</form>

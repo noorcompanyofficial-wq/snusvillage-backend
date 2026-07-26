@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   birthDate: Date,
+  phone: { type: String, default: "" },
 
   email: {
     type: String,
@@ -92,6 +93,13 @@ const userSchema = new mongoose.Schema({
   },
 
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+
+  notificationPrefs: {
+    orderUpdates: { type: Boolean, default: true },
+    marketingEmails: { type: Boolean, default: false },
+  },
+
+  deletionRequestedAt: { type: Date, default: null },
 });
 
 module.exports = mongoose.model("User", userSchema);

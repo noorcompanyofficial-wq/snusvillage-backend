@@ -1,0 +1,60 @@
+<%
+  const STRENGTH_COLORS = {
+    "LOW": "linear-gradient(90deg,#22c55e,#16a34a)",
+    "MEDIUM": "linear-gradient(90deg,#3b82f6,#2563eb)",
+    "STRONG": "linear-gradient(90deg,#f59e0b,#d97706)",
+    "X-STRONG": "linear-gradient(90deg,#ef4444,#dc2626)",
+    "EXTREME": "linear-gradient(90deg,#7f1d1d,#450a0a)",
+  };
+%>
+
+<div class="dsh-ph">
+  <div>
+    <div class="dsh-ph-eye">Account</div>
+    <h1>Wishlist</h1>
+    <p><%= products.length %> product<%= products.length === 1 ? "" : "s" %> saved.</p>
+  </div>
+  <% if (products.length) { %>
+    <div class="dsh-ph-right">
+      <button type="button" id="dshAddAllToCart" class="dsh-btn dsh-btn-red"><i class="fa-solid fa-bag-shopping"></i> Add all to cart</button>
+    </div>
+  <% } %>
+</div>
+
+<div class="dsh-card">
+  <% if (!products.length) { %>
+    <div class="dsh-empty"><i class="fa-regular fa-heart"></i>Your wishlist is empty. <a href="/shop" data-no-spa>Browse products</a> to save some for later.</div>
+  <% } else { %>
+    <div class="dsh-wish-grid">
+      <% products.forEach(function(p) { %>
+        <%
+          const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+          const strip = STRENGTH_COLORS[p.strength] || STRENGTH_COLORS["MEDIUM"];
+        %>
+        <div class="dsh-wish-card">
+          <div class="dsh-wc-img">
+            <div class="dsh-wc-remove" title="Remove from wishlist" data-wishlist-remove="<%= p._id %>"><i class="fa-solid fa-xmark"></i></div>
+            <a href="/products/<%= p.slug || p._id %>" data-no-spa>
+              <% if (p.images && p.images.length) { %>
+                <img src="<%= optimiseImageUrl(p.images[0], { width: 200 }) %>" alt="<%= p.name %>" />
+              <% } %>
+            </a>
+            <div class="dsh-wc-str" style="background:<%= strip %>;"></div>
+          </div>
+          <div class="dsh-wc-body">
+            <div class="dsh-wc-brand"><%= p.brand || "" %></div>
+            <div class="dsh-wc-name"><%= p.name %></div>
+            <div class="dsh-wc-foot">
+              <span class="dsh-wc-price">&pound;<%= Number(finalPrice).toFixed(2) %></span>
+              <% if (p.stock > 0) { %>
+                <button type="button" class="dsh-wc-add" data-wishlist-add="<%= p._id %>"><i class="fa-solid fa-plus"></i> Add</button>
+              <% } else { %>
+                <button type="button" class="dsh-wc-add" disabled style="background:var(--dsh-mu);">Out of stock</button>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</div>

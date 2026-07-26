@@ -6,6 +6,7 @@ const Order = require("../models/order");
 const Product = require("../models/Products");
 const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
+const Address = require("../models/Address");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
 const { sendOrderEmails } = require("../utils/orderEmails");
 const {
@@ -706,10 +707,15 @@ router.get("/", async (req, res, next) => {
     const { subtotal, shipping, discountAmount, total, discountResult, freeShippingThreshold, standardShippingFee, nextDayShippingFee, nextDayDeliveryCutoff } =
       await calculateCheckoutTotals(req, cart, "delivery");
 
+    const savedAddresses = req.session?.user?._id
+      ? await Address.find({ user: req.session.user._id }).sort({ isDefault: -1, createdAt: -1 }).lean()
+      : [];
+
     res.render("checkout/checkout", {
       layout: "layouts/checkout-layout",
       title: "Checkout",
       cart,
+      savedAddresses,
       subtotal,
       shipping,
       discountAmount,

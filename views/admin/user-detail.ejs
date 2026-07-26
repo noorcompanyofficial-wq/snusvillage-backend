@@ -1,5 +1,20 @@
 <%- include("../partials/admin-flash") %>
 
+<% if (account.deletionRequestedAt) { %>
+  <div class="sec" style="border-color:rgba(217,119,6,.35);margin-bottom:16px;">
+    <div class="sec-head" style="border-color:rgba(217,119,6,.2);">
+      <h2 style="color:#d97706;"><i class="fa-solid fa-triangle-exclamation"></i> Account Deletion Requested</h2>
+    </div>
+    <div class="sec-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <p style="color:var(--mu);font-size:12px;margin:0;">This customer requested account deletion on <%= new Date(account.deletionRequestedAt).toLocaleString("en-GB") %>. Review and action manually, then dismiss once handled.</p>
+      <form action="/admin/users/<%= account._id %>/dismiss-deletion-request" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="btn btn-ghost btn-sm"><i class="fa-solid fa-check"></i> Dismiss Request</button>
+      </form>
+    </div>
+  </div>
+<% } %>
+
 <div class="ph">
   <div>
     <div class="ph-eye">Customer Profile</div>

@@ -1,32 +1,115 @@
-<link rel="stylesheet" href="/css/auth.css" />
+<%
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.email || "there";
+  const memberSinceLabel = memberSince ? new Date(memberSince).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) : "";
+%>
 
-<section class="account-page">
-  <div class="account-hero">
-    <span class="auth-pill">Customer Account</span>
-    <h1>Hi <%= user.firstName %>.</h1>
-    <p>Your customer login is active. Use this page to manage your account and shop.</p>
+<div class="dsh-welcome-bar">
+  <div class="dsh-wb-text">
+    <div class="dsh-wb-greeting">Welcome back</div>
+    <div class="dsh-wb-name"><%= fullName %></div>
+    <div class="dsh-wb-sub">You have <%= stats.activeOrders %> active order<%= stats.activeOrders === 1 ? "" : "s" %><% if (typeof dashboardWishlistCount !== "undefined" && dashboardWishlistCount) { %> and <%= dashboardWishlistCount %> saved item<%= dashboardWishlistCount === 1 ? "" : "s" %><% } %>.</div>
   </div>
+  <a href="/shop" class="dsh-wb-shop"><i class="fa-solid fa-bag-shopping"></i> Shop Now</a>
+</div>
 
-  <div class="account-grid">
-    <div class="account-card">
-      <i class="fa-solid fa-envelope"></i>
-      <span>Email</span>
-      <strong><%= user.email %></strong>
-    </div>
-    <div class="account-card">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Email Status</span>
-      <strong><%= user.isVerified ? "Verified" : "Not verified" %></strong>
-    </div>
-    <div class="account-card">
-      <i class="fa-solid fa-store"></i>
-      <span>Trader Status</span>
-      <strong><%= user.traderStatus || "none" %></strong>
+<div class="dsh-ov-grid">
+  <div class="dsh-ov-stat">
+    <div class="dsh-ov-icon dsh-oi-b"><i class="fa-solid fa-receipt"></i></div>
+    <div>
+      <div class="dsh-ov-label">Total Orders</div>
+      <div class="dsh-ov-val"><%= stats.totalOrders %></div>
+      <% if (memberSinceLabel) { %><div class="dsh-ov-sub">Since joining <%= memberSinceLabel %></div><% } %>
     </div>
   </div>
-
-  <div class="account-actions">
-    <a class="auth-btn account-action" href="/shop">Shop products</a>
-    <a class="auth-btn account-action account-action--ghost" href="/auth/logout">Logout</a>
+  <div class="dsh-ov-stat">
+    <div class="dsh-ov-icon dsh-oi-g"><i class="fa-solid fa-sterling-sign"></i></div>
+    <div>
+      <div class="dsh-ov-label">Total Spent</div>
+      <div class="dsh-ov-val">&pound;<%= stats.totalSpent.toFixed(2) %></div>
+      <% if (stats.totalOrders) { %><div class="dsh-ov-sub">Avg &pound;<%= (stats.totalSpent / stats.totalOrders).toFixed(2) %> per order</div><% } %>
+    </div>
   </div>
-</section>
+  <div class="dsh-ov-stat">
+    <div class="dsh-ov-icon dsh-oi-r"><i class="fa-solid fa-star"></i></div>
+    <div>
+      <div class="dsh-ov-label">Favourite Brand</div>
+      <% if (favouriteBrand) { %>
+        <div class="dsh-ov-val" style="font-size:16px;margin-top:2px;"><%= favouriteBrand.brand %></div>
+        <div class="dsh-ov-sub"><%= favouriteBrand.count %> of <%= stats.totalOrders %> orders</div>
+      <% } else { %>
+        <div class="dsh-ov-val" style="font-size:16px;margin-top:2px;color:var(--dsh-mu);">&mdash;</div>
+        <div class="dsh-ov-sub">No orders yet</div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% if (usualProduct) { %>
+  <div class="dsh-usual-card">
+    <img class="dsh-usual-img" src="<%= optimiseImageUrl(usualProduct.image || usualProduct.live?.images?.[0] || '', { width: 160 }) %>" alt="<%= usualProduct.name %>" />
+    <div>
+      <div class="dsh-usual-label">Your usual</div>
+      <div class="dsh-usual-name"><%= usualProduct.name %></div>
+      <div class="dsh-usual-meta">
+        <% if (usualProduct.live) { %>
+          <span><i class="fa-solid fa-bolt" style="color:var(--dsh-amb);"></i> <%= usualProduct.live.strength %><% if (usualProduct.live.nicotine) { %> &middot; <%= usualProduct.live.nicotine %>mg<% } %></span>
+          <span>&bull;</span>
+          <span style="color:var(--dsh-grn);font-weight:700;">&pound;<%= (usualProduct.live.discountPrice > 0 ? usualProduct.live.discountPrice : usualProduct.live.price).toFixed(2) %> per can</span>
+        <% } %>
+        <span>&bull;</span>
+        <span>Ordered <%= usualProduct.count %> time<%= usualProduct.count === 1 ? "" : "s" %></span>
+      </div>
+    </div>
+    <div class="dsh-usual-actions">
+      <% if (usualProduct.live && usualProduct.live.stock > 0) { %>
+        <form action="/cart/add/<%= usualProduct.product %>" method="POST" data-no-spa>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="hidden" name="quantity" value="1" />
+          <button type="submit" class="dsh-btn dsh-btn-red"><i class="fa-solid fa-rotate-right"></i> Reorder</button>
+        </form>
+      <% } %>
+      <a href="/auth/dashboard/wishlist" class="dsh-btn dsh-btn-ghost dsh-btn-sm dsh-btn-icon"><i class="fa-regular fa-heart"></i></a>
+    </div>
+  </div>
+<% } %>
+
+<div class="dsh-ov-cols">
+  <div class="dsh-card">
+    <div class="dsh-card-head">
+      <h2>Recent Orders</h2>
+      <a class="dsh-card-link" href="/auth/dashboard/orders">View all &rarr;</a>
+    </div>
+    <% if (!recentOrders.length) { %>
+      <div class="dsh-empty"><i class="fa-solid fa-receipt"></i>No orders yet.</div>
+    <% } %>
+    <% recentOrders.forEach(function(order) { %>
+      <div class="dsh-order-row">
+        <span class="dsh-or-id">#<%= order._id.toString().slice(-4).toUpperCase() %></span>
+        <span class="dsh-or-items"><%= order.itemsSummary %></span>
+        <span class="dsh-or-amt">&pound;<%= Number(order.total).toFixed(2) %></span>
+        <div class="dsh-or-actions">
+          <span class="dsh-pill <%= order.pill.cls %>"><%= order.pill.label %></span>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="dsh-card">
+    <div class="dsh-card-head"><h2>Activity</h2></div>
+    <% if (!activity.length) { %>
+      <div class="dsh-empty"><i class="fa-regular fa-clock"></i>No recent activity.</div>
+    <% } else { %>
+      <div class="dsh-timeline">
+        <% activity.forEach(function(item) { %>
+          <div class="dsh-tl-item">
+            <div class="dsh-tl-dot dsh-td-<%= item.tone === 'blue' ? 'bl' : (item.tone === 'muted' ? 'mu' : 'ok') %>"><i class="fa-solid <%= item.icon %>"></i></div>
+            <div>
+              <div class="dsh-tl-action"><%= item.text %></div>
+              <div class="dsh-tl-time"><%= relTime(item.time) %><% if (item.amount) { %> &middot; &pound;<%= Number(item.amount).toFixed(2) %><% } %></div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</div>
