@@ -108,9 +108,7 @@
       <link rel="stylesheet" href="/css/products-v4.css?v=v4-scroll-fix-20260716" />
     <% } %>
 
-    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage || isWishlistPage) { %>
-      <link rel="stylesheet" href="/css/cart.css?v=v4-cart-20260717" />
-    <% } %>
+    <link rel="stylesheet" href="/css/cart.css?v=v4-cart-20260726" />
 
     <% if (isCartPage) { %>
       <style>main { width: 100% !important; max-width: none !important; padding-top: 138px; }</style>
@@ -227,7 +225,7 @@
       <script src="/js/products.js" defer></script>
     <% } %>
 
-    <% if (isCartPage || isShopPage || isProductPage || isCollectionPage || isWishlistPage) { %>
+    <% if (!isCartPage) { %>
       <script src="/js/cart.js" defer></script>
     <% } %>
 
