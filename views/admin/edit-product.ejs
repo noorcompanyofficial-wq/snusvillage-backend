@@ -19,6 +19,15 @@
         <div class="fld"><label>Product Name</label><input type="text" name="name" value="<%= product.name || '' %>" required></div>
         <div class="fld"><label>Brand</label><input list="brandOptions" type="text" name="brand" value="<%= product.brand || '' %>" required></div>
         <div class="fld"><label>Category</label><input list="categoryOptions" type="text" name="category" value="<%= product.category || '' %>"></div>
+        <div class="fld"><label>Format</label>
+          <select name="format">
+            <option value="" <%= !product.format ? "selected" : "" %>>Not set</option>
+            <option value="All White" <%= product.format === "All White" ? "selected" : "" %>>All White</option>
+            <option value="Original" <%= product.format === "Original" ? "selected" : "" %>>Original</option>
+            <option value="Slim" <%= product.format === "Slim" ? "selected" : "" %>>Slim</option>
+            <option value="Mini" <%= product.format === "Mini" ? "selected" : "" %>>Mini</option>
+          </select>
+        </div>
         <div class="fld"><label>SKU</label><input type="text" name="sku" value="<%= product.sku || '' %>"></div>
         <div class="fld"><label>Barcode / EAN</label><input type="text" name="barcode" value="<%= product.barcode || '' %>"></div>
         <div class="fld"><label>Supplier</label><input type="text" name="supplier" value="<%= product.supplier || '' %>"></div>

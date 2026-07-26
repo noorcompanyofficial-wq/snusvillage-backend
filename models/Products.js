@@ -61,6 +61,12 @@ const productSchema = new mongoose.Schema(
       default: "general",
     },
 
+    format: {
+      type: String,
+      enum: ["", "All White", "Original", "Slim", "Mini"],
+      default: "",
+    },
+
     sku: {
       type: String,
       default: "",

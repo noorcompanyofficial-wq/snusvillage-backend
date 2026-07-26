@@ -2719,6 +2719,7 @@ router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.product
       "Brand",
       "Flavour",
       "Category",
+      "Format",
       "Strength",
       "Nicotine",
       "Price",
@@ -2748,6 +2749,7 @@ router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.product
       product.brand || "",
       product.flavour || "",
       product.category || "",
+      product.format || "",
       product.strength || "",
       product.nicotine || "",
       Number(product.price || 0).toFixed(2),
@@ -2789,7 +2791,7 @@ router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.product
 });
 
 const IMPORT_TEMPLATE_HEADERS = [
-  "Name", "SKU", "Barcode", "Brand", "Flavour", "Category", "Strength", "Nicotine",
+  "Name", "SKU", "Barcode", "Brand", "Flavour", "Category", "Format", "Strength", "Nicotine",
   "Price", "Discount Price", "Cost Price", "Stock", "Pouches Per Can",
   "Supplier", "Supplier Code", "Active", "Featured", "Best Seller", "Sale Badge",
   "SEO Title", "SEO Description", "Description", "Images",
@@ -2801,7 +2803,7 @@ router.get("/products/import", isAdmin, requireAdminRole(PERMISSIONS.products), 
 
 router.get("/products/import/template", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
   const example = [
-    "White Fox Peppered Mint", "WF-PM-20", "", "WHITE FOX", "Peppered Mint", "Nicotine Pouches",
+    "White Fox Peppered Mint", "WF-PM-20", "", "WHITE FOX", "Peppered Mint", "Nicotine Pouches", "Slim",
     "STRONG", "16", "3.99", "0.00", "1.50", "50", "20", "", "",
     "yes", "no", "no", "no", "", "",
     "Clean, cool mint with a long-lasting nicotine release.", "",
@@ -2888,6 +2890,14 @@ router.post(
         const skuRaw = get("sku");
         const sku = skuRaw ? skuRaw.toUpperCase() : "";
 
+        const FORMATS = ["All White", "Original", "Slim", "Mini"];
+        const formatRaw = get("format");
+        const format = FORMATS.find((f) => f.toLowerCase() === formatRaw.toLowerCase()) || "";
+        if (formatRaw && !format) {
+          results.errors.push({ row: rowNum, name, reason: `Invalid format "${formatRaw}" — must be one of ${FORMATS.join(", ")}, or left blank.` });
+          continue;
+        }
+
         const parseBool = (value, fallback) => {
           if (!value) return fallback;
           return ["yes", "true", "1"].includes(value.toLowerCase());
@@ -2901,6 +2911,7 @@ router.post(
           brand,
           flavour: get("flavour", "flavor"),
           category: get("category") || "general",
+          format,
           strength,
           nicotine: get("nicotine", "mg", "nicotine (mg)", "nicotine mg"),
           price,
@@ -3149,6 +3160,7 @@ router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), up
       brand,
       flavour,
       category,
+      format,
       sku,
       barcode,
       supplier,
@@ -3178,6 +3190,7 @@ router.post("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), up
       brand,
       flavour,
       category,
+      format: format || "",
       sku: String(sku || "").trim().toUpperCase(),
       barcode: String(barcode || "").trim(),
       supplier: String(supplier || "").trim(),
@@ -3276,6 +3289,7 @@ router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products
       brand,
       flavour,
       category,
+      format,
       sku,
       barcode,
       supplier,
@@ -3300,6 +3314,7 @@ router.post("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products
       brand,
       flavour,
       category,
+      format: format || "",
       sku: String(sku || "").trim().toUpperCase(),
       barcode: String(barcode || "").trim(),
       supplier: String(supplier || "").trim(),

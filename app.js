@@ -132,6 +132,7 @@ const legalRoutes = require("./routes/legal");
 const newsletterRoutes = require("./routes/newsletter");
 
 const wholesaleRoutes = require("./routes/wholesale");
+const wishlistRoutes = require("./routes/wishlist");
 
 // ====== Database connection ======
 
@@ -435,6 +436,7 @@ app.use("/", legalRoutes);
 app.use("/cart", cartRoutes);
 
 app.use("/wholesale", wholesaleRoutes);
+app.use("/wishlist", wishlistRoutes);
 
 app.use((req, res) => {
   res.status(404).render("404", {

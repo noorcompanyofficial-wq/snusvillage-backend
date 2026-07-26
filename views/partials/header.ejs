@@ -134,6 +134,7 @@
         <a class="header-cart" href="/cart">Cart</a>
 
         <% if (user) { %>
+          <a class="customer-nav__link" href="/wishlist"><i class="fa-regular fa-heart"></i> Wishlist</a>
           <a class="customer-nav__link" href="/auth/dashboard">Account</a>
         <% } else { %>
           <a class="customer-nav__link" href="/auth/login">Login</a>

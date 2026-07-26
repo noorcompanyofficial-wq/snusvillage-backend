@@ -1,203 +1,233 @@
-<section class="shop-page">
-  <div class="shop-hero">
-    <div class="shop-hero__content">
-      <span class="shop-eyebrow">All Products</span>
-      <h1>Shop Premium Snus & Nicotine Pouches</h1>
-      <p>
-        Browse trusted nicotine pouch brands, strengths, flavours and fast-moving stock from Snus Village.
-      </p>
+<%
+  const STRENGTH_META = {
+    "LOW": { key: "low", label: "Low", mg: "Under 6mg", bar: "sp-1", color: "#22c55e" },
+    "MEDIUM": { key: "medium", label: "Medium", mg: "6–12mg", bar: "sp-2", color: "#3b82f6" },
+    "STRONG": { key: "strong", label: "Strong", mg: "12–20mg", bar: "sp-3", color: "#f59e0b" },
+    "X-STRONG": { key: "x-strong", label: "X-Strong", mg: "20–30mg", bar: "sp-4", color: "#ef4444" },
+    "EXTREME": { key: "extreme", label: "Extreme", mg: "30mg+", bar: "sp-5", color: "#7f1d1d" },
+  };
+  const STRENGTH_PCT = { "low": 25, "medium": 45, "strong": 70, "x-strong": 88, "extreme": 100 };
+  const activeStrengthKey = query?.strength ? (STRENGTH_META[query.strength.toUpperCase()]?.key || "") : "";
+  const activeBrandLower = (query?.brand || "").toLowerCase();
+  // Note: the ?flavour= deep-link param uses a broader server-side fuzzy
+  // keyword match (see routes/shop.js) than the curated sidebar flavour
+  // pills below, so a pill is deliberately never pre-checked from it --
+  // doing so would silently re-filter the already-correct server results
+  // down to a narrower subset behind the user's back.
+%>
+<div class="shop-v2">
 
-      <div class="shop-hero__badges">
-        <span>18+ Only</span>
-        <span>Authentic Stock</span>
-        <span>Free UK Delivery Over £<%= Number(storeSettings?.freeDeliveryThreshold || 10).toFixed(2) %></span>
-        <span>London Retail Support</span>
+  <div class="coll-hero">
+    <div class="ch-inner">
+      <div class="ch-text">
+        <div class="ch-eye">Collection</div>
+        <h1 class="ch-title"><%= query?.brand ? query.brand : "All Nicotine Pouches" %></h1>
+        <p class="ch-sub">The UK&rsquo;s best selection of nicotine pouches in every strength. Tobacco-free, smoke-free &mdash; delivered next day or available in-store.</p>
+        <div class="ch-stats">
+          <div class="ch-stat"><strong><%= catalogueTotals.products %></strong><span>Products</span></div>
+          <div class="ch-stat"><strong><%= catalogueTotals.brands %></strong><span>Brands</span></div>
+          <div class="ch-stat"><strong><%= catalogueTotals.strengths %></strong><span>Strengths</span></div>
+          <div class="ch-stat"><strong>3</strong><span>London Stores</span></div>
+        </div>
+      </div>
+      <div class="ch-img-strip">
+        <% products.slice(0, 3).forEach((p) => { if (p.images && p.images[0]) { %>
+          <img src="<%= optimiseImageUrl(p.images[0], { width: 140 }) %>" alt="">
+        <% } }) %>
       </div>
     </div>
   </div>
 
-  <div class="shop-toolbar">
-    <form class="shop-search-form" action="/shop" method="GET">
-      <div class="shop-search-box">
-        <label for="shopSearch">Search Products</label>
-        <input
-          id="shopSearch"
-          type="text"
-          name="search"
-          value="<%= query?.search || '' %>"
-          placeholder="Search Brand, Flavour Or Product..."
-        >
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="/">Home</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <span>Shop All</span>
+    </div>
+  </div>
+
+  <div class="shop-wrap-v2">
+
+    <aside class="filters" id="sidebarFilters">
+      <div class="filters-header">
+        <div class="filters-title">Filters</div>
+        <button type="button" class="filters-clear" id="clearAll">Clear all</button>
       </div>
 
-      <div class="shop-filter-box">
-        <label for="shopStrength">Strength</label>
-        <select id="shopStrength" name="strength">
-          <option value="">All Strengths</option>
-          <option value="LOW" <%= query?.strength === "LOW" ? "selected" : "" %>>Low</option>
-          <option value="MEDIUM" <%= query?.strength === "MEDIUM" ? "selected" : "" %>>Medium</option>
-          <option value="STRONG" <%= query?.strength === "STRONG" ? "selected" : "" %>>Strong</option>
-          <option value="X-STRONG" <%= query?.strength === "X-STRONG" ? "selected" : "" %>>X-Strong</option>
-          <option value="EXTREME" <%= query?.strength === "EXTREME" ? "selected" : "" %>>Extreme</option>
+      <div class="filt-group">
+        <div class="filt-label">Strength</div>
+        <div class="str-picker">
+          <% facets.strengths.forEach((s) => { const meta = STRENGTH_META[s.name]; %>
+            <div class="sp-item <%= activeStrengthKey === meta.key ? 'active' : '' %>" data-str="<%= meta.key %>">
+              <div class="sp-bar <%= meta.bar %>"></div>
+              <div class="sp-info"><div class="sp-name" style="color:<%= meta.color %>;"><%= meta.label %></div><div class="sp-mg"><%= meta.mg %></div></div>
+              <span class="sp-count"><%= s.count %></span>
+              <div class="sp-check"></div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="filt-group">
+        <div class="filt-label">Brand</div>
+        <div class="brand-list">
+          <% facets.brands.forEach((b) => { %>
+            <div class="cb-item <%= activeBrandLower === b.name.toLowerCase() ? 'checked' : '' %>" data-brand="<%= b.name.toLowerCase() %>"><div class="cb-box"></div><%= b.name %><span class="cb-count"><%= b.count %></span></div>
+          <% }) %>
+        </div>
+      </div>
+
+      <% if (facets.flavours.length) { %>
+        <div class="filt-group">
+          <div class="filt-label">Flavour</div>
+          <div class="flavour-pills">
+            <% facets.flavours.forEach((f) => { %>
+              <div class="fp" data-flavour="<%= f.key %>"><%= f.label %></div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (facets.formats.length) { %>
+        <div class="filt-group">
+          <div class="filt-label">Format</div>
+          <div class="brand-list">
+            <% facets.formats.forEach((f) => { %>
+              <div class="cb-item" data-format="<%= f.name.toLowerCase() %>"><div class="cb-box"></div><%= f.name %><span class="cb-count"><%= f.count %></span></div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <div class="filt-group">
+        <div class="filt-label">Max Price <span id="priceVal">&pound;<%= priceRange.max %></span></div>
+        <div class="price-range">
+          <input type="range" id="priceSlider" min="<%= priceRange.min %>" max="<%= priceRange.max %>" value="<%= priceRange.max %>">
+        </div>
+        <div class="pr-labels"><span>&pound;<%= priceRange.min %></span><span>&pound;<%= priceRange.max %></span></div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+
+      <div class="toolbar">
+        <div class="tool-count"><strong id="prodCount"><%= totalProducts %></strong> <span>product<%= totalProducts === 1 ? "" : "s" %></span></div>
+
+        <form class="tool-search" action="/shop" method="GET">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--shop-mu);font-size:12px;flex-shrink:0;"></i>
+          <input type="search" name="search" value="<%= query?.search || '' %>" placeholder="Search products...">
+        </form>
+
+        <select class="sort-sel" id="sortSelect">
+          <option value="popular">Newest First</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name">Name A-Z</option>
         </select>
+
+        <div class="view-btns">
+          <div class="vb active" id="vbGrid"><i class="fa-solid fa-grip"></i></div>
+          <div class="vb" id="vbList"><i class="fa-solid fa-list"></i></div>
+        </div>
+
+        <button type="button" class="mobile-filter-btn" id="openFiltersBtn">
+          <i class="fa-solid fa-sliders"></i> Filters
+        </button>
       </div>
 
-      <div class="shop-filter-box">
-        <label for="shopBrand">Brand</label>
-        <input
-          id="shopBrand"
-          type="text"
-          name="brand"
-          value="<%= query?.brand || '' %>"
-          placeholder="White Fox, Pablo..."
-        >
-      </div>
+      <div class="active-filters" id="activeFilters"></div>
 
-      <div class="shop-filter-box">
-        <label for="shopFlavour">Flavour</label>
-        <input
-          id="shopFlavour"
-          type="text"
-          name="flavour"
-          value="<%= query?.flavour || '' %>"
-          placeholder="Mint, Pineapple, Berry..."
-        >
-      </div>
+      <% if (!products || products.length === 0) { %>
+        <div class="empty visible">
+          <i class="fa-solid fa-face-frown-open"></i>
+          <h3>No products found</h3>
+          <p>Try adjusting your filters or search term.</p>
+        </div>
+      <% } else { %>
+        <div class="prod-grid-v2" id="prodGrid">
+          <% products.forEach((p) => {
+            const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+            const meta = STRENGTH_META[p.strength] || STRENGTH_META["MEDIUM"];
+            const pct = STRENGTH_PCT[meta.key] || 50;
+            const isWishlisted = wishlistIds.includes(String(p._id));
+          %>
+            <div class="pc"
+              data-id="<%= p._id %>"
+              data-brand="<%= (p.brand || '').toLowerCase() %>"
+              data-str="<%= meta.key %>"
+              data-flavour="<%= (p.flavourTags || []).join(' ') %>"
+              data-format="<%= (p.format || '').toLowerCase() %>"
+              data-price="<%= finalPrice %>"
+              data-name="<%= (p.name || '').toLowerCase() %>"
+            >
+              <div class="pc-inner">
+                <div class="pc-img-wrap">
+                  <div class="pc-badges">
+                    <% if (p.showSaleBadge && p.discountPrice > 0) { %><span class="pc-badge pb-sale">Sale</span><% } %>
+                    <% if (p.isBestSeller) { %><span class="pc-badge pb-best">Best Seller</span><% } %>
+                    <% if (p.isFeatured) { %><span class="pc-badge pb-featured">Featured</span><% } %>
+                  </div>
+                  <div class="pc-wish <%= isWishlisted ? 'on' : '' %>" data-wish-toggle data-product-id="<%= p._id %>">
+                    <i class="<%= isWishlisted ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
+                  </div>
+                  <a href="/products/<%= p.slug || p._id %>">
+                    <% if (p.images && p.images.length) { %>
+                      <img src="<%= optimiseImageUrl(p.images[0], { width: 320 }) %>" alt="<%= p.name %>" loading="lazy">
+                    <% } else { %>
+                      <span style="color:var(--shop-mu);font-size:11px;">No Image</span>
+                    <% } %>
+                  </a>
+                  <div class="pc-str-strip" style="background:<%= meta.color %>;"></div>
+                  <% if (p.stock <= 0) { %><div class="pc-out"><span>Out Of Stock</span></div><% } %>
+                </div>
+                <div class="pc-body">
+                  <div class="pc-brand"><%= p.brand || "" %></div>
+                  <h2 class="pc-name"><a href="/products/<%= p.slug || p._id %>"><%= p.name %></a></h2>
+                  <div class="pc-str-row">
+                    <div class="pc-str-track"><div class="pc-str-fill" style="width:<%= pct %>%;background:<%= meta.color %>;"></div></div>
+                    <span class="pc-str-label" style="color:<%= meta.color %>;"><%= meta.label %></span>
+                  </div>
+                  <div class="pc-foot">
+                    <span class="pc-price">
+                      <% if (p.discountPrice && p.discountPrice > 0) { %><small>&pound;<%= Number(p.price).toFixed(2) %></small><% } %>
+                      &pound;<%= Number(finalPrice).toFixed(2) %>
+                    </span>
+                    <div class="pc-meta"><strong><%= p.nicotine ? p.nicotine + "mg" : "" %></strong>per pouch</div>
+                  </div>
+                </div>
+                <div class="pc-quick">
+                  <button type="button" data-quick-add data-product-id="<%= p._id %>" data-product-name="<%= p.name %>" <%= p.stock <= 0 ? "disabled" : "" %>>
+                    <i class="fa-solid fa-bag-shopping"></i> <%= p.stock <= 0 ? "Out Of Stock" : "Quick Add" %>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
 
-      <div class="shop-filter-actions">
-        <button type="submit">Filter</button>
-        <a href="/shop">Reset</a>
-      </div>
-    </form>
+        <div class="empty" id="emptyState">
+          <i class="fa-solid fa-face-frown-open"></i>
+          <h3>No products found</h3>
+          <p>Try adjusting your filters or search term.</p>
+        </div>
+
+        <div class="shop-load-more" id="loadMoreWrap">
+          <button type="button" id="loadMoreBtn"><i class="fa-solid fa-arrow-down"></i> Load more products</button>
+          <div class="load-more-info" id="loadMoreInfo"></div>
+        </div>
+      <% } %>
+    </div>
   </div>
 
-  <% if (!products || products.length === 0) { %>
-    <div class="empty-shop">
-      <span>0 Products</span>
-      <h2>No Products Available Yet</h2>
-      <p>Add Products From The Admin Dashboard To Show Them Here.</p>
-      <a href="/contact">Contact Us</a>
+  <div class="filter-overlay" id="filterOverlay"></div>
+  <div class="filter-panel" id="filterPanel">
+    <div class="fp-head">
+      <h2>Filters</h2>
+      <button type="button" class="fp-close" id="closeFiltersBtn"><i class="fa-solid fa-xmark"></i></button>
     </div>
-  <% } else { %>
-    <div class="shop-results-head">
-      <div>
-        <span class="shop-eyebrow">Available Now</span>
-        <h2>Product Collection</h2>
-      </div>
+    <div id="filterPanelBody"></div>
+    <button type="button" class="fp-apply" id="applyFiltersBtn">Apply Filters</button>
+  </div>
 
-      <p>
-        <%= totalProducts || products.length %> Product<%= (totalProducts || products.length) === 1 ? "" : "s" %>
-        Across <%= brandSections.length %> Brand<%= brandSections.length === 1 ? "" : "s" %>
-      </p>
-    </div>
-
-    <div class="shop-brand-layout">
-      <% brandSections.forEach(section => { %>
-        <section class="shop-brand-section" id="brand-<%= section.brand.toLowerCase().replace(/[^a-z0-9]+/g, '-') %>">
-          <div class="shop-brand-head">
-            <div>
-              <span class="shop-brand-kicker">Brand Range</span>
-              <h3><%= section.brand %></h3>
-            </div>
-
-            <span class="shop-brand-count">
-              <%= section.count %> Product<%= section.count === 1 ? "" : "s" %>
-            </span>
-          </div>
-
-          <div class="shop-brand-carousel-wrap">
-            <button type="button" class="shop-brand-arrow shop-brand-arrow--prev" aria-label="Scroll <%= section.brand %> Left">‹</button>
-
-            <div class="shop-brand-products" data-brand-carousel>
-              <% section.products.forEach(p => { %>
-              <% const finalPrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
-
-              <article class="shop-product-card">
-                <div class="shop-product-badges">
-                  <% if (p.showSaleBadge && p.discountPrice && p.discountPrice > 0) { %>
-                    <span class="shop-product-badge sale">Sale</span>
-                  <% } %>
-                  <% if (p.isBestSeller) { %>
-                    <span class="shop-product-badge best">Best Seller</span>
-                  <% } %>
-                  <% if (p.isFeatured) { %>
-                    <span class="shop-product-badge featured">Featured</span>
-                  <% } %>
-                </div>
-
-                <a href="/products/<%= p.slug || p._id %>" class="shop-product-image">
-                  <% if (p.images && p.images.length > 0) { %>
-                    <img src="<%= optimiseImageUrl(p.images[0], { width: 640 }) %>" alt="<%= p.name %>" loading="lazy" decoding="async">
-                  <% } else { %>
-                    <span>No Image</span>
-                  <% } %>
-                </a>
-
-                <div class="shop-product-body">
-                  <div class="shop-product-top">
-                    <span class="strength-badge"><%= p.strength || "Normal" %></span>
-                    <span class="<%= p.stock > 0 ? 'shop-stock in' : 'shop-stock out' %>">
-                      <%= p.stock > 0 ? "In Stock" : "Out Of Stock" %>
-                    </span>
-                  </div>
-
-                  <h2>
-                    <a href="/products/<%= p.slug || p._id %>"><%= p.name %></a>
-                  </h2>
-
-                  <p>
-                    <%= p.description ? p.description.substring(0, 96) : "Premium Product From Snus Village." %><%= p.description && p.description.length > 96 ? "..." : "" %>
-                  </p>
-
-                  <div class="shop-product-meta">
-                    <span><%= p.brand || "Brand N/A" %></span>
-                    <span><%= p.nicotine ? p.nicotine + "mg" : "Nicotine N/A" %></span>
-                  </div>
-
-                  <div class="shop-product-bottom">
-                    <div class="shop-price-wrap">
-                      <% if (p.discountPrice && p.discountPrice > 0) { %>
-                        <small>£<%= p.price.toFixed(2) %></small>
-                      <% } %>
-                      <strong>£<%= finalPrice.toFixed(2) %></strong>
-                    </div>
-
-                    <% if (p.stock > 0) { %>
-                      <form action="/cart/add/<%= p._id %>" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit">Add To Cart</button>
-                      </form>
-                    <% } else { %>
-                      <a class="shop-view-btn" href="/products/<%= p.slug || p._id %>">View Product</a>
-                    <% } %>
-                  </div>
-                </div>
-              </article>
-              <% }) %>
-            </div>
-
-            <button type="button" class="shop-brand-arrow shop-brand-arrow--next" aria-label="Scroll <%= section.brand %> Right">›</button>
-          </div>
-</section>
-
-
-      <% }) %>
-    </div>
-  <% } %>
-
-  <section class="seo-support-copy">
-    <h2>Shop Nicotine Pouches At Snus Village</h2>
-    <p>
-      Snus Village helps adult customers browse trusted nicotine pouch brands,
-      flavours and strength levels in one place. The shop is organised
-      so customers can search by product name, brand, flavour or strength before adding
-      items to the basket.
-    </p>
-    <p>
-      Every order is built around age-restricted checkout, clear product information,
-      secure payment and UK delivery or collection options where available. Popular
-      ranges include strong nicotine pouches, mint flavours, fruit flavours and
-      well-known brands selected for adult customers looking for reliable stock.
-    </p>
-  </section>
-</section>
+  <div class="shop-v2-toast" id="shopToast"><i class="fa-solid fa-circle-check"></i><span id="shopToastMsg">Added to cart!</span></div>
+</div>
