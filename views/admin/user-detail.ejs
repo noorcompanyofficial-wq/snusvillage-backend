@@ -1,117 +1,49 @@
-<section class="admin-page admin-user-detail-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Customer Profile</span>
-      <h1><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User Account" %></h1>
-      <p><%= account.email %></p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <div class="admin-head-actions">
-      <a class="admin-secondary" href="/admin/users">
-        <i class="fa-solid fa-arrow-left"></i>
-        Back To Users
-      </a>
-      <a class="admin-primary" href="mailto:<%= account.email %>">
-        <i class="fa-solid fa-envelope"></i>
-        Email Customer
-      </a>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Customer Profile</div>
+    <h1><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User Account" %></h1>
+    <p><%= account.email %></p>
+  </div>
+  <div class="ph-right">
+    <a class="btn btn-ghost" href="/admin/users"><i class="fa-solid fa-arrow-left"></i> Back To Users</a>
+    <a class="btn btn-red" href="mailto:<%= account.email %>" data-no-spa><i class="fa-solid fa-envelope"></i> Email Customer</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat stat-blue"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-receipt"></i></div></div><div class="stat-lbl">Total Orders</div><div class="stat-val"><%= stats.totalOrders || 0 %></div></div>
+  <div class="stat stat-grn"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-circle-check"></i></div></div><div class="stat-lbl">Paid Orders</div><div class="stat-val"><%= stats.paidOrders || 0 %></div></div>
+  <div class="stat stat-blue"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-sterling-sign"></i></div></div><div class="stat-lbl">Total Spend</div><div class="stat-val" style="font-size:19px;">&pound;<%= Number(stats.totalSpend || 0).toFixed(2) %></div></div>
+  <div class="stat stat-amb"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-calendar"></i></div></div><div class="stat-lbl">Last Order</div><div class="stat-val" style="font-size:16px;"><%= stats.lastOrder ? new Date(stats.lastOrder.createdAt).toLocaleDateString("en-GB") : "None" %></div></div>
+</div>
+
+<div class="dg2">
+  <div class="sec">
+    <div class="sec-head"><h2>Account Details</h2></div>
+    <div class="sec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div class="stat-lbl">Name</div><strong><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "Not Provided" %></strong></div>
+      <div><div class="stat-lbl">Email</div><strong><%= account.email %></strong></div>
+      <div><div class="stat-lbl">Role</div><strong><%= account.role || "user" %></strong></div>
+      <div><div class="stat-lbl">Email Verified</div><strong><%= account.isVerified ? "Yes" : "No" %></strong></div>
+      <div><div class="stat-lbl">Age Verified</div><strong><%= account.isAgeVerified ? "Yes" : "No" %></strong></div>
+      <div><div class="stat-lbl">Didit Status</div><strong><%= account.didit?.status || account.diditStatus || "Not Started" %></strong></div>
+      <div><div class="stat-lbl">Trader Status</div><strong><%= account.traderStatus || "none" %></strong></div>
+      <div><div class="stat-lbl">Joined</div><strong><%= account.createdAt ? new Date(account.createdAt).toLocaleString("en-GB") : "N/A" %></strong></div>
     </div>
   </div>
 
-  <div class="admin-analytics-grid">
-    <div class="admin-analytics-card admin-analytics-card--dark">
-      <i class="fa-solid fa-receipt"></i>
-      <span>Total Orders</span>
-      <strong><%= stats.totalOrders || 0 %></strong>
-      <small>All Orders Linked To This Customer</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Paid Orders</span>
-      <strong><%= stats.paidOrders || 0 %></strong>
-      <small>Completed Payments</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-sterling-sign"></i>
-      <span>Total Spend</span>
-      <strong>£<%= Number(stats.totalSpend || 0).toFixed(2) %></strong>
-      <small>Paid Orders Only</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-calendar"></i>
-      <span>Last Order</span>
-      <strong><%= stats.lastOrder ? new Date(stats.lastOrder.createdAt).toLocaleDateString("en-GB") : "None" %></strong>
-      <small><%= stats.lastOrder ? "Most Recent Order" : "No Orders Yet" %></small>
-    </div>
-  </div>
-
-  <div class="admin-user-detail-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Account Details</h2>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Name</span>
-          <strong><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "Not Provided" %></strong>
-        </div>
-
-        <div>
-          <span>Email</span>
-          <strong><%= account.email %></strong>
-        </div>
-
-        <div>
-          <span>Role</span>
-          <strong><%= account.role || "user" %></strong>
-        </div>
-
-        <div>
-          <span>Email Verified</span>
-          <strong><%= account.isVerified ? "Yes" : "No" %></strong>
-        </div>
-
-        <div>
-          <span>Age Verified</span>
-          <strong><%= account.isAgeVerified ? "Yes" : "No" %></strong>
-        </div>
-
-        <div>
-          <span>Didit Status</span>
-          <strong><%= account.didit?.status || account.diditStatus || "Not Started" %></strong>
-        </div>
-
-        <div>
-          <span>Trader Status</span>
-          <strong><%= account.traderStatus || "none" %></strong>
-        </div>
-
-        <div>
-          <span>Joined</span>
-          <strong><%= account.createdAt ? new Date(account.createdAt).toLocaleString("en-GB") : "N/A" %></strong>
-        </div>
-      </div>
-    </section>
-
-    <% if (["owner", "admin"].includes(user?.role || "")) { %>
-      <section class="admin-panel">
-        <div class="admin-panel__head">
-          <h2>Staff Role Control</h2>
-        </div>
-
+  <% if (["owner", "admin"].includes(user?.role || "")) { %>
+    <div class="sec">
+      <div class="sec-head"><h2>Staff Role Control</h2></div>
+      <div class="sec-body">
         <% if (String(user?._id || "") === String(account._id || "")) { %>
-          <div class="admin-empty-small">
-            <p>You cannot change your own role from this page.</p>
-          </div>
+          <p style="color:var(--mu);font-size:12px;">You cannot change your own role from this page.</p>
         <% } else { %>
-          <form action="/admin/users/<%= account._id %>/role" method="POST" class="admin-notes-form">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <label>
-              Account Role
+          <form action="/admin/users/<%= account._id %>/role" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="fld"><label>Account Role</label>
               <select name="role">
                 <option value="user" <%= account.role === "user" ? "selected" : "" %>>User</option>
                 <option value="owner" <%= account.role === "owner" ? "selected" : "" %>>Owner</option>
@@ -121,178 +53,86 @@
                 <option value="support" <%= account.role === "support" ? "selected" : "" %>>Support</option>
                 <option value="product_manager" <%= account.role === "product_manager" ? "selected" : "" %>>Product Manager</option>
               </select>
-            </label>
-
-            <button type="submit" class="admin-primary">
-              <i class="fa-solid fa-user-shield"></i>
-              Update Role
-            </button>
+            </div>
+            <button type="submit" class="btn btn-red" onclick="return confirm('Change this user\'s role?')"><i class="fa-solid fa-user-shield"></i> Update Role</button>
           </form>
         <% } %>
-      </section>
-    <% } %>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Private Admin Notes</h2>
       </div>
+    </div>
+  <% } %>
 
-      <form action="/admin/users/<%= account._id %>/notes" method="POST" class="admin-notes-form">
+  <div class="sec">
+    <div class="sec-head"><h2>Private Admin Notes</h2></div>
+    <form class="sec-body" action="/admin/users/<%= account._id %>/notes" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <label>
-          Notes
-          <textarea name="adminNotes" placeholder="Add private notes about this customer..."><%= account.adminNotes || "" %></textarea>
-        </label>
+      <div class="fld"><label>Notes</label><textarea name="adminNotes" rows="3" placeholder="Add private notes about this customer..."><%= account.adminNotes || "" %></textarea></div>
+      <button type="submit" class="btn btn-red"><i class="fa-solid fa-floppy-disk"></i> Save Notes</button>
+    </form>
+  </div>
 
-        <button type="submit" class="admin-primary">
-          <i class="fa-solid fa-floppy-disk"></i>
-          Save Notes
-        </button>
-      </form>
-    </section>
+  <div class="sec">
+    <div class="sec-head"><h2>Security Details</h2></div>
+    <div class="sec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div class="stat-lbl">Login Attempts</div><strong><%= account.loginAttempts || 0 %></strong></div>
+      <div><div class="stat-lbl">Locked Until</div><strong><%= account.lockUntil ? new Date(account.lockUntil).toLocaleString("en-GB") : "Not Locked" %></strong></div>
+      <div><div class="stat-lbl">Suspicious IPs</div><strong><%= account.suspiciousIPs?.length || 0 %></strong></div>
+      <div><div class="stat-lbl">Blocked IPs</div><strong><%= account.blockedIPs?.length || 0 %></strong></div>
+    </div>
+  </div>
 
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Security Details</h2>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Login Attempts</span>
-          <strong><%= account.loginAttempts || 0 %></strong>
-        </div>
-
-        <div>
-          <span>Locked Until</span>
-          <strong><%= account.lockUntil ? new Date(account.lockUntil).toLocaleString("en-GB") : "Not Locked" %></strong>
-        </div>
-
-        <div>
-          <span>Last IP</span>
-          <strong><%= account.ip || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Device</span>
-          <strong><%= account.device || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Suspicious IPs</span>
-          <strong><%= account.suspiciousIPs?.length || 0 %></strong>
-        </div>
-
-        <div>
-          <span>Blocked IPs</span>
-          <strong><%= account.blockedIPs?.length || 0 %></strong>
-        </div>
-      </div>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Trader Record</h2>
-      </div>
-
+  <div class="sec">
+    <div class="sec-head"><h2>Trader Record</h2></div>
+    <div class="sec-body">
       <% if (trader) { %>
-        <div class="admin-detail-list">
-          <div>
-            <span>Business</span>
-            <strong><%= trader.businessName || "N/A" %></strong>
-          </div>
-
-          <div>
-            <span>Contact</span>
-            <strong><%= trader.contactName || "N/A" %></strong>
-          </div>
-
-          <div>
-            <span>Status</span>
-            <strong><%= trader.status || "N/A" %></strong>
-          </div>
-
-          <div>
-            <span>Phone</span>
-            <strong><%= trader.phone || "N/A" %></strong>
-          </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><div class="stat-lbl">Business</div><strong><%= trader.businessName || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Contact</div><strong><%= trader.contactName || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Status</div><strong><%= trader.status || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Phone</div><strong><%= trader.phone || "N/A" %></strong></div>
         </div>
       <% } else { %>
-        <div class="admin-empty-small">
-          <p>No trader record linked to this customer.</p>
-        </div>
+        <p style="color:var(--mu);font-size:12px;">No trader record linked to this customer.</p>
       <% } %>
-    </section>
+    </div>
+  </div>
 
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Cart History</h2>
-        <a href="/admin/carts">View Carts</a>
-      </div>
-
+  <div class="sec">
+    <div class="sec-head"><h2>Cart History</h2><span class="panel-lk" onclick="location.href='/admin/carts'">View carts &rarr;</span></div>
+    <div class="sec-body">
       <% if (carts && carts.length) { %>
-        <div class="admin-list admin-list--orders">
-          <% carts.forEach((cart) => { %>
-            <% const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0); %>
-            <a href="/admin/carts">
-              <span>
-                <strong><%= cart.items.length %> Item<%= cart.items.length === 1 ? "" : "s" %></strong>
-                <small>Updated <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></small>
-              </span>
-              <strong>£<%= Number(cartTotal || 0).toFixed(2) %></strong>
+        <div class="al-list" style="padding:0;">
+          <% carts.forEach((cart) => {
+            const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0);
+          %>
+            <a class="msg-item2" href="/admin/carts">
+              <div style="flex:1;"><div class="msg-name"><%= cart.items.length %> item<%= cart.items.length === 1 ? "" : "s" %></div><div class="msg-prev" style="max-width:none;">Updated <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></div></div>
+              <span class="t-amt">&pound;<%= Number(cartTotal || 0).toFixed(2) %></span>
             </a>
           <% }) %>
         </div>
       <% } else { %>
-        <div class="admin-empty-small">
-          <p>No carts found for this customer.</p>
-        </div>
+        <p style="color:var(--mu);font-size:12px;">No carts found for this customer.</p>
       <% } %>
-    </section>
-  </div>
-
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>Order History</h2>
-      <a href="/admin/orders">View All Orders</a>
     </div>
+  </div>
+</div>
 
-    <% if (orders && orders.length) { %>
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Order</th>
-              <th>Date</th>
-              <th>Payment</th>
-              <th>Status</th>
-              <th>Total</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% orders.forEach((order) => { %>
-              <tr>
-                <td>#<%= order._id.toString().slice(-6).toUpperCase() %></td>
-                <td><%= new Date(order.createdAt).toLocaleString("en-GB") %></td>
-                <td>
-                  <span class="status-pill <%= order.paymentStatus === 'paid' ? 'order-completed' : order.paymentStatus === 'failed' ? 'payment-failed' : 'payment-pending' %>">
-                    <%= order.paymentStatus || "pending" %>
-                  </span>
-                </td>
-                <td><%= order.orderStatus || "new" %></td>
-                <td>£<%= Number(order.total || 0).toFixed(2) %></td>
-                <td><a class="admin-table-action" href="/admin/orders/<%= order._id %>">View</a></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    <% } else { %>
-      <div class="admin-empty-state">
-        <h2>No Orders Found</h2>
-        <p>This customer has not placed an order yet.</p>
-      </div>
-    <% } %>
-  </section>
-</section>
+<div class="sec">
+  <div class="sec-head"><h2>Order History</h2><span class="panel-lk" onclick="location.href='/admin/orders'">View all orders &rarr;</span></div>
+  <% if (orders && orders.length) { %>
+    <div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Date</th><th>Payment</th><th>Status</th><th>Total</th><th>Action</th></tr></thead><tbody>
+      <% orders.forEach((order) => { %>
+        <tr>
+          <td class="t-mono">#<%= order._id.toString().slice(-6).toUpperCase() %></td>
+          <td class="t-sub"><%= new Date(order.createdAt).toLocaleString("en-GB") %></td>
+          <td><span class="pill p-<%= order.paymentStatus || 'pending' %>"><%= order.paymentStatus || "pending" %></span></td>
+          <td><span class="pill p-<%= order.orderStatus || 'new' %>"><%= order.orderStatus || "new" %></span></td>
+          <td><span class="t-amt">&pound;<%= Number(order.total || 0).toFixed(2) %></span></td>
+          <td><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>">View</a></td>
+        </tr>
+      <% }) %>
+    </tbody></table></div>
+  <% } else { %>
+    <div class="admin-empty-state"><h2>No Orders Found</h2><p>This customer has not placed an order yet.</p></div>
+  <% } %>
+</div>

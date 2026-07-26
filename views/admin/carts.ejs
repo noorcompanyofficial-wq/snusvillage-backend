@@ -1,107 +1,69 @@
-<section class="admin-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Carts</span>
-      <h1>Unfinished Customer Carts</h1>
-      <p>Track active and abandoned carts so you can understand missed orders, product interest, and checkout drop-off.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <a class="admin-primary" href="/admin/dashboard">
-      <i class="fa-solid fa-chart-line"></i>
-      Back To Dashboard
-    </a>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Commerce</div>
+    <h1>Unfinished Customer Carts</h1>
+    <p>Track active and abandoned carts so you can understand missed orders, product interest, and checkout drop-off.</p>
+  </div>
+  <div class="ph-right"><a class="btn btn-red" href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i> Back To Dashboard</a></div>
+</div>
+
+<div class="tabs" style="background:var(--card);border:1px solid var(--bdr);border-radius:var(--r) var(--r) 0 0;border-bottom:none;">
+  <a class="tab <%= status === 'all' ? 'active' : '' %>" href="/admin/carts">All Carts</a>
+  <a class="tab <%= status === 'active' ? 'active' : '' %>" href="/admin/carts?status=active">Active</a>
+  <a class="tab <%= status === 'abandoned' ? 'active' : '' %>" href="/admin/carts?status=abandoned">Abandoned</a>
+</div>
+
+<% if (!carts || carts.length === 0) { %>
+  <div class="sec"><div class="admin-empty-state"><h2>No Carts Found</h2><p>Carts with products will appear here once customers add items.</p></div></div>
+<% } else { %>
+  <%
+    const totalCartValue = carts.reduce((total, cart) => total + cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0), 0);
+  %>
+  <div class="stats" style="grid-template-columns:repeat(2,1fr);">
+    <div class="stat stat-blue"><div class="stat-lbl">Carts Showing</div><div class="stat-val"><%= carts.length %></div></div>
+    <div class="stat stat-grn"><div class="stat-lbl">Total Cart Value</div><div class="stat-val">&pound;<%= Number(totalCartValue || 0).toFixed(2) %></div></div>
   </div>
 
-  <div class="admin-cart-filter-bar">
-    <a class="<%= status === 'all' ? 'is-active' : '' %>" href="/admin/carts">All Carts</a>
-    <a class="<%= status === 'active' ? 'is-active' : '' %>" href="/admin/carts?status=active">Active</a>
-    <a class="<%= status === 'abandoned' ? 'is-active' : '' %>" href="/admin/carts?status=abandoned">Abandoned</a>
-  </div>
-
-  <% if (!carts || carts.length === 0) { %>
-    <div class="admin-empty-state">
-      <h2>No Carts Found</h2>
-      <p>Carts with products will appear here once customers add items.</p>
-    </div>
-  <% } else { %>
-    <div class="admin-carts-summary">
-      <div>
-        <strong><%= carts.length %></strong>
-        <span>Cart<%= carts.length === 1 ? "" : "s" %> Showing</span>
-      </div>
-
-      <div>
-        <% const totalCartValue = carts.reduce((total, cart) => total + cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0), 0); %>
-        <strong>£<%= Number(totalCartValue || 0).toFixed(2) %></strong>
-        <span>Total Cart Value</span>
-      </div>
-    </div>
-
-    <div class="admin-carts-grid">
-      <% carts.forEach((cart) => { %>
-        <% const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0); %>
-        <% const isAbandoned = new Date(cart.updatedAt) < cartStaleCutoff; %>
-
-        <article class="admin-cart-card">
-          <div class="admin-cart-card__top">
+  <div class="prod-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr));">
+    <% carts.forEach((cart) => {
+      const cartTotal = cart.items.reduce((sum, item) => sum + ((item.priceAtTime || 0) * (item.quantity || 0)), 0);
+      const isAbandoned = new Date(cart.updatedAt) < cartStaleCutoff;
+    %>
+      <div class="prod-card">
+        <div class="prod-body">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;">
             <div>
-              <span class="<%= isAbandoned ? 'status-pill payment-failed' : 'status-pill order-processing' %>">
-                <%= isAbandoned ? "Abandoned" : "Active" %>
-              </span>
-
-              <h2><%= cart.user ? "Customer Cart" : "Guest Cart" %></h2>
-
+              <span class="pill <%= isAbandoned ? 'p-failed' : 'p-processing' %>"><%= isAbandoned ? "Abandoned" : "Active" %></span>
+              <div class="prod-name" style="margin-top:6px;"><%= cart.user ? "Customer Cart" : "Guest Cart" %></div>
               <% if (cart.user) { %>
-                <p>
-                  <strong>
-                    <%= cart.user.firstName || "" %>
-                    <%= cart.user.lastName || "" %>
-                  </strong>
-                  <br>
-                  <%= cart.user.email || "No Email" %>
-                  <% if (cart.user.phone) { %>
-                    <br><%= cart.user.phone %>
-                  <% } %>
-                </p>
+                <p style="font-size:11px;color:var(--mu);"><strong><%= [cart.user.firstName, cart.user.lastName].filter(Boolean).join(" ") %></strong><br><%= cart.user.email || "No Email" %><% if (cart.user.phone) { %><br><%= cart.user.phone %><% } %></p>
               <% } else { %>
-                <p>Guest Session: <%= cart.sessionId ? cart.sessionId.slice(-10) : "N/A" %></p>
+                <p style="font-size:11px;color:var(--mu);">Guest Session: <%= cart.sessionId ? cart.sessionId.slice(-10) : "N/A" %></p>
               <% } %>
-
-              <p>Last Active: <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></p>
+              <p style="font-size:10px;color:var(--mu);">Last active: <%= new Date(cart.updatedAt).toLocaleString("en-GB") %></p>
             </div>
-
-            <strong>£<%= Number(cartTotal || 0).toFixed(2) %></strong>
+            <strong class="t-amt">&pound;<%= Number(cartTotal || 0).toFixed(2) %></strong>
           </div>
 
-          <div class="admin-cart-items">
+          <div style="display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--bdr);">
             <% cart.items.forEach((item) => { %>
-              <div class="admin-cart-item">
-                <% if (item.product && item.product.images && item.product.images[0]) { %>
-                  <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>">
-                <% } else { %>
-                  <span>No Image</span>
-                <% } %>
-
-                <div>
-                  <strong><%= item.product?.name || "Deleted Product" %></strong>
-                  <small>
-                    Qty: <%= item.quantity %> × £<%= Number(item.priceAtTime || 0).toFixed(2) %>
-                  </small>
-                </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <% if (item.product && item.product.images && item.product.images[0]) { %><img src="<%= item.product.images[0] %>" alt="" style="width:28px;height:28px;object-fit:contain;flex-shrink:0;"><% } %>
+                <div style="flex:1;min-width:0;"><strong style="display:block;font-size:11px;"><%= item.product?.name || "Deleted Product" %></strong><small style="font-size:10px;color:var(--mu);">Qty: <%= item.quantity %> &times; &pound;<%= Number(item.priceAtTime || 0).toFixed(2) %></small></div>
               </div>
             <% }) %>
           </div>
-
-          <div class="admin-cart-card__footer">
-            <span><%= cart.items.length %> Item<%= cart.items.length === 1 ? "" : "s" %></span>
-
-            <form action="/admin/carts/<%= cart._id %>/delete" method="POST" onsubmit="return confirm('Remove this cart from admin tracking?');">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit">Remove Cart</button>
-            </form>
-          </div>
-        </article>
-      <% }) %>
-    </div>
-  <% } %>
-</section>
+        </div>
+        <div class="prod-actions">
+          <span style="font-size:10px;color:var(--mu);flex:1;display:flex;align-items:center;"><%= cart.items.length %> item<%= cart.items.length === 1 ? "" : "s" %></span>
+          <form action="/admin/carts/<%= cart._id %>/delete" method="POST" onsubmit="return confirm('Remove this cart from admin tracking?');">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+          </form>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

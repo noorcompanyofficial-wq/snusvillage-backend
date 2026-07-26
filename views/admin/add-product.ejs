@@ -1,263 +1,90 @@
-<link rel="stylesheet" href="/css/admin-add-product.css" />
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-/>
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-product-editor-page">
-  <div class="admin-product-editor-head">
-    <div>
-      <span>Catalogue</span>
-      <h1>Add Product</h1>
-      <p>Create a new product with images, stock, display controls, and SEO fields.</p>
-    </div>
-
-    <a href="/admin/products" class="admin-editor-back">
-      <i class="fa-solid fa-arrow-left"></i>
-      Back To Products
-    </a>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Commerce</div>
+    <h1>Add Product</h1>
+    <p>Create a new product with images, stock, display controls, and SEO fields.</p>
   </div>
+  <div class="ph-right"><a class="btn btn-ghost" href="/admin/products"><i class="fa-solid fa-arrow-left"></i> Back To Products</a></div>
+</div>
 
-  <form
-    action="/admin/products/add"
-    method="POST"
-    enctype="multipart/form-data"
-    class="admin-product-editor-card"
-  >
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-editor-section">
-      <div class="admin-editor-section-head">
-        <h2>Product Details</h2>
-        <span>Main catalogue information</span>
-      </div>
+<form action="/admin/products/add" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-      <div class="admin-editor-grid">
-        <label>
-          Product Name
-          <input type="text" name="name" placeholder="White Fox Mint" required>
-        </label>
-
-        <label>
-          Brand
-          <input list="brandOptions" type="text" name="brand" placeholder="WHITE FOX" required>
-        </label>
-
-        <label>
-          Category
-          <input list="categoryOptions" type="text" name="category" placeholder="Nicotine Pouches">
-        </label>
-
-        <label>
-          SKU
-          <input type="text" name="sku" placeholder="WFM001">
-        </label>
-
-        <label>
-          Barcode / EAN
-          <input type="text" name="barcode" placeholder="7311250000000">
-        </label>
-
-        <label>
-          Supplier
-          <input type="text" name="supplier" placeholder="Supplier name">
-        </label>
-
-        <label>
-          Supplier Code
-          <input type="text" name="supplierCode" placeholder="WF-MINT-16">
-        </label>
-
-        <label>
-          Cost Price
-          <input type="number" name="costPrice" step="0.01" min="0" placeholder="2.50">
-        </label>
-
-        <label>
-          Flavour
-          <input type="text" name="flavour" placeholder="Mint">
-        </label>
-
-        <label>
-          Strength
+  <div class="sec">
+    <div class="sec-head"><h2>Product Details</h2><span style="font-size:11px;color:var(--mu);">Main catalogue information</span></div>
+    <div class="sec-body">
+      <div class="fgrid-3">
+        <div class="fld"><label>Product Name</label><input type="text" name="name" placeholder="White Fox Mint" required></div>
+        <div class="fld"><label>Brand</label><input list="brandOptions" type="text" name="brand" placeholder="WHITE FOX" required></div>
+        <div class="fld"><label>Category</label><input list="categoryOptions" type="text" name="category" placeholder="Nicotine Pouches"></div>
+        <div class="fld"><label>SKU</label><input type="text" name="sku" placeholder="WFM001"></div>
+        <div class="fld"><label>Barcode / EAN</label><input type="text" name="barcode" placeholder="7311250000000"></div>
+        <div class="fld"><label>Supplier</label><input type="text" name="supplier" placeholder="Supplier name"></div>
+        <div class="fld"><label>Supplier Code</label><input type="text" name="supplierCode" placeholder="WF-MINT-16"></div>
+        <div class="fld"><label>Cost Price</label><input type="number" name="costPrice" step="0.01" min="0" placeholder="2.50"></div>
+        <div class="fld"><label>Flavour</label><input type="text" name="flavour" placeholder="Mint"></div>
+        <div class="fld"><label>Strength</label>
           <select name="strength" required>
             <option value="">Select strength</option>
-            <option value="LOW">LOW</option>
-            <option value="MEDIUM">MEDIUM</option>
-            <option value="STRONG">STRONG</option>
-            <option value="X-STRONG">X-STRONG</option>
-            <option value="EXTREME">EXTREME</option>
+            <option value="LOW">LOW</option><option value="MEDIUM">MEDIUM</option><option value="STRONG">STRONG</option><option value="X-STRONG">X-STRONG</option><option value="EXTREME">EXTREME</option>
           </select>
-        </label>
-
-        <label>
-          Nicotine
-          <input type="text" name="nicotine" placeholder="16mg">
-        </label>
-
-        <label>
-          Pouches Per Can
-          <input type="number" name="pouchesPerCan" min="0" step="1" value="20" placeholder="20">
-        </label>
+        </div>
+        <div class="fld"><label>Nicotine</label><input type="text" name="nicotine" placeholder="16mg"></div>
+        <div class="fld"><label>Pouches Per Can</label><input type="number" name="pouchesPerCan" min="0" step="1" value="20" placeholder="20"></div>
       </div>
+      <div class="fld fspan"><label>Description</label><textarea name="description" rows="4" placeholder="Write the product description..." required></textarea></div>
+    </div>
+  </div>
 
-      <label class="admin-editor-full">
-        Description
-        <textarea name="description" placeholder="Write the product description..." required></textarea>
+  <div class="sec">
+    <div class="sec-head"><h2>Pricing &amp; Stock</h2></div>
+    <div class="sec-body"><div class="fgrid-3">
+      <div class="fld"><label>Price (&pound;)</label><input type="number" name="price" step="0.01" min="0" placeholder="5.99" required></div>
+      <div class="fld"><label>Discount Price (&pound;)</label><input type="number" name="discountPrice" step="0.01" min="0" placeholder="0.00"></div>
+      <div class="fld"><label>Stock</label><input type="number" name="stock" min="0" placeholder="20"></div>
+    </div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Display Controls</h2><span style="font-size:11px;color:var(--mu);">How this product appears on the site</span></div>
+    <div class="sec-body">
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Active Product</strong><span>Show this product on the website</span></div><label class="toggle"><input type="checkbox" name="isActive" checked><span class="tslider"></span></label></div>
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Featured</strong><span>Prioritise in featured &amp; same-brand collections</span></div><label class="toggle"><input type="checkbox" name="isFeatured"><span class="tslider"></span></label></div>
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Best Seller</strong><span>Show in best seller areas</span></div><label class="toggle"><input type="checkbox" name="isBestSeller"><span class="tslider"></span></label></div>
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Sale Badge</strong><span>Show sale badge when discount price is active</span></div><label class="toggle"><input type="checkbox" name="showSaleBadge"><span class="tslider"></span></label></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-head"><h2>Product Images</h2><span style="font-size:11px;color:var(--mu);">Upload up to 5 images &mdash; first is the main image</span></div>
+    <div class="sec-body">
+      <label class="img-drop" for="productImages" style="display:block;">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <p>Click to upload product images</p>
+        <small>JPG, PNG, WEBP or AVIF &mdash; max 15MB each</small>
       </label>
+      <input id="productImages" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden data-image-drop-input="#imagePreviewGrid">
+      <div class="img-thumbs" id="imagePreviewGrid"></div>
     </div>
+  </div>
 
-    <div class="admin-editor-section">
-      <div class="admin-editor-section-head">
-        <h2>Pricing & Stock</h2>
-        <span>Control price, sale price and stock level</span>
-      </div>
-
-      <div class="admin-editor-grid">
-        <label>
-          Price
-          <input type="number" name="price" step="0.01" min="0" placeholder="5.99" required>
-        </label>
-
-        <label>
-          Discount Price
-          <input type="number" name="discountPrice" step="0.01" min="0" placeholder="0.00">
-        </label>
-
-        <label>
-          Stock
-          <input type="number" name="stock" min="0" placeholder="20">
-        </label>
-      </div>
+  <div class="sec">
+    <div class="sec-head"><h2>SEO</h2><span style="font-size:11px;color:var(--mu);">Optional Google search fields</span></div>
+    <div class="sec-body">
+      <div class="fld"><label>SEO Title</label><input type="text" name="seoTitle" placeholder="White Fox Mint Nicotine Pouches"></div>
+      <div class="fld fspan"><label>SEO Description</label><textarea name="seoDescription" rows="2" placeholder="Short SEO description for this product..."></textarea></div>
     </div>
+  </div>
 
-    <div class="admin-editor-section">
-      <div class="admin-editor-section-head">
-        <h2>Display Controls</h2>
-        <span>Choose how this product appears on homepage, shop and brand collection sections</span>
-      </div>
-
-      <div class="admin-toggle-grid">
-        <label>
-          <input type="checkbox" name="isActive" checked>
-          <span>
-            <strong>Active Product</strong>
-            <small>Show this product on the website.</small>
-          </span>
-        </label>
-
-        <label>
-          <input type="checkbox" name="isFeatured">
-          <span>
-            <strong>Featured</strong>
-            <small>Prioritise this product in featured and same-brand product page collections.</small>
-          </span>
-        </label>
-
-        <label>
-          <input type="checkbox" name="isBestSeller">
-          <span>
-            <strong>Best Seller</strong>
-            <small>Show this in best seller areas and rank it higher in same-brand collections.</small>
-          </span>
-        </label>
-
-        <label>
-          <input type="checkbox" name="showSaleBadge">
-          <span>
-            <strong>Sale Badge</strong>
-            <small>Show sale badge when discount price is active.</small>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <div class="admin-editor-section">
-      <div class="admin-editor-section-head">
-        <h2>Product Images</h2>
-        <span>Upload up to 5 images</span>
-      </div>
-
-      <div class="admin-upload-box">
-        <input id="productImages" type="file" name="images" accept="image/jpeg,image/png,image/webp,image/avif" multiple>
-        <label for="productImages">
-          <i class="fa-solid fa-cloud-arrow-up"></i>
-          <strong>Upload Product Images</strong>
-          <span>JPG, PNG, WEBP or AVIF</span>
-        </label>
-      </div>
-
-      <div class="admin-image-preview-grid" id="imagePreviewGrid"></div>
-    </div>
-
-    <div class="admin-editor-section">
-      <div class="admin-editor-section-head">
-        <h2>SEO</h2>
-        <span>Optional Google search fields</span>
-      </div>
-
-      <div class="admin-editor-grid">
-        <label>
-          SEO Title
-          <input type="text" name="seoTitle" placeholder="White Fox Mint Nicotine Pouches">
-        </label>
-
-        <label class="admin-editor-full">
-          SEO Description
-          <textarea name="seoDescription" placeholder="Short SEO description for this product..."></textarea>
-        </label>
-      </div>
-    </div>
-
-    <button type="submit" class="admin-editor-submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Product
-    </button>
-  </form>
-</section>
+  <button type="submit" class="btn btn-red" style="width:100%;justify-content:center;height:44px;margin-bottom:24px;"><i class="fa-solid fa-floppy-disk"></i> Save Product</button>
+</form>
 
 <datalist id="brandOptions">
-  <option value="WHITE FOX">
-  <option value="SIBERIA">
-  <option value="VELO">
-  <option value="KILLA">
-  <option value="PABLO">
-  <option value="GARANT">
-  <option value="ICEBERG">
-  <option value="CUBA">
-  <option value="LOOP">
-  <option value="CAFERO">
-  <option value="HIT">
-  <option value="ODEN'S">
+  <option value="WHITE FOX"><option value="SIBERIA"><option value="VELO"><option value="KILLA"><option value="PABLO">
+  <option value="GARANT"><option value="ICEBERG CUBA"><option value="LOOP"><option value="CAFERO"><option value="HIT"><option value="ODEN'S">
 </datalist>
-
 <datalist id="categoryOptions">
-  <option value="Nicotine Pouches">
-  <option value="Snus">
-  <option value="Vape">
-  <option value="Accessories">
+  <option value="Nicotine Pouches"><option value="Snus"><option value="Vape"><option value="Accessories">
 </datalist>
-
-<script>
-  const input = document.getElementById("productImages");
-  const previewGrid = document.getElementById("imagePreviewGrid");
-
-  input?.addEventListener("change", () => {
-    previewGrid.innerHTML = "";
-
-    Array.from(input.files || []).forEach((file) => {
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        const card = document.createElement("div");
-        card.className = "admin-preview-card";
-        card.innerHTML = `
-          <img src="${event.target.result}" alt="">
-          <span>${file.name}</span>
-        `;
-        previewGrid.appendChild(card);
-      };
-
-      reader.readAsDataURL(file);
-    });
-  });
-</script>

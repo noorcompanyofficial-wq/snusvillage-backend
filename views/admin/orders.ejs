@@ -1,250 +1,91 @@
 <%
-  function money(value) {
-    return "£" + Number(value || 0).toFixed(2);
-  }
-
-  function orderShortId(order) {
-    return order._id.toString().slice(-6).toUpperCase();
-  }
-
-  function buildQuery(extra = {}) {
-    const params = new URLSearchParams();
-
-    Object.entries(query || {}).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && String(value).trim() !== "" && key !== "page") {
-        params.set(key, value);
-      }
-    });
-
-    Object.entries(extra).forEach(([key, value]) => {
-      if (value === "" || value === null || value === undefined) {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
-    });
-
-    return params.toString();
-  }
+  function money(value) { return "£" + Number(value || 0).toFixed(2); }
+  function orderShortId(order) { return order._id.toString().slice(-6).toUpperCase(); }
 %>
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-page admin-orders-page admin-orders-v2">
-  <div class="admin-page-head">
-    <div>
-      <span>B2C Orders</span>
-      <h1>Customer Orders</h1>
-      <p>Search, filter, and manage checkout orders, fulfilment, payment status, and Royal Mail sync.</p>
-    </div>
-
-    <div class="admin-head-actions">
-      <a href="/admin/orders/export/csv" class="admin-secondary">
-        <i class="fa-solid fa-file-export"></i>
-        Export CSV
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Commerce</div>
+    <h1>Orders</h1>
+    <p>Search, filter, and manage checkout orders, fulfilment, payment status, and Royal Mail sync.</p>
   </div>
-
-  <div class="admin-stat-grid">
-    <a class="admin-stat-card" href="/admin/orders">
-      <i class="fa-solid fa-receipt"></i>
-      <span>Total Orders</span>
-      <strong><%= stats.total %></strong>
-    </a>
-
-    <a class="admin-stat-card" href="/admin/orders?paymentStatus=paid">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Paid</span>
-      <strong><%= stats.paid %></strong>
-    </a>
-
-    <a class="admin-stat-card" href="/admin/orders?orderStatus=processing">
-      <i class="fa-solid fa-box-open"></i>
-      <span>Active Orders</span>
-      <strong><%= stats.active %></strong>
-    </a>
-
-    <a class="admin-stat-card" href="/admin/orders?royalMailStatus=failed">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-      <span>Royal Mail Failed</span>
-      <strong><%= stats.royalMailFailed %></strong>
-    </a>
+  <div class="ph-right">
+    <a class="btn btn-ghost" href="/admin/orders/export/csv" data-no-spa><i class="fa-solid fa-file-export"></i> Export CSV</a>
   </div>
+</div>
 
-  <form class="admin-panel admin-orders-filter-form" action="/admin/orders" method="GET">
-    <div class="admin-orders-filter-grid">
-      <label class="is-wide">
-        Search
-        <input name="search" value="<%= query.search || '' %>" placeholder="Email, phone, name, order ID, SumUp reference">
-      </label>
+<div class="stats">
+  <a class="stat stat-blue" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-receipt"></i></div></div><div class="stat-lbl">Total Orders</div><div class="stat-val"><%= stats.total %></div></a>
+  <a class="stat stat-grn" href="/admin/orders?paymentStatus=paid"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-circle-check"></i></div></div><div class="stat-lbl">Paid</div><div class="stat-val"><%= stats.paid %></div></a>
+  <a class="stat stat-amb" href="/admin/orders?orderStatus=processing"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-box-open"></i></div></div><div class="stat-lbl">Active Orders</div><div class="stat-val"><%= stats.active %></div></a>
+  <a class="stat stat-red" href="/admin/orders?royalMailStatus=failed"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-triangle-exclamation"></i></div></div><div class="stat-lbl">Royal Mail Failed</div><div class="stat-val"><%= stats.royalMailFailed %></div></a>
+</div>
 
-      <label>
-        Payment
-        <select name="paymentStatus">
-          <option value="">All Payments</option>
-          <option value="pending" <%= query.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
-          <option value="paid" <%= query.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
-          <option value="failed" <%= query.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
-          <option value="refunded" <%= query.paymentStatus === "refunded" ? "selected" : "" %>>Refunded</option>
-        </select>
-      </label>
-
-      <label>
-        Order Status
-        <select name="orderStatus">
-          <option value="">All Orders</option>
-          <option value="new" <%= query.orderStatus === "new" ? "selected" : "" %>>New</option>
-          <option value="processing" <%= query.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
-          <option value="packed" <%= query.orderStatus === "packed" ? "selected" : "" %>>Packed</option>
-          <option value="shipped" <%= query.orderStatus === "shipped" ? "selected" : "" %>>Shipped</option>
-          <option value="completed" <%= query.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
-          <option value="cancelled" <%= query.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
-        </select>
-      </label>
-
-      <label>
-        Fulfilment
-        <select name="fulfilmentMethod">
-          <option value="">All Methods</option>
-          <option value="delivery" <%= query.fulfilmentMethod === "delivery" ? "selected" : "" %>>Delivery</option>
-          <option value="click_collect" <%= query.fulfilmentMethod === "click_collect" ? "selected" : "" %>>Click & Collect</option>
-        </select>
-      </label>
-
-      <label>
-        Royal Mail
-        <select name="royalMailStatus">
-          <option value="">All Royal Mail</option>
-          <option value="not_sent" <%= query.royalMailStatus === "not_sent" ? "selected" : "" %>>Not Sent</option>
-          <option value="sent" <%= query.royalMailStatus === "sent" ? "selected" : "" %>>Sent</option>
-          <option value="failed" <%= query.royalMailStatus === "failed" ? "selected" : "" %>>Failed</option>
-        </select>
-      </label>
-
-      <label>
-        Sort
-        <select name="sort">
-          <option value="newest" <%= !query.sort || query.sort === "newest" ? "selected" : "" %>>Newest</option>
-          <option value="oldest" <%= query.sort === "oldest" ? "selected" : "" %>>Oldest</option>
-          <option value="total-high" <%= query.sort === "total-high" ? "selected" : "" %>>Total High</option>
-          <option value="total-low" <%= query.sort === "total-low" ? "selected" : "" %>>Total Low</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="admin-orders-filter-actions">
-      <button type="submit">Apply Filters</button>
-      <a href="/admin/orders">Clear</a>
-    </div>
+<div class="sec">
+  <form class="toolbar" method="GET" action="/admin/orders">
+    <div class="t-search"><i class="fa-solid fa-magnifying-glass" style="color:var(--mu);font-size:10px;flex-shrink:0;"></i><input type="search" name="search" value="<%= query.search || '' %>" placeholder="Email, phone, name, order ID, SumUp reference"></div>
+    <select class="f-sel" name="paymentStatus" onchange="this.form.requestSubmit()">
+      <option value="">All Payments</option>
+      <option value="pending" <%= query.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
+      <option value="paid" <%= query.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
+      <option value="failed" <%= query.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
+      <option value="refunded" <%= query.paymentStatus === "refunded" ? "selected" : "" %>>Refunded</option>
+    </select>
+    <select class="f-sel" name="orderStatus" onchange="this.form.requestSubmit()">
+      <option value="">All Orders</option>
+      <option value="new" <%= query.orderStatus === "new" ? "selected" : "" %>>New</option>
+      <option value="processing" <%= query.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
+      <option value="packed" <%= query.orderStatus === "packed" ? "selected" : "" %>>Packed</option>
+      <option value="shipped" <%= query.orderStatus === "shipped" ? "selected" : "" %>>Shipped</option>
+      <option value="completed" <%= query.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
+      <option value="cancelled" <%= query.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
+    </select>
+    <select class="f-sel" name="fulfilmentMethod" onchange="this.form.requestSubmit()">
+      <option value="">All Methods</option>
+      <option value="delivery" <%= query.fulfilmentMethod === "delivery" ? "selected" : "" %>>Delivery</option>
+      <option value="click_collect" <%= query.fulfilmentMethod === "click_collect" ? "selected" : "" %>>Click &amp; Collect</option>
+    </select>
+    <select class="f-sel" name="royalMailStatus" onchange="this.form.requestSubmit()">
+      <option value="">All Royal Mail</option>
+      <option value="not_sent" <%= query.royalMailStatus === "not_sent" ? "selected" : "" %>>Not Sent</option>
+      <option value="sent" <%= query.royalMailStatus === "sent" ? "selected" : "" %>>Sent</option>
+      <option value="failed" <%= query.royalMailStatus === "failed" ? "selected" : "" %>>Failed</option>
+    </select>
+    <select class="f-sel" name="sort" onchange="this.form.requestSubmit()">
+      <option value="newest" <%= !query.sort || query.sort === "newest" ? "selected" : "" %>>Newest</option>
+      <option value="oldest" <%= query.sort === "oldest" ? "selected" : "" %>>Oldest</option>
+      <option value="total-high" <%= query.sort === "total-high" ? "selected" : "" %>>Total High</option>
+      <option value="total-low" <%= query.sort === "total-low" ? "selected" : "" %>>Total Low</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-red">Apply</button>
+    <a href="/admin/orders" class="btn btn-sm btn-ghost">Clear</a>
   </form>
 
   <% if (!orders || orders.length === 0) { %>
-    <div class="admin-empty-state">
-      <h2>No Orders Found</h2>
-      <p>No orders match your current filters.</p>
-    </div>
+    <div class="admin-empty-state"><h2>No Orders Found</h2><p>No orders match your current filters.</p></div>
   <% } else { %>
-    <div class="admin-orders-list-v2">
+    <div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Amount</th><th>Payment</th><th>Order</th><th>Royal Mail</th><th>Date</th><th>Actions</th></tr></thead><tbody>
       <% orders.forEach(order => { %>
         <% const isClickCollect = order.fulfilment?.method === "click_collect"; %>
-
-        <article class="admin-order-card-v2">
-          <div class="admin-order-card-main">
-            <div class="admin-order-card-head">
-              <div>
-                <span>Order #<%= orderShortId(order) %></span>
-                <h2><%= [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(" ") || "Customer" %></h2>
-                <p><%= order.customer?.email || "No email" %> · <%= order.customer?.phone || "No phone" %></p>
-              </div>
-
-              <div class="admin-order-card-total">
-                <strong><%= money(order.total) %></strong>
-                <span><%= new Date(order.createdAt).toLocaleString("en-GB") %></span>
-              </div>
-            </div>
-
-            <div class="admin-order-card-badges">
-              <span class="status-pill payment-<%= order.paymentStatus %>"><%= order.paymentStatus || "pending" %></span>
-              <span class="status-pill order-<%= order.orderStatus %>"><%= order.orderStatus || "new" %></span>
-              <span class="status-pill <%= isClickCollect ? 'payment-pending' : 'order-completed' %>">
-                <%= isClickCollect ? "Click & Collect" : "Delivery" %>
-              </span>
-              <span class="status-pill <%= order.royalMail?.syncStatus === 'failed' ? 'payment-failed' : order.royalMail?.syncStatus === 'sent' ? 'order-completed' : 'payment-pending' %>">
-                Royal Mail: <%= order.royalMail?.syncStatus || "not_sent" %>
-              </span>
-              <% if (order.discount?.code) { %>
-                <span class="status-pill order-completed">Discount: <%= order.discount.code %></span>
-              <% } %>
-            </div>
-
-            <div class="admin-order-items-mini">
-              <% (order.items || []).slice(0, 3).forEach(item => { %>
-                <div>
-                  <% if (item.image) { %>
-                    <img src="<%= item.image %>" alt="<%= item.name %>">
-                  <% } %>
-                  <span>
-                    <strong><%= item.name %></strong>
-                    <small>Qty: <%= item.quantity %> × <%= money(item.price) %></small>
-                  </span>
-                </div>
-              <% }) %>
-
-              <% if ((order.items || []).length > 3) { %>
-                <small>+ <%= order.items.length - 3 %> more item(s)</small>
-              <% } %>
-            </div>
-          </div>
-
-          <div class="admin-order-card-side">
-            <a class="admin-primary" href="/admin/orders/<%= order._id %>">View Details</a>
-
-            <form class="admin-order-status-form compact" action="/admin/orders/<%= order._id %>/status" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <label>
-                Payment
-                <select name="paymentStatus">
-                  <option value="pending" <%= order.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
-                  <option value="paid" <%= order.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
-                  <option value="failed" <%= order.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
-                </select>
-              </label>
-
-              <label>
-                Order
-                <select name="orderStatus">
-                  <option value="new" <%= order.orderStatus === "new" ? "selected" : "" %>>New</option>
-                  <option value="processing" <%= order.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
-                  <option value="packed" <%= order.orderStatus === "packed" ? "selected" : "" %>>Packed</option>
-                  <option value="shipped" <%= order.orderStatus === "shipped" ? "selected" : "" %>>Shipped</option>
-                  <option value="completed" <%= order.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
-                  <option value="cancelled" <%= order.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
-                </select>
-              </label>
-
-              <button type="submit">Update</button>
-            </form>
-
-            <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
-              <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button class="admin-secondary" type="submit">Send Royal Mail</button>
-              </form>
-            <% } %>
-          </div>
-        </article>
+        <tr>
+          <td><span class="t-mono">#<%= orderShortId(order) %></span></td>
+          <td><span class="t-name"><%= [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(" ") || "Customer" %></span><span class="t-sub"><%= order.customer?.email || "No email" %></span></td>
+          <td class="t-sub"><%= (order.items || []).length %> item<%= (order.items || []).length === 1 ? "" : "s" %> &middot; <%= isClickCollect ? "Click &amp; Collect" : "Delivery" %></td>
+          <td><span class="t-amt"><%= money(order.total) %></span></td>
+          <td><span class="pill p-<%= order.paymentStatus || 'pending' %>"><%= order.paymentStatus || "pending" %></span></td>
+          <td><span class="pill p-<%= order.orderStatus || 'new' %>"><%= order.orderStatus || "new" %></span></td>
+          <td><span class="pill p-<%= order.royalMail?.syncStatus || 'not_sent' %>"><%= order.royalMail?.syncStatus || "not_sent" %></span></td>
+          <td class="t-sub"><%= new Date(order.createdAt).toLocaleString("en-GB") %></td>
+          <td><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>">View</a></td>
+        </tr>
       <% }) %>
-    </div>
+    </tbody></table></div>
 
     <div class="admin-pagination">
-      <% if (pagination.hasPrev) { %>
-        <a href="/admin/orders?<%= buildQuery({ page: pagination.page - 1 }) %>">Previous</a>
-      <% } %>
-
-      <span>Page <%= pagination.page %> of <%= pagination.totalPages %> · <%= pagination.totalOrders %> result(s)</span>
-
-      <% if (pagination.hasNext) { %>
-        <a href="/admin/orders?<%= buildQuery({ page: pagination.page + 1 }) %>">Next</a>
-      <% } %>
+      <% if (pagination.hasPrev) { %><a href="/admin/orders?<%- new URLSearchParams({ ...query, page: pagination.page - 1 }).toString() %>">&larr; Previous</a><% } %>
+      <span>Page <%= pagination.page %> of <%= pagination.totalPages %> &middot; <%= pagination.totalOrders %> result(s)</span>
+      <% if (pagination.hasNext) { %><a href="/admin/orders?<%- new URLSearchParams({ ...query, page: pagination.page + 1 }).toString() %>">Next &rarr;</a><% } %>
     </div>
   <% } %>
-</section>
+</div>

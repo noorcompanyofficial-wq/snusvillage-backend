@@ -7,128 +7,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Snus Village Admin</title>
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-
-    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/admin-v2.css?v=1" />
   </head>
 
   <body class="admin-body">
-    <div class="admin-shell">
-      <aside class="admin-sidebar" id="sidebar">
-        <a class="admin-brand" href="/admin/dashboard">
-          <span class="admin-brand__mark">
-            <img src="/images/logo/snus-village-logo.webp" alt="Snus Village">
-          </span>
+    <%
+      const adminRole = user?.role || "user";
+      const isOwnerAdmin = ["owner", "admin"].includes(adminRole);
+      const canManageProducts = ["owner", "admin", "manager", "product_manager"].includes(adminRole);
+      const canManageOrders = ["owner", "admin", "manager", "fulfilment"].includes(adminRole);
+      const canSupportCustomers = ["owner", "admin", "manager", "support"].includes(adminRole);
+      const canManageWebsite = ["owner", "admin", "manager"].includes(adminRole);
+      const canViewAnalytics = ["owner", "admin", "manager"].includes(adminRole);
+      const glance = typeof adminGlance !== "undefined" && adminGlance ? adminGlance : {};
+      const initials = (user?.firstName?.[0] || user?.email?.[0] || "A").toUpperCase();
+    %>
 
-          <span class="admin-brand__text">
-            <strong>Snus Village</strong>
-            <small>Operations Panel</small>
-          </span>
+    <div class="shell" id="shell">
+      <aside class="sidebar">
+        <a class="sb-logo" href="/admin/dashboard">
+          <span class="sb-logo-mark"><img src="/images/logo/snus-village-logo.webp" alt="Snus Village" /></span>
+          <span class="sb-logo-words"><strong>Snus Village</strong><small>Operations Panel</small></span>
         </a>
 
-        <%
-          const adminRole = user?.role || "user";
-          const isOwnerAdmin = ["owner", "admin"].includes(adminRole);
-          const canManageProducts = ["owner", "admin", "manager", "product_manager"].includes(adminRole);
-          const canManageOrders = ["owner", "admin", "manager", "fulfilment"].includes(adminRole);
-          const canSupportCustomers = ["owner", "admin", "manager", "support"].includes(adminRole);
-          const canManageWebsite = ["owner", "admin", "manager"].includes(adminRole);
-          const canViewAnalytics = ["owner", "admin", "manager"].includes(adminRole);
-        %>
-
-        <nav class="admin-nav" aria-label="Admin navigation">
-          <a href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
-
-          <% if (canViewAnalytics) { %>
-            <a href="/admin/analytics"><i class="fa-solid fa-chart-pie"></i><span>Analytics</span></a>
-            <a href="/admin/search-analytics"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Search Data</span></a>
-          <% } %>
+        <nav class="sb-nav" aria-label="Admin navigation">
+          <div class="sb-grp">
+            <div class="sb-lbl"><span>Overview</span><div class="sb-lbl-line"></div></div>
+            <a class="nav-link" href="/admin/dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+            <% if (canViewAnalytics) { %>
+              <a class="nav-link" href="/admin/analytics"><i class="fa-solid fa-chart-pie"></i><span>Analytics</span></a>
+              <a class="nav-link" href="/admin/search-analytics"><i class="fa-solid fa-magnifying-glass-chart"></i><span>Search Data</span></a>
+            <% } %>
+          </div>
 
           <% if (canManageWebsite) { %>
-            <a href="/admin/homepage"><i class="fa-solid fa-house-chimney-window"></i><span>Homepage</span></a>
-            <a href="/admin/homepage/hero"><i class="fa-solid fa-images"></i><span>Hero Banner</span></a>
-            <a href="/admin/seo"><i class="fa-solid fa-magnifying-glass-chart"></i><span>SEO</span></a>
-            <a href="/admin/discounts"><i class="fa-solid fa-ticket"></i><span>Discounts</span></a>
-            <a href="/admin/settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+            <div class="sb-grp">
+              <div class="sb-lbl"><span>Content</span><div class="sb-lbl-line"></div></div>
+              <a class="nav-link" href="/admin/homepage"><i class="fa-solid fa-house-chimney-window"></i><span>Homepage</span></a>
+              <a class="nav-link" href="/admin/homepage/hero"><i class="fa-solid fa-images"></i><span>Hero Banner</span></a>
+              <a class="nav-link" href="/admin/seo"><i class="fa-solid fa-globe"></i><span>SEO</span></a>
+              <a class="nav-link" href="/admin/discounts"><i class="fa-solid fa-ticket"></i><span>Discounts</span></a>
+              <a class="nav-link" href="/admin/settings"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+            </div>
           <% } %>
 
-          <% if (canSupportCustomers) { %>
-            <a href="/admin/messages"><i class="fa-solid fa-inbox"></i><span>Messages</span></a>
+          <% if (canManageOrders || canManageProducts) { %>
+            <div class="sb-grp">
+              <div class="sb-lbl"><span>Commerce</span><div class="sb-lbl-line"></div></div>
+              <% if (canManageOrders) { %>
+                <a class="nav-link" href="/admin/orders"><i class="fa-solid fa-receipt"></i><span>Orders</span><% if (glance.pendingOrders) { %><span class="nb nb-red"><%= glance.pendingOrders %></span><% } %></a>
+                <a class="nav-link" href="/admin/carts"><i class="fa-solid fa-cart-shopping"></i><span>Carts</span></a>
+              <% } %>
+              <% if (canManageProducts) { %>
+                <a class="nav-link" href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></a>
+                <a class="nav-link" href="/admin/inventory"><i class="fa-solid fa-warehouse"></i><span>Inventory</span></a>
+                <a class="nav-link" href="/admin/products/add"><i class="fa-solid fa-circle-plus"></i><span>Add Product</span></a>
+              <% } %>
+            </div>
           <% } %>
 
-          <% if (canManageOrders) { %>
-            <a href="/admin/orders"><i class="fa-solid fa-receipt"></i><span>Orders</span></a>
-            <a href="/admin/carts"><i class="fa-solid fa-cart-shopping"></i><span>Carts</span></a>
-          <% } %>
-
-          <% if (canManageProducts) { %>
-            <a href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></a>
-            <a href="/admin/inventory"><i class="fa-solid fa-warehouse"></i><span>Inventory</span></a>
-            <a href="/admin/products/add"><i class="fa-solid fa-circle-plus"></i><span>Add Product</span></a>
+          <% if (canSupportCustomers || isOwnerAdmin) { %>
+            <div class="sb-grp">
+              <div class="sb-lbl"><span>Customers</span><div class="sb-lbl-line"></div></div>
+              <% if (canSupportCustomers) { %>
+                <a class="nav-link" href="/admin/messages"><i class="fa-solid fa-inbox"></i><span>Messages</span><% if (glance.unreadMessages) { %><span class="nb nb-red"><%= glance.unreadMessages %></span><% } %></a>
+              <% } %>
+              <% if (isOwnerAdmin) { %>
+                <a class="nav-link" href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span>Wholesale</span><% if (glance.pendingWholesale) { %><span class="nb nb-amb"><%= glance.pendingWholesale %></span><% } %></a>
+                <a class="nav-link" href="/admin/users"><i class="fa-solid fa-users"></i><span>Users & Traders</span></a>
+              <% } %>
+            </div>
           <% } %>
 
           <% if (isOwnerAdmin) { %>
-            <a href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span>Wholesale</span></a>
-            <a href="/admin/users"><i class="fa-solid fa-users"></i><span>Users & Traders</span></a>
-            <a href="/admin/security"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
-            <a href="/admin/audit-logs"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Logs</span></a>
-            <a href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i><span>Email Test</span></a>
+            <div class="sb-grp">
+              <div class="sb-lbl"><span>System</span><div class="sb-lbl-line"></div></div>
+              <a class="nav-link" href="/admin/security"><i class="fa-solid fa-shield-halved"></i><span>Security</span></a>
+              <a class="nav-link" href="/admin/audit-logs"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Logs</span></a>
+              <a class="nav-link" href="/admin/email-test"><i class="fa-solid fa-envelope-circle-check"></i><span>Email Test</span></a>
+            </div>
           <% } %>
         </nav>
 
-        <div class="admin-sidebar__bottom">
-          <a href="/shop"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>View Shop</span></a>
-          <a href="/auth/logout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+        <div class="sb-foot">
+          <div class="sb-user">
+            <div class="sb-av"><%= initials %></div>
+            <div><div class="sb-uname"><%= user?.firstName || user?.email || "Admin" %></div><div class="sb-urole"><%= adminRole %></div></div>
+          </div>
+          <div class="sb-foot-row">
+            <a href="/shop" target="_blank" class="sb-flink"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Shop</span></a>
+            <a href="/auth/logout" class="sb-flink" data-no-spa><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+          </div>
         </div>
       </aside>
 
-      <div class="admin-main" id="main">
-        <header class="admin-topbar">
-          <div class="admin-topbar__left">
-            <button class="admin-menu-btn" id="toggleBtn" type="button" aria-label="Toggle menu">
-              <i class="fa-solid fa-bars"></i>
-            </button>
-
-            <div>
-              <span>Snus Village Admin</span>
-              <strong>Welcome, <%= user?.firstName || "Admin" %></strong>
-            </div>
+      <div class="main">
+        <header class="topbar">
+          <button class="tb-tog" id="toggleBtn" type="button" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+          <div class="tb-crumb">
+            <span>Admin</span>
+            <i class="fa-solid fa-chevron-right" style="font-size:8px;color:var(--mu);margin:0 2px;"></i>
+            <strong id="crumb">Dashboard</strong>
           </div>
-
-          <div class="admin-topbar__actions">
-            <a class="admin-topbar__ghost" href="/shop">
-              <i class="fa-solid fa-store"></i>
-              Store
-            </a>
-
-            <a class="admin-topbar__action" href="/admin/products/add">
-              <i class="fa-solid fa-plus"></i>
-              Add Product
-            </a>
+          <form class="tb-search" action="/admin/products" method="GET">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--mu);font-size:11px;flex-shrink:0;"></i>
+            <input type="search" name="search" placeholder="Search products&hellip;" />
+          </form>
+          <div class="tb-right">
+            <a class="tb-icon" href="/admin/messages"><i class="fa-solid fa-inbox"></i><% if (glance.unreadMessages) { %><span class="tb-dot"></span><% } %></a>
+            <a href="/shop" target="_blank" class="tb-icon"><i class="fa-solid fa-store"></i></a>
+            <a class="tb-btn" href="/admin/products/add"><i class="fa-solid fa-plus"></i> Add Product</a>
           </div>
         </header>
 
-        <% if (success && success.length) { %>
-          <div class="admin-flash admin-flash--success">
-            <i class="fa-solid fa-circle-check"></i>
-            <span><%= success[0] %></span>
-          </div>
-        <% } %>
+        <div class="glance">
+          <a class="gl gl-a" href="/admin/orders?orderStatus=processing"><i class="fa-solid fa-hourglass-half"></i><span><span class="gv"><%= glance.pendingOrders || 0 %></span> orders pending</span></a>
+          <a class="gl gl-r" href="/admin/messages"><i class="fa-solid fa-inbox"></i><span><span class="gv"><%= glance.unreadMessages || 0 %></span> unread messages</span></a>
+          <a class="gl gl-a" href="/admin/inventory?stock=low"><i class="fa-solid fa-triangle-exclamation"></i><span><span class="gv"><%= glance.lowStock || 0 %></span> low stock</span></a>
+          <a class="gl gl-b" href="/admin/wholesale"><i class="fa-solid fa-id-card"></i><span><span class="gv"><%= glance.pendingWholesale || 0 %></span> wholesale pending</span></a>
+          <a class="gl gl-g" href="/admin/carts?status=active"><i class="fa-solid fa-cart-shopping"></i><span><span class="gv"><%= glance.activeCarts || 0 %></span> active carts</span></a>
+        </div>
 
-        <% if (error && error.length) { %>
-          <div class="admin-flash admin-flash--error">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <span><%= error[0] %></span>
-          </div>
-        <% } %>
-
-        <main class="admin-content"><%- body %></main>
+        <div class="content" id="content"><%- body %></div>
       </div>
     </div>
 
-    <script src="/js/admin.js"></script>
+    <script src="/js/admin-shell.js?v=1"></script>
   </body>
 </html>

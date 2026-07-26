@@ -1,76 +1,44 @@
-<section class="admin-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Email</span>
-      <h1>SMTP test</h1>
-      <p>Send a test email from this server to diagnose verification-code delivery.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
+
+<div class="ph">
+  <div>
+    <div class="ph-eye">System</div>
+    <h1>SMTP Test</h1>
+    <p>Send a test email from this server to diagnose verification-code delivery.</p>
   </div>
+</div>
 
-  <section class="admin-panel">
-    <div class="admin-table-wrap">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Setting</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Provider</td>
-            <td><%= mailConfig.provider %></td>
-          </tr>
-          <tr>
-            <td>Email user</td>
-            <td>
-              <%= mailConfig.hasEmailUser ? "Configured" : "Missing" %>
-              <% if (mailConfig.emailUser) { %>
-                <span><%= mailConfig.emailUser %></span>
-              <% } %>
-            </td>
-          </tr>
-          <tr>
-            <td>From address</td>
-            <td><%= mailConfig.emailFrom || "Not set" %></td>
-          </tr>
-          <tr>
-            <td>SMTP server</td>
-            <td><%= mailConfig.smtpHost %>:<%= mailConfig.smtpPort %></td>
-          </tr>
-          <tr>
-            <td>SMTP secure</td>
-            <td><%= mailConfig.smtpSecure ? "true" : "false" %></td>
-          </tr>
-          <tr>
-            <td>Email password</td>
-            <td><%= mailConfig.hasEmailPass ? "Configured" : "Missing" %></td>
-          </tr>
-          <tr>
-            <td>Timeout</td>
-            <td><%= mailConfig.timeout %>ms</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+<div class="sec">
+  <div class="sec-head"><h2>Mail Configuration</h2></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Setting</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="t-name">Provider</td><td><%= mailConfig.provider %></td></tr>
+        <tr><td class="t-name">Email User</td><td><%= mailConfig.hasEmailUser ? "Configured" : "Missing" %><% if (mailConfig.emailUser) { %> <span class="t-sub"><%= mailConfig.emailUser %></span><% } %></td></tr>
+        <tr><td class="t-name">From Address</td><td><%= mailConfig.emailFrom || "Not set" %></td></tr>
+        <tr><td class="t-name">SMTP Server</td><td class="t-mono"><%= mailConfig.smtpHost %>:<%= mailConfig.smtpPort %></td></tr>
+        <tr><td class="t-name">SMTP Secure</td><td><%= mailConfig.smtpSecure ? "true" : "false" %></td></tr>
+        <tr><td class="t-name">Email Password</td><td><%= mailConfig.hasEmailPass ? "Configured" : "Missing" %></td></tr>
+        <tr><td class="t-name">Timeout</td><td><%= mailConfig.timeout %>ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-  <section class="admin-panel">
-    <form class="admin-email-test-form" method="POST" action="/admin/email-test">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <label>
-        Send test to
-        <input type="email" name="to" placeholder="customer@example.com" required />
-      </label>
-      <button type="submit">Send Test Email</button>
-    </form>
-  </section>
+<div class="sec">
+  <div class="sec-head"><h2>Send Test Email</h2></div>
+  <form class="sec-body" style="display:flex;gap:12px;align-items:end;" method="POST" action="/admin/email-test">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="fld" style="margin-bottom:0;flex:1;"><label>Send Test To</label><input type="email" name="to" placeholder="customer@example.com" required></div>
+    <button type="submit" class="btn btn-red">Send Test Email</button>
+  </form>
+</div>
 
-  <% if (result) { %>
-    <% const parsed = JSON.parse(result); %>
-    <section class="admin-panel">
-      <h2>Email test result</h2>
-      <pre class="admin-email-test-result"><%= JSON.stringify(parsed, null, 2) %></pre>
-    </section>
-  <% } %>
-</section>
+<% if (result) { %>
+  <% const parsed = JSON.parse(result); %>
+  <div class="sec">
+    <div class="sec-head"><h2>Email Test Result</h2></div>
+    <div class="sec-body"><pre style="background:var(--bg);border-radius:8px;padding:14px;font-size:11px;overflow-x:auto;"><%= JSON.stringify(parsed, null, 2) %></pre></div>
+  </div>
+<% } %>

@@ -5,173 +5,145 @@
   const discountAmount = Number(order.discount?.amount || 0);
   const paidAt = order.sumup?.paidAt ? new Date(order.sumup.paidAt).toLocaleString("en-GB") : "Not paid yet";
 %>
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-page admin-order-detail-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Order Detail</span>
-      <h1>Order #<%= shortId %></h1>
-      <p>Customer, payment, discount, fulfilment, Royal Mail, and internal admin notes.</p>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Order Detail</div>
+    <h1>Order #<%= shortId %></h1>
+    <p>Customer, payment, discount, fulfilment, Royal Mail, and internal admin notes.</p>
+  </div>
+  <div class="ph-right">
+    <a class="btn btn-ghost" href="/admin/orders/export/csv" data-no-spa><i class="fa-solid fa-file-export"></i> Export CSV</a>
+    <a class="btn btn-red" href="/admin/orders"><i class="fa-solid fa-arrow-left"></i> Back To Orders</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat stat-blue"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-sterling-sign"></i></div></div><div class="stat-lbl">Total</div><div class="stat-val">&pound;<%= Number(order.total || 0).toFixed(2) %></div><div class="stat-sub">Final customer payment</div></div>
+  <div class="stat stat-grn"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-credit-card"></i></div></div><div class="stat-lbl">Payment</div><div class="stat-val" style="font-size:16px;text-transform:capitalize;"><%= order.paymentStatus || "pending" %></div><div class="stat-sub">SumUp: <%= order.sumup?.status || "Not started" %></div></div>
+  <div class="stat stat-amb"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-box"></i></div></div><div class="stat-lbl">Order Status</div><div class="stat-val" style="font-size:16px;text-transform:capitalize;"><%= order.orderStatus || "new" %></div><div class="stat-sub">Created <%= new Date(order.createdAt).toLocaleString("en-GB") %></div></div>
+  <div class="stat stat-red"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid <%= isClickCollect ? 'fa-store' : 'fa-truck' %>"></i></div></div><div class="stat-lbl">Fulfilment</div><div class="stat-val" style="font-size:16px;"><%= isClickCollect ? "Click & Collect" : "Delivery" %></div><div class="stat-sub"><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? (order.fulfilment?.collectionBranch || "Collection") : "Royal Mail") %></div></div>
+</div>
+
+<div class="od-layout">
+  <div>
+    <div class="sec">
+      <div class="sec-head"><h2>Customer</h2><% if (order.user) { %><a class="btn btn-sm btn-ghost" href="/admin/users/<%= order.user %>">View Customer</a><% } %></div>
+      <div class="sec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><div class="stat-lbl">Name</div><strong><%= [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(" ") || "No name" %></strong></div>
+        <div><div class="stat-lbl">Email</div><strong><%= order.customer?.email || "No email" %></strong></div>
+        <div><div class="stat-lbl">Phone</div><strong><%= order.customer?.phone || "No phone" %></strong></div>
+        <div><div class="stat-lbl">Order ID</div><strong style="font-size:11px;"><%= order._id %></strong></div>
+      </div>
     </div>
 
-    <div class="admin-head-actions">
-      <a href="/admin/orders/export/csv" class="admin-secondary">
-        <i class="fa-solid fa-file-export"></i>
-        Export CSV
-      </a>
-      <a href="/admin/orders" class="admin-primary">
-        <i class="fa-solid fa-arrow-left"></i>
-        Back To Orders
-      </a>
+    <div class="sec">
+      <div class="sec-head"><h2><%= isClickCollect ? "Collection" : "Delivery" %></h2></div>
+      <div class="sec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><div class="stat-lbl">Method</div><strong><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? "Click & Collect" : "Delivery") %></strong></div>
+        <% if (!isClickCollect && order.fulfilment?.deliveryService === "next_day") { %><div><div class="stat-lbl">Cut-Off</div><strong>Before <%= order.fulfilment?.deliveryCutoff || "4:30pm" %></strong></div><% } %>
+        <div><div class="stat-lbl">Delivery Charge</div><strong><%= Number(order.shipping || 0) === 0 ? "Free" : "£" + Number(order.shipping || 0).toFixed(2) %></strong></div>
+        <div><div class="stat-lbl">Address</div><strong><%= order.delivery?.address || "No address" %></strong></div>
+        <div><div class="stat-lbl">City</div><strong><%= order.delivery?.city || "No city" %></strong></div>
+        <div><div class="stat-lbl">Postcode</div><strong><%= order.delivery?.postcode || "No postcode" %></strong></div>
+        <% if (isClickCollect) { %><div><div class="stat-lbl">Collection Branch</div><strong><%= order.fulfilment?.collectionBranch || "N/A" %></strong></div><% } %>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Items</h2><span style="font-size:11px;color:var(--mu);"><%= order.items?.length || 0 %> item<%= order.items?.length === 1 ? "" : "s" %></span></div>
+      <div class="sec-body" style="display:grid;gap:10px;">
+        <% (order.items || []).forEach(item => { %>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <% if (item.image) { %><img src="<%= item.image %>" alt="<%= item.name %>" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;background:var(--bg);border-radius:6px;"><% } %>
+            <div style="flex:1;"><strong style="display:block;font-size:12px;"><%= item.name %></strong><span style="font-size:10px;color:var(--mu);"><%= item.brand || "Snus Village" %> &middot; Qty: <%= item.quantity %> &times; &pound;<%= Number(item.price || 0).toFixed(2) %></span></div>
+            <strong class="t-amt">&pound;<%= Number((item.quantity || 0) * (item.price || 0)).toFixed(2) %></strong>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="dg2">
+      <div class="sec">
+        <div class="sec-head"><h2>Totals</h2></div>
+        <div class="sec-body">
+          <div class="checkout-total-row" style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;"><span>Subtotal</span><strong>&pound;<%= Number(order.subtotal || 0).toFixed(2) %></strong></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;"><span>Shipping</span><strong><%= Number(order.shipping || 0) === 0 ? "Free" : "£" + Number(order.shipping || 0).toFixed(2) %></strong></div>
+          <% if (discountAmount > 0) { %><div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;color:var(--grn);"><span>Discount <%= order.discount?.code ? "(" + order.discount.code + ")" : "" %></span><strong>-&pound;<%= discountAmount.toFixed(2) %></strong></div><% } %>
+          <div style="display:flex;justify-content:space-between;padding:10px 0 0;margin-top:6px;border-top:1px solid var(--bdr);font-size:14px;font-weight:800;"><span>Total</span><strong>&pound;<%= Number(order.total || 0).toFixed(2) %></strong></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><h2>Discount</h2></div>
+        <div class="sec-body">
+          <% if (order.discount?.code) { %>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div><div class="stat-lbl">Code</div><strong><%= order.discount.code %></strong></div>
+              <div><div class="stat-lbl">Type</div><strong><%= order.discount.type || "N/A" %></strong></div>
+              <div><div class="stat-lbl">Value</div><strong><% if (order.discount.type === "percentage") { %><%= Number(order.discount.value || 0).toFixed(0) %>%<% } else { %>&pound;<%= Number(order.discount.value || 0).toFixed(2) %><% } %></strong></div>
+              <div><div class="stat-lbl">Saved</div><strong>&pound;<%= discountAmount.toFixed(2) %></strong></div>
+            </div>
+          <% } else { %>
+            <p style="color:var(--mu);font-size:12px;">No discount code used on this order.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Royal Mail</h2></div>
+      <div class="sec-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div><div class="stat-lbl">Status</div><span class="pill p-<%= order.royalMail?.syncStatus || 'not_sent' %>"><%= order.royalMail?.syncStatus || "not_sent" %></span></div>
+          <div><div class="stat-lbl">Order Identifier</div><strong><%= order.royalMail?.orderIdentifier || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Reference</div><strong><%= order.royalMail?.orderReference || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Tracking</div><strong><%= order.royalMail?.trackingNumber || "N/A" %></strong></div>
+          <% if (order.royalMail?.syncError) { %><div style="grid-column:1/-1;"><div class="stat-lbl">Error</div><strong style="color:#dc2626;"><%= order.royalMail.syncError %></strong></div><% } %>
+        </div>
+        <div class="t-actions">
+          <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
+            <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-blue">Send To Royal Mail</button></form>
+          <% } %>
+          <% if (!isClickCollect && order.royalMail?.syncStatus === "sent" && !order.royalMail?.labelGenerated) { %>
+            <form action="/admin/orders/<%= order._id %>/generate-label" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost">Generate Label</button></form>
+          <% } %>
+          <% if (order.royalMail?.labelGenerated) { %><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>/download-label" data-no-spa>Download Label</a><% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Internal Admin Notes</h2></div>
+      <form class="sec-body" action="/admin/orders/<%= order._id %>/admin-update" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;font-size:12px;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" name="paymentChecked" style="width:auto;min-height:0;" <%= checklist.paymentChecked ? "checked" : "" %>> Payment Checked</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" name="stockChecked" style="width:auto;min-height:0;" <%= checklist.stockChecked ? "checked" : "" %>> Stock Checked</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" name="packed" style="width:auto;min-height:0;" <%= checklist.packed ? "checked" : "" %>> Packed</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" name="labelReady" style="width:auto;min-height:0;" <%= checklist.labelReady ? "checked" : "" %>> Label Ready</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" name="customerNotified" style="width:auto;min-height:0;" <%= checklist.customerNotified ? "checked" : "" %>> Customer Notified</label>
+        </div>
+        <div class="fld"><label>Notes</label><textarea name="adminNotes" rows="3" placeholder="Add internal order notes here..."><%= order.adminNotes || "" %></textarea></div>
+        <button type="submit" class="btn btn-red">Save Internal Notes</button>
+      </form>
     </div>
   </div>
 
-  <div class="admin-order-overview-grid">
-    <div class="admin-analytics-card admin-analytics-card--dark">
-      <i class="fa-solid fa-sterling-sign"></i>
-      <span>Total</span>
-      <strong>£<%= Number(order.total || 0).toFixed(2) %></strong>
-      <small>Final customer payment amount</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-credit-card"></i>
-      <span>Payment</span>
-      <strong><%= order.paymentStatus || "pending" %></strong>
-      <small>SumUp: <%= order.sumup?.status || "Not started" %></small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-box"></i>
-      <span>Order Status</span>
-      <strong><%= order.orderStatus || "new" %></strong>
-      <small>Created <%= new Date(order.createdAt).toLocaleString("en-GB") %></small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid <%= isClickCollect ? 'fa-store' : 'fa-truck' %>"></i>
-      <span>Fulfilment</span>
-      <strong><%= isClickCollect ? "Click & Collect" : "Delivery" %></strong>
-      <small><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? (order.fulfilment?.collectionBranch || "Collection") : "Royal Mail / Delivery") %></small>
-    </div>
-  </div>
-
-  <div class="admin-order-detail-grid">
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>Customer</h2>
-        <% if (order.user) { %>
-          <a href="/admin/users/<%= order.user %>">View Customer</a>
-        <% } %>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Name</span>
-          <strong><%= [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(" ") || "No name" %></strong>
-        </div>
-
-        <div>
-          <span>Email</span>
-          <strong><%= order.customer?.email || "No email" %></strong>
-        </div>
-
-        <div>
-          <span>Phone</span>
-          <strong><%= order.customer?.phone || "No phone" %></strong>
-        </div>
-
-        <div>
-          <span>Order ID</span>
-          <strong><%= order._id %></strong>
-        </div>
-      </div>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2><%= isClickCollect ? "Collection" : "Delivery" %></h2>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Method</span>
-          <strong><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? "Click & Collect" : "Delivery") %></strong>
-        </div>
-
-        <% if (!isClickCollect && order.fulfilment?.deliveryService === "next_day") { %>
-          <div>
-            <span>Cut-Off</span>
-            <strong>Order before <%= order.fulfilment?.deliveryCutoff || "4:30pm" %></strong>
-          </div>
-        <% } %>
-
-        <% if (!isClickCollect) { %>
-          <div>
-            <span>Courier</span>
-            <strong>Royal Mail</strong>
-          </div>
-        <% } %>
-
-        <div>
-          <span>Delivery Charge</span>
-          <strong><%= Number(order.shipping || 0) === 0 ? "Free" : "£" + Number(order.shipping || 0).toFixed(2) %></strong>
-        </div>
-
-        <div>
-          <span>Address</span>
-          <strong><%= order.delivery?.address || "No address" %></strong>
-        </div>
-
-        <div>
-          <span>City</span>
-          <strong><%= order.delivery?.city || "No city" %></strong>
-        </div>
-
-        <div>
-          <span>Postcode</span>
-          <strong><%= order.delivery?.postcode || "No postcode" %></strong>
-        </div>
-
-        <% if (isClickCollect) { %>
-          <div>
-            <span>Collection Branch</span>
-            <strong><%= order.fulfilment?.collectionBranch || "N/A" %></strong>
-          </div>
-        <% } %>
-      </div>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>Status Update</h2>
-      </div>
-
-      <div class="admin-status-stack">
-        <p>
-          <strong>Payment</strong>
-          <span class="status-pill payment-<%= order.paymentStatus %>"><%= order.paymentStatus || "pending" %></span>
-        </p>
-
-        <p>
-          <strong>Order</strong>
-          <span class="status-pill order-<%= order.orderStatus %>"><%= order.orderStatus || "new" %></span>
-        </p>
-      </div>
-
-      <form class="admin-order-status-form" action="/admin/orders/<%= order._id %>/status" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <label>
-          Payment
+  <div>
+    <div class="sec">
+      <div class="sec-head"><h2>Status Update</h2></div>
+      <form class="sec-body" action="/admin/orders/<%= order._id %>/status" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="fld"><label>Payment</label>
           <select name="paymentStatus">
             <option value="pending" <%= order.paymentStatus === "pending" ? "selected" : "" %>>Pending</option>
             <option value="paid" <%= order.paymentStatus === "paid" ? "selected" : "" %>>Paid</option>
             <option value="failed" <%= order.paymentStatus === "failed" ? "selected" : "" %>>Failed</option>
           </select>
-        </label>
-
-        <label>
-          Order
+        </div>
+        <div class="fld"><label>Order</label>
           <select name="orderStatus">
             <option value="new" <%= order.orderStatus === "new" ? "selected" : "" %>>New</option>
             <option value="processing" <%= order.orderStatus === "processing" ? "selected" : "" %>>Processing</option>
@@ -180,264 +152,35 @@
             <option value="completed" <%= order.orderStatus === "completed" ? "selected" : "" %>>Completed</option>
             <option value="cancelled" <%= order.orderStatus === "cancelled" ? "selected" : "" %>>Cancelled</option>
           </select>
-        </label>
-
-        <button type="submit">Update Status</button>
+        </div>
+        <button type="submit" class="btn btn-red" style="width:100%;justify-content:center;">Update Status</button>
       </form>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>SumUp Payment</h2>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Checkout ID</span>
-          <strong><%= order.sumup?.checkoutId || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Reference</span>
-          <strong><%= order.sumup?.checkoutReference || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Status</span>
-          <strong><%= order.sumup?.status || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Paid At</span>
-          <strong><%= paidAt %></strong>
-        </div>
-
-        <% if (order.sumup?.error) { %>
-          <div>
-            <span>Error</span>
-            <strong><%= order.sumup.error %></strong>
-          </div>
-        <% } %>
-
-        <% if (order.sumup?.refunded) { %>
-          <div>
-            <span>Refunded At</span>
-            <strong><%= new Date(order.sumup.refundedAt).toLocaleString("en-GB") %></strong>
-          </div>
-
-          <div>
-            <span>Refund Amount</span>
-            <strong>£<%= Number(order.sumup.refundAmount || 0).toFixed(2) %></strong>
-          </div>
-
-          <div>
-            <span>Refund Transaction</span>
-            <strong><%= order.sumup.refundTransactionId || "N/A" %></strong>
-          </div>
-
-          <% if (order.sumup.refundedBy) { %>
-            <div>
-              <span>Refunded By</span>
-              <strong><%= order.sumup.refundedBy %></strong>
-            </div>
-          <% } %>
-        <% } %>
-
-        <% if (order.sumup?.refundError && !order.sumup?.refunded) { %>
-          <div>
-            <span>Last Refund Attempt</span>
-            <strong class="admin-refund-error-text"><%= order.sumup.refundError %></strong>
-          </div>
-        <% } %>
-      </div>
-
-      <% if (order.paymentStatus === "paid" && !order.sumup?.refunded) { %>
-        <div class="admin-order-action-row">
-          <form
-            action="/admin/orders/<%= order._id %>/cancel-refund"
-            method="POST"
-            onsubmit="return confirm('Cancel this order and refund £<%= Number(order.total || 0).toFixed(2) %> to the customer via SumUp? This cannot be undone.');"
-          >
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit" class="admin-danger-btn">
-              <i class="fa-solid fa-rotate-left"></i>
-              Cancel &amp; Refund Via SumUp
-            </button>
-          </form>
-        </div>
-      <% } %>
-    </section>
-  </div>
-
-  <section class="admin-detail-card admin-items-card">
-    <div class="admin-panel__head">
-      <h2>Items</h2>
-      <span><%= order.items?.length || 0 %> Item<%= order.items?.length === 1 ? "" : "s" %></span>
     </div>
 
-    <% (order.items || []).forEach(item => { %>
-      <div class="admin-detail-item">
-        <% if (item.image) { %>
-          <img src="<%= item.image %>" alt="<%= item.name %>">
+    <div class="sec">
+      <div class="sec-head"><h2>SumUp Payment</h2></div>
+      <div class="sec-body" style="display:grid;gap:10px;">
+        <div><div class="stat-lbl">Checkout ID</div><strong style="font-size:11px;word-break:break-all;"><%= order.sumup?.checkoutId || "N/A" %></strong></div>
+        <div><div class="stat-lbl">Reference</div><strong style="font-size:11px;"><%= order.sumup?.checkoutReference || "N/A" %></strong></div>
+        <div><div class="stat-lbl">Status</div><strong><%= order.sumup?.status || "N/A" %></strong></div>
+        <div><div class="stat-lbl">Paid At</div><strong style="font-size:11px;"><%= paidAt %></strong></div>
+        <% if (order.sumup?.error) { %><div><div class="stat-lbl">Error</div><strong style="color:#dc2626;font-size:11px;"><%= order.sumup.error %></strong></div><% } %>
+        <% if (order.sumup?.refunded) { %>
+          <div><div class="stat-lbl">Refunded At</div><strong style="font-size:11px;"><%= new Date(order.sumup.refundedAt).toLocaleString("en-GB") %></strong></div>
+          <div><div class="stat-lbl">Refund Amount</div><strong>&pound;<%= Number(order.sumup.refundAmount || 0).toFixed(2) %></strong></div>
+          <div><div class="stat-lbl">Refund Transaction</div><strong style="font-size:11px;"><%= order.sumup.refundTransactionId || "N/A" %></strong></div>
+          <% if (order.sumup.refundedBy) { %><div><div class="stat-lbl">Refunded By</div><strong style="font-size:11px;"><%= order.sumup.refundedBy %></strong></div><% } %>
         <% } %>
-
-        <div>
-          <strong><%= item.name %></strong>
-          <span><%= item.brand || "Snus Village" %></span>
-          <small>Qty: <%= item.quantity %> × £<%= Number(item.price || 0).toFixed(2) %></small>
-        </div>
-
-        <strong>£<%= Number((item.quantity || 0) * (item.price || 0)).toFixed(2) %></strong>
+        <% if (order.sumup?.refundError && !order.sumup?.refunded) { %><div><div class="stat-lbl">Last Refund Attempt</div><strong style="color:#dc2626;font-size:11px;"><%= order.sumup.refundError %></strong></div><% } %>
       </div>
-    <% }) %>
-  </section>
-
-  <div class="admin-order-detail-grid">
-    <section class="admin-detail-card admin-total-card">
-      <div class="admin-panel__head">
-        <h2>Totals</h2>
-      </div>
-
-      <p>
-        <strong>Subtotal</strong>
-        <span>£<%= Number(order.subtotal || 0).toFixed(2) %></span>
-      </p>
-
-      <p>
-        <strong>Shipping</strong>
-        <span><%= Number(order.shipping || 0) === 0 ? "Free" : "£" + Number(order.shipping || 0).toFixed(2) %></span>
-      </p>
-
-      <% if (discountAmount > 0) { %>
-        <p class="admin-discount-line">
-          <strong>Discount <%= order.discount?.code ? "(" + order.discount.code + ")" : "" %></strong>
-          <span>-£<%= discountAmount.toFixed(2) %></span>
-        </p>
-      <% } %>
-
-      <p class="admin-grand-total">
-        <strong>Total</strong>
-        <span>£<%= Number(order.total || 0).toFixed(2) %></span>
-      </p>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>Discount</h2>
-      </div>
-
-      <% if (order.discount?.code) { %>
-        <div class="admin-detail-list">
-          <div>
-            <span>Code</span>
-            <strong><%= order.discount.code %></strong>
-          </div>
-
-          <div>
-            <span>Type</span>
-            <strong><%= order.discount.type || "N/A" %></strong>
-          </div>
-
-          <div>
-            <span>Value</span>
-            <strong>
-              <% if (order.discount.type === "percentage") { %>
-                <%= Number(order.discount.value || 0).toFixed(0) %>%
-              <% } else { %>
-                £<%= Number(order.discount.value || 0).toFixed(2) %>
-              <% } %>
-            </strong>
-          </div>
-
-          <div>
-            <span>Saved</span>
-            <strong>£<%= discountAmount.toFixed(2) %></strong>
-          </div>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No discount code used on this order.</p>
+      <% if (order.paymentStatus === "paid" && !order.sumup?.refunded) { %>
+        <div class="sec-body" style="padding-top:0;">
+          <form action="/admin/orders/<%= order._id %>/cancel-refund" method="POST" onsubmit="return confirm('Cancel this order and refund £<%= Number(order.total || 0).toFixed(2) %> to the customer via SumUp? This cannot be undone.');">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-danger" style="width:100%;justify-content:center;"><i class="fa-solid fa-rotate-left"></i> Cancel &amp; Refund</button>
+          </form>
         </div>
       <% } %>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>Royal Mail</h2>
-      </div>
-
-      <div class="admin-detail-list">
-        <div>
-          <span>Status</span>
-          <strong><%= order.royalMail?.syncStatus || "not_sent" %></strong>
-        </div>
-
-        <div>
-          <span>Order Identifier</span>
-          <strong><%= order.royalMail?.orderIdentifier || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Reference</span>
-          <strong><%= order.royalMail?.orderReference || "N/A" %></strong>
-        </div>
-
-        <div>
-          <span>Tracking</span>
-          <strong><%= order.royalMail?.trackingNumber || "N/A" %></strong>
-        </div>
-
-        <% if (order.royalMail?.syncError) { %>
-          <div>
-            <span>Error</span>
-            <strong><%= order.royalMail.syncError %></strong>
-          </div>
-        <% } %>
-      </div>
-
-      <div class="admin-order-action-row">
-        <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
-          <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit">Send To Royal Mail</button>
-          </form>
-        <% } %>
-
-        <% if (!isClickCollect && order.royalMail?.syncStatus === "sent" && !order.royalMail?.labelGenerated) { %>
-          <form action="/admin/orders/<%= order._id %>/generate-label" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button type="submit">Generate Label</button>
-          </form>
-        <% } %>
-
-        <% if (order.royalMail?.labelGenerated) { %>
-          <a href="/admin/orders/<%= order._id %>/download-label">Download Label</a>
-        <% } %>
-      </div>
-    </section>
-
-    <section class="admin-detail-card">
-      <div class="admin-panel__head">
-        <h2>Internal Admin Notes</h2>
-      </div>
-
-      <form class="admin-order-admin-form" action="/admin/orders/<%= order._id %>/admin-update" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <div class="admin-checklist-grid">
-          <label><input type="checkbox" name="paymentChecked" <%= checklist.paymentChecked ? "checked" : "" %>> Payment Checked</label>
-          <label><input type="checkbox" name="stockChecked" <%= checklist.stockChecked ? "checked" : "" %>> Stock Checked</label>
-          <label><input type="checkbox" name="packed" <%= checklist.packed ? "checked" : "" %>> Packed</label>
-          <label><input type="checkbox" name="labelReady" <%= checklist.labelReady ? "checked" : "" %>> Label Ready</label>
-          <label><input type="checkbox" name="customerNotified" <%= checklist.customerNotified ? "checked" : "" %>> Customer Notified</label>
-        </div>
-
-        <label class="admin-note-label">
-          Notes
-          <textarea name="adminNotes" placeholder="Add internal order notes here..."><%= order.adminNotes || "" %></textarea>
-        </label>
-
-        <button type="submit">Save Internal Notes</button>
-      </form>
-    </section>
+    </div>
   </div>
-</section>
+</div>

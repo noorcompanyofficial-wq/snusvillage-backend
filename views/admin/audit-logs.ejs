@@ -1,60 +1,30 @@
-<section class="admin-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Audit Logs</span>
-      <h1>Admin Activity Log</h1>
-      <p>Track staff/admin actions including role changes, order updates, stock changes, product deletion, and wholesale reviews.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
+
+<div class="ph">
+  <div>
+    <div class="ph-eye">System</div>
+    <h1>Admin Activity Log</h1>
+    <p>Track staff/admin actions including role changes, order updates, stock changes, product deletion, and wholesale reviews.</p>
   </div>
+</div>
 
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>Recent Admin Actions</h2>
-      <span><%= logs.length %> Log<%= logs.length === 1 ? "" : "s" %></span>
-    </div>
-
-    <% if (logs && logs.length) { %>
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Admin</th>
-              <th>Role</th>
-              <th>Action</th>
-              <th>Target</th>
-              <th>Summary</th>
-              <th>IP</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% logs.forEach((log) => { %>
-              <tr>
-                <td><%= log.createdAt ? new Date(log.createdAt).toLocaleString("en-GB") : "N/A" %></td>
-                <td>
-                  <strong><%= log.adminEmail || "Unknown" %></strong>
-                </td>
-                <td><%= log.adminRole || "N/A" %></td>
-                <td>
-                  <span class="status-pill order-completed"><%= log.action %></span>
-                </td>
-                <td>
-                  <strong><%= log.targetType || "N/A" %></strong>
-                  <span style="display:block;color:#64748b;font-size:12px;margin-top:4px;"><%= log.targetId || "" %></span>
-                </td>
-                <td><%= log.summary || "No summary" %></td>
-                <td><%= log.ip || "N/A" %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    <% } else { %>
-      <div class="admin-empty-state">
-        <h2>No Audit Logs Yet</h2>
-        <p>Admin actions will appear here once changes are made.</p>
-      </div>
-    <% } %>
-  </section>
-</section>
+<div class="sec">
+  <div class="sec-head"><h2>Recent Admin Actions</h2><span style="font-size:11px;color:var(--mu);"><%= logs.length %> log<%= logs.length === 1 ? "" : "s" %></span></div>
+  <% if (logs && logs.length) { %>
+    <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Admin</th><th>Role</th><th>Action</th><th>Target</th><th>Summary</th><th>IP</th></tr></thead><tbody>
+      <% logs.forEach((log) => { %>
+        <tr>
+          <td class="t-sub"><%= log.createdAt ? new Date(log.createdAt).toLocaleString("en-GB") : "N/A" %></td>
+          <td class="t-name"><%= log.adminEmail || "Unknown" %></td>
+          <td class="t-sub"><%= log.adminRole || "N/A" %></td>
+          <td><span class="pill p-completed"><%= log.action %></span></td>
+          <td><span class="t-name"><%= log.targetType || "N/A" %></span><span class="t-sub"><%= log.targetId || "" %></span></td>
+          <td class="t-sub"><%= log.summary || "No summary" %></td>
+          <td class="t-mono"><%= log.ip || "N/A" %></td>
+        </tr>
+      <% }) %>
+    </tbody></table></div>
+  <% } else { %>
+    <div class="admin-empty-state"><h2>No Audit Logs Yet</h2><p>Admin actions will appear here once changes are made.</p></div>
+  <% } %>
+</div>

@@ -59,6 +59,43 @@ const PERMISSIONS = {
   products: ["owner", "admin", "manager", "product_manager"],
 };
 
+// The admin panel is a single-page shell (views/layouts/admin-layout.ejs).
+// Direct URL loads render the full shell; in-app navigation fetches the same
+// route with this header set and gets back just the page content, which the
+// client swaps into #content without a full reload.
+function adminLayout(req) {
+  return req.get("X-Admin-Spa") === "1" ? false : "layouts/admin-layout";
+}
+
+async function getAdminGlance() {
+  const fallback = { pendingOrders: 0, unreadMessages: 0, lowStock: 0, pendingWholesale: 0, activeCarts: 0 };
+
+  if (mongoose.connection.readyState !== 1) return fallback;
+
+  try {
+    const staleCutoff = new Date(Date.now() - 60 * 60 * 1000);
+
+    const [pendingOrders, unreadMessages, lowStock, pendingWholesale, activeCarts] = await Promise.all([
+      Order.countDocuments({ orderStatus: { $in: ["new", "processing"] } }),
+      Contact.countDocuments({ isRead: false }),
+      Product.countDocuments({ isActive: { $ne: false }, stock: { $gt: 0, $lte: 5 } }),
+      WholesaleApplication.countDocuments({ status: "pending" }),
+      Cart.countDocuments({ updatedAt: { $gte: staleCutoff }, "items.0": { $exists: true } }),
+    ]);
+
+    return { pendingOrders, unreadMessages, lowStock, pendingWholesale, activeCarts };
+  } catch (err) {
+    console.log("Admin glance stats failed:", err.message);
+    return fallback;
+  }
+}
+
+router.use(async (req, res, next) => {
+  if (!req.session?.user) return next();
+  res.locals.adminGlance = await getAdminGlance();
+  next();
+});
+
 async function logAdminAction(req, action, options = {}) {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -312,7 +349,7 @@ router.get("/homepage", isAdmin, requireAdminRole(PERMISSIONS.website), async (r
     }
 
     res.render("admin/homepage", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       homepageContent,
     });
   } catch (err) {
@@ -338,7 +375,7 @@ router.get("/homepage/hero", isAdmin, requireAdminRole(PERMISSIONS.website), asy
       .lean();
 
     res.render("admin/homepage-hero", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       heroSlides: homepageContent?.hero?.slides || [],
       products,
     });
@@ -872,7 +909,7 @@ router.get("/seo", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, r
     const products = productsRaw.map(analyseProduct);
 
     res.render("admin/seo", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       products,
       query: req.query,
       stats: {
@@ -895,7 +932,7 @@ router.get("/search-analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics)
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.render("admin/search-analytics", {
-        layout: "layouts/admin-layout",
+        layout: adminLayout(req),
         stats: {
           totalSearches: 0,
           noResultSearches: 0,
@@ -960,7 +997,7 @@ router.get("/search-analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics)
     ]);
 
     res.render("admin/search-analytics", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       stats: {
         totalSearches,
         noResultSearches,
@@ -983,7 +1020,7 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
   try {
     if (mongoose.connection.readyState !== 1) {
       return res.render("admin/analytics", {
-        layout: "layouts/admin-layout",
+        layout: adminLayout(req),
         stats: {
           totalRevenue: 0,
           todayRevenue: 0,
@@ -1208,7 +1245,7 @@ router.get("/analytics", isAdmin, requireAdminRole(PERMISSIONS.analytics), async
     const todayRevenue = todayRevenueAgg[0]?.totalRevenue || 0;
 
     res.render("admin/analytics", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       stats: {
         totalRevenue,
         todayRevenue,
@@ -1275,7 +1312,7 @@ router.get("/dashboard", isAdmin, async (req, res) => {
       : [[], [], [], [], [], [], [], [], []];
 
   res.render("admin/dashboard", {
-    layout: "layouts/admin-layout",
+    layout: adminLayout(req),
     stats,
     recentProducts,
     recentOrders,
@@ -1317,7 +1354,7 @@ router.get("/carts", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, 
         : [];
 
     res.render("admin/carts", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       carts,
       cartStaleCutoff,
       status,
@@ -1432,7 +1469,7 @@ router.get("/messages", isAdmin, requireAdminRole(PERMISSIONS.support), async (r
         : [0, 0, 0];
 
     res.render("admin/messages", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       messages,
       totalMessages,
       unreadMessages,
@@ -1461,7 +1498,7 @@ router.get("/messages/:id", isAdmin, requireAdminRole(PERMISSIONS.support), asyn
     }
 
     res.render("admin/message-detail", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       message,
     });
   } catch (err) {
@@ -1584,7 +1621,7 @@ router.get("/settings", isAdmin, requireAdminRole(PERMISSIONS.website), async (r
         : null;
 
     res.render("admin/settings", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       settings,
     });
   } catch (err) {
@@ -1646,7 +1683,7 @@ router.get("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async (
         : [];
 
     res.render("admin/discounts", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       discounts,
     });
   } catch (err) {
@@ -1814,7 +1851,7 @@ router.get("/orders", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req,
     const totalPages = Math.max(1, Math.ceil(totalOrders / limit));
 
     res.render("admin/orders", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       orders,
       query: req.query,
       pagination: {
@@ -2089,7 +2126,7 @@ router.get("/users", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async (r
     }
 
     res.render("admin/users", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       users,
       traders,
       userOrderStats,
@@ -2141,7 +2178,7 @@ router.get("/users/:id", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), asyn
     const lastOrder = orders[0] || null;
 
     res.render("admin/user-detail", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       account: user,
       orders,
       carts,
@@ -2243,7 +2280,7 @@ router.get("/audit-logs", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), asy
         : [];
 
     res.render("admin/audit-logs", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       logs,
     });
   } catch (err) {
@@ -2271,7 +2308,7 @@ router.get("/security", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), async
         : [];
 
     res.render("admin/security", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       users,
     });
   } catch (err) {
@@ -2285,7 +2322,7 @@ router.get("/email-test", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), (re
   const mailConfig = transporter.snusMailConfig || {};
 
   res.render("admin/email-test", {
-    layout: "layouts/admin-layout",
+    layout: adminLayout(req),
     mailConfig: {
       provider: mailConfig.provider || "smtp",
       emailUser: mailConfig.emailUser || "",
@@ -2367,7 +2404,7 @@ router.get("/wholesale", isAdmin, requireAdminRole(PERMISSIONS.ownerAdmin), asyn
         : await wholesaleApplicationStore.findAll();
 
     res.render("admin/wholesale-applications", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       applications,
     });
   } catch (err) {
@@ -2525,7 +2562,7 @@ router.get("/inventory", isAdmin, requireAdminRole(PERMISSIONS.products), async 
     ]);
 
     res.render("admin/inventory", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       products,
       brands: brands.filter(Boolean).sort(),
       query: req.query,
@@ -2752,7 +2789,7 @@ router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.product
 //  Add Product Page
 router.get("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
   res.render("admin/add-product", {
-    layout: "layouts/admin-layout",
+    layout: adminLayout(req),
   });
 });
 
@@ -2795,7 +2832,7 @@ router.get("/products", isAdmin, requireAdminRole(PERMISSIONS.products), async (
     }
 
     res.render("admin/products", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       products,
       hasMore: page * limit < total,
       nextPage: page + 1,
@@ -3041,7 +3078,7 @@ router.get("/products/edit/:id", isAdmin, requireAdminRole(PERMISSIONS.products)
   const product = await Product.findById(req.params.id);
 
   res.render("admin/edit-product", {
-    layout: "layouts/admin-layout",
+    layout: adminLayout(req),
     product,
   });
 });
@@ -3326,7 +3363,7 @@ router.get("/orders/:id", isAdmin, requireAdminRole(PERMISSIONS.orders), async (
     }
 
     res.render("admin/order-detail", {
-      layout: "layouts/admin-layout",
+      layout: adminLayout(req),
       order,
     });
   } catch (err) {

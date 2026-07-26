@@ -2,521 +2,175 @@
   const distro = homepageContent?.distro || {};
   const distroImages = distro.images && distro.images.length
     ? distro.images
-    : [
-        { imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" },
-      ];
+    : [{ imageSrc: "/images/header/h-1.jpeg", alt: "SVG Distro Location Image 1" }];
   const distroImage = distroImages[0] || {};
 
   const collections = homepageContent?.collections || {};
   const collectionCards = collections.cards && collections.cards.length
     ? collections.cards
     : [
-        {
-          number: "01",
-          title: "Mint Favourites",
-          text: "Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.",
-          linkText: "Shop Mint",
-          linkUrl: "/shop?flavour=mint",
-          imageSrc: "/images/social/s-1.jpeg",
-          darkCard: false,
-        },
-        {
-          number: "02",
-          title: "Strong Selections",
-          text: "Higher Strength Products For Adult Customers Who Know Exactly What They Want.",
-          linkText: "Shop Strong",
-          linkUrl: "/shop?strength=STRONG",
-          imageSrc: "/images/social/s-6.jpeg",
-          darkCard: false,
-        },
-        {
-          number: "03",
-          title: "Fruity Flavours",
-          text: "Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.",
-          linkText: "Shop Flavours",
-          linkUrl: "/shop",
-          imageSrc: "/images/social/s-10.jpeg",
-          darkCard: false,
-        },
-        {
-          number: "04",
-          title: "Tobacco-Free Pouches",
-          text: "Explore Tobacco-Free Nicotine Pouches And Modern Nicotine Alternatives For Adult Customers.",
-          linkText: "Shop Pouches",
-          linkUrl: "/shop?category=Nicotine%20Pouches",
-          imageSrc: "/images/social/s-4.jpeg",
-          darkCard: false,
-        },
+        { number: "01", title: "Mint Favourites", text: "Clean, Cool, And Reliable Flavour Profiles From Leading Nicotine Pouch Brands.", linkText: "Shop Mint", linkUrl: "/shop?flavour=mint", imageSrc: "/images/social/s-1.jpeg", darkCard: false },
+        { number: "02", title: "Strong Selections", text: "Higher Strength Products For Adult Customers Who Know Exactly What They Want.", linkText: "Shop Strong", linkUrl: "/shop?strength=STRONG", imageSrc: "/images/social/s-6.jpeg", darkCard: false },
+        { number: "03", title: "Fruity Flavours", text: "Berry, Citrus, Cola, Tropical, And Sweet Profiles For A Brighter Choice.", linkText: "Shop Flavours", linkUrl: "/shop", imageSrc: "/images/social/s-10.jpeg", darkCard: false },
+        { number: "04", title: "Tobacco-Free Pouches", text: "Explore Tobacco-Free Nicotine Pouches And Modern Nicotine Alternatives For Adult Customers.", linkText: "Shop Pouches", linkUrl: "/shop?category=Nicotine%20Pouches", imageSrc: "/images/social/s-4.jpeg", darkCard: false },
       ];
 
   const locations = homepageContent?.locations || {};
   const locationCards = locations.cards && locations.cards.length
     ? locations.cards
     : [
-        {
-          label: "London Branch",
-          title: "Camden Town",
-          description: "Central North London Access With A Strong Range Of Best-Selling Products.",
-          mapUrl: "https://www.google.com/maps?q=Camden+Town+London&output=embed",
-          mapTitle: "Camden Town",
-          buttonText: "Ask About Stock",
-          buttonLink: "/contact",
-        },
-        {
-          label: "London Branch",
-          title: "Oxford Street",
-          description: "Easy Access For Shoppers Near One Of London’s Busiest Retail Destinations.",
-          mapUrl: "https://www.google.com/maps?q=Oxford+Street+London&output=embed",
-          mapTitle: "Oxford Street",
-          buttonText: "Ask About Stock",
-          buttonLink: "/contact",
-        },
-        {
-          label: "London Branch",
-          title: "Edgware Road",
-          description: "Convenient West London Area For Quick Visits And Product Enquiries.",
-          mapUrl: "https://www.google.com/maps?q=Edgware+Road+London&output=embed",
-          mapTitle: "Edgware Road",
-          buttonText: "Ask About Stock",
-          buttonLink: "/contact",
-        },
+        { label: "London Branch", title: "Camden Town", description: "Central North London Access With A Strong Range Of Best-Selling Products.", mapUrl: "https://www.google.com/maps?q=Camden+Town+London&output=embed", mapTitle: "Camden Town", buttonText: "Ask About Stock", buttonLink: "/contact" },
+        { label: "London Branch", title: "Oxford Street", description: "Easy Access For Shoppers Near One Of London's Busiest Retail Destinations.", mapUrl: "https://www.google.com/maps?q=Oxford+Street+London&output=embed", mapTitle: "Oxford Street", buttonText: "Ask About Stock", buttonLink: "/contact" },
+        { label: "London Branch", title: "Edgware Road", description: "Convenient West London Area For Quick Visits And Product Enquiries.", mapUrl: "https://www.google.com/maps?q=Edgware+Road+London&output=embed", mapTitle: "Edgware Road", buttonText: "Ask About Stock", buttonLink: "/contact" },
       ];
 
   const social = homepageContent?.social || {};
   const slides = social.slides && social.slides.length
     ? social.slides
     : [
-        {
-          videoSrc: "/videos/social/social-1.mp4",
-          posterSrc: "/images/header/h-1.jpeg",
-          title: "New Stock Arrival",
-          subtitle: "Latest Product Highlights From Snus Village",
-        },
-        {
-          videoSrc: "/videos/social/social-2.mp4",
-          posterSrc: "/images/header/h-2.jpeg",
-          title: "In-Store Content",
-          subtitle: "Store Moments, Promotions, And Customer Favourites",
-        },
-        {
-          videoSrc: "/videos/social/social-3.mp4",
-          posterSrc: "/images/delivery/delivery.jpg",
-          title: "London Updates",
-          subtitle: "See What Is Happening Across Our Locations",
-        },
+        { videoSrc: "/videos/social/social-1.mp4", posterSrc: "/images/header/h-1.jpeg", title: "New Stock Arrival", subtitle: "Latest Product Highlights From Snus Village" },
+        { videoSrc: "/videos/social/social-2.mp4", posterSrc: "/images/header/h-2.jpeg", title: "In-Store Content", subtitle: "Store Moments, Promotions, And Customer Favourites" },
+        { videoSrc: "/videos/social/social-3.mp4", posterSrc: "/images/delivery/delivery.jpg", title: "London Updates", subtitle: "See What Is Happening Across Our Locations" },
       ];
 %>
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-page admin-homepage-controls">
-  <div class="admin-page-head">
-    <div>
-      <span>Homepage</span>
-      <h1>Homepage Content Controls</h1>
-      <p>Edit hero banners, SVG Distro images, and social media content without changing code.</p>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Homepage</div>
+    <h1>Homepage Content Controls</h1>
+    <p>Edit hero banners, SVG Distro images, and social media content without changing code.</p>
+  </div>
+  <div class="ph-right"><a class="btn btn-red" href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Homepage</a></div>
+</div>
 
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/" target="_blank" rel="noopener">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        Preview Homepage
-      </a>
+<div class="sec">
+  <div class="sec-head"><h2>Best Sellers</h2><span style="font-size:11px;color:var(--mu);">Shown automatically from products</span></div>
+  <div class="sec-body">
+    <div class="admin-homepage-help" style="background:var(--bg);border-radius:10px;padding:14px;">
+      <strong>How this section works</strong>
+      <p style="font-size:12px;color:var(--mu);margin:6px 0 12px;">The homepage Best Sellers section is filled by products marked as <strong>Best Seller</strong> in the Products admin page. Edit a product, tick Best Seller, save it, and it will appear on the homepage.</p>
+      <div class="t-actions">
+        <a class="btn btn-sm btn-red" href="/admin/products?bestSeller=yes"><i class="fa-solid fa-star"></i> View Best Sellers</a>
+        <a class="btn btn-sm btn-ghost" href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i> Manage Products</a>
+      </div>
     </div>
   </div>
+</div>
 
-  <section class="admin-panel admin-homepage-best-sellers">
-    <div class="admin-panel__head">
-      <h2>Best Sellers</h2>
-      <span>Shown Automatically From Products</span>
+<div class="sec">
+  <div class="sec-head"><h2>Hero Banner</h2><span style="font-size:11px;color:var(--mu);">Products and background photos</span></div>
+  <div class="sec-body">
+    <p style="font-size:12px;color:var(--mu);margin-bottom:12px;">The homepage hero slideshow is managed on its own page — choose which products appear and upload a background photo for each slide.</p>
+    <a class="btn btn-red" href="/admin/homepage/hero"><i class="fa-solid fa-images"></i> Manage Hero Banner</a>
+  </div>
+</div>
+
+<form action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data" class="sec">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="sec-head"><h2>SVG Distro Section</h2><span style="font-size:11px;color:var(--mu);">Text, badges and main image</span></div>
+  <div class="sec-body fgrid">
+    <div class="fld"><label>Kicker</label><input name="distroKicker" value="<%= distro.kicker || 'Distribution Hub' %>"></div>
+    <div class="fld"><label>Title</label><input name="distroTitle" value="<%= distro.title || 'SVG Distro' %>"></div>
+    <div class="fld"><label>Address</label><input name="distroAddress" value="<%= distro.address || 'Snus Village Charles House, Southall' %>"></div>
+    <div class="fld"><label>Button Text</label><input name="distroButtonText" value="<%= distro.buttonText || 'Contact For Details' %>"></div>
+    <div class="fld"><label>Button Link</label><input name="distroButtonLink" value="<%= distro.buttonLink || '/contact' %>"></div>
+    <div class="fld"><label>Badges (comma separated)</label><input name="distroBadges" value="<%= (distro.badges || ['Stock Support', 'Trade Enquiries', 'Southall', '18+ Only']).join(', ') %>"></div>
+    <div class="fld fspan"><label>Description</label><textarea name="distroDescription" rows="2"><%= distro.description || 'Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders.' %></textarea></div>
+    <div class="fspan" style="border:1px solid var(--bdr);border-radius:8px;padding:14px;display:grid;gap:10px;">
+      <strong style="font-size:12px;">Distro Image</strong>
+      <div class="fld" style="margin-bottom:0;"><label>Current Image Path</label><input name="distroImageSrc1" value="<%= distroImage.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg"></div>
+      <div class="fld" style="margin-bottom:0;"><label>Upload New Distro Image</label><input type="file" name="distroImage1" accept="image/jpeg,image/png,image/webp,image/avif"></div>
+      <div class="fld" style="margin-bottom:0;"><label>Alt Text</label><input name="distroImageAlt1" value="<%= distroImage.alt || '' %>"></div>
     </div>
+  </div>
+  <div class="sec-body" style="padding-top:0;"><button class="btn btn-red" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Hero And Distro</button></div>
+</form>
 
-    <div class="admin-homepage-help">
-      <strong>How this section works</strong>
-      <p>
-        The homepage Best Sellers section is filled by products marked as
-        <strong>Best Seller</strong> in the Products admin page. Edit a product,
-        tick Best Seller, save it, and it will appear on the homepage.
-      </p>
-      <div class="admin-head-actions">
-        <a class="admin-primary" href="/admin/products?bestSeller=yes">
-          <i class="fa-solid fa-star"></i>
-          View Best Sellers
-        </a>
-        <a class="admin-secondary" href="/admin/products">
-          <i class="fa-solid fa-boxes-stacked"></i>
-          Manage Products
-        </a>
+<form action="/admin/homepage/collections" method="POST" enctype="multipart/form-data" class="sec">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="sec-head"><h2>Collections Section</h2><span style="font-size:11px;color:var(--mu);">Homepage collection cards</span></div>
+  <div class="sec-body fgrid">
+    <div class="fld"><label>Eyebrow</label><input name="collectionsEyebrow" value="<%= collections.eyebrow || 'Collections' %>"></div>
+    <div class="fld"><label>Heading</label><input name="collectionsHeading" value="<%= collections.heading || 'Shop By Strength, Flavour, And Brand' %>"></div>
+    <div class="fld"><label>Button Text</label><input name="collectionsButtonText" value="<%= collections.buttonText || 'Open Shop' %>"></div>
+    <div class="fld"><label>Button Link</label><input name="collectionsButtonLink" value="<%= collections.buttonLink || '/shop' %>"></div>
+    <div class="fld fspan"><label>Description</label><textarea name="collectionsDescription" rows="2"><%= collections.description || 'Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference.' %></textarea></div>
+  </div>
+  <div class="sec-body" style="padding-top:0;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+    <% [0, 1, 2, 3].forEach((index) => { const card = collectionCards[index] || {}; %>
+      <div style="border:1px solid var(--bdr);border-radius:8px;padding:14px;display:grid;gap:10px;">
+        <strong style="font-size:12px;">Collection Card <%= index + 1 %></strong>
+        <div class="fld" style="margin-bottom:0;"><label>Number</label><input name="collectionNumber<%= index + 1 %>" value="<%= card.number || ('0' + (index + 1)) %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Title</label><input name="collectionTitle<%= index + 1 %>" value="<%= card.title || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Text</label><textarea name="collectionText<%= index + 1 %>" rows="2"><%= card.text || '' %></textarea></div>
+        <div class="fld" style="margin-bottom:0;"><label>Link Text</label><input name="collectionLinkText<%= index + 1 %>" value="<%= card.linkText || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Link URL</label><input name="collectionLinkUrl<%= index + 1 %>" value="<%= card.linkUrl || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Current Image Path</label><input name="collectionImageSrc<%= index + 1 %>" value="<%= card.imageSrc || '' %>" placeholder="/images/social/s-1.jpeg"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Upload New Image</label><input type="file" name="collectionImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif"></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;"><input type="checkbox" name="collectionDarkCard<%= index + 1 %>" style="width:auto;min-height:0;" <%= card.darkCard ? "checked" : "" %>> Dark Card Style</label>
       </div>
-    </div>
-  </section>
+    <% }) %>
+  </div>
+  <div class="sec-body" style="padding-top:0;"><button class="btn btn-red" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Collections Section</button></div>
+</form>
 
-  <section class="admin-panel admin-homepage-form">
-    <div class="admin-panel__head">
-      <h2>Hero Banner</h2>
-      <span>Products And Background Photos</span>
-    </div>
-
-    <p>The homepage hero slideshow is now managed on its own page — choose which products appear and upload a background photo for each slide.</p>
-
-    <a class="admin-primary" href="/admin/homepage/hero">
-      <i class="fa-solid fa-images"></i>
-      Manage Hero Banner
-    </a>
-  </section>
-
-  <form class="admin-panel admin-homepage-form" action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>SVG Distro Section</h2>
-      <span>Text, Badges And Main Image</span>
-    </div>
-
-    <div class="admin-homepage-grid">
-      <label>
-        Kicker
-        <input name="distroKicker" value="<%= distro.kicker || 'Distribution Hub' %>">
-      </label>
-
-      <label>
-        Title
-        <input name="distroTitle" value="<%= distro.title || 'SVG Distro' %>">
-      </label>
-
-      <label>
-        Address
-        <input name="distroAddress" value="<%= distro.address || 'Snus Village Charles House, Southall' %>">
-      </label>
-
-      <label>
-        Button Text
-        <input name="distroButtonText" value="<%= distro.buttonText || 'Contact For Details' %>">
-      </label>
-
-      <label>
-        Button Link
-        <input name="distroButtonLink" value="<%= distro.buttonLink || '/contact' %>">
-      </label>
-
-      <label>
-        Badges
-        <input name="distroBadges" value="<%= (distro.badges || ['Stock Support', 'Trade Enquiries', 'Southall', '18+ Only']).join(', ') %>">
-      </label>
-
-      <label class="is-wide">
-        Description
-        <textarea name="distroDescription"><%= distro.description || 'Our Southall Location Supports Stock Availability, Trade Enquiries, Local Distribution, And Product Support For Adult Customers And Approved Traders.' %></textarea>
-      </label>
-    </div>
-
-    <div class="admin-homepage-slides">
-      <div class="admin-homepage-slide-card">
-        <div class="admin-homepage-slide-head">
-          <strong>Distro Image</strong>
-          <span>Main Image</span>
-        </div>
-
-        <label>
-          Current Image Path
-          <input name="distroImageSrc1" value="<%= distroImage.imageSrc || '' %>" placeholder="/images/header/h-1.jpeg">
-        </label>
-
-        <label>
-          Upload New Distro Image
-          <input type="file" name="distroImage1" accept="image/jpeg,image/png,image/webp,image/avif">
-        </label>
-
-        <label>
-          Alt Text
-          <input name="distroImageAlt1" value="<%= distroImage.alt || '' %>">
-        </label>
+<form action="/admin/homepage/locations" method="POST" class="sec">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="sec-head"><h2>Locations Section</h2><span style="font-size:11px;color:var(--mu);">Homepage branch cards</span></div>
+  <div class="sec-body fgrid">
+    <div class="fld"><label>Eyebrow</label><input name="locationsEyebrow" value="<%= locations.eyebrow || 'Location' %>"></div>
+    <div class="fld"><label>Heading</label><input name="locationsHeading" value="<%= locations.heading || 'Find Snus Village In London' %>"></div>
+    <div class="fld"><label>Button Text</label><input name="locationsButtonText" value="<%= locations.buttonText || 'Contact Us' %>"></div>
+    <div class="fld"><label>Button Link</label><input name="locationsButtonLink" value="<%= locations.buttonLink || '/contact' %>"></div>
+    <div class="fld fspan"><label>Description</label><textarea name="locationsDescription" rows="2"><%= locations.description || 'Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions.' %></textarea></div>
+  </div>
+  <div class="sec-body" style="padding-top:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <% [0, 1, 2].forEach((index) => { const location = locationCards[index] || {}; %>
+      <div style="border:1px solid var(--bdr);border-radius:8px;padding:14px;display:grid;gap:10px;">
+        <strong style="font-size:12px;">Location Card <%= index + 1 %></strong>
+        <div class="fld" style="margin-bottom:0;"><label>Label</label><input name="locationLabel<%= index + 1 %>" value="<%= location.label || 'London Branch' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Title</label><input name="locationTitle<%= index + 1 %>" value="<%= location.title || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Description</label><textarea name="locationDescription<%= index + 1 %>" rows="2"><%= location.description || '' %></textarea></div>
+        <div class="fld" style="margin-bottom:0;"><label>Google Map Embed URL</label><input name="locationMapUrl<%= index + 1 %>" value="<%= location.mapUrl || '' %>" placeholder="https://www.google.com/maps?q=Camden+Town+London&output=embed"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Map Title</label><input name="locationMapTitle<%= index + 1 %>" value="<%= location.mapTitle || location.title || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Button Text</label><input name="locationButtonText<%= index + 1 %>" value="<%= location.buttonText || 'Ask About Stock' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Button Link</label><input name="locationButtonLink<%= index + 1 %>" value="<%= location.buttonLink || '/contact' %>"></div>
       </div>
-    </div>
+    <% }) %>
+  </div>
+  <div class="sec-body" style="padding-top:0;">
+    <p style="font-size:11px;color:var(--mu);margin-bottom:12px;"><strong>Map URL Example:</strong> https://www.google.com/maps?q=Camden+Town+London&output=embed</p>
+    <button class="btn btn-red" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Locations Section</button>
+  </div>
+</form>
 
-    <button class="admin-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Hero And Distro
-    </button>
-  </form>
-
-
-  <form class="admin-panel admin-homepage-form" action="/admin/homepage/collections" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>Collections Section</h2>
-      <span>Homepage Collection Cards</span>
-    </div>
-
-    <div class="admin-homepage-grid">
-      <label>
-        Eyebrow
-        <input name="collectionsEyebrow" value="<%= collections.eyebrow || 'Collections' %>">
-      </label>
-
-      <label>
-        Heading
-        <input name="collectionsHeading" value="<%= collections.heading || 'Shop By Strength, Flavour, And Brand' %>">
-      </label>
-
-      <label>
-        Button Text
-        <input name="collectionsButtonText" value="<%= collections.buttonText || 'Open Shop' %>">
-      </label>
-
-      <label>
-        Button Link
-        <input name="collectionsButtonLink" value="<%= collections.buttonLink || '/shop' %>">
-      </label>
-
-      <label class="is-wide">
-        Description
-        <textarea name="collectionsDescription"><%= collections.description || 'Move Quickly From Your Preferred Flavour To The Strength, Brand, And Product Type That Fits Your Preference.' %></textarea>
-      </label>
-    </div>
-
-    <div class="admin-homepage-slides">
-      <% [0, 1, 2, 3].forEach((index) => { %>
-        <% const card = collectionCards[index] || {}; %>
-
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Collection Card <%= index + 1 %></strong>
-            <span>Homepage Collection Tile</span>
-          </div>
-
-          <label>
-            Number
-            <input name="collectionNumber<%= index + 1 %>" value="<%= card.number || ('0' + (index + 1)) %>">
-          </label>
-
-          <label>
-            Title
-            <input name="collectionTitle<%= index + 1 %>" value="<%= card.title || '' %>">
-          </label>
-
-          <label class="is-wide">
-            Text
-            <textarea name="collectionText<%= index + 1 %>"><%= card.text || '' %></textarea>
-          </label>
-
-          <label>
-            Link Text
-            <input name="collectionLinkText<%= index + 1 %>" value="<%= card.linkText || '' %>">
-          </label>
-
-          <label>
-            Link URL
-            <input name="collectionLinkUrl<%= index + 1 %>" value="<%= card.linkUrl || '' %>">
-          </label>
-
-          <label>
-            Current Image Path
-            <input name="collectionImageSrc<%= index + 1 %>" value="<%= card.imageSrc || '' %>" placeholder="/images/social/s-1.jpeg">
-          </label>
-
-          <label>
-            Upload New Image
-            <input type="file" name="collectionImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
-          </label>
-
-          <label>
-            Dark Card Style
-            <input type="checkbox" name="collectionDarkCard<%= index + 1 %>" <%= card.darkCard ? "checked" : "" %>>
-          </label>
-        </div>
-      <% }) %>
-    </div>
-
-    <button class="admin-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Collections Section
-    </button>
-  </form>
-
-
-  <form class="admin-panel admin-homepage-form" action="/admin/homepage/locations" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>Locations Section</h2>
-      <span>Homepage Branch Cards</span>
-    </div>
-
-    <div class="admin-homepage-grid">
-      <label>
-        Eyebrow
-        <input name="locationsEyebrow" value="<%= locations.eyebrow || 'Location' %>">
-      </label>
-
-      <label>
-        Heading
-        <input name="locationsHeading" value="<%= locations.heading || 'Find Snus Village In London' %>">
-      </label>
-
-      <label>
-        Button Text
-        <input name="locationsButtonText" value="<%= locations.buttonText || 'Contact Us' %>">
-      </label>
-
-      <label>
-        Button Link
-        <input name="locationsButtonLink" value="<%= locations.buttonLink || '/contact' %>">
-      </label>
-
-      <label class="is-wide">
-        Description
-        <textarea name="locationsDescription"><%= locations.description || 'Visit One Of Our London Locations Or Contact The Team Before You Travel For Stock Questions.' %></textarea>
-      </label>
-    </div>
-
-    <div class="admin-homepage-slides">
-      <% [0, 1, 2].forEach((index) => { %>
-        <% const location = locationCards[index] || {}; %>
-
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Location Card <%= index + 1 %></strong>
-            <span>Homepage Branch Tile</span>
-          </div>
-
-          <label>
-            Label
-            <input name="locationLabel<%= index + 1 %>" value="<%= location.label || 'London Branch' %>">
-          </label>
-
-          <label>
-            Title
-            <input name="locationTitle<%= index + 1 %>" value="<%= location.title || '' %>">
-          </label>
-
-          <label class="is-wide">
-            Description
-            <textarea name="locationDescription<%= index + 1 %>"><%= location.description || '' %></textarea>
-          </label>
-
-          <label class="is-wide">
-            Google Map Embed URL
-            <input name="locationMapUrl<%= index + 1 %>" value="<%= location.mapUrl || '' %>" placeholder="https://www.google.com/maps?q=Camden+Town+London&output=embed">
-          </label>
-
-          <label>
-            Map Title
-            <input name="locationMapTitle<%= index + 1 %>" value="<%= location.mapTitle || location.title || '' %>">
-          </label>
-
-          <label>
-            Button Text
-            <input name="locationButtonText<%= index + 1 %>" value="<%= location.buttonText || 'Ask About Stock' %>">
-          </label>
-
-          <label>
-            Button Link
-            <input name="locationButtonLink<%= index + 1 %>" value="<%= location.buttonLink || '/contact' %>">
-          </label>
-        </div>
-      <% }) %>
-    </div>
-
-    <div class="admin-homepage-help">
-      <strong>Map URL Example:</strong>
-      <span>https://www.google.com/maps?q=Camden+Town+London&output=embed</span>
-    </div>
-
-    <button class="admin-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Locations Section
-    </button>
-  </form>
-
-  <form class="admin-panel admin-homepage-form" action="/admin/homepage/social" method="POST" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>Social Media Section</h2>
-      <span>iPhone Reel Showcase</span>
-    </div>
-
-    <div class="admin-homepage-grid">
-      <label>
-        Eyebrow
-        <input name="eyebrow" value="<%= social.eyebrow || 'Social Media' %>">
-      </label>
-
-      <label>
-        Heading
-        <input name="heading" value="<%= social.heading || 'See Snus Village In Action' %>">
-      </label>
-
-      <label class="is-wide">
-        Description
-        <textarea name="description"><%= social.description || 'Follow Our Latest Product Drops, In-Store Moments, Promotions, And London Updates Through Our Social Content.' %></textarea>
-      </label>
-
-      <label>
-        Instagram URL
-        <input name="instagramUrl" value="<%= social.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">
-      </label>
-
-      <label>
-        Copy Card Title
-        <input name="cardTitle" value="<%= social.cardTitle || 'Follow Our Socials' %>">
-      </label>
-
-      <label class="is-wide">
-        Copy Card Text
-        <textarea name="cardText"><%= social.cardText || 'Discover New Stock, Best Sellers, Promotions, Branch Updates, And Behind-The-Scenes Clips From Snus Village.' %></textarea>
-      </label>
-    </div>
-
-    <div class="admin-homepage-slides">
-      <% [0, 1, 2].forEach((index) => { %>
-        <% const slide = slides[index] || {}; %>
-
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Social Reel <%= index + 1 %></strong>
-            <span>Use paths from public folder</span>
-          </div>
-
-          <label>
-            Current Video Path
-            <input name="videoSrc<%= index + 1 %>" value="<%= slide.videoSrc || '' %>" placeholder="/videos/social/social-1.mp4">
-          </label>
-
-          <label>
-            Upload New Video
-            <input type="file" name="socialVideo<%= index + 1 %>" accept="video/mp4,video/webm,video/quicktime">
-          </label>
-
-          <label>
-            Current Poster Image Path
-            <input name="posterSrc<%= index + 1 %>" value="<%= slide.posterSrc || '' %>" placeholder="/images/header/h-1.jpeg">
-          </label>
-
-          <label>
-            Upload New Poster Image
-            <input type="file" name="posterImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif">
-          </label>
-
-          <label>
-            Title
-            <input name="title<%= index + 1 %>" value="<%= slide.title || '' %>">
-          </label>
-
-          <label>
-            Subtitle
-            <input name="subtitle<%= index + 1 %>" value="<%= slide.subtitle || '' %>">
-          </label>
-        </div>
-      <% }) %>
-    </div>
-
-    <div class="admin-homepage-help">
-      <strong>Image Path Example:</strong>
-      <span>/images/header/h-1.jpeg</span>
-      <strong>Video Path Example:</strong>
-      <span>/videos/social/social-1.mp4</span>
-    </div>
-
-    <button class="admin-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Social Section
-    </button>
-  </form>
-</section>
+<form action="/admin/homepage/social" method="POST" enctype="multipart/form-data" class="sec">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="sec-head"><h2>Social Media Section</h2><span style="font-size:11px;color:var(--mu);">Video reel showcase</span></div>
+  <div class="sec-body fgrid">
+    <div class="fld"><label>Eyebrow</label><input name="eyebrow" value="<%= social.eyebrow || 'Social Media' %>"></div>
+    <div class="fld"><label>Heading</label><input name="heading" value="<%= social.heading || 'See Snus Village In Action' %>"></div>
+    <div class="fld fspan"><label>Description</label><textarea name="description" rows="2"><%= social.description || 'Follow Our Latest Product Drops, In-Store Moments, Promotions, And London Updates Through Our Social Content.' %></textarea></div>
+    <div class="fld"><label>Instagram URL</label><input name="instagramUrl" value="<%= social.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>"></div>
+    <div class="fld"><label>Copy Card Title</label><input name="cardTitle" value="<%= social.cardTitle || 'Follow Our Socials' %>"></div>
+    <div class="fld fspan"><label>Copy Card Text</label><textarea name="cardText" rows="2"><%= social.cardText || 'Discover New Stock, Best Sellers, Promotions, Branch Updates, And Behind-The-Scenes Clips From Snus Village.' %></textarea></div>
+  </div>
+  <div class="sec-body" style="padding-top:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <% [0, 1, 2].forEach((index) => { const slide = slides[index] || {}; %>
+      <div style="border:1px solid var(--bdr);border-radius:8px;padding:14px;display:grid;gap:10px;">
+        <strong style="font-size:12px;">Social Reel <%= index + 1 %></strong>
+        <div class="fld" style="margin-bottom:0;"><label>Current Video Path</label><input name="videoSrc<%= index + 1 %>" value="<%= slide.videoSrc || '' %>" placeholder="/videos/social/social-1.mp4"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Upload New Video</label><input type="file" name="socialVideo<%= index + 1 %>" accept="video/mp4,video/webm,video/quicktime"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Current Poster Image Path</label><input name="posterSrc<%= index + 1 %>" value="<%= slide.posterSrc || '' %>" placeholder="/images/header/h-1.jpeg"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Upload New Poster Image</label><input type="file" name="posterImage<%= index + 1 %>" accept="image/jpeg,image/png,image/webp,image/avif"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Title</label><input name="title<%= index + 1 %>" value="<%= slide.title || '' %>"></div>
+        <div class="fld" style="margin-bottom:0;"><label>Subtitle</label><input name="subtitle<%= index + 1 %>" value="<%= slide.subtitle || '' %>"></div>
+      </div>
+    <% }) %>
+  </div>
+  <div class="sec-body" style="padding-top:0;">
+    <p style="font-size:11px;color:var(--mu);margin-bottom:12px;"><strong>Image path example:</strong> /images/header/h-1.jpeg &nbsp;&nbsp; <strong>Video path example:</strong> /videos/social/social-1.mp4</p>
+    <button class="btn btn-red" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Social Section</button>
+  </div>
+</form>

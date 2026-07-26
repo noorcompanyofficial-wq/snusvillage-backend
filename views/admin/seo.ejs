@@ -1,167 +1,64 @@
-<section class="admin-page admin-seo-page">
-  <div class="admin-page-head">
-    <div>
-      <span>SEO Dashboard</span>
-      <h1>Product SEO Health</h1>
-      <p>Find missing SEO titles, weak descriptions, missing images, inactive products, and products that need optimisation before launch.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <div class="admin-head-actions">
-      <a class="admin-secondary" href="/admin/products">
-        <i class="fa-solid fa-boxes-stacked"></i>
-        Products
-      </a>
-      <a class="admin-secondary" href="/shop" target="_blank" rel="noopener">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        Preview Shop
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Content</div>
+    <h1>Product SEO Health</h1>
+    <p>Find missing SEO titles, weak descriptions, missing images, inactive products, and products that need optimisation before launch.</p>
   </div>
-
-  <div class="admin-analytics-grid">
-    <a class="admin-analytics-card admin-analytics-card--dark" href="/admin/seo">
-      <i class="fa-solid fa-magnifying-glass-chart"></i>
-      <span>Total Products</span>
-      <strong><%= stats.totalProducts %></strong>
-      <small>Products scanned</small>
-    </a>
-
-    <a class="admin-analytics-card admin-analytics-card--warning" href="/admin/seo?issue=missingTitle">
-      <i class="fa-solid fa-heading"></i>
-      <span>Missing SEO Title</span>
-      <strong><%= stats.missingSeoTitle %></strong>
-      <small>Needs meta title</small>
-    </a>
-
-    <a class="admin-analytics-card admin-analytics-card--warning" href="/admin/seo?issue=missingDescription">
-      <i class="fa-solid fa-align-left"></i>
-      <span>Missing SEO Description</span>
-      <strong><%= stats.missingSeoDescription %></strong>
-      <small>Needs meta description</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/seo?issue=shortDescription">
-      <i class="fa-solid fa-file-lines"></i>
-      <span>Short Description</span>
-      <strong><%= stats.shortDescription %></strong>
-      <small>Less than 80 characters</small>
-    </a>
-
-    <a class="admin-analytics-card admin-analytics-card--warning" href="/admin/seo?issue=noImage">
-      <i class="fa-solid fa-image"></i>
-      <span>No Image</span>
-      <strong><%= stats.noImage %></strong>
-      <small>Product image missing</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/seo?issue=hidden">
-      <i class="fa-solid fa-eye-slash"></i>
-      <span>Hidden Products</span>
-      <strong><%= stats.hiddenProducts %></strong>
-      <small>Not active</small>
-    </a>
+  <div class="ph-right">
+    <a class="btn btn-ghost" href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i> Products</a>
+    <a class="btn btn-red" href="/shop" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Shop</a>
   </div>
+</div>
 
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <div>
-        <h2>SEO Filters</h2>
-        <p>Filter products by SEO issue and fix them quickly.</p>
-      </div>
-      <a href="/admin/seo">Reset</a>
+<div class="stats">
+  <a class="stat stat-blue" href="/admin/seo"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-magnifying-glass-chart"></i></div></div><div class="stat-lbl">Total Products</div><div class="stat-val"><%= stats.totalProducts %></div></a>
+  <a class="stat stat-amb" href="/admin/seo?issue=missingTitle"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-heading"></i></div></div><div class="stat-lbl">Missing SEO Title</div><div class="stat-val"><%= stats.missingSeoTitle %></div></a>
+  <a class="stat stat-amb" href="/admin/seo?issue=missingDescription"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-align-left"></i></div></div><div class="stat-lbl">Missing SEO Description</div><div class="stat-val"><%= stats.missingSeoDescription %></div></a>
+  <a class="stat stat-blue" href="/admin/seo?issue=shortDescription"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-file-lines"></i></div></div><div class="stat-lbl">Short Description</div><div class="stat-val"><%= stats.shortDescription %></div></a>
+  <a class="stat stat-red" href="/admin/seo?issue=noImage"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-image"></i></div></div><div class="stat-lbl">No Image</div><div class="stat-val"><%= stats.noImage %></div></a>
+  <a class="stat stat-blue" href="/admin/seo?issue=hidden"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-eye-slash"></i></div></div><div class="stat-lbl">Hidden Products</div><div class="stat-val"><%= stats.hiddenProducts %></div></a>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><h2>SEO Filters</h2><a href="/admin/seo" class="btn btn-sm btn-ghost">Reset</a></div>
+  <form class="sec-body" style="display:flex;gap:12px;align-items:end;flex-wrap:wrap;" method="GET" action="/admin/seo">
+    <div class="fld" style="margin-bottom:0;min-width:220px;"><label>SEO Issue</label>
+      <select name="issue">
+        <option value="">All Products</option>
+        <option value="missingTitle" <%= query.issue === "missingTitle" ? "selected" : "" %>>Missing SEO Title</option>
+        <option value="missingDescription" <%= query.issue === "missingDescription" ? "selected" : "" %>>Missing SEO Description</option>
+        <option value="shortDescription" <%= query.issue === "shortDescription" ? "selected" : "" %>>Short Product Description</option>
+        <option value="noImage" <%= query.issue === "noImage" ? "selected" : "" %>>No Product Image</option>
+        <option value="hidden" <%= query.issue === "hidden" ? "selected" : "" %>>Hidden Products</option>
+      </select>
     </div>
+    <div class="fld" style="margin-bottom:0;flex:1;min-width:220px;"><label>Search</label><input name="search" value="<%= query.search || '' %>" placeholder="Product name, brand, SKU, slug"></div>
+    <button type="submit" class="btn btn-red">Apply</button>
+  </form>
+</div>
 
-    <form class="admin-seo-filter-form" method="GET" action="/admin/seo">
-      <label>
-        SEO Issue
-        <select name="issue">
-          <option value="">All Products</option>
-          <option value="missingTitle" <%= query.issue === "missingTitle" ? "selected" : "" %>>Missing SEO Title</option>
-          <option value="missingDescription" <%= query.issue === "missingDescription" ? "selected" : "" %>>Missing SEO Description</option>
-          <option value="shortDescription" <%= query.issue === "shortDescription" ? "selected" : "" %>>Short Product Description</option>
-          <option value="noImage" <%= query.issue === "noImage" ? "selected" : "" %>>No Product Image</option>
-          <option value="hidden" <%= query.issue === "hidden" ? "selected" : "" %>>Hidden Products</option>
-        </select>
-      </label>
-
-      <label>
-        Search
-        <input name="search" value="<%= query.search || '' %>" placeholder="Product name, brand, SKU, slug">
-      </label>
-
-      <button type="submit">Apply</button>
-    </form>
-  </section>
-
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>Product SEO Checklist</h2>
-      <span><%= products.length %> Product<%= products.length === 1 ? "" : "s" %></span>
-    </div>
-
-    <% if (!products.length) { %>
-      <div class="admin-empty-state">
-        <h2>No Products Found</h2>
-        <p>No products match this SEO filter.</p>
-      </div>
-    <% } else { %>
-      <div class="admin-table-wrap">
-        <table class="admin-table admin-seo-table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>SEO Score</th>
-              <th>SEO Title</th>
-              <th>SEO Description</th>
-              <th>Issues</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% products.forEach((product) => { %>
-              <tr>
-                <td>
-                  <strong><%= product.name %></strong>
-                  <span><%= product.brand || "No Brand" %> · <%= product.sku || "No SKU" %></span>
-                  <span>Slug: <%= product.slug || "Missing slug" %></span>
-                </td>
-
-                <td>
-                  <strong><%= product.seoScore %>%</strong>
-                  <span class="status-pill <%= product.seoScore >= 80 ? 'order-completed' : product.seoScore >= 50 ? 'payment-pending' : 'payment-failed' %>">
-                    <%= product.seoScore >= 80 ? "Good" : product.seoScore >= 50 ? "Needs Work" : "Poor" %>
-                  </span>
-                </td>
-
-                <td>
-                  <strong><%= product.seoTitle || "Missing" %></strong>
-                  <span><%= product.seoTitleLength %> characters</span>
-                </td>
-
-                <td>
-                  <strong><%= product.seoDescription || "Missing" %></strong>
-                  <span><%= product.seoDescriptionLength %> characters</span>
-                </td>
-
-                <td>
-                  <% if (product.issues.length) { %>
-                    <% product.issues.forEach((issue) => { %>
-                      <span class="status-pill payment-pending" style="margin: 3px;"><%= issue %></span>
-                    <% }) %>
-                  <% } else { %>
-                    <span class="status-pill order-completed">No Major Issues</span>
-                  <% } %>
-                </td>
-
-                <td>
-                  <a class="admin-table-action" href="/admin/products/edit/<%= product._id %>">Edit SEO</a>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    <% } %>
-  </section>
-</section>
+<div class="sec">
+  <div class="sec-head"><h2>Product SEO Checklist</h2><span style="font-size:11px;color:var(--mu);"><%= products.length %> product<%= products.length === 1 ? "" : "s" %></span></div>
+  <% if (!products.length) { %>
+    <div class="admin-empty-state"><h2>No Products Found</h2><p>No products match this SEO filter.</p></div>
+  <% } else { %>
+    <div class="tbl-wrap"><table><thead><tr><th>Product</th><th>SEO Score</th><th>SEO Title</th><th>SEO Description</th><th>Issues</th><th>Action</th></tr></thead><tbody>
+      <% products.forEach((product) => { %>
+        <tr>
+          <td><span class="t-name"><%= product.name %></span><span class="t-sub"><%= product.brand || "No Brand" %> &middot; <%= product.sku || "No SKU" %></span></td>
+          <td><strong><%= product.seoScore %>%</strong><br><span class="pill <%= product.seoScore >= 80 ? 'p-completed' : product.seoScore >= 50 ? 'p-pending' : 'p-failed' %>"><%= product.seoScore >= 80 ? "Good" : product.seoScore >= 50 ? "Needs Work" : "Poor" %></span></td>
+          <td><span class="t-sub"><%= product.seoTitle || "Missing" %></span><br><span class="t-sub"><%= product.seoTitleLength %> chars</span></td>
+          <td><span class="t-sub"><%= product.seoDescription || "Missing" %></span><br><span class="t-sub"><%= product.seoDescriptionLength %> chars</span></td>
+          <td>
+            <% if (product.issues.length) { %>
+              <% product.issues.forEach((issue) => { %><span class="pill p-pending" style="margin:2px;"><%= issue %></span><% }) %>
+            <% } else { %><span class="pill p-completed">No Major Issues</span><% } %>
+          </td>
+          <td><a class="btn btn-sm btn-ghost" href="/admin/products/edit/<%= product._id %>">Edit SEO</a></td>
+        </tr>
+      <% }) %>
+    </tbody></table></div>
+  <% } %>
+</div>

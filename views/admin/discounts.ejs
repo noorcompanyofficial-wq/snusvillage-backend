@@ -1,182 +1,63 @@
-<section class="admin-page admin-discounts-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Marketing</span>
-      <h1>Discount Codes</h1>
-      <p>Create and manage promo codes for checkout, campaigns, branches, brands, and customer offers.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/admin/orders">
-        <i class="fa-solid fa-receipt"></i>
-        View Orders
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Content</div>
+    <h1>Discount Codes</h1>
+    <p>Create and manage promo codes for checkout, campaigns, branches, brands, and customer offers.</p>
   </div>
+  <div class="ph-right"><a class="btn btn-red" href="/admin/orders"><i class="fa-solid fa-receipt"></i> View Orders</a></div>
+</div>
 
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>Create Discount Code</h2>
-      <span>Checkout Connection Comes Next</span>
+<div class="sec">
+  <div class="sec-head"><h2>Create Discount Code</h2></div>
+  <form class="sec-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" action="/admin/discounts" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="fld" style="margin-bottom:0;"><label>Code</label><input name="code" placeholder="WELCOME10" style="text-transform:uppercase;" required></div>
+    <div class="fld" style="margin-bottom:0;"><label>Description</label><input name="description" placeholder="10% off first order"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Discount Type</label>
+      <select name="type" required><option value="percentage">Percentage</option><option value="fixed">Fixed Amount</option></select>
     </div>
-
-    <form class="admin-discount-form" action="/admin/discounts" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <label>
-        Code
-        <input name="code" placeholder="WELCOME10" required>
-      </label>
-
-      <label>
-        Description
-        <input name="description" placeholder="10% off first order">
-      </label>
-
-      <label>
-        Discount Type
-        <select name="type" required>
-          <option value="percentage">Percentage</option>
-          <option value="fixed">Fixed Amount</option>
-        </select>
-      </label>
-
-      <label>
-        Value
-        <input type="number" name="value" min="0" step="0.01" placeholder="10" required>
-      </label>
-
-      <label>
-        Minimum Spend
-        <input type="number" name="minimumSpend" min="0" step="0.01" placeholder="0">
-      </label>
-
-      <label>
-        Usage Limit
-        <input type="number" name="usageLimit" min="0" step="1" placeholder="0 = unlimited">
-      </label>
-
-      <label>
-        Applies To Brand
-        <input name="appliesToBrand" placeholder="White Fox">
-      </label>
-
-      <label>
-        Applies To Category
-        <input name="appliesToCategory" placeholder="Nicotine Pouches">
-      </label>
-
-      <label>
-        Expiry Date
-        <input type="date" name="expiresAt">
-      </label>
-
-      <label class="admin-checkbox-label">
-        <input type="checkbox" name="isActive" checked>
-        Active Code
-      </label>
-
-      <button class="admin-primary" type="submit">
-        <i class="fa-solid fa-plus"></i>
-        Create Discount
-      </button>
-    </form>
-  </section>
-
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>All Discount Codes</h2>
-      <span><%= discounts.length %> Code<%= discounts.length === 1 ? "" : "s" %></span>
+    <div class="fld" style="margin-bottom:0;"><label>Value</label><input type="number" name="value" min="0" step="0.01" placeholder="10" required></div>
+    <div class="fld" style="margin-bottom:0;"><label>Minimum Spend (&pound;)</label><input type="number" name="minimumSpend" min="0" step="0.01" placeholder="0"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Usage Limit</label><input type="number" name="usageLimit" min="0" step="1" placeholder="0 = unlimited"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Applies To Brand</label><input name="appliesToBrand" placeholder="White Fox"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Applies To Category</label><input name="appliesToCategory" placeholder="Nicotine Pouches"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Expiry Date</label><input type="date" name="expiresAt"></div>
+    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx);"><input type="checkbox" name="isActive" checked style="width:auto;min-height:0;"> Active Code</label>
+      <button class="btn btn-red" type="submit"><i class="fa-solid fa-plus"></i> Create Discount</button>
     </div>
+  </form>
+</div>
 
-    <% if (!discounts || discounts.length === 0) { %>
-      <div class="admin-empty-state">
-        <h2>No Discount Codes Yet</h2>
-        <p>Create your first code above, for example WELCOME10 or CAMDEN20.</p>
-      </div>
-    <% } else { %>
-      <div class="admin-discount-grid">
-        <% discounts.forEach((discount) => { %>
-          <% const isExpired = discount.expiresAt && new Date(discount.expiresAt) < new Date(); %>
-          <% const usageFinished = discount.usageLimit > 0 && discount.usedCount >= discount.usageLimit; %>
-
-          <article class="admin-discount-card">
-            <div class="admin-discount-card__top">
-              <div>
-                <span class="status-pill <%= discount.isActive && !isExpired && !usageFinished ? 'order-completed' : 'payment-failed' %>">
-                  <%= discount.isActive && !isExpired && !usageFinished ? "Active" : "Inactive" %>
-                </span>
-
-                <h3><%= discount.code %></h3>
-                <p><%= discount.description || "No description added." %></p>
-              </div>
-
-              <strong>
-                <% if (discount.type === "percentage") { %>
-                  <%= Number(discount.value || 0).toFixed(0) %>%
-                <% } else { %>
-                  £<%= Number(discount.value || 0).toFixed(2) %>
-                <% } %>
-              </strong>
-            </div>
-
-            <div class="admin-discount-meta">
-              <div>
-                <span>Type</span>
-                <strong><%= discount.type === "percentage" ? "Percentage" : "Fixed" %></strong>
-              </div>
-
-              <div>
-                <span>Minimum Spend</span>
-                <strong>£<%= Number(discount.minimumSpend || 0).toFixed(2) %></strong>
-              </div>
-
-              <div>
-                <span>Usage</span>
-                <strong>
-                  <%= discount.usedCount || 0 %>
-                  /
-                  <%= discount.usageLimit > 0 ? discount.usageLimit : "∞" %>
-                </strong>
-              </div>
-
-              <div>
-                <span>Expires</span>
-                <strong><%= discount.expiresAt ? new Date(discount.expiresAt).toLocaleDateString("en-GB") : "Never" %></strong>
-              </div>
-
-              <div>
-                <span>Brand</span>
-                <strong><%= discount.appliesToBrand || "Any" %></strong>
-              </div>
-
-              <div>
-                <span>Category</span>
-                <strong><%= discount.appliesToCategory || "Any" %></strong>
-              </div>
-            </div>
-
-            <% if (isExpired) { %>
-              <div class="admin-discount-warning">Expired Code</div>
-            <% } else if (usageFinished) { %>
-              <div class="admin-discount-warning">Usage Limit Reached</div>
-            <% } %>
-
-            <div class="admin-discount-actions">
-              <form action="/admin/discounts/<%= discount._id %>/toggle" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit">
-                  <%= discount.isActive ? "Disable" : "Enable" %>
-                </button>
-              </form>
-
-              <form action="/admin/discounts/<%= discount._id %>/delete" method="POST" onsubmit="return confirm('Delete this discount code?');">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit" class="is-danger">Delete</button>
-              </form>
-            </div>
-          </article>
-        <% }) %>
-      </div>
-    <% } %>
-  </section>
-</section>
+<div class="sec">
+  <div class="sec-head"><h2>All Discount Codes</h2><span style="font-size:11px;color:var(--mu);"><%= discounts.length %> code<%= discounts.length === 1 ? "" : "s" %></span></div>
+  <% if (!discounts || discounts.length === 0) { %>
+    <div class="admin-empty-state"><h2>No Discount Codes Yet</h2><p>Create your first code above, for example WELCOME10 or CAMDEN20.</p></div>
+  <% } else { %>
+    <div class="sec-body" style="display:grid;gap:8px;">
+      <% discounts.forEach((discount) => {
+        const isExpired = discount.expiresAt && new Date(discount.expiresAt) < new Date();
+        const usageFinished = discount.usageLimit > 0 && discount.usedCount >= discount.usageLimit;
+        const isLive = discount.isActive && !isExpired && !usageFinished;
+        const usagePct = discount.usageLimit > 0 ? Math.min(100, Math.round(((discount.usedCount || 0) / discount.usageLimit) * 100)) : 0;
+      %>
+        <div class="disc-card">
+          <span class="disc-code"><%= discount.code %></span>
+          <div style="flex:1;min-width:180px;">
+            <div class="disc-type"><%= discount.type === "percentage" ? Number(discount.value || 0).toFixed(0) + "% off" : "£" + Number(discount.value || 0).toFixed(2) + " off" %> &middot; Min &pound;<%= Number(discount.minimumSpend || 0).toFixed(2) %><% if (discount.appliesToBrand) { %> &middot; <%= discount.appliesToBrand %><% } %><% if (isExpired) { %> &middot; Expired<% } else if (usageFinished) { %> &middot; Usage limit reached<% } %></div>
+            <% if (discount.usageLimit > 0) { %><div class="disc-bw" style="margin-top:8px;"><div class="disc-bf" style="width:<%= usagePct %>%;"></div></div><% } %>
+          </div>
+          <div class="disc-usage" style="text-align:center;"><strong><%= discount.usedCount || 0 %></strong><span>/ <%= discount.usageLimit > 0 ? discount.usageLimit : "&infin;" %> uses</span></div>
+          <span class="disc-exp"><%= discount.expiresAt ? "Expires " + new Date(discount.expiresAt).toLocaleDateString("en-GB") : "Never expires" %></span>
+          <span class="pill <%= isLive ? 'p-active' : 'p-inactive' %>"><%= isLive ? "Active" : "Inactive" %></span>
+          <div class="t-actions">
+            <form action="/admin/discounts/<%= discount._id %>/toggle" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost"><%= discount.isActive ? "Disable" : "Enable" %></button></form>
+            <form action="/admin/discounts/<%= discount._id %>/delete" method="POST" onsubmit="return confirm('Delete this discount code?');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-danger">Delete</button></form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

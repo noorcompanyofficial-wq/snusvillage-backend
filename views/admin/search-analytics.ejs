@@ -1,154 +1,62 @@
-<section class="admin-page admin-search-analytics-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Search Analytics</span>
-      <h1>Product Interest</h1>
-      <p>Track what customers search for, which terms return products, and which searches show missing stock opportunities.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/shop" target="_blank" rel="noopener">
-        <i class="fa-solid fa-store"></i>
-        Test Shop Search
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Overview</div>
+    <h1>Search Analytics</h1>
+    <p>Track what customers search for, which terms return products, and which searches show missing stock opportunities.</p>
+  </div>
+  <div class="ph-right"><a class="btn btn-red" href="/shop" target="_blank"><i class="fa-solid fa-store"></i> Test Shop Search</a></div>
+</div>
+
+<div class="stats">
+  <div class="stat stat-blue"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-magnifying-glass"></i></div></div><div class="stat-lbl">Total Searches</div><div class="stat-val"><%= stats.totalSearches || 0 %></div></div>
+  <div class="stat stat-grn"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-calendar-day"></i></div></div><div class="stat-lbl">Today</div><div class="stat-val"><%= stats.todaySearches || 0 %></div></div>
+  <div class="stat stat-blue"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-tags"></i></div></div><div class="stat-lbl">Unique Terms</div><div class="stat-val"><%= stats.uniqueTerms || 0 %></div></div>
+  <div class="stat stat-amb"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-circle-exclamation"></i></div></div><div class="stat-lbl">No Results</div><div class="stat-val"><%= stats.noResultSearches || 0 %></div></div>
+</div>
+
+<div class="an-grid">
+  <div class="chart-card">
+    <div class="ch-head"><h3>Most Searched Terms</h3><span style="font-size:10px;color:var(--mu);">Customer demand</span></div>
+    <% if (topTerms && topTerms.length) { %>
+      <div class="top-list">
+        <% const maxCount = Math.max(...topTerms.map(t => Number(t.count || 0)), 1); %>
+        <% topTerms.forEach((term, index) => { %>
+          <div class="top-item"><span class="top-rank"><%= index + 1 %></span><span class="top-name"><%= term.originalTerm || term._id %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(term.count || 0) / maxCount) * 100)) %>%;"></div></div><span class="top-val"><%= term.count %> searches</span></div>
+        <% }) %>
+      </div>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No search data yet. Try searching on the shop page.</p><% } %>
   </div>
 
-  <div class="admin-analytics-grid">
-    <div class="admin-analytics-card admin-analytics-card--dark">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <span>Total Searches</span>
-      <strong><%= stats.totalSearches || 0 %></strong>
-      <small>All Tracked Shop Searches</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-calendar-day"></i>
-      <span>Today</span>
-      <strong><%= stats.todaySearches || 0 %></strong>
-      <small>Searches Today</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-tags"></i>
-      <span>Unique Terms</span>
-      <strong><%= stats.uniqueTerms || 0 %></strong>
-      <small>Different Search Terms</small>
-    </div>
-
-    <div class="admin-analytics-card admin-analytics-card--warning">
-      <i class="fa-solid fa-circle-exclamation"></i>
-      <span>No Results</span>
-      <strong><%= stats.noResultSearches || 0 %></strong>
-      <small>Possible Missing Products</small>
-    </div>
+  <div class="chart-card">
+    <div class="ch-head"><h3>No-Result Searches</h3><span style="font-size:10px;color:var(--mu);">Stock opportunities</span></div>
+    <% if (noResultTerms && noResultTerms.length) { %>
+      <div class="top-list">
+        <% const maxNoResult = Math.max(...noResultTerms.map(t => Number(t.count || 0)), 1); %>
+        <% noResultTerms.forEach((term, index) => { %>
+          <div class="top-item"><span class="top-rank"><%= index + 1 %></span><span class="top-name"><%= term.originalTerm || term._id %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(term.count || 0) / maxNoResult) * 100)) %>%;background:linear-gradient(90deg,var(--amb),var(--red));"></div></div><span class="top-val"><%= term.count %></span></div>
+        <% }) %>
+      </div>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No failed searches yet.</p><% } %>
   </div>
+</div>
 
-  <div class="admin-sales-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Most Searched Terms</h2>
-        <span>Customer Demand</span>
-      </div>
-
-      <% if (topTerms && topTerms.length) { %>
-        <div class="admin-rank-list">
-          <% topTerms.forEach((term, index) => { %>
-            <div class="admin-rank-item admin-search-rank-item">
-              <span><%= index + 1 %></span>
-              <div>
-                <strong><%= term.originalTerm || term._id %></strong>
-                <small>Average Results: <%= Number(term.averageResults || 0).toFixed(1) %></small>
-              </div>
-              <div>
-                <strong><%= term.count %></strong>
-                <small>Searches</small>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No search data yet. Try searching on the shop page.</p>
-        </div>
-      <% } %>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>No-Result Searches</h2>
-        <span>Stock Opportunities</span>
-      </div>
-
-      <% if (noResultTerms && noResultTerms.length) { %>
-        <div class="admin-rank-list">
-          <% noResultTerms.forEach((term, index) => { %>
-            <div class="admin-rank-item admin-search-rank-item admin-search-rank-item--warning">
-              <span><%= index + 1 %></span>
-              <div>
-                <strong><%= term.originalTerm || term._id %></strong>
-                <small>Last Searched: <%= new Date(term.lastSearchedAt).toLocaleString("en-GB") %></small>
-              </div>
-              <div>
-                <strong><%= term.count %></strong>
-                <small>No Results</small>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No failed searches yet.</p>
-        </div>
-      <% } %>
-    </section>
-  </div>
-
-  <section class="admin-panel">
-    <div class="admin-panel__head">
-      <h2>Recent Searches</h2>
-      <span>Latest 50</span>
-    </div>
-
-    <% if (recentSearches && recentSearches.length) { %>
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Term</th>
-              <th>Results</th>
-              <th>Status</th>
-              <th>Filters</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% recentSearches.forEach((search) => { %>
-              <tr>
-                <td><strong><%= search.originalTerm || search.term %></strong></td>
-                <td><%= search.resultCount || 0 %></td>
-                <td>
-                  <span class="status-pill <%= search.hadResults ? 'order-completed' : 'payment-failed' %>">
-                    <%= search.hadResults ? "Results" : "No Results" %>
-                  </span>
-                </td>
-                <td>
-                  Brand: <%= search.filters?.brand || "Any" %><br>
-                  Strength: <%= search.filters?.strength || "Any" %><br>
-                  Flavour: <%= search.filters?.flavour || "Any" %>
-                </td>
-                <td><%= new Date(search.createdAt).toLocaleString("en-GB") %></td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    <% } else { %>
-      <div class="admin-empty-state">
-        <h2>No Search Data Yet</h2>
-        <p>Search terms will appear here once customers use the shop search bar.</p>
-      </div>
-    <% } %>
-  </section>
-</section>
+<div class="sec">
+  <div class="sec-head"><h2>Recent Searches</h2><span style="font-size:10px;color:var(--mu);">Latest 50</span></div>
+  <% if (recentSearches && recentSearches.length) { %>
+    <div class="tbl-wrap"><table><thead><tr><th>Term</th><th>Results</th><th>Status</th><th>Filters</th><th>Date</th></tr></thead><tbody>
+      <% recentSearches.forEach((search) => { %>
+        <tr>
+          <td><span class="t-name"><%= search.originalTerm || search.term %></span></td>
+          <td><%= search.resultCount || 0 %></td>
+          <td><span class="pill <%= search.hadResults ? 'p-completed' : 'p-failed' %>"><%= search.hadResults ? "Results" : "No Results" %></span></td>
+          <td class="t-sub">Brand: <%= search.filters?.brand || "Any" %> &middot; Strength: <%= search.filters?.strength || "Any" %> &middot; Flavour: <%= search.filters?.flavour || "Any" %></td>
+          <td class="t-sub"><%= new Date(search.createdAt).toLocaleString("en-GB") %></td>
+        </tr>
+      <% }) %>
+    </tbody></table></div>
+  <% } else { %>
+    <div class="admin-empty-state"><h2>No Search Data Yet</h2><p>Search terms will appear here once customers use the shop search bar.</p></div>
+  <% } %>
+</div>

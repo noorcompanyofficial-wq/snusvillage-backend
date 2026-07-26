@@ -1,124 +1,63 @@
-<section class="admin-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Users & Traders</span>
-      <h1>Access Management</h1>
-      <p>Review customer accounts, age verification status, trader access, and approved trader login records.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
+
+<div class="ph">
+  <div>
+    <div class="ph-eye">Customers</div>
+    <h1>Access Management</h1>
+    <p>Review customer accounts, age verification status, trader access, and approved trader login records.</p>
   </div>
+</div>
 
-  <div class="admin-dashboard-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Customers</h2>
-        <span><%= users.length %> Account<%= users.length === 1 ? "" : "s" %></span>
-      </div>
-
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
+<div class="sec">
+  <div class="sec-head"><h2>Customers</h2><span style="font-size:11px;color:var(--mu);"><%= users.length %> account<%= users.length === 1 ? "" : "s" %></span></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Verified</th><th>Age</th><th>Trader</th><th>Orders</th><th>Total Spend</th><th>Last Order</th><th>Action</th></tr></thead>
+      <tbody>
+        <% if (users.length) { %>
+          <% users.forEach((account) => {
+            const accountStats = userOrderStats[String(account.email || "").trim().toLowerCase()] || {};
+          %>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Verified</th>
-              <th>Age</th>
-              <th>Trader</th>
-              <th>Orders</th>
-              <th>Total Spend</th>
-              <th>Last Order</th>
-              <th>Action</th>
+              <td><span class="t-name"><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User" %></span></td>
+              <td class="t-sub"><%= account.email %></td>
+              <td class="t-sub"><%= account.role || "user" %></td>
+              <td><span class="pill <%= account.isVerified ? 'p-completed' : 'p-pending' %>"><%= account.isVerified ? "Yes" : "No" %></span></td>
+              <td><span class="pill <%= account.isAgeVerified ? 'p-completed' : 'p-failed' %>"><%= account.isAgeVerified ? "Verified" : "Not Verified" %></span></td>
+              <td class="t-sub"><%= account.traderStatus || "none" %></td>
+              <td><strong><%= accountStats.totalOrders || 0 %></strong><span class="t-sub" style="display:block;"><%= accountStats.paidOrders || 0 %> paid</span></td>
+              <td><span class="t-amt">&pound;<%= Number(accountStats.totalSpend || 0).toFixed(2) %></span></td>
+              <td class="t-sub"><%= accountStats.lastOrderAt ? new Date(accountStats.lastOrderAt).toLocaleDateString("en-GB") : "None" %></td>
+              <td><a class="btn btn-sm btn-ghost" href="/admin/users/<%= account._id %>">View</a></td>
             </tr>
-          </thead>
-
-          <tbody>
-            <% if (users.length) { %>
-              <% users.forEach((account) => { %>
-                <tr>
-                  <td>
-                    <strong><%= [account.firstName, account.lastName].filter(Boolean).join(" ") || "User" %></strong>
-                  </td>
-                  <td><%= account.email %></td>
-                  <td><%= account.role || "user" %></td>
-                  <td>
-                    <span class="status-pill <%= account.isVerified ? 'order-completed' : 'payment-pending' %>">
-                      <%= account.isVerified ? "Yes" : "No" %>
-                    </span>
-                  </td>
-                  <td>
-                    <span class="status-pill <%= account.isAgeVerified ? 'order-completed' : 'payment-failed' %>">
-                      <%= account.isAgeVerified ? "Verified" : "Not Verified" %>
-                    </span>
-                  </td>
-                  <% const accountStats = userOrderStats[String(account.email || "").trim().toLowerCase()] || {}; %>
-
-                  <td><%= account.traderStatus || "none" %></td>
-
-                  <td>
-                    <strong><%= accountStats.totalOrders || 0 %></strong>
-                    <span style="display:block;color:#64748b;font-size:12px;margin-top:4px;">
-                      <%= accountStats.paidOrders || 0 %> paid
-                    </span>
-                  </td>
-
-                  <td>
-                    <strong>£<%= Number(accountStats.totalSpend || 0).toFixed(2) %></strong>
-                  </td>
-
-                  <td>
-                    <%= accountStats.lastOrderAt ? new Date(accountStats.lastOrderAt).toLocaleDateString("en-GB") : "None" %>
-                  </td>
-
-                  <td>
-                    <a class="admin-table-action" href="/admin/users/<%= account._id %>">View</a>
-                  </td>
-                </tr>
-              <% }) %>
-            <% } else { %>
-              <tr><td colspan="10">No users found.</td></tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Trader Logins</h2>
-        <span><%= traders.length %> Trader<%= traders.length === 1 ? "" : "s" %></span>
-      </div>
-
-      <div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Business</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Last Login</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% if (traders.length) { %>
-              <% traders.forEach((trader) => { %>
-                <tr>
-                  <td><%= trader.businessName %></td>
-                  <td><%= trader.email %></td>
-                  <td>
-                    <span class="status-pill <%= trader.status === 'approved' ? 'order-completed' : 'payment-pending' %>">
-                      <%= trader.status %>
-                    </span>
-                  </td>
-                  <td><%= trader.lastLoginAt ? trader.lastLoginAt.toLocaleString() : "Never" %></td>
-                </tr>
-              <% }) %>
-            <% } else { %>
-              <tr><td colspan="4">No trader logins found.</td></tr>
-            <% } %>
-          </tbody>
-        </table>
-      </div>
-    </section>
+          <% }) %>
+        <% } else { %>
+          <tr><td colspan="10" style="color:var(--mu);">No users found.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
   </div>
-</section>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><h2>Trader Logins</h2><span style="font-size:11px;color:var(--mu);"><%= traders.length %> trader<%= traders.length === 1 ? "" : "s" %></span></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Business</th><th>Email</th><th>Status</th><th>Last Login</th></tr></thead>
+      <tbody>
+        <% if (traders.length) { %>
+          <% traders.forEach((trader) => { %>
+            <tr>
+              <td class="t-name"><%= trader.businessName %></td>
+              <td class="t-sub"><%= trader.email %></td>
+              <td><span class="pill <%= trader.status === 'approved' ? 'p-completed' : 'p-pending' %>"><%= trader.status %></span></td>
+              <td class="t-sub"><%= trader.lastLoginAt ? new Date(trader.lastLoginAt).toLocaleString("en-GB") : "Never" %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr><td colspan="4" style="color:var(--mu);">No trader logins found.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

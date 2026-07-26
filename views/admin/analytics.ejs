@@ -1,270 +1,104 @@
-<section class="admin-page admin-analytics-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Analytics</span>
-      <h1>Sales & Website Analytics</h1>
-      <p>Track revenue, orders, website viewership, popular pages, and recent paid order performance.</p>
-    </div>
+<%- include("../partials/admin-flash") %>
 
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/admin/orders">
-        <i class="fa-solid fa-receipt"></i>
-        View Orders
-      </a>
-      <a class="admin-secondary" href="/admin/orders/export/csv">
-        <i class="fa-solid fa-file-export"></i>
-        Export CSV
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Overview</div>
+    <h1>Sales &amp; Website Analytics</h1>
+    <p>Track revenue, orders, website viewership, popular pages, and recent paid order performance.</p>
+  </div>
+  <div class="ph-right">
+    <a class="btn btn-red" href="/admin/orders"><i class="fa-solid fa-receipt"></i> View Orders</a>
+    <a class="btn btn-ghost" href="/admin/orders/export/csv" data-no-spa><i class="fa-solid fa-file-export"></i> Export CSV</a>
+  </div>
+</div>
+
+<div class="stats">
+  <a class="stat stat-blue" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-sterling-sign"></i></div></div><div class="stat-lbl">Total Revenue</div><div class="stat-val" style="font-size:19px;">&pound;<%= Number(stats.totalRevenue || 0).toFixed(2) %></div></a>
+  <a class="stat stat-grn" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-calendar-day"></i></div></div><div class="stat-lbl">Today's Revenue</div><div class="stat-val" style="font-size:19px;">&pound;<%= Number(stats.todayRevenue || 0).toFixed(2) %></div></a>
+  <a class="stat stat-blue" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-bag-shopping"></i></div></div><div class="stat-lbl">Total Orders</div><div class="stat-val"><%= stats.totalOrders || 0 %></div></a>
+  <a class="stat stat-grn" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-circle-check"></i></div></div><div class="stat-lbl">Paid Orders</div><div class="stat-val"><%= stats.paidOrders || 0 %></div></a>
+  <a class="stat stat-amb" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-triangle-exclamation"></i></div></div><div class="stat-lbl">Failed Payments</div><div class="stat-val"><%= stats.failedPayments || 0 %></div></a>
+  <a class="stat stat-blue" href="/admin/orders"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-chart-line"></i></div></div><div class="stat-lbl">Average Order</div><div class="stat-val" style="font-size:19px;">&pound;<%= Number(stats.averageOrderValue || 0).toFixed(2) %></div></a>
+  <div class="stat stat-red"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-eye"></i></div></div><div class="stat-lbl">Today's Views</div><div class="stat-val"><%= stats.todayPageViews || 0 %></div></div>
+  <div class="stat stat-red"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-users-viewfinder"></i></div></div><div class="stat-lbl">7-Day Visitors</div><div class="stat-val"><%= stats.sevenDayUniqueVisitors || 0 %></div></div>
+</div>
+
+<div class="an-grid">
+  <div class="chart-card">
+    <div class="ch-head"><h3>Revenue Last 7 Days</h3><span style="font-size:10px;color:var(--mu);">Paid orders only</span></div>
+    <% if (revenueByDay && revenueByDay.length) { %>
+      <% const maxRevenue = Math.max(...revenueByDay.map(day => Number(day.revenue || 0)), 1); %>
+      <div class="top-list">
+        <% revenueByDay.forEach((day) => { %>
+          <div class="top-item"><span class="top-name"><%= day._id.slice(5) %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(day.revenue || 0) / maxRevenue) * 100)) %>%;"></div></div><span class="top-val">&pound;<%= Number(day.revenue || 0).toFixed(0) %></span></div>
+        <% }) %>
+      </div>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No paid revenue data yet.</p><% } %>
   </div>
 
-  <div class="admin-analytics-grid">
-    <a class="admin-analytics-card admin-analytics-card--dark" href="/admin/orders">
-      <i class="fa-solid fa-sterling-sign"></i>
-      <span>Total Revenue</span>
-      <strong>£<%= Number(stats.totalRevenue || 0).toFixed(2) %></strong>
-      <small>All Paid Orders</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/orders">
-      <i class="fa-solid fa-calendar-day"></i>
-      <span>Today's Revenue</span>
-      <strong>£<%= Number(stats.todayRevenue || 0).toFixed(2) %></strong>
-      <small>Paid Orders Today</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/orders">
-      <i class="fa-solid fa-bag-shopping"></i>
-      <span>Total Orders</span>
-      <strong><%= stats.totalOrders || 0 %></strong>
-      <small>All Order Records</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/orders">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Paid Orders</span>
-      <strong><%= stats.paidOrders || 0 %></strong>
-      <small>Completed Payments</small>
-    </a>
-
-    <a class="admin-analytics-card admin-analytics-card--warning" href="/admin/orders">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-      <span>Failed Payments</span>
-      <strong><%= stats.failedPayments || 0 %></strong>
-      <small>Needs Review</small>
-    </a>
-
-    <a class="admin-analytics-card" href="/admin/orders">
-      <i class="fa-solid fa-chart-line"></i>
-      <span>Average Order</span>
-      <strong>£<%= Number(stats.averageOrderValue || 0).toFixed(2) %></strong>
-      <small>Average Paid Order Value</small>
-    </a>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-eye"></i>
-      <span>Today's Views</span>
-      <strong><%= stats.todayPageViews || 0 %></strong>
-      <small>Public Website Page Views</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-users-viewfinder"></i>
-      <span>7-Day Visitors</span>
-      <strong><%= stats.sevenDayUniqueVisitors || 0 %></strong>
-      <small>Unique Website Visitors</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-chart-simple"></i>
-      <span>7-Day Views</span>
-      <strong><%= stats.sevenDayPageViews || 0 %></strong>
-      <small>Total Public Page Views</small>
-    </div>
-
-    <div class="admin-analytics-card">
-      <i class="fa-solid fa-user-clock"></i>
-      <span>Today's Visitors</span>
-      <strong><%= stats.todayUniqueVisitors || 0 %></strong>
-      <small>Unique Visitors Today</small>
+  <div class="chart-card">
+    <div class="ch-head"><h3>Recent Paid Orders</h3><span class="panel-lk" onclick="location.href='/admin/orders'">View all &rarr;</span></div>
+    <div class="al-list" style="padding:0;">
+      <% if (recentPaidOrders && recentPaidOrders.length) { %>
+        <% recentPaidOrders.forEach((order) => { %>
+          <a class="msg-item2" href="/admin/orders/<%= order._id %>">
+            <div style="flex:1;min-width:0;"><div class="msg-name">#<%= order._id.toString().slice(-6).toUpperCase() %></div><div class="msg-prev" style="max-width:none;"><%= order.customer?.email || "No Email" %> &middot; <%= new Date(order.createdAt).toLocaleString("en-GB") %></div></div>
+            <span class="t-amt">&pound;<%= Number(order.total || 0).toFixed(2) %></span>
+          </a>
+        <% }) %>
+      <% } else { %><p style="color:var(--mu);font-size:12px;padding:12px;">No paid orders found yet.</p><% } %>
     </div>
   </div>
+</div>
 
-  <div class="admin-sales-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Revenue Last 7 Days</h2>
-        <span>Paid Orders Only</span>
+<div class="an-grid">
+  <div class="chart-card">
+    <div class="ch-head"><h3>Website Views Last 7 Days</h3><span style="font-size:10px;color:var(--mu);">Public pages only</span></div>
+    <% if (pageViewsByDay && pageViewsByDay.length) { %>
+      <% const maxViews = Math.max(...pageViewsByDay.map(day => Number(day.views || 0)), 1); %>
+      <div class="top-list">
+        <% pageViewsByDay.forEach((day) => { %>
+          <div class="top-item"><span class="top-name"><%= day._id.slice(5) %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(day.views || 0) / maxViews) * 100)) %>%;"></div></div><span class="top-val"><%= Number(day.views || 0) %></span></div>
+        <% }) %>
       </div>
-
-      <% if (revenueByDay && revenueByDay.length) { %>
-        <div class="admin-revenue-bars">
-          <% const maxRevenue = Math.max(...revenueByDay.map(day => Number(day.revenue || 0)), 1); %>
-
-          <% revenueByDay.forEach((day) => { %>
-            <% const barHeight = Math.max(8, Math.round((Number(day.revenue || 0) / maxRevenue) * 120)); %>
-
-            <div class="admin-revenue-day">
-              <div class="admin-revenue-bar-wrap">
-                <span class="admin-revenue-bar" style="height:<%= barHeight %>px"></span>
-              </div>
-              <strong>£<%= Number(day.revenue || 0).toFixed(0) %></strong>
-              <small><%= day._id.slice(5) %></small>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No paid revenue data yet.</p>
-        </div>
-      <% } %>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Recent Paid Orders</h2>
-        <a href="/admin/orders">View All</a>
-      </div>
-
-      <div class="admin-list admin-list--orders">
-        <% if (recentPaidOrders && recentPaidOrders.length) { %>
-          <% recentPaidOrders.forEach((order) => { %>
-            <a href="/admin/orders/<%= order._id %>">
-              <span>
-                <strong>#<%= order._id.toString().slice(-6).toUpperCase() %></strong>
-                <small><%= order.customer?.email || "No Email" %> • <%= new Date(order.createdAt).toLocaleString("en-GB") %></small>
-              </span>
-              <strong>£<%= Number(order.total || 0).toFixed(2) %></strong>
-            </a>
-          <% }) %>
-        <% } else { %>
-          <p>No paid orders found yet.</p>
-        <% } %>
-      </div>
-    </section>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No website view data yet.</p><% } %>
   </div>
 
-  <div class="admin-sales-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Website Views Last 7 Days</h2>
-        <span>Public Pages Only</span>
+  <div class="chart-card">
+    <div class="ch-head"><h3>Popular Pages</h3><span style="font-size:10px;color:var(--mu);">Last 7 days</span></div>
+    <% if (popularPages && popularPages.length) { %>
+      <div class="top-list">
+        <% const maxPageViews = Math.max(...popularPages.map(p => Number(p.views || 0)), 1); %>
+        <% popularPages.forEach((page, index) => { %>
+          <div class="top-item"><span class="top-rank"><%= index + 1 %></span><span class="top-name"><%= page._id || "/" %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(page.views || 0) / maxPageViews) * 100)) %>%;"></div></div><span class="top-val"><%= page.views || 0 %> views</span></div>
+        <% }) %>
       </div>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No popular page data yet.</p><% } %>
+  </div>
+</div>
 
-      <% if (pageViewsByDay && pageViewsByDay.length) { %>
-        <div class="admin-revenue-bars admin-view-bars">
-          <% const maxViews = Math.max(...pageViewsByDay.map(day => Number(day.views || 0)), 1); %>
-
-          <% pageViewsByDay.forEach((day) => { %>
-            <% const barHeight = Math.max(8, Math.round((Number(day.views || 0) / maxViews) * 120)); %>
-
-            <div class="admin-revenue-day">
-              <div class="admin-revenue-bar-wrap">
-                <span class="admin-revenue-bar" style="height:<%= barHeight %>px"></span>
-              </div>
-              <strong><%= Number(day.views || 0) %></strong>
-              <small><%= day._id.slice(5) %></small>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No website view data yet.</p>
-        </div>
-      <% } %>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Popular Pages</h2>
-        <span>Last 7 Days</span>
+<div class="an-grid">
+  <div class="chart-card">
+    <div class="ch-head"><h3>Best-Selling Products</h3><span style="font-size:10px;color:var(--mu);">By quantity sold</span></div>
+    <% if (bestProducts && bestProducts.length) { %>
+      <div class="top-list">
+        <% const maxQty = Math.max(...bestProducts.map(p => Number(p.quantity || 0)), 1); %>
+        <% bestProducts.forEach((product, index) => { %>
+          <div class="top-item"><span class="top-rank"><%= index + 1 %></span><span class="top-name"><%= product._id || "Unknown Product" %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(product.quantity || 0) / maxQty) * 100)) %>%;"></div></div><span class="top-val">&pound;<%= Number(product.revenue || 0).toFixed(0) %></span></div>
+        <% }) %>
       </div>
-
-      <% if (popularPages && popularPages.length) { %>
-        <div class="admin-rank-list">
-          <% popularPages.forEach((page, index) => { %>
-            <div class="admin-rank-item admin-rank-item--brand">
-              <span><%= index + 1 %></span>
-              <div>
-                <strong><%= page._id || "/" %></strong>
-                <small><%= page.uniqueVisitors || 0 %> Unique Visitor<%= Number(page.uniqueVisitors || 0) === 1 ? "" : "s" %></small>
-              </div>
-              <div>
-                <strong><%= page.views || 0 %></strong>
-                <small>Views</small>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No popular page data yet.</p>
-        </div>
-      <% } %>
-    </section>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No product sales data yet.</p><% } %>
   </div>
 
-  <div class="admin-sales-grid">
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Best-Selling Products</h2>
-        <span>By Quantity Sold</span>
+  <div class="chart-card">
+    <div class="ch-head"><h3>Best-Selling Brands</h3><span style="font-size:10px;color:var(--mu);">By revenue</span></div>
+    <% if (bestBrands && bestBrands.length) { %>
+      <div class="top-list">
+        <% const maxBrandRev = Math.max(...bestBrands.map(b => Number(b.revenue || 0)), 1); %>
+        <% bestBrands.forEach((brand, index) => { %>
+          <div class="top-item"><span class="top-rank"><%= index + 1 %></span><span class="top-name"><%= brand._id || "Unknown Brand" %></span><div class="bar-wrap"><div class="bar-fill" style="width:<%= Math.max(4, Math.round((Number(brand.revenue || 0) / maxBrandRev) * 100)) %>%;"></div></div><span class="top-val">&pound;<%= Number(brand.revenue || 0).toFixed(0) %></span></div>
+        <% }) %>
       </div>
-
-      <% if (bestProducts && bestProducts.length) { %>
-        <div class="admin-rank-list">
-          <% bestProducts.forEach((product, index) => { %>
-            <div class="admin-rank-item">
-              <span><%= index + 1 %></span>
-              <div>
-                <strong><%= product._id || "Unknown Product" %></strong>
-                <small><%= product.brand || "Unknown Brand" %></small>
-              </div>
-              <div>
-                <strong><%= product.quantity || 0 %></strong>
-                <small>Sold</small>
-              </div>
-              <div>
-                <strong>£<%= Number(product.revenue || 0).toFixed(2) %></strong>
-                <small>Revenue</small>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No product sales data yet.</p>
-        </div>
-      <% } %>
-    </section>
-
-    <section class="admin-panel">
-      <div class="admin-panel__head">
-        <h2>Best-Selling Brands</h2>
-        <span>By Revenue</span>
-      </div>
-
-      <% if (bestBrands && bestBrands.length) { %>
-        <div class="admin-rank-list">
-          <% bestBrands.forEach((brand, index) => { %>
-            <div class="admin-rank-item admin-rank-item--brand">
-              <span><%= index + 1 %></span>
-              <div>
-                <strong><%= brand._id || "Unknown Brand" %></strong>
-                <small><%= brand.quantity || 0 %> Units Sold</small>
-              </div>
-              <div>
-                <strong>£<%= Number(brand.revenue || 0).toFixed(2) %></strong>
-                <small>Revenue</small>
-              </div>
-            </div>
-          <% }) %>
-        </div>
-      <% } else { %>
-        <div class="admin-empty-small">
-          <p>No brand sales data yet.</p>
-        </div>
-      <% } %>
-    </section>
+    <% } else { %><p style="color:var(--mu);font-size:12px;">No brand sales data yet.</p><% } %>
   </div>
-</section>
+</div>

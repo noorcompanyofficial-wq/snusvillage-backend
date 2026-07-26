@@ -1,185 +1,80 @@
 <%
   const s = settings || {};
 %>
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-page admin-settings-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Settings</span>
-      <h1>Website Settings</h1>
-      <p>Control store contact details, delivery pricing, checkout notices, and click & collect information.</p>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">System</div>
+    <h1>Website Settings</h1>
+    <p>Control store contact details, delivery pricing, checkout notices, and click &amp; collect information.</p>
+  </div>
+  <div class="ph-right"><a class="btn btn-red" href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Website</a></div>
+</div>
 
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/" target="_blank" rel="noopener">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        Preview Website
-      </a>
+<form action="/admin/settings" method="POST">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="sec">
+    <div class="sec-head"><h2>Store Details</h2><span style="font-size:11px;color:var(--mu);">Public contact information</span></div>
+    <div class="sec-body fgrid">
+      <div class="fld"><label>Store Name</label><input name="storeName" value="<%= s.storeName || 'Snus Village' %>"></div>
+      <div class="fld"><label>Store Email</label><input name="storeEmail" value="<%= s.storeEmail || 'info@snusvillage.co.uk' %>"></div>
+      <div class="fld"><label>Store Phone</label><input name="storePhone" value="<%= s.storePhone || '+44 7777 222771' %>"></div>
+      <div class="fld"><label>Instagram URL</label><input name="instagramUrl" value="<%= s.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>"></div>
     </div>
   </div>
 
-  <form class="admin-panel admin-settings-form" action="/admin/settings" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div class="admin-panel__head">
-      <h2>Store Details</h2>
-      <span>Public Contact Information</span>
+  <div class="sec">
+    <div class="sec-head"><h2>Checkout Settings</h2><span style="font-size:11px;color:var(--mu);">Delivery and payment messages</span></div>
+    <div class="sec-body fgrid">
+      <div class="fld"><label>Delivery Price (&pound;)</label><input type="number" step="0.01" min="0" name="deliveryPrice" value="<%= Number(s.deliveryPrice || 0).toFixed(2) %>"></div>
+      <div class="fld"><label>Free Delivery Threshold (&pound;)</label><input type="number" step="0.01" min="0" name="freeDeliveryThreshold" value="<%= Number(s.freeDeliveryThreshold || 0).toFixed(2) %>"></div>
+      <div class="fld fspan"><label>Checkout Notice</label><textarea name="checkoutNotice" rows="2"><%= s.checkoutNotice || 'You Will Be Redirected To SumUp To Complete Your Card Payment Securely.' %></textarea></div>
+      <div class="fld fspan"><label>Age Gate Message</label><textarea name="ageGateMessage" rows="2"><%= s.ageGateMessage || 'You Must Be 18+ To Enter This Website.' %></textarea></div>
     </div>
+  </div>
 
-    <div class="admin-settings-grid">
-      <label>
-        Store Name
-        <input name="storeName" value="<%= s.storeName || 'Snus Village' %>">
-      </label>
-
-      <label>
-        Store Email
-        <input name="storeEmail" value="<%= s.storeEmail || 'info@snusvillage.co.uk' %>">
-      </label>
-
-      <label>
-        Store Phone
-        <input name="storePhone" value="<%= s.storePhone || '+44 7777 222771' %>">
-      </label>
-
-      <label>
-        Instagram URL
-        <input name="instagramUrl" value="<%= s.instagramUrl || 'https://www.instagram.com/snusvillage.uk/' %>">
-      </label>
+  <div class="sec">
+    <div class="sec-head"><h2>Click &amp; Collect</h2><span style="font-size:11px;color:var(--mu);">Collection branch details</span></div>
+    <div class="sec-body fgrid">
+      <div class="fld"><label>Branch Name</label><input name="clickCollectBranch" value="<%= s.clickCollectBranch || 'Edgware Road' %>"></div>
+      <div class="fld"><label>City</label><input name="clickCollectCity" value="<%= s.clickCollectCity || 'London' %>"></div>
+      <div class="fld"><label>Postcode</label><input name="clickCollectPostcode" value="<%= s.clickCollectPostcode || 'W2 2HX' %>"></div>
+      <div class="fld fspan"><label>Collection Address</label><textarea name="clickCollectAddress" rows="2"><%= s.clickCollectAddress || 'SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX' %></textarea></div>
     </div>
+  </div>
 
-    <div class="admin-panel__head">
-      <h2>Checkout Settings</h2>
-      <span>Delivery And Payment Messages</span>
+  <div class="sec">
+    <div class="sec-head"><h2>Category Visibility</h2><span style="font-size:11px;color:var(--mu);">Temporarily hide categories that aren't ready to list</span></div>
+    <div class="sec-body">
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Hide Vapes Category</strong><span>Removes vapes from shop navigation and listings</span></div><label class="toggle"><input type="checkbox" name="hideVapesCategory" <%= s.hideVapesCategory !== false ? "checked" : "" %>><span class="tslider"></span></label></div>
     </div>
+  </div>
 
-    <div class="admin-settings-grid">
-      <label>
-        Delivery Price
-        <input type="number" step="0.01" min="0" name="deliveryPrice" value="<%= Number(s.deliveryPrice || 0).toFixed(2) %>">
-      </label>
-
-      <label>
-        Free Delivery Threshold
-        <input type="number" step="0.01" min="0" name="freeDeliveryThreshold" value="<%= Number(s.freeDeliveryThreshold || 0).toFixed(2) %>">
-      </label>
-
-      <label class="is-wide">
-        Checkout Notice
-        <textarea name="checkoutNotice"><%= s.checkoutNotice || 'You Will Be Redirected To SumUp To Complete Your Card Payment Securely.' %></textarea>
-      </label>
-
-      <label class="is-wide">
-        Age Gate Message
-        <textarea name="ageGateMessage"><%= s.ageGateMessage || 'You Must Be 18+ To Enter This Website.' %></textarea>
-      </label>
+  <div class="sec">
+    <div class="sec-head"><h2>Welcome Discount Popup</h2><span style="font-size:11px;color:var(--mu);">Shown a few seconds after a visitor passes the age gate</span></div>
+    <div class="sec-body">
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Show Welcome Discount Popup</strong><span>Displays automatically after age verification</span></div><label class="toggle"><input type="checkbox" name="promoPopupEnabled" <%= s.promoPopupEnabled !== false ? "checked" : "" %>><span class="tslider"></span></label></div>
+      <div class="fgrid" style="margin-top:14px;">
+        <div class="fld"><label>Delay After Age Verification (seconds)</label><input type="number" step="1" min="0" name="promoPopupDelaySeconds" value="<%= Number(s.promoPopupDelaySeconds != null ? s.promoPopupDelaySeconds : 20) %>"></div>
+        <div class="fld"><label>Discount Code</label><input name="promoPopupCode" value="<%= s.promoPopupCode || 'WELCOME10' %>"></div>
+        <div class="fld fspan"><label>Heading</label><input name="promoPopupHeading" value="<%= s.promoPopupHeading || 'Welcome to Snus Village!' %>"></div>
+        <div class="fld fspan"><label>Body Text</label><textarea name="promoPopupBody" rows="2"><%= s.promoPopupBody || 'Enjoy 10% off your first order, on us.' %></textarea></div>
+        <div class="fld"><label>Button Text</label><input name="promoPopupButtonText" value="<%= s.promoPopupButtonText || 'Shop Now' %>"></div>
+        <div class="fld"><label>Button Link</label><input name="promoPopupButtonLink" value="<%= s.promoPopupButtonLink || '/shop' %>"></div>
+      </div>
+      <p style="font-size:11px;color:var(--mu);margin-top:10px;">This only displays the code &mdash; create a matching discount code under <a href="/admin/discounts" style="color:var(--blue);font-weight:700;">Discount Codes</a> so it actually works at checkout.</p>
     </div>
+  </div>
 
-    <div class="admin-panel__head">
-      <h2>Click & Collect</h2>
-      <span>Collection Branch Details</span>
+  <div class="sec">
+    <div class="sec-head"><h2>Maintenance Mode</h2><span style="font-size:11px;color:var(--mu);">Emergency website notice</span></div>
+    <div class="sec-body">
+      <div class="toggle-wrap"><div class="toggle-info"><strong>Maintenance Mode Enabled</strong><span>Takes the storefront offline for customers</span></div><label class="toggle"><input type="checkbox" name="maintenanceMode" <%= s.maintenanceMode ? "checked" : "" %>><span class="tslider"></span></label></div>
+      <div class="fld fspan" style="margin-top:14px;"><label>Maintenance Message</label><textarea name="maintenanceMessage" rows="2"><%= s.maintenanceMessage || 'Snus Village is currently updating the website. Please check back soon.' %></textarea></div>
     </div>
+  </div>
 
-    <div class="admin-settings-grid">
-      <label>
-        Branch Name
-        <input name="clickCollectBranch" value="<%= s.clickCollectBranch || 'Edgware Road' %>">
-      </label>
-
-      <label>
-        City
-        <input name="clickCollectCity" value="<%= s.clickCollectCity || 'London' %>">
-      </label>
-
-      <label>
-        Postcode
-        <input name="clickCollectPostcode" value="<%= s.clickCollectPostcode || 'W2 2HX' %>">
-      </label>
-
-      <label class="is-wide">
-        Collection Address
-        <textarea name="clickCollectAddress"><%= s.clickCollectAddress || 'SNUS VILLAGE, EDGWARE ROAD, TYBURNIA, London, W2 2HX' %></textarea>
-      </label>
-    </div>
-
-    <div class="admin-panel__head">
-      <h2>Category Visibility</h2>
-      <span>Temporarily hide categories that are not ready to list</span>
-    </div>
-
-    <div class="admin-settings-grid">
-      <label class="admin-checkbox-label">
-        <input type="checkbox" name="hideVapesCategory" <%= s.hideVapesCategory !== false ? "checked" : "" %>>
-        Hide Vapes Category
-      </label>
-    </div>
-
-    <div class="admin-panel__head">
-      <h2>Welcome Discount Popup</h2>
-      <span>Shown a few seconds after a visitor passes the age gate</span>
-    </div>
-
-    <div class="admin-settings-grid">
-      <label class="admin-checkbox-label">
-        <input type="checkbox" name="promoPopupEnabled" <%= s.promoPopupEnabled !== false ? "checked" : "" %>>
-        Show Welcome Discount Popup
-      </label>
-
-      <label>
-        Delay After Age Verification (seconds)
-        <input type="number" step="1" min="0" name="promoPopupDelaySeconds" value="<%= Number(s.promoPopupDelaySeconds != null ? s.promoPopupDelaySeconds : 20) %>">
-      </label>
-
-      <label>
-        Discount Code
-        <input name="promoPopupCode" value="<%= s.promoPopupCode || 'WELCOME10' %>">
-      </label>
-
-      <label class="is-wide">
-        Heading
-        <input name="promoPopupHeading" value="<%= s.promoPopupHeading || 'Welcome to Snus Village!' %>">
-      </label>
-
-      <label class="is-wide">
-        Body Text
-        <textarea name="promoPopupBody"><%= s.promoPopupBody || 'Enjoy 10% off your first order, on us.' %></textarea>
-      </label>
-
-      <label>
-        Button Text
-        <input name="promoPopupButtonText" value="<%= s.promoPopupButtonText || 'Shop Now' %>">
-      </label>
-
-      <label>
-        Button Link
-        <input name="promoPopupButtonLink" value="<%= s.promoPopupButtonLink || '/shop' %>">
-      </label>
-
-      <p class="admin-settings-note">
-        This only displays the code — create a matching discount code under
-        <a href="/admin/discounts">Discount Codes</a> so it actually works at checkout.
-      </p>
-    </div>
-
-    <div class="admin-panel__head">
-      <h2>Maintenance Mode</h2>
-      <span>Emergency Website Notice</span>
-    </div>
-
-    <div class="admin-settings-grid">
-      <label class="admin-checkbox-label">
-        <input type="checkbox" name="maintenanceMode" <%= s.maintenanceMode ? "checked" : "" %>>
-        Maintenance Mode Enabled
-      </label>
-
-      <label class="is-wide">
-        Maintenance Message
-        <textarea name="maintenanceMessage"><%= s.maintenanceMessage || 'Snus Village is currently updating the website. Please check back soon.' %></textarea>
-      </label>
-    </div>
-
-    <button class="admin-primary" type="submit">
-      <i class="fa-solid fa-floppy-disk"></i>
-      Save Settings
-    </button>
-  </form>
-</section>
+  <button class="btn btn-red" type="submit" style="width:100%;justify-content:center;height:44px;margin-bottom:24px;"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+</form>

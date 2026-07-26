@@ -3,145 +3,70 @@
   const productMap = {};
   products.forEach((p) => { productMap[productLabel(p)] = p._id.toString(); });
 %>
+<%- include("../partials/admin-flash") %>
 
+<div id="heroProductMapData" data-map='<%- JSON.stringify(productMap) %>' hidden></div>
 <datalist id="heroProductOptions">
-  <% products.forEach((p) => { %>
-    <option value="<%= productLabel(p) %>"></option>
-  <% }) %>
+  <% products.forEach((p) => { %><option value="<%= productLabel(p) %>"></option><% }) %>
 </datalist>
 
-<section class="admin-page-head">
+<div class="ph">
   <div>
-    <span>Homepage</span>
+    <div class="ph-eye">Homepage</div>
     <h1>Hero Banner</h1>
     <p>Choose which products appear in the homepage hero slideshow and the background photo behind each one.</p>
   </div>
+  <div class="ph-right"><a class="btn btn-ghost" href="/admin/homepage"><i class="fa-solid fa-arrow-left"></i> Back To Homepage</a></div>
+</div>
 
-  <div class="admin-head-actions">
-    <a class="admin-secondary" href="/admin/homepage">
-      <i class="fa-solid fa-arrow-left"></i>
-      Back To Homepage
-    </a>
-  </div>
-</section>
-
-<form class="admin-panel admin-homepage-form" action="/admin/homepage/hero/slides" method="POST" enctype="multipart/form-data">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <div class="admin-panel__head">
-    <h2>Add Hero Slide</h2>
-    <span>Pick A Product And Background Photo</span>
-  </div>
-
-  <div class="admin-homepage-slide-card">
-    <label>
-      Product
+<div class="sec">
+  <div class="sec-head"><h2>Add Hero Slide</h2><span style="font-size:11px;color:var(--mu);">Pick a product and background photo</span></div>
+  <form class="sec-body fgrid-3" style="align-items:end;" action="/admin/homepage/hero/slides" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="fld" style="margin-bottom:0;">
+      <label>Product</label>
       <input type="text" class="hero-product-search" list="heroProductOptions" placeholder="Search products…" autocomplete="off">
       <input type="hidden" name="product" class="hero-product-id">
-    </label>
-
-    <label>
-      Background Image
-      <input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif" required>
-    </label>
-
-    <button type="submit" class="admin-primary">
-      <i class="fa-solid fa-circle-plus"></i>
-      Add Hero Slide
-    </button>
-  </div>
-</form>
-
-<section class="admin-panel admin-homepage-form">
-  <div class="admin-panel__head">
-    <h2>Current Slides</h2>
-    <span><%= heroSlides.length %> Slide<%= heroSlides.length === 1 ? "" : "s" %> · In Display Order</span>
-  </div>
-
-  <% if (!heroSlides.length) { %>
-    <div class="admin-homepage-help">
-      <strong>No hero slides yet.</strong>
-      <span>Add a slide above — it'll appear on the homepage hero as soon as it's saved.</span>
     </div>
+    <div class="fld" style="margin-bottom:0;"><label>Background Image</label><input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif" required></div>
+    <button type="submit" class="btn btn-red"><i class="fa-solid fa-circle-plus"></i> Add Hero Slide</button>
+  </form>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><h2>Current Slides</h2><span style="font-size:11px;color:var(--mu);"><%= heroSlides.length %> slide<%= heroSlides.length === 1 ? "" : "s" %> &middot; in display order</span></div>
+  <% if (!heroSlides.length) { %>
+    <div class="admin-empty-state"><h2>No Hero Slides Yet</h2><p>Add a slide above — it'll appear on the homepage hero as soon as it's saved.</p></div>
   <% } else { %>
-    <div class="admin-homepage-slides">
+    <div class="prod-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));">
       <% heroSlides.forEach((slide, index) => { %>
-        <div class="admin-homepage-slide-card">
-          <div class="admin-homepage-slide-head">
-            <strong>Slide <%= index + 1 %></strong>
-            <span><%= slide.product ? slide.product.name : "No product selected" %></span>
+        <div class="prod-card">
+          <div class="prod-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <strong style="font-size:12px;">Slide <%= index + 1 %></strong>
+              <span class="t-sub"><%= slide.product ? slide.product.name : "No product selected" %></span>
+            </div>
+            <% if (slide.bgImageSrc) { %>
+              <img src="<%= optimiseImageUrl(slide.bgImageSrc, { width: 400 }) %>" alt="Hero slide background" style="width:100%;border-radius:8px;object-fit:cover;aspect-ratio:16/9;margin-bottom:10px;">
+            <% } %>
+            <form action="/admin/homepage/hero/slides/<%= slide._id %>" method="POST" enctype="multipart/form-data" style="display:grid;gap:10px;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <div class="fld" style="margin-bottom:0;">
+                <label>Product</label>
+                <input type="text" class="hero-product-search" list="heroProductOptions" autocomplete="off" value="<%= slide.product ? productLabel(slide.product) : '' %>">
+                <input type="hidden" name="product" class="hero-product-id" value="<%= slide.product ? slide.product._id : '' %>">
+              </div>
+              <div class="fld" style="margin-bottom:0;"><label>Replace Background Image</label><input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif"></div>
+              <button type="submit" class="btn btn-sm btn-red">Save Changes</button>
+            </form>
           </div>
-
-          <% if (slide.bgImageSrc) { %>
-            <img src="<%= optimiseImageUrl(slide.bgImageSrc, { width: 400 }) %>" alt="Hero slide background" style="width:100%;border-radius:14px;object-fit:cover;aspect-ratio:16/9;">
-          <% } %>
-
-          <form action="/admin/homepage/hero/slides/<%= slide._id %>" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-            <label>
-              Product
-              <input type="text" class="hero-product-search" list="heroProductOptions" autocomplete="off" value="<%= slide.product ? productLabel(slide.product) : '' %>">
-              <input type="hidden" name="product" class="hero-product-id" value="<%= slide.product ? slide.product._id : '' %>">
-            </label>
-
-            <label>
-              Replace Background Image
-              <input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif">
-            </label>
-
-            <button type="submit" class="admin-primary">Save Changes</button>
-          </form>
-
-          <div class="admin-order-card-side" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <form action="/admin/homepage/hero/slides/<%= slide._id %>/move" method="POST">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" name="direction" value="up" class="admin-secondary" <%= index === 0 ? "disabled" : "" %>>
-                <i class="fa-solid fa-arrow-up"></i>
-              </button>
-            </form>
-
-            <form action="/admin/homepage/hero/slides/<%= slide._id %>/move" method="POST">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" name="direction" value="down" class="admin-secondary" <%= index === heroSlides.length - 1 ? "disabled" : "" %>>
-                <i class="fa-solid fa-arrow-down"></i>
-              </button>
-            </form>
-
-            <form action="/admin/homepage/hero/slides/<%= slide._id %>/delete" method="POST" onsubmit="return confirm('Remove this hero slide?')">
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" class="admin-danger-btn">
-                <i class="fa-solid fa-trash"></i>
-                Delete
-              </button>
-            </form>
+          <div class="prod-actions">
+            <form action="/admin/homepage/hero/slides/<%= slide._id %>/move" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" name="direction" value="up" class="btn btn-sm btn-ghost" <%= index === 0 ? "disabled" : "" %>><i class="fa-solid fa-arrow-up"></i></button></form>
+            <form action="/admin/homepage/hero/slides/<%= slide._id %>/move" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" name="direction" value="down" class="btn btn-sm btn-ghost" <%= index === heroSlides.length - 1 ? "disabled" : "" %>><i class="fa-solid fa-arrow-down"></i></button></form>
+            <form action="/admin/homepage/hero/slides/<%= slide._id %>/delete" method="POST" onsubmit="return confirm('Remove this hero slide?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button></form>
           </div>
         </div>
       <% }) %>
     </div>
   <% } %>
-</section>
-
-<script>
-  (function () {
-    const productMap = <%- JSON.stringify(productMap) %>;
-
-    document.querySelectorAll(".hero-product-search").forEach((input) => {
-      const hiddenInput = input.parentElement.querySelector(".hero-product-id");
-
-      input.addEventListener("input", () => {
-        const id = productMap[input.value];
-        if (id) hiddenInput.value = id;
-      });
-
-      const form = input.closest("form");
-      if (form) {
-        form.addEventListener("submit", (event) => {
-          if (!hiddenInput.value) {
-            event.preventDefault();
-            alert("Please choose a product from the list.");
-          }
-        });
-      }
-    });
-  })();
-</script>
+</div>

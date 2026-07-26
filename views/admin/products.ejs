@@ -1,543 +1,161 @@
-<link rel="stylesheet" href="/css/admin-products.css" />
+<%- include("../partials/admin-flash") %>
 
-<section class="admin-page admin-products-page">
-  <div class="admin-page-head">
-    <div>
-      <span>Products</span>
-      <h1>Product Catalogue</h1>
-      <p>Manage products, stock status, pricing, images, brands, nicotine strength, and catalogue visibility.</p>
-    </div>
-
-    <div class="admin-head-actions">
-      <a class="admin-primary" href="/admin/products/add">
-        <i class="fa-solid fa-plus"></i>
-        Add Product
-      </a>
-
-      <a class="admin-secondary" href="/admin/products/export/csv">
-        <i class="fa-solid fa-file-export"></i>
-        Export CSV
-      </a>
-
-      <a class="admin-secondary" href="/admin/inventory">
-        <i class="fa-solid fa-warehouse"></i>
-        Inventory
-      </a>
-    </div>
+<div class="ph">
+  <div>
+    <div class="ph-eye">Commerce</div>
+    <h1>Product Catalogue</h1>
+    <p>Manage products, stock status, pricing, images, brands, nicotine strength, and catalogue visibility.</p>
   </div>
-
-  <div class="admin-products-stats">
-    <a href="/admin/products" class="admin-products-stat admin-products-stat--dark">
-      <i class="fa-solid fa-boxes-stacked"></i>
-      <span>Total Products</span>
-      <strong><%= totalProducts %></strong>
-    </a>
-
-    <a href="/admin/products?stock=in" class="admin-products-stat">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>In Stock</span>
-      <strong><%= inStock %></strong>
-    </a>
-
-    <a href="/admin/products?stock=out" class="admin-products-stat admin-products-stat--danger">
-      <i class="fa-solid fa-circle-xmark"></i>
-      <span>Out Of Stock</span>
-      <strong><%= outStock %></strong>
-    </a>
-
-    <a href="/admin/products?visibility=hidden" class="admin-products-stat admin-products-stat--danger">
-      <i class="fa-solid fa-eye-slash"></i>
-      <span>Hidden</span>
-      <strong><%= hiddenProducts %></strong>
-    </a>
-
-    <a href="/admin/products?featured=yes" class="admin-products-stat">
-      <i class="fa-solid fa-star"></i>
-      <span>Featured</span>
-      <strong><%= featuredProducts %></strong>
-    </a>
-
-    <a href="/admin/products?bestSeller=yes" class="admin-products-stat admin-products-stat--action">
-      <i class="fa-solid fa-fire"></i>
-      <span>Best Sellers</span>
-      <strong><%= bestSellerProducts %></strong>
-    </a>
-  </div>
-
-  <section class="admin-products-filter-panel">
-    <div class="admin-products-filter-head">
-      <div>
-        <h2>Filter Catalogue</h2>
-        <p>Find products by brand, strength, stock status, or sorting preference.</p>
-      </div>
-
-      <a href="/admin/products">Reset Filters</a>
-    </div>
-
-    <div class="admin-products-filters admin-products-filters--extended">
-      <label class="admin-products-search-label">
-        Search
-        <input
-          id="searchFilter"
-          type="text"
-          value="<%= query.search || '' %>"
-          placeholder="Search name, brand, flavour, nicotine..."
-          onkeydown="if(event.key === 'Enter') applyFilter()"
-        >
-      </label>
-
-      <label>
-        Brand
-        <select onchange="applyFilter()" id="brandFilter">
-          <option value="">All Brands</option>
-          <option value="WHITE FOX" <%= query.brand === "WHITE FOX" ? "selected" : "" %>>WHITE FOX</option>
-          <option value="SIBERIA" <%= query.brand === "SIBERIA" ? "selected" : "" %>>SIBERIA</option>
-          <option value="VELO" <%= query.brand === "VELO" ? "selected" : "" %>>VELO</option>
-          <option value="KILLA" <%= query.brand === "KILLA" ? "selected" : "" %>>KILLA</option>
-          <option value="PABLO" <%= query.brand === "PABLO" ? "selected" : "" %>>PABLO</option>
-          <option value="GARANT" <%= query.brand === "GARANT" ? "selected" : "" %>>GARANT</option>
-          <option value="ICEBERG CUBA" <%= query.brand === "ICEBERG CUBA" ? "selected" : "" %>>ICEBERG CUBA</option>
-          <option value="LOOP" <%= query.brand === "LOOP" ? "selected" : "" %>>LOOP</option>
-          <option value="CAFERO" <%= query.brand === "CAFERO" ? "selected" : "" %>>CAFERO</option>
-          <option value="HIT" <%= query.brand === "HIT" ? "selected" : "" %>>HIT</option>
-          <option value="ODEN'S" <%= query.brand === "ODEN'S" ? "selected" : "" %>>ODEN'S</option>
-        </select>
-      </label>
-
-      <label>
-        Strength
-        <select onchange="applyFilter()" id="strengthFilter">
-          <option value="">All Strengths</option>
-          <option value="LOW" <%= query.strength === "LOW" ? "selected" : "" %>>LOW</option>
-          <option value="MEDIUM" <%= query.strength === "MEDIUM" ? "selected" : "" %>>MEDIUM</option>
-          <option value="STRONG" <%= query.strength === "STRONG" ? "selected" : "" %>>STRONG</option>
-          <option value="X-STRONG" <%= query.strength === "X-STRONG" ? "selected" : "" %>>X-STRONG</option>
-          <option value="EXTREME" <%= query.strength === "EXTREME" ? "selected" : "" %>>EXTREME</option>
-        </select>
-      </label>
-
-      <label>
-        Sort
-        <select onchange="applyFilter()" id="sortFilter">
-          <option value="" <%= !query.sort ? "selected" : "" %>>Newest</option>
-          <option value="price-low" <%= query.sort === "price-low" ? "selected" : "" %>>Price Low</option>
-          <option value="price-high" <%= query.sort === "price-high" ? "selected" : "" %>>Price High</option>
-          <option value="name" <%= query.sort === "name" ? "selected" : "" %>>Name A-Z</option>
-        </select>
-      </label>
-
-      <label>
-        Stock
-        <select onchange="applyFilter()" id="stockFilter">
-          <option value="" <%= !query.stock ? "selected" : "" %>>All Stock</option>
-          <option value="in" <%= query.stock === "in" ? "selected" : "" %>>In Stock</option>
-          <option value="out" <%= query.stock === "out" ? "selected" : "" %>>Out Of Stock</option>
-        </select>
-      </label>
-
-      <label>
-        Visibility
-        <select onchange="applyFilter()" id="visibilityFilter">
-          <option value="" <%= !query.visibility ? "selected" : "" %>>All</option>
-          <option value="active" <%= query.visibility === "active" ? "selected" : "" %>>Active</option>
-          <option value="hidden" <%= query.visibility === "hidden" ? "selected" : "" %>>Hidden</option>
-        </select>
-      </label>
-
-      <label>
-        Featured
-        <select onchange="applyFilter()" id="featuredFilter">
-          <option value="" <%= !query.featured ? "selected" : "" %>>All</option>
-          <option value="yes" <%= query.featured === "yes" ? "selected" : "" %>>Featured Only</option>
-        </select>
-      </label>
-
-      <label>
-        Best Seller
-        <select onchange="applyFilter()" id="bestSellerFilter">
-          <option value="" <%= !query.bestSeller ? "selected" : "" %>>All</option>
-          <option value="yes" <%= query.bestSeller === "yes" ? "selected" : "" %>>Best Sellers Only</option>
-        </select>
-      </label>
-
-      <label>
-        Sale Badge
-        <select onchange="applyFilter()" id="saleBadgeFilter">
-          <option value="" <%= !query.saleBadge ? "selected" : "" %>>All</option>
-          <option value="yes" <%= query.saleBadge === "yes" ? "selected" : "" %>>Sale Badge Only</option>
-        </select>
-      </label>
-    </div>
-  </section>
-
-  <section class="admin-bulk-price-panel">
-    <div class="admin-products-filter-head">
-      <div>
-        <h2>Quick Price Change</h2>
-        <p>
-          Update prices for every product matching the current filters.
-          This will affect <strong><%= filteredTotal || 0 %></strong>
-          product<%= Number(filteredTotal || 0) === 1 ? "" : "s" %>.
-        </p>
-      </div>
-    </div>
-
-    <form class="admin-bulk-price-form" action="/admin/products/bulk-prices" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <input type="hidden" name="search" value="<%= query.search || '' %>">
-      <input type="hidden" name="brand" value="<%= query.brand || '' %>">
-      <input type="hidden" name="strength" value="<%= query.strength || '' %>">
-      <input type="hidden" name="sort" value="<%= query.sort || '' %>">
-      <input type="hidden" name="stock" value="<%= query.stock || '' %>">
-      <input type="hidden" name="visibility" value="<%= query.visibility || '' %>">
-      <input type="hidden" name="featured" value="<%= query.featured || '' %>">
-      <input type="hidden" name="bestSeller" value="<%= query.bestSeller || '' %>">
-      <input type="hidden" name="saleBadge" value="<%= query.saleBadge || '' %>">
-
-      <label>
-        New Price (£)
-        <input type="number" name="price" min="0" step="0.01" placeholder="Leave blank to keep">
-      </label>
-
-      <label>
-        New Discount Price (£)
-        <input type="number" name="discountPrice" min="0" step="0.01" placeholder="Leave blank to keep, 0 to clear">
-      </label>
-
-      <label>
-        Confirm
-        <input type="text" name="confirmText" placeholder="Type UPDATE">
-      </label>
-
-      <button type="submit">
-        <i class="fa-solid fa-bolt"></i>
-        Apply Price Change
-      </button>
-    </form>
-
-    <p class="admin-bulk-price-note">
-      Tip: filter by brand, strength, stock or best seller first. Fill in a new price and/or a new discount price — whatever you leave blank stays unchanged. This applies to all matching products, not only the products visible on this page.
-    </p>
-  </section>
-
-  <% if (!products || products.length === 0) { %>
-    <div class="admin-empty-state">
-      <h2>No Products Found</h2>
-      <p>Add products or reset your filters to see catalogue items here.</p>
-    </div>
-  <% } else { %>
-    <div class="admin-products-toolbar">
-      <div>
-        <span>Catalogue Results</span>
-        <strong><%= products.length %> Product<%= products.length === 1 ? "" : "s" %> Showing</strong>
-      </div>
-
-      <a href="/shop" target="_blank" rel="noopener">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        Preview Shop
-      </a>
-    </div>
-
-    <div class="admin-products-grid" id="adminProductsGrid">
-      <% products.forEach(p => { %>
-        <% const activePrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price; %>
-
-        <article class="admin-product-card">
-          <div class="admin-product-card__media">
-            <% if (p.images && p.images[0]) { %>
-              <img src="<%= p.images[0] %>" alt="<%= p.name %>">
-            <% } else { %>
-              <span>No Image</span>
-            <% } %>
-
-            <span class="admin-product-stock <%= p.stock > 0 ? 'is-in' : 'is-out' %>">
-              <%= p.stock > 0 ? "In Stock" : "Out Of Stock" %>
-            </span>
-
-            <div class="admin-product-card-badges">
-              <span class="<%= p.isActive === false ? 'is-hidden' : 'is-active' %>">
-                <%= p.isActive === false ? "Hidden" : "Active" %>
-              </span>
-
-              <% if (p.isFeatured) { %>
-                <span>Featured</span>
-              <% } %>
-
-              <% if (p.isBestSeller) { %>
-                <span>Best Seller</span>
-              <% } %>
-
-              <% if (p.showSaleBadge) { %>
-                <span>Sale Badge</span>
-              <% } %>
-            </div>
-          </div>
-
-          <div class="admin-product-card__body">
-            <div class="admin-product-tags">
-              <span><%= p.brand || "Brand N/A" %></span>
-              <span><%= p.strength || "Strength N/A" %></span>
-
-              <% if (p.isFeatured) { %>
-                <span class="admin-tag admin-tag--featured">Featured</span>
-              <% } %>
-
-              <% if (p.isBestSeller) { %>
-                <span class="admin-tag admin-tag--best">Best Seller</span>
-              <% } %>
-
-              <% if (p.isActive === false) { %>
-                <span class="admin-tag admin-tag--hidden">Hidden</span>
-              <% } %>
-            </div>
-
-            <h2><%= p.name %></h2>
-
-            <p>
-              <%= p.description ? p.description.substring(0, 92) : "No Description Added." %><%= p.description && p.description.length > 92 ? "..." : "" %>
-            </p>
-
-            <%
-              const cost = Number(p.costPrice || 0);
-              const sale = Number(activePrice || 0);
-              const profit = sale - cost;
-              const margin = cost > 0 ? ((profit / cost) * 100).toFixed(0) : 0;
-            %>
-
-            <div class="admin-product-meta">
-              <div>
-                <small>Price</small>
-                <strong>£<%= sale.toFixed(2) %></strong>
-              </div>
-
-              <div>
-                <small>Cost</small>
-                <strong>£<%= cost.toFixed(2) %></strong>
-              </div>
-
-              <div>
-                <small>Profit</small>
-                <strong>£<%= profit.toFixed(2) %></strong>
-              </div>
-
-              <div>
-                <small>Margin</small>
-                <strong><%= margin %>%</strong>
-              </div>
-
-              <div>
-                <small>Stock</small>
-                <strong><%= p.stock || 0 %></strong>
-              </div>
-
-              <div>
-                <small>SKU</small>
-                <strong><%= p.sku || "N/A" %></strong>
-              </div>
-            </div>
-
-            <div class="admin-product-actions">
-              <a href="/admin/products/edit/<%= p._id %>" class="admin-product-edit">
-                <i class="fa-solid fa-pen"></i>
-                Edit
-              </a>
-
-              <form action="/admin/products/<%= p._id %>/toggle-active" method="POST" class="admin-product-inline-form">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit" class="admin-product-visibility">
-                  <i class="fa-solid <%= p.isActive === false ? 'fa-eye' : 'fa-eye-slash' %>"></i>
-                  <%= p.isActive === false ? "Activate" : "Hide" %>
-                </button>
-              </form>
-
-              <button type="button" class="admin-product-delete delete-btn" data-id="<%= p._id %>">
-                <i class="fa-solid fa-trash"></i>
-                Delete
-              </button>
-            </div>
-          </div>
-        </article>
-      <% }) %>
-    </div>
-
-    <% if (hasMore) { %>
-      <button id="loadMore" class="admin-load-more">Load More</button>
-    <% } %>
-  <% } %>
-</section>
-
-<div id="deleteModal" class="delete-modal">
-  <div class="delete-box">
-    <h3>Delete Product</h3>
-    <p>Are you sure you want to delete this product? This action cannot be undone.</p>
-
-    <div class="delete-actions">
-      <button id="cancelDelete" type="button">Cancel</button>
-      <form id="deleteForm" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button type="submit" class="confirm-delete">Yes, Delete</button>
-      </form>
-    </div>
+  <div class="ph-right">
+    <a class="btn btn-red" href="/admin/products/add"><i class="fa-solid fa-plus"></i> Add Product</a>
+    <a class="btn btn-ghost" href="/admin/products/export/csv" data-no-spa><i class="fa-solid fa-file-export"></i> Export CSV</a>
+    <a class="btn btn-ghost" href="/admin/inventory"><i class="fa-solid fa-warehouse"></i> Inventory</a>
   </div>
 </div>
 
-<script>
-function applyFilter() {
-  const search = document.getElementById("searchFilter")?.value || "";
-  const brand = document.getElementById("brandFilter").value;
-  const strength = document.getElementById("strengthFilter").value;
-  const sort = document.getElementById("sortFilter").value;
-  const stock = document.getElementById("stockFilter").value;
-  const visibility = document.getElementById("visibilityFilter")?.value || "";
-  const featured = document.getElementById("featuredFilter")?.value || "";
-  const bestSeller = document.getElementById("bestSellerFilter")?.value || "";
-  const saleBadge = document.getElementById("saleBadgeFilter")?.value || "";
+<div class="stats">
+  <a class="stat stat-blue" href="/admin/products"><div class="stat-top"><div class="stat-icon si-b"><i class="fa-solid fa-boxes-stacked"></i></div></div><div class="stat-lbl">Total Products</div><div class="stat-val"><%= totalProducts %></div></a>
+  <a class="stat stat-grn" href="/admin/products?stock=in"><div class="stat-top"><div class="stat-icon si-g"><i class="fa-solid fa-circle-check"></i></div></div><div class="stat-lbl">In Stock</div><div class="stat-val"><%= inStock %></div></a>
+  <a class="stat stat-red" href="/admin/products?stock=out"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-circle-xmark"></i></div></div><div class="stat-lbl">Out Of Stock</div><div class="stat-val"><%= outStock %></div></a>
+  <a class="stat stat-red" href="/admin/products?visibility=hidden"><div class="stat-top"><div class="stat-icon si-r"><i class="fa-solid fa-eye-slash"></i></div></div><div class="stat-lbl">Hidden</div><div class="stat-val"><%= hiddenProducts %></div></a>
+  <a class="stat stat-amb" href="/admin/products?featured=yes"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-star"></i></div></div><div class="stat-lbl">Featured</div><div class="stat-val"><%= featuredProducts %></div></a>
+  <a class="stat stat-amb" href="/admin/products?bestSeller=yes"><div class="stat-top"><div class="stat-icon si-a"><i class="fa-solid fa-fire"></i></div></div><div class="stat-lbl">Best Sellers</div><div class="stat-val"><%= bestSellerProducts %></div></a>
+</div>
 
-  const params = new URLSearchParams();
+<div class="sec">
+  <div class="sec-head">
+    <h2>Filter Catalogue</h2>
+    <a href="/admin/products" class="btn btn-sm btn-ghost">Reset Filters</a>
+  </div>
+  <form class="sec-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;" method="GET" action="/admin/products">
+    <div class="fld" style="grid-column:1/-1;margin-bottom:0;">
+      <label>Search</label>
+      <input type="text" name="search" value="<%= query.search || '' %>" placeholder="Search name, brand, flavour, nicotine...">
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Brand</label>
+      <select name="brand" onchange="this.form.requestSubmit()">
+        <option value="">All Brands</option>
+        <% ["WHITE FOX","SIBERIA","VELO","KILLA","PABLO","GARANT","ICEBERG CUBA","LOOP","CAFERO","HIT","ODEN'S"].forEach((b) => { %>
+          <option value="<%= b %>" <%= query.brand === b ? "selected" : "" %>><%= b %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Strength</label>
+      <select name="strength" onchange="this.form.requestSubmit()">
+        <option value="">All Strengths</option>
+        <% ["LOW","MEDIUM","STRONG","X-STRONG","EXTREME"].forEach((s) => { %>
+          <option value="<%= s %>" <%= query.strength === s ? "selected" : "" %>><%= s %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Sort</label>
+      <select name="sort" onchange="this.form.requestSubmit()">
+        <option value="" <%= !query.sort ? "selected" : "" %>>Newest</option>
+        <option value="price-low" <%= query.sort === "price-low" ? "selected" : "" %>>Price Low</option>
+        <option value="price-high" <%= query.sort === "price-high" ? "selected" : "" %>>Price High</option>
+        <option value="name" <%= query.sort === "name" ? "selected" : "" %>>Name A-Z</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Stock</label>
+      <select name="stock" onchange="this.form.requestSubmit()">
+        <option value="" <%= !query.stock ? "selected" : "" %>>All Stock</option>
+        <option value="in" <%= query.stock === "in" ? "selected" : "" %>>In Stock</option>
+        <option value="out" <%= query.stock === "out" ? "selected" : "" %>>Out Of Stock</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Visibility</label>
+      <select name="visibility" onchange="this.form.requestSubmit()">
+        <option value="" <%= !query.visibility ? "selected" : "" %>>All</option>
+        <option value="active" <%= query.visibility === "active" ? "selected" : "" %>>Active</option>
+        <option value="hidden" <%= query.visibility === "hidden" ? "selected" : "" %>>Hidden</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Featured</label>
+      <select name="featured" onchange="this.form.requestSubmit()">
+        <option value="" <%= !query.featured ? "selected" : "" %>>All</option>
+        <option value="yes" <%= query.featured === "yes" ? "selected" : "" %>>Featured Only</option>
+      </select>
+    </div>
+    <div class="fld" style="margin-bottom:0;"><label>Best Seller</label>
+      <select name="bestSeller" onchange="this.form.requestSubmit()">
+        <option value="" <%= !query.bestSeller ? "selected" : "" %>>All</option>
+        <option value="yes" <%= query.bestSeller === "yes" ? "selected" : "" %>>Best Sellers Only</option>
+      </select>
+    </div>
+  </form>
+</div>
 
-  if (search) params.append("search", search);
-  if (brand) params.append("brand", brand);
-  if (strength) params.append("strength", strength);
-  if (sort) params.append("sort", sort);
-  if (stock) params.append("stock", stock);
-  if (visibility) params.append("visibility", visibility);
-  if (featured) params.append("featured", featured);
-  if (bestSeller) params.append("bestSeller", bestSeller);
-  if (saleBadge) params.append("saleBadge", saleBadge);
+<div class="sec">
+  <div class="sec-head">
+    <h2>Quick Price Change</h2>
+    <span style="font-size:11px;color:var(--mu);">Affects <strong><%= filteredTotal || 0 %></strong> product<%= Number(filteredTotal || 0) === 1 ? "" : "s" %> matching current filters</span>
+  </div>
+  <form class="sec-body" style="display:grid;grid-template-columns:repeat(3,1fr) auto;gap:12px;align-items:end;" action="/admin/products/bulk-prices" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="search" value="<%= query.search || '' %>">
+    <input type="hidden" name="brand" value="<%= query.brand || '' %>">
+    <input type="hidden" name="strength" value="<%= query.strength || '' %>">
+    <input type="hidden" name="sort" value="<%= query.sort || '' %>">
+    <input type="hidden" name="stock" value="<%= query.stock || '' %>">
+    <input type="hidden" name="visibility" value="<%= query.visibility || '' %>">
+    <input type="hidden" name="featured" value="<%= query.featured || '' %>">
+    <input type="hidden" name="bestSeller" value="<%= query.bestSeller || '' %>">
+    <div class="fld" style="margin-bottom:0;"><label>New Price (&pound;)</label><input type="number" name="price" min="0" step="0.01" placeholder="Leave blank to keep"></div>
+    <div class="fld" style="margin-bottom:0;"><label>New Discount Price (&pound;)</label><input type="number" name="discountPrice" min="0" step="0.01" placeholder="Leave blank / 0 to clear"></div>
+    <div class="fld" style="margin-bottom:0;"><label>Confirm</label><input type="text" name="confirmText" placeholder="Type UPDATE"></div>
+    <button type="submit" class="btn btn-red" onclick="return confirm('Apply this price change to ' + <%- JSON.stringify(filteredTotal || 0) %> + ' product(s)?')"><i class="fa-solid fa-bolt"></i> Apply</button>
+  </form>
+</div>
 
-  window.location.href = "/admin/products" + (params.toString() ? "?" + params.toString() : "");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("deleteModal");
-  const deleteForm = document.getElementById("deleteForm");
-  const cancelBtn = document.getElementById("cancelDelete");
-
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      deleteForm.action = "/admin/products/delete/" + btn.dataset.id;
-      modal.classList.add("active");
-    });
-  });
-
-  cancelBtn?.addEventListener("click", () => {
-    modal.classList.remove("active");
-  });
-
-  modal?.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      modal.classList.remove("active");
-    }
-  });
-
-  const loadBtn = document.getElementById("loadMore");
-  const container = document.getElementById("adminProductsGrid");
-
-  if (!loadBtn || !container) return;
-
-  let page = 1;
-
-  loadBtn.addEventListener("click", async () => {
-    page++;
-
-    const currentParams = new URLSearchParams(window.location.search);
-    currentParams.set("page", page);
-
-    const response = await fetch("/admin/products?" + currentParams.toString(), {
-      headers: {
-        Accept: "application/json",
-      },
-    });
-
-    const data = await response.json();
-
-    if (!data.products || data.products.length === 0) {
-      loadBtn.style.display = "none";
-      return;
-    }
-
-    data.products.forEach((p) => {
-      const activePrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
-      const image = p.images && p.images[0]
-        ? `<img src="${p.images[0]}" alt="${p.name}">`
-        : `<span>No Image</span>`;
-
-      const badges = `
-        <div class="admin-product-card-badges">
-          <span class="${p.isActive === false ? "is-hidden" : "is-active"}">
-            ${p.isActive === false ? "Hidden" : "Active"}
-          </span>
-          ${p.isFeatured ? "<span>Featured</span>" : ""}
-          ${p.isBestSeller ? "<span>Best Seller</span>" : ""}
-          ${p.showSaleBadge ? "<span>Sale Badge</span>" : ""}
+<% if (!products || products.length === 0) { %>
+  <div class="admin-empty-state"><h2>No Products Found</h2><p>Add products or reset your filters to see catalogue items here.</p></div>
+<% } else { %>
+  <div class="sec">
+    <div class="sec-head">
+      <h2><%= products.length %> Product<%= products.length === 1 ? "" : "s" %> Showing</h2>
+      <a href="/shop" target="_blank" class="btn btn-sm btn-ghost"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Shop</a>
+    </div>
+    <div class="prod-grid">
+      <% products.forEach(p => {
+        const activePrice = p.discountPrice && p.discountPrice > 0 ? p.discountPrice : p.price;
+        const badgeClass = p.strength === "X-STRONG" || p.strength === "EXTREME" ? "pb-xstr" : p.strength === "STRONG" ? "pb-str" : p.strength === "MEDIUM" ? "pb-med" : "pb-low";
+      %>
+        <div class="prod-card">
+          <div class="prod-img-wrap">
+            <% if (p.strength) { %><span class="pb <%= badgeClass %>"><%= p.strength %></span><% } %>
+            <% if (p.images && p.images[0]) { %><img src="<%= p.images[0] %>" alt="<%= p.name %>"><% } else { %><span style="color:var(--mu);font-size:11px;">No Image</span><% } %>
+            <div class="p-sbar" style="background:<%= p.stock > 0 ? 'var(--grn)' : '#dc2626' %>;"></div>
+          </div>
+          <div class="prod-body">
+            <div class="prod-brand"><%= p.brand || "Brand N/A" %><% if (p.isActive === false) { %> &middot; Hidden<% } %><% if (p.isBestSeller) { %> &middot; Best Seller<% } %><% if (p.isFeatured) { %> &middot; Featured<% } %></div>
+            <div class="prod-name"><%= p.name %></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;color:var(--mu);margin-bottom:9px;">
+              <span>Cost: &pound;<%= Number(p.costPrice || 0).toFixed(2) %></span>
+              <span>SKU: <%= p.sku || "N/A" %></span>
+            </div>
+            <div class="prod-foot">
+              <span class="prod-price">&pound;<%= Number(activePrice || 0).toFixed(2) %></span>
+              <div class="prod-stock"><span class="sdot <%= p.stock > 0 ? 's-ok' : 's-out' %>"></span><span style="color:<%= p.stock > 0 ? 'var(--grn)' : '#dc2626' %>;"><%= p.stock > 0 ? p.stock + " left" : "Out of stock" %></span></div>
+            </div>
+          </div>
+          <div class="prod-actions">
+            <a class="btn btn-sm btn-ghost" href="/admin/products/edit/<%= p._id %>"><i class="fa-solid fa-pen"></i> Edit</a>
+            <form action="/admin/products/<%= p._id %>/toggle-active" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-ghost"><i class="fa-solid <%= p.isActive === false ? 'fa-eye' : 'fa-eye-slash' %>"></i> <%= p.isActive === false ? "Show" : "Hide" %></button>
+            </form>
+            <form action="/admin/products/delete/<%= p._id %>" method="POST" onsubmit="return confirm('Delete this product? This cannot be undone.')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </div>
         </div>
-      `;
-
-      const card = `
-        <article class="admin-product-card">
-          <div class="admin-product-card__media">
-            ${image}
-            <span class="admin-product-stock ${p.stock > 0 ? "is-in" : "is-out"}">
-              ${p.stock > 0 ? "In Stock" : "Out Of Stock"}
-            </span>
-            ${badges}
-          </div>
-
-          <div class="admin-product-card__body">
-            <div class="admin-product-tags">
-              <span>${p.brand || "Brand N/A"}</span>
-              <span>${p.strength || "Strength N/A"}</span>
-            </div>
-
-            <h2>${p.name}</h2>
-
-            <p>${p.description ? p.description.substring(0, 92) : "No Description Added."}${p.description && p.description.length > 92 ? "..." : ""}</p>
-
-            <div class="admin-product-meta">
-              <div><small>Price</small><strong>£${Number(activePrice || 0).toFixed(2)}</strong></div>
-              <div><small>Cost</small><strong>£${Number(p.costPrice || 0).toFixed(2)}</strong></div>
-              <div><small>Profit</small><strong>£${(Number(activePrice || 0) - Number(p.costPrice || 0)).toFixed(2)}</strong></div>
-              <div><small>Margin</small><strong>${Number(p.costPrice || 0) > 0 ? (((Number(activePrice || 0) - Number(p.costPrice || 0)) / Number(p.costPrice || 0)) * 100).toFixed(0) : 0}%</strong></div>
-              <div><small>Stock</small><strong>${p.stock || 0}</strong></div>
-              <div><small>SKU</small><strong>${p.sku || "N/A"}</strong></div>
-            </div>
-
-            <div class="admin-product-actions">
-              <a href="/admin/products/edit/${p._id}" class="admin-product-edit">
-                <i class="fa-solid fa-pen"></i>
-                Edit
-              </a>
-
-              <form action="/admin/products/${p._id}/toggle-active" method="POST" class="admin-product-inline-form">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit" class="admin-product-visibility">
-                  <i class="fa-solid ${p.isActive === false ? "fa-eye" : "fa-eye-slash"}"></i>
-                  ${p.isActive === false ? "Activate" : "Hide"}
-                </button>
-              </form>
-
-              <button type="button" class="admin-product-delete delete-btn" data-id="${p._id}">
-                <i class="fa-solid fa-trash"></i>
-                Delete
-              </button>
-            </div>
-          </div>
-        </article>
-      `;
-
-      container.insertAdjacentHTML("beforeend", card);
-    });
-
-    document.querySelectorAll(".delete-btn").forEach((btn) => {
-      btn.onclick = () => {
-        deleteForm.action = "/admin/products/delete/" + btn.dataset.id;
-        modal.classList.add("active");
-      };
-    });
-
-    if (!data.hasMore) {
-      loadBtn.style.display = "none";
-    }
-  });
-});
-</script>
+      <% }) %>
+    </div>
+    <% if (hasMore) { %>
+      <div style="padding:16px;text-align:center;">
+        <a class="btn btn-ghost" href="/admin/products?<%- new URLSearchParams({ ...query, page: nextPage }).toString() %>">Next Page &rarr;</a>
+      </div>
+    <% } %>
+  </div>
+<% } %>
