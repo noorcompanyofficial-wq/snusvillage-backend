@@ -1,0 +1,69 @@
+<%- include("../partials/admin-flash") %>
+
+<div class="ph">
+  <div>
+    <div class="ph-eye">Commerce</div>
+    <h1>Import Products</h1>
+    <p>Bulk add or update products from a CSV file — name, description, price, flavour, nicotine, SKU, and more.</p>
+  </div>
+  <div class="ph-right"><a class="btn btn-ghost" href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i> Products</a></div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><h2>1. Download The Template</h2><span style="font-size:11px;color:var(--mu);">Fill this in, one row per product</span></div>
+  <div class="sec-body">
+    <p style="font-size:12px;color:var(--mu);margin-bottom:12px;">Required columns: <strong>Name, Brand, Strength, Price, Description</strong>. Everything else is optional — leave a cell blank to use the default. <strong>Strength</strong> must be one of LOW, MEDIUM, STRONG, X-STRONG, EXTREME. <strong>Images</strong> should be one or more public image URLs separated by a <code>|</code> — CSV can't carry photo files directly, so upload photos to the product afterwards via Edit Product if you don't have URLs.</p>
+    <a class="btn btn-red" href="/admin/products/import/template" data-no-spa><i class="fa-solid fa-file-arrow-down"></i> Download CSV Template</a>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sec-head"><h2>2. Upload Your CSV</h2></div>
+  <form class="sec-body" action="/admin/products/import" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="fld"><label>CSV File</label><input type="file" name="file" accept=".csv,text/csv" required></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:16px;">
+      <input type="checkbox" name="updateExisting" style="width:auto;min-height:0;">
+      Update existing products when the SKU already matches one in the catalogue
+    </label>
+    <p style="font-size:11px;color:var(--mu);margin-bottom:16px;">If this is left unticked, any row whose SKU already exists will be skipped rather than overwritten — nothing already in your catalogue gets changed unless you tick this.</p>
+    <button type="submit" class="btn btn-red"><i class="fa-solid fa-file-arrow-up"></i> Import Products</button>
+  </form>
+</div>
+
+<% if (results) { %>
+  <div class="stats" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat stat-blue"><div class="stat-lbl">Rows In File</div><div class="stat-val"><%= results.totalRows %></div></div>
+    <div class="stat stat-grn"><div class="stat-lbl">Created</div><div class="stat-val"><%= results.created %></div></div>
+    <div class="stat stat-blue"><div class="stat-lbl">Updated</div><div class="stat-val"><%= results.updated %></div></div>
+    <div class="stat stat-amb"><div class="stat-lbl">Skipped / Failed</div><div class="stat-val"><%= results.skipped.length + results.errors.length %></div></div>
+  </div>
+
+  <% if (results.errors.length) { %>
+    <div class="sec">
+      <div class="sec-head"><h2>Rows That Failed</h2><span style="font-size:11px;color:var(--mu);"><%= results.errors.length %> row<%= results.errors.length === 1 ? "" : "s" %></span></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Row</th><th>Name</th><th>Reason</th></tr></thead><tbody>
+        <% results.errors.forEach((e) => { %>
+          <tr><td class="t-mono"><%= e.row %></td><td class="t-name"><%= e.name %></td><td class="t-sub"><%= e.reason %></td></tr>
+        <% }) %>
+      </tbody></table></div>
+    </div>
+  <% } %>
+
+  <% if (results.skipped.length) { %>
+    <div class="sec">
+      <div class="sec-head"><h2>Rows Skipped</h2><span style="font-size:11px;color:var(--mu);"><%= results.skipped.length %> row<%= results.skipped.length === 1 ? "" : "s" %></span></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Row</th><th>Name</th><th>Reason</th></tr></thead><tbody>
+        <% results.skipped.forEach((s) => { %>
+          <tr><td class="t-mono"><%= s.row %></td><td class="t-name"><%= s.name %></td><td class="t-sub"><%= s.reason %></td></tr>
+        <% }) %>
+      </tbody></table></div>
+    </div>
+  <% } %>
+
+  <% if (results.created > 0 || results.updated > 0) { %>
+    <div class="sec"><div class="sec-body" style="text-align:center;">
+      <a class="btn btn-red" href="/admin/products"><i class="fa-solid fa-boxes-stacked"></i> View Products</a>
+    </div></div>
+  <% } %>
+<% } %>

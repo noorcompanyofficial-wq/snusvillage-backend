@@ -20,6 +20,8 @@ const AdminAuditLog = require("../models/AdminAuditLog");
 const isAdmin = require("../middleware/isAdmin");
 const upload = require("../middleware/upload");
 const videoUpload = require("../middleware/videoUpload");
+const csvUpload = require("../middleware/csvUpload");
+const { parse: parseCsv } = require("csv-parse/sync");
 const { verifyCsrfToken } = require("../middleware/csrf");
 const wholesaleApplicationStore = require("../utils/wholesaleApplicationStore");
 const transporter = require("../config/mailer");
@@ -2785,6 +2787,184 @@ router.get("/products/export/csv", isAdmin, requireAdminRole(PERMISSIONS.product
     res.redirect("/admin/products");
   }
 });
+
+const IMPORT_TEMPLATE_HEADERS = [
+  "Name", "SKU", "Barcode", "Brand", "Flavour", "Category", "Strength", "Nicotine",
+  "Price", "Discount Price", "Cost Price", "Stock", "Pouches Per Can",
+  "Supplier", "Supplier Code", "Active", "Featured", "Best Seller", "Sale Badge",
+  "SEO Title", "SEO Description", "Description", "Images",
+];
+
+router.get("/products/import", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
+  res.render("admin/import-products", { layout: adminLayout(req), results: null });
+});
+
+router.get("/products/import/template", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
+  const example = [
+    "White Fox Peppered Mint", "WF-PM-20", "", "WHITE FOX", "Peppered Mint", "Nicotine Pouches",
+    "STRONG", "16", "3.99", "0.00", "1.50", "50", "20", "", "",
+    "yes", "no", "no", "no", "", "",
+    "Clean, cool mint with a long-lasting nicotine release.", "",
+  ];
+  const csv = [IMPORT_TEMPLATE_HEADERS, example].map((row) => row.map(csvCell).join(",")).join("\n");
+
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", "attachment; filename=snus-village-product-import-template.csv");
+  res.send(csv);
+});
+
+router.post(
+  "/products/import",
+  isAdmin,
+  requireAdminRole(PERMISSIONS.products),
+  csvUpload.single("file"),
+  verifyCsrfToken,
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        req.flash("error", "Please choose a CSV file to import.");
+        return res.redirect("/admin/products/import");
+      }
+
+      const updateExisting = req.body.updateExisting === "on";
+
+      let records;
+      try {
+        records = parseCsv(req.file.buffer, {
+          columns: true,
+          skip_empty_lines: true,
+          trim: true,
+          bom: true,
+        });
+      } catch (parseErr) {
+        req.flash("error", "Could not read that CSV file: " + parseErr.message);
+        return res.redirect("/admin/products/import");
+      }
+
+      const STRENGTHS = ["LOW", "MEDIUM", "STRONG", "X-STRONG", "EXTREME"];
+      const results = { totalRows: records.length, created: 0, updated: 0, skipped: [], errors: [] };
+
+      for (let i = 0; i < records.length; i++) {
+        const rowNum = i + 2; // header is row 1
+        const raw = records[i];
+
+        const get = (...keys) => {
+          for (const key of Object.keys(raw)) {
+            if (keys.includes(key.trim().toLowerCase())) {
+              const value = raw[key];
+              if (value != null && String(value).trim() !== "") return String(value).trim();
+            }
+          }
+          return "";
+        };
+
+        const name = get("name");
+        const brand = get("brand");
+        const strengthRaw = get("strength");
+        const priceRaw = get("price");
+        const description = get("description");
+
+        if (!name || !brand || !strengthRaw || !priceRaw || !description) {
+          results.errors.push({
+            row: rowNum,
+            name: name || "(no name)",
+            reason: "Missing required field(s) — Name, Brand, Strength, Price, and Description are all required.",
+          });
+          continue;
+        }
+
+        const strength = strengthRaw.toUpperCase();
+        if (!STRENGTHS.includes(strength)) {
+          results.errors.push({ row: rowNum, name, reason: `Invalid strength "${strengthRaw}" — must be one of ${STRENGTHS.join(", ")}.` });
+          continue;
+        }
+
+        const price = Number(priceRaw);
+        if (!Number.isFinite(price) || price < 0) {
+          results.errors.push({ row: rowNum, name, reason: `Invalid price "${priceRaw}".` });
+          continue;
+        }
+
+        const skuRaw = get("sku");
+        const sku = skuRaw ? skuRaw.toUpperCase() : "";
+
+        const parseBool = (value, fallback) => {
+          if (!value) return fallback;
+          return ["yes", "true", "1"].includes(value.toLowerCase());
+        };
+
+        const imagesRaw = get("images", "image", "image url", "image urls");
+        const images = imagesRaw ? imagesRaw.split(/[|,]/).map((s) => s.trim()).filter(Boolean) : [];
+
+        const fields = {
+          name,
+          brand,
+          flavour: get("flavour", "flavor"),
+          category: get("category") || "general",
+          strength,
+          nicotine: get("nicotine", "mg", "nicotine (mg)", "nicotine mg"),
+          price,
+          discountPrice: Number(get("discount price", "discountprice", "sale price")) || 0,
+          costPrice: Number(get("cost price", "costprice")) || 0,
+          stock: Number(get("stock", "quantity", "qty")) || 0,
+          pouchesPerCan: Number(get("pouches per can", "pouchespercan", "pouches")) || 20,
+          supplier: get("supplier"),
+          supplierCode: get("supplier code", "suppliercode"),
+          sku,
+          barcode: get("barcode"),
+          isActive: parseBool(get("active"), true),
+          isFeatured: parseBool(get("featured"), false),
+          isBestSeller: parseBool(get("best seller", "bestseller"), false),
+          showSaleBadge: parseBool(get("sale badge", "salebadge"), false),
+          seoTitle: get("seo title", "seotitle"),
+          seoDescription: get("seo description", "seodescription"),
+          description,
+        };
+
+        try {
+          const existing = sku ? await Product.findOne({ sku }) : null;
+
+          if (existing) {
+            if (!updateExisting) {
+              results.skipped.push({ row: rowNum, name, reason: `SKU "${sku}" already exists — tick "Update existing products" to overwrite it.` });
+              continue;
+            }
+
+            Object.assign(existing, fields);
+            if (images.length) existing.images = images;
+            await existing.save();
+            results.updated++;
+          } else {
+            const baseSlug = buildProductSlug(name);
+            let finalSlug = baseSlug;
+            let suffix = 1;
+            while (await Product.findOne({ slug: finalSlug })) {
+              suffix++;
+              finalSlug = `${baseSlug}-${suffix}`;
+            }
+
+            await Product.create({ ...fields, slug: finalSlug, images });
+            results.created++;
+          }
+        } catch (rowErr) {
+          results.errors.push({ row: rowNum, name, reason: rowErr.message });
+        }
+      }
+
+      await logAdminAction(req, "PRODUCTS_IMPORTED_CSV", {
+        targetType: "Product",
+        summary: `Imported CSV: ${results.created} created, ${results.updated} updated, ${results.skipped.length} skipped, ${results.errors.length} failed`,
+        meta: results,
+      });
+
+      res.render("admin/import-products", { layout: adminLayout(req), results });
+    } catch (err) {
+      console.log(err);
+      req.flash("error", "Unable to import CSV: " + err.message);
+      res.redirect("/admin/products/import");
+    }
+  }
+);
 
 //  Add Product Page
 router.get("/products/add", isAdmin, requireAdminRole(PERMISSIONS.products), (req, res) => {
