@@ -1,14 +1,7 @@
 <%
   const productLabel = (p) => (p?.brand ? p.brand + " — " : "") + (p?.name || "");
-  const productMap = {};
-  products.forEach((p) => { productMap[productLabel(p)] = p._id.toString(); });
 %>
 <%- include("../partials/admin-flash") %>
-
-<div id="heroProductMapData" data-map='<%- JSON.stringify(productMap) %>' hidden></div>
-<datalist id="heroProductOptions">
-  <% products.forEach((p) => { %><option value="<%= productLabel(p) %>"></option><% }) %>
-</datalist>
 
 <div class="ph">
   <div>
@@ -19,14 +12,24 @@
   <div class="ph-right"><a class="btn btn-ghost" href="/admin/homepage"><i class="fa-solid fa-arrow-left"></i> Back To Homepage</a></div>
 </div>
 
+<div class="admin-homepage-help" style="background:#eef3ff;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:12px;color:var(--mu);">
+  <strong style="color:var(--blue);display:block;margin-bottom:4px;">How this works</strong>
+  Slides you add here are shown <strong>exactly as ordered below</strong> — nothing else is mixed in automatically. Add at least <strong>2 slides</strong> to get a rotating slideshow; with only 1 slide the hero will just show that one banner without arrows or rotation. If you remove every slide, the homepage falls back to showing your Best Sellers automatically.
+</div>
+
 <div class="sec">
   <div class="sec-head"><h2>Add Hero Slide</h2><span style="font-size:11px;color:var(--mu);">Pick a product and background photo</span></div>
   <form class="sec-body fgrid-3" style="align-items:end;" action="/admin/homepage/hero/slides" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="fld" style="margin-bottom:0;">
       <label>Product</label>
-      <input type="text" class="hero-product-search" list="heroProductOptions" placeholder="Search products…" autocomplete="off">
-      <input type="hidden" name="product" class="hero-product-id">
+      <input type="text" class="hero-product-filter" placeholder="Type to filter…" autocomplete="off">
+      <select name="product" class="hero-product-select" required style="margin-top:6px;">
+        <option value="">Select a product…</option>
+        <% products.forEach((p) => { %>
+          <option value="<%= p._id %>" data-search="<%= productLabel(p).toLowerCase() %>"><%= productLabel(p) %></option>
+        <% }) %>
+      </select>
     </div>
     <div class="fld" style="margin-bottom:0;"><label>Background Image</label><input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif" required></div>
     <button type="submit" class="btn btn-red"><i class="fa-solid fa-circle-plus"></i> Add Hero Slide</button>
@@ -53,8 +56,13 @@
               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
               <div class="fld" style="margin-bottom:0;">
                 <label>Product</label>
-                <input type="text" class="hero-product-search" list="heroProductOptions" autocomplete="off" value="<%= slide.product ? productLabel(slide.product) : '' %>">
-                <input type="hidden" name="product" class="hero-product-id" value="<%= slide.product ? slide.product._id : '' %>">
+                <input type="text" class="hero-product-filter" placeholder="Type to filter…" autocomplete="off">
+                <select name="product" class="hero-product-select" required style="margin-top:6px;">
+                  <option value="">Select a product…</option>
+                  <% products.forEach((p) => { %>
+                    <option value="<%= p._id %>" data-search="<%= productLabel(p).toLowerCase() %>" <%= slide.product && String(slide.product._id) === String(p._id) ? "selected" : "" %>><%= productLabel(p) %></option>
+                  <% }) %>
+                </select>
               </div>
               <div class="fld" style="margin-bottom:0;"><label>Replace Background Image</label><input type="file" name="bgImage" accept="image/jpeg,image/png,image/webp,image/avif"></div>
               <button type="submit" class="btn btn-sm btn-red">Save Changes</button>

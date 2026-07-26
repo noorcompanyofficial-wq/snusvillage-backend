@@ -246,35 +246,25 @@
   }
 
   function initHeroProductPicker() {
-    const mapEl = document.getElementById("heroProductMapData");
-    if (!mapEl) return;
+    document.querySelectorAll(".hero-product-filter").forEach((filterInput) => {
+      const select = filterInput.parentElement.querySelector(".hero-product-select");
+      if (!select) return;
 
-    let map;
-    try {
-      map = JSON.parse(mapEl.dataset.map || "{}");
-    } catch (err) {
-      return;
-    }
+      const options = Array.from(select.options).filter((opt) => opt.value);
 
-    document.querySelectorAll(".hero-product-search").forEach((input) => {
-      const hiddenInput = input.parentElement.querySelector(".hero-product-id");
-      if (!hiddenInput) return;
+      filterInput.addEventListener("input", () => {
+        const term = filterInput.value.trim().toLowerCase();
 
-      input.addEventListener("input", () => {
-        const id = map[input.value];
-        if (id) hiddenInput.value = id;
-      });
-
-      const form = input.closest("form");
-      if (form && !form.dataset.heroValidateBound) {
-        form.dataset.heroValidateBound = "1";
-        form.addEventListener("submit", (event) => {
-          if (!hiddenInput.value) {
-            event.preventDefault();
-            window.alert("Please choose a product from the list.");
-          }
+        options.forEach((opt) => {
+          opt.hidden = term.length > 0 && !opt.dataset.search.includes(term);
         });
-      }
+
+        const selected = select.selectedOptions[0];
+        if (term && selected && selected.hidden) {
+          const firstVisible = options.find((opt) => !opt.hidden);
+          if (firstVisible) select.value = firstVisible.value;
+        }
+      });
     });
   }
 
