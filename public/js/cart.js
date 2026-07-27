@@ -41,6 +41,12 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  let quantity = 1;
+  if (btn.dataset.quantityInput) {
+    const quantityEl = document.querySelector(btn.dataset.quantityInput);
+    if (quantityEl) quantity = Math.max(1, parseInt(quantityEl.value, 10) || 1);
+  }
+
   try {
     btn.disabled = true;
     await fetch(`/cart/add/${id}`, {
@@ -50,7 +56,7 @@ document.addEventListener("click", async (e) => {
         Accept: "application/json",
         "X-CSRF-Token": getCsrfToken(),
       },
-      body: JSON.stringify({ quantity: 1 }),
+      body: JSON.stringify({ quantity }),
     });
 
     cart?.classList.add("active");

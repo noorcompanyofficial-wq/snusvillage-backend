@@ -68,6 +68,9 @@
                 <div class="dsh-oc-item-meta"><%= item.brand %> &middot; &times;<%= item.quantity %></div>
               </div>
               <div class="dsh-oc-item-price">&pound;<%= (item.price * item.quantity).toFixed(2) %></div>
+              <% if (order.orderStatus === "completed" && item.product) { %>
+                <a href="/products/<%= item.product %>#pdReviews" class="dsh-btn dsh-btn-ghost dsh-btn-sm" data-no-spa><i class="fa-solid fa-star"></i> Review</a>
+              <% } %>
             </div>
           <% }); %>
         </div>

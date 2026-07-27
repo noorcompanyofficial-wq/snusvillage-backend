@@ -6,309 +6,385 @@
   const productImages = product.images && product.images.length ? product.images : [];
   const hasMultipleProductImages = productImages.length > 1;
   const pouchesPerCan = Number(product.pouchesPerCan || 20);
-  const pouchesPerCanLabel = pouchesPerCan > 0 ? pouchesPerCan + " per can" : "N/A";
   const freeDeliveryThreshold = Number((typeof storeSettings !== "undefined" && storeSettings?.freeDeliveryThreshold) || 10);
   const bundleQuantities = [1, 3, 5, 10].filter((qty) => qty <= Math.max(Number(product.stock || 0), 1));
-  const strengthClass = (product.strength || "medium").toLowerCase().replace("-", "");
+
+  const STRENGTH_CLASS = { "LOW": "low", "MEDIUM": "medium", "STRONG": "strong", "X-STRONG": "xstrong", "EXTREME": "extreme" };
+  const strengthClass = STRENGTH_CLASS[product.strength] || "medium";
+
+  const fullStars = Math.floor(reviewStats.average);
+  const hasHalfStar = reviewStats.average - fullStars >= 0.25 && reviewStats.average - fullStars < 0.75;
+
+  const highlights = [
+    product.format && `${product.format} format`,
+    product.nicotine && `${product.nicotine}mg nicotine per pouch`,
+    pouchesPerCan && `${pouchesPerCan} pouches per can`,
+    "Tobacco-free & smoke-free",
+    product.flavour && `${product.flavour} flavour`,
+    product.brand && `Made by ${product.brand}`,
+  ].filter(Boolean);
 %>
 
 <% if (typeof schema !== "undefined" && schema) { %>
   <script type="application/ld+json"><%- schema %></script>
 <% } %>
 
-<div class="pdv4">
-  <!-- V4 breadcrumb bar: full-width dark navy strip -->
-  <div class="pdv4-breadcrumb-bar">
-    <div class="pdv4-breadcrumb-bar__inner">
+<div class="pd2">
+  <div class="pd2-crumb-bar">
+    <div class="pd2-crumb-inner">
       <a href="/">Home</a>
-      <span class="pdv4-bc-sep">›</span>
-      <a href="/shop">Shop</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <a href="/shop">Shop All</a>
       <% if (product.brand) { %>
-        <span class="pdv4-bc-sep">›</span>
+        <i class="fa-solid fa-chevron-right"></i>
         <a href="/shop?brand=<%= encodeURIComponent(product.brand) %>"><%= product.brand %></a>
       <% } %>
-      <span class="pdv4-bc-sep">›</span>
-      <strong><%= product.name %></strong>
+      <i class="fa-solid fa-chevron-right"></i>
+      <span><%= product.name %></span>
     </div>
   </div>
 
-  <section class="pd">
-    <!-- Legacy breadcrumb hidden via .pdv4 .pd-breadcrumb { display: none } -->
-    <nav class="pd-breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span>/</span>
-      <a href="/shop">Shop</a>
-      <% if (product.brand) { %>
-        <span>/</span>
-        <a href="/shop?brand=<%= encodeURIComponent(product.brand) %>"><%= product.brand %></a>
-      <% } %>
-      <span>/</span>
-      <strong><%= product.name %></strong>
-    </nav>
+  <% if (typeof error !== "undefined" && error && error.length) { %>
+    <div class="pd2-flash pd2-flash-error"><%= error[0] %></div>
+  <% } %>
+  <% if (typeof success !== "undefined" && success && success.length) { %>
+    <div class="pd2-flash pd2-flash-success"><%= success[0] %></div>
+  <% } %>
 
-    <div class="pd-detail">
-      <div class="pd-gallery">
-        <div class="pd-gallery__main">
-          <span class="pd-strength-badge pd-strength-badge--<%= strengthClass %>"><%= product.strength || "Medium" %></span>
-          <% if (hasSalePrice) { %>
-            <span class="pd-sale-badge">Sale</span>
-          <% } %>
+  <div class="pd2-wrap">
+    <div class="pd2-product">
+      <!-- Gallery -->
+      <div class="pd2-gallery">
+        <div class="pd2-gallery-main">
+          <div class="pd2-gallery-badges">
+            <% if (product.isBestSeller) { %><span class="pd2-g-badge pd2-gb-hot">Best Seller</span><% } %>
+            <% if (hasSalePrice) { %><span class="pd2-g-badge pd2-gb-sale">Sale</span><% } %>
+          </div>
+          <div class="pd2-gallery-wish <%= isWishlisted ? 'on' : '' %>" id="pdWishBtn" data-wish-toggle data-product-id="<%= product._id %>">
+            <i class="fa-<%= isWishlisted ? 'solid' : 'regular' %> fa-heart"></i>
+          </div>
 
           <% if (productImages.length) { %>
             <% if (hasMultipleProductImages) { %>
-              <button class="pd-gallery__nav pd-gallery__nav--prev" type="button" aria-label="Previous product image">
-                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-              </button>
+              <button class="pd2-gallery-nav pd2-gallery-nav--prev" type="button" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
             <% } %>
             <img id="pdMainImage" src="<%= optimiseImageUrl(productImages[0], { width: 1200, quality: 'auto:best' }) %>" alt="<%= product.name %>" loading="eager" decoding="async">
             <% if (hasMultipleProductImages) { %>
-              <button class="pd-gallery__nav pd-gallery__nav--next" type="button" aria-label="Next product image">
-                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-              </button>
+              <button class="pd2-gallery-nav pd2-gallery-nav--next" type="button" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
             <% } %>
           <% } else { %>
-            <div class="pd-gallery__placeholder">No image</div>
+            <span style="color:var(--pd2-mu);font-size:12px;">No image</span>
           <% } %>
 
-          <!-- V4 strength colour bar at bottom of gallery -->
-          <div class="pdv4-sbar pdv4-sbar--<%= strengthClass %>"></div>
+          <div class="pd2-gallery-strip pd2-str-<%= strengthClass %>"></div>
         </div>
 
         <% if (hasMultipleProductImages) { %>
-          <div class="pd-gallery__thumbs" aria-label="Product images">
+          <div class="pd2-thumbs">
             <% productImages.forEach((img, i) => { %>
-              <button class="pd-gallery__thumb <%= i === 0 ? 'is-active' : '' %>" type="button" data-product-image="<%= optimiseImageUrl(img, { width: 1200, quality: 'auto:best' }) %>" aria-label="Show <%= product.name %> image <%= i + 1 %>">
-                <img src="<%= optimiseImageUrl(img, { width: 200 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
+              <button class="pd2-thumb <%= i === 0 ? 'is-active' : '' %>" type="button" data-product-image="<%= optimiseImageUrl(img, { width: 1200, quality: 'auto:best' }) %>" aria-label="Show image <%= i + 1 %>">
+                <img src="<%= optimiseImageUrl(img, { width: 100 }) %>" alt="<%= product.name %> image <%= i + 1 %>" loading="lazy" decoding="async">
               </button>
             <% }) %>
           </div>
         <% } %>
       </div>
 
-      <aside class="pd-info" aria-label="Product purchase information">
-        <a class="pd-info__brand" href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>"><%= product.brand || "Snus Village" %></a>
+      <!-- Buy box -->
+      <div class="pd2-buybox">
+        <a class="pd2-brand" href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>"><%= product.brand || "Snus Village" %></a>
+        <h1 class="pd2-name"><%= product.name %></h1>
 
-        <h1><%= product.name %></h1>
-
-        <p class="pd-info__description">
-          <%= product.description || "Premium nicotine pouch available from Snus Village." %>
-        </p>
-
-        <div class="pd-spec-grid">
-          <div class="pd-spec">
-            <div class="pd-spec__label">Strength</div>
-            <div class="pd-spec__value"><%= product.strength || "N/A" %></div>
-          </div>
-          <div class="pd-spec">
-            <div class="pd-spec__label">Nicotine</div>
-            <div class="pd-spec__value"><%= product.nicotine ? product.nicotine + "mg/g" : "N/A" %></div>
-          </div>
-          <div class="pd-spec">
-            <div class="pd-spec__label">Pouches</div>
-            <div class="pd-spec__value"><%= pouchesPerCanLabel %></div>
-          </div>
-          <div class="pd-spec">
-            <div class="pd-spec__label">Flavour</div>
-            <div class="pd-spec__value"><%= product.flavour || "N/A" %></div>
-          </div>
-        </div>
-
-        <div class="pd-warning" role="note">
-          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-          <span>
-            <strong>Nicotine Pouch Warning</strong>
-            Contains nicotine. Nicotine is an addictive substance. For use by adults 18+ only.
-          </span>
-        </div>
-
-        <div class="pd-buybox">
-          <div class="pd-buybox__price-row">
-            <span class="pd-price">£<%= activePrice.toFixed(2) %></span>
-            <% if (hasSalePrice) { %>
-              <span class="pd-price-old">£<%= originalPrice.toFixed(2) %></span>
+        <div class="pd2-stars-row">
+          <div class="pd2-stars">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <% if (i <= fullStars) { %><i class="fa-solid fa-star"></i>
+              <% } else if (i === fullStars + 1 && hasHalfStar) { %><i class="fa-solid fa-star-half-stroke"></i>
+              <% } else { %><i class="fa-regular fa-star"></i><% } %>
             <% } %>
-            <span class="pd-stock-pill <%= inStock ? 'pd-stock-pill--in' : 'pd-stock-pill--out' %>">
-              <%= inStock ? "In Stock" : "Out of Stock" %>
-            </span>
           </div>
-
-          <% if (inStock) { %>
-            <form action="/cart/add/<%= product._id %>" method="POST" class="pd-buybox__form" id="pdAddForm">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <% if (bundleQuantities.length > 1) { %>
-                <fieldset class="pd-qty-options">
-                  <legend>Choose quantity</legend>
-                  <div class="pd-qty-grid">
-                    <% bundleQuantities.forEach((qty, index) => { %>
-                      <button class="pd-qty-chip <%= index === 0 ? 'is-active' : '' %>" type="button" data-quantity="<%= qty %>">
-                        <strong><%= qty %></strong>
-                        <span><%= qty === 1 ? "can" : "cans" %></span>
-                      </button>
-                    <% }) %>
-                  </div>
-                </fieldset>
-              <% } %>
-
-              <label class="pd-qty-input">
-                <span>Quantity</span>
-                <input id="pdQuantity" type="number" name="quantity" value="1" min="1" max="<%= product.stock %>">
-              </label>
-
-              <button class="pd-add-button" type="submit">
-                <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-                Add to Cart
-              </button>
-            </form>
-
-            <div
-              class="pd-express"
-              id="pdExpressCheckout"
-              data-product-id="<%= product._id %>"
-              data-sumup-public-key="<%= sumupPublicKey || "" %>"
-              data-google-pay-merchant-id="<%= googlePayMerchantId || "" %>"
-              hidden
-            >
-              <div class="pd-express__title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Buy this product now</div>
-              <div id="pdExpressCheckoutContainer" class="pd-express__container"></div>
-              <p class="pd-express__note">
-                Express payment purchases only this product in your selected quantity.
-                For multiple products, use <a href="/cart">cart express checkout</a>.
-              </p>
-              <p id="pdExpressCheckoutError" class="pd-express__error" role="alert" aria-live="polite" hidden></p>
-            </div>
+          <% if (reviewStats.count) { %>
+            <span><%= reviewStats.average.toFixed(1) %></span>
+            <a href="#pdReviews" data-tab-link="reviews"><%= reviewStats.count %> review<%= reviewStats.count === 1 ? "" : "s" %></a>
           <% } else { %>
-            <button class="pd-disabled-button" disabled>Out of Stock</button>
+            <a href="#pdReviews" data-tab-link="reviews">Be the first to review</a>
           <% } %>
+        </div>
 
-          <div class="pd-service-grid">
-            <div class="pd-service">
-              <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
-              <div><strong>Fast UK Delivery</strong><span>From £<%= freeDeliveryThreshold.toFixed(2) %>, next day available</span></div>
-            </div>
-            <div class="pd-service">
-              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-              <div><strong>Age Verified</strong><span>Checkout requires 18+ ID check</span></div>
-            </div>
+        <div class="pd2-str-block">
+          <div class="pd2-str-head">
+            <span class="pd2-str-label">Strength</span>
+            <span class="pd2-str-value"><%= product.strength || "Medium" %></span>
+          </div>
+          <div class="pd2-str-track">
+            <div class="pd2-str-fill" style="width:<%= strengthPosition %>%;"></div>
+            <div class="pd2-str-marker" style="left:<%= strengthPosition %>%;"></div>
+          </div>
+          <div class="pd2-str-scale">
+            <span>Light</span><span>Medium</span><span>Strong</span><span>X-Strong</span><span>Extreme</span>
+          </div>
+          <div class="pd2-str-specs">
+            <div class="pd2-str-spec"><div class="pd2-str-spec-label">Nicotine</div><div class="pd2-str-spec-val"><%= product.nicotine || "N/A" %> <span class="pd2-str-spec-unit">mg</span></div></div>
+            <div class="pd2-str-spec"><div class="pd2-str-spec-label">Per Can</div><div class="pd2-str-spec-val"><%= pouchesPerCan %> <span class="pd2-str-spec-unit">pouches</span></div></div>
+            <% if (product.format) { %>
+              <div class="pd2-str-spec"><div class="pd2-str-spec-label">Format</div><div class="pd2-str-spec-val" style="font-size:13px;"><%= product.format %></div></div>
+            <% } %>
           </div>
         </div>
-      </aside>
-    </div>
 
-    <div class="pd-sections">
-      <div class="pd-section">
-        <h2>Product Details</h2>
-        <ul>
-          <li><strong>Brand:</strong> <%= product.brand || "Snus Village" %></li>
-          <li><strong>Product type:</strong> <%= product.category || "Nicotine pouch" %></li>
-          <li><strong>Flavour profile:</strong> <%= product.flavour || "See product description" %></li>
-          <li><strong>Strength level:</strong> <%= product.strength || "N/A" %></li>
-          <% if (product.sku) { %>
-            <li><strong>SKU:</strong> <%= product.sku %></li>
+        <% if (related && related.length) { %>
+          <span class="pd2-var-label">More From <%= product.brand %></span>
+          <div class="pd2-variants">
+            <a class="pd2-variant is-active" href="/products/<%= product.slug || product._id %>"><%= product.name %></a>
+            <% related.slice(0, 5).forEach((item) => { %>
+              <% const oos = Number(item.stock || 0) <= 0; %>
+              <a class="pd2-variant <%= oos ? 'is-oos' : '' %>" href="<%= oos ? '#' : '/products/' + (item.slug || item._id) %>"><%= item.name %></a>
+            <% }); %>
+          </div>
+        <% } %>
+
+        <div class="pd2-stock-row">
+          <span class="pd2-sdot <%= inStock ? 'pd2-s-ok' : 'pd2-s-out' %>"></span>
+          <span class="pd2-stock-text" style="color:<%= inStock ? 'var(--pd2-grn)' : '#dc2626' %>;"><%= inStock ? "In stock" : "Out of stock" %></span>
+          <span class="pd2-stock-where">Online &middot; Edgware Road Click &amp; Collect</span>
+        </div>
+
+        <div class="pd2-price-row">
+          <span class="pd2-price">&pound;<%= activePrice.toFixed(2) %></span>
+          <% if (hasSalePrice) { %><span class="pd2-price-old">&pound;<%= originalPrice.toFixed(2) %></span><% } %>
+          <span class="pd2-price-per">per can</span>
+        </div>
+
+        <% if (inStock) { %>
+          <% if (bundleQuantities.length > 1) { %>
+            <fieldset class="pd2-qty-options">
+              <legend>Choose quantity</legend>
+              <div class="pd2-qty-grid">
+                <% bundleQuantities.forEach((qty, index) => { %>
+                  <button class="pd2-qty-chip <%= index === 0 ? 'is-active' : '' %>" type="button" data-quantity="<%= qty %>">
+                    <strong><%= qty %></strong>
+                    <span><%= qty === 1 ? "can" : "cans" %></span>
+                  </button>
+                <% }) %>
+              </div>
+            </fieldset>
           <% } %>
-          <li><strong>Tobacco-free</strong> nicotine pouch</li>
-        </ul>
-      </div>
 
-      <div class="pd-section">
-        <h2>Delivery &amp; Returns</h2>
-        <ul>
-          <li>Standard UK delivery from <strong>£1.99</strong></li>
-          <li>Next-day delivery available before <strong>4:30pm</strong></li>
-          <li>Free shipping over <strong>£<%= freeDeliveryThreshold.toFixed(2) %></strong></li>
-          <li>Age verification required on delivery</li>
-        </ul>
-      </div>
-
-      <div class="pd-section">
-        <h2>Responsible Use</h2>
-        <ul>
-          <li>For adults <strong>18+</strong> only</li>
-          <li>Contains nicotine, an addictive substance</li>
-          <li>Keep out of reach of children and pets</li>
-          <li>Not a smoking cessation product</li>
-        </ul>
-      </div>
-    </div>
-
-    <% if (related && related.length) { %>
-      <section class="pd-related" aria-labelledby="pdRelatedTitle">
-        <div class="pd-related__head">
-          <div>
-            <span class="pd-related__eyebrow">You May Also Like</span>
-            <h2 id="pdRelatedTitle">More From <%= product.brand || "This Brand" %></h2>
+          <div class="pd2-qty-cart">
+            <div class="pd2-qty">
+              <button type="button" data-qty-dec>&minus;</button>
+              <input type="number" id="pdQuantity" value="1" min="1" max="<%= product.stock %>">
+              <button type="button" data-qty-inc>+</button>
+            </div>
+            <button class="pd2-add-cart add-cart" id="pdAddBtn" data-id="<%= product._id %>" data-quantity-input="#pdQuantity">
+              <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+            </button>
           </div>
 
+          <div class="pd2-express" id="pdExpressCheckout" data-product-id="<%= product._id %>" data-sumup-public-key="<%= sumupPublicKey || "" %>" data-google-pay-merchant-id="<%= googlePayMerchantId || "" %>" hidden>
+            <div class="pd2-express-title"><i class="fa-solid fa-bolt"></i> Buy this product now</div>
+            <div id="pdExpressCheckoutContainer" class="pd2-express-container"></div>
+            <p class="pd2-express-note">
+              Express payment purchases only this product in your selected quantity.
+              For multiple products, use <a href="/cart">cart express checkout</a>.
+            </p>
+            <p id="pdExpressCheckoutError" class="pd2-express-error" role="alert" aria-live="polite" hidden></p>
+          </div>
+        <% } else { %>
+          <button class="pd2-disabled-btn" disabled>Out of Stock</button>
+        <% } %>
+
+        <div class="pd2-trust">
+          <div class="pd2-trust-item"><i class="fa-solid fa-truck-fast"></i><div><strong>Free delivery</strong> on orders over &pound;<%= freeDeliveryThreshold.toFixed(2) %></div></div>
+          <div class="pd2-trust-item"><i class="fa-solid fa-calendar-check"></i><div><strong>Next day</strong> available before <%= nextDayDeliveryCutoff %></div></div>
+          <div class="pd2-trust-item"><i class="fa-solid fa-shop"></i><div><strong>Click &amp; Collect</strong> &mdash; Edgware Road</div></div>
+          <div class="pd2-trust-item"><i class="fa-solid fa-shield-halved"></i><div><strong>Age verified</strong> at checkout &mdash; 18+ only</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="pd2-tabs-section">
+      <div class="pd2-tab-strip">
+        <button class="pd2-tab-btn is-active" type="button" data-tab="desc">Description</button>
+        <button class="pd2-tab-btn" type="button" data-tab="specs">Specifications</button>
+        <button class="pd2-tab-btn" type="button" data-tab="delivery">Delivery</button>
+        <button class="pd2-tab-btn" type="button" data-tab="reviews">Reviews <span class="pd2-tab-count"><%= reviewStats.count %></span></button>
+      </div>
+
+      <div class="pd2-tab-pane is-active" id="pd2-tab-desc">
+        <div class="pd2-desc-grid">
+          <div class="pd2-desc-body"><%= product.description %></div>
+          <% if (highlights.length) { %>
+            <div class="pd2-desc-highlights">
+              <h4>Highlights</h4>
+              <% highlights.forEach((h) => { %><div class="pd2-hl"><i class="fa-solid fa-check"></i><%= h %></div><% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="pd2-tab-pane" id="pd2-tab-specs">
+        <table class="pd2-specs-table">
+          <tr><td>Brand</td><td><%= product.brand || "Snus Village" %></td></tr>
+          <% if (product.flavour) { %><tr><td>Flavour</td><td><%= product.flavour %></td></tr><% } %>
+          <% if (product.format) { %><tr><td>Format</td><td><%= product.format %></td></tr><% } %>
+          <tr><td>Strength</td><td><%= product.strength %></td></tr>
+          <tr><td>Nicotine per pouch</td><td><%= product.nicotine %> mg</td></tr>
+          <tr><td>Pouches per can</td><td><%= pouchesPerCan %></td></tr>
+          <tr><td>Tobacco content</td><td>None (tobacco-free)</td></tr>
+          <tr><td>Minimum age</td><td>18+</td></tr>
+          <% if (product.sku) { %><tr><td>SKU</td><td><%= product.sku %></td></tr><% } %>
+        </table>
+      </div>
+
+      <div class="pd2-tab-pane" id="pd2-tab-delivery">
+        <div class="pd2-del-grid">
+          <div class="pd2-del-card"><div class="pd2-del-icon">🚚</div><h4>Standard Delivery</h4><p>1&ndash;3 working days &middot; <strong>&pound;<%= standardShippingFee.toFixed(2) %></strong><br/><strong style="color:var(--pd2-grn);">Free</strong> on orders over &pound;<%= freeDeliveryThreshold.toFixed(2) %></p></div>
+          <div class="pd2-del-card"><div class="pd2-del-icon">⚡</div><h4>Next Day Delivery</h4><p>Order before <%= nextDayDeliveryCutoff %> &middot; <strong>&pound;<%= nextDayShippingFee.toFixed(2) %></strong></p></div>
+          <div class="pd2-del-card"><div class="pd2-del-icon">🏪</div><h4>Click &amp; Collect</h4><p><strong>Free</strong> &mdash; ready same day<br/>Edgware Road only</p></div>
+          <div class="pd2-del-card"><div class="pd2-del-icon">🛡️</div><h4>Age Verification</h4><p>Required at checkout<br/>18+ only, ID may be checked on delivery</p></div>
+        </div>
+      </div>
+
+      <div class="pd2-tab-pane" id="pd2-tab-reviews">
+        <% if (reviewStats.count) { %>
+          <div class="pd2-rv-top">
+            <div class="pd2-rv-score">
+              <div class="pd2-rv-big"><%= reviewStats.average.toFixed(1) %></div>
+              <div class="pd2-rv-stars">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= fullStars) { %><i class="fa-solid fa-star"></i>
+                  <% } else if (i === fullStars + 1 && hasHalfStar) { %><i class="fa-solid fa-star-half-stroke"></i>
+                  <% } else { %><i class="fa-regular fa-star"></i><% } %>
+                <% } %>
+              </div>
+              <div class="pd2-rv-ct"><%= reviewStats.count %> review<%= reviewStats.count === 1 ? "" : "s" %></div>
+            </div>
+            <div class="pd2-rv-bars">
+              <% [5,4,3,2,1].forEach((star) => {
+                const n = reviewStats.breakdown[star] || 0;
+                const pct = reviewStats.count ? Math.round((n / reviewStats.count) * 100) : 0;
+              %>
+                <div class="pd2-rv-bar"><span><%= star %> &#9733;</span><div class="pd2-rvb-track"><div class="pd2-rvb-fill" style="width:<%= pct %>%;"></div></div><em><%= n %></em></div>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <% if (canReview) { %>
+          <form class="pd2-rv-form" action="/products/<%= product._id %>/reviews" method="POST" id="pdReviewForm">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="rating" id="pdReviewRating" value="0">
+            <h4>Write a Review</h4>
+            <div class="pd2-star-input" id="pdStarInput">
+              <i class="fa-solid fa-star" data-star="1"></i>
+              <i class="fa-solid fa-star" data-star="2"></i>
+              <i class="fa-solid fa-star" data-star="3"></i>
+              <i class="fa-solid fa-star" data-star="4"></i>
+              <i class="fa-solid fa-star" data-star="5"></i>
+            </div>
+            <textarea name="body" maxlength="2000" placeholder="Share your experience with this product..." required></textarea>
+            <button type="submit" class="pd2-rv-write-btn">Post Review</button>
+          </form>
+        <% } else if (alreadyReviewed) { %>
+          <div class="pd2-rv-gate">You've already reviewed this product &mdash; thanks for your feedback!</div>
+        <% } else if (!user) { %>
+          <div class="pd2-rv-gate"><a href="/auth/login">Log in</a> to write a review if you've purchased this product.</div>
+        <% } else { %>
+          <div class="pd2-rv-gate">Only customers who've purchased this product can leave a review.</div>
+        <% } %>
+
+        <% if (!reviews.length) { %>
+          <div class="pd2-rv-empty">No reviews yet &mdash; be the first to share your experience.</div>
+        <% } else { %>
+          <% reviews.forEach((r) => { %>
+            <div class="pd2-rv-card">
+              <div class="pd2-rvc-top"><div class="pd2-rvc-name"><%= r.displayName %></div><div class="pd2-rvc-date"><%= relTime(r.createdAt) %></div></div>
+              <div class="pd2-rvc-stars">
+                <% for (let i = 1; i <= 5; i++) { %><i class="fa-<%= i <= r.rating ? 'solid' : 'regular' %> fa-star"></i><% } %>
+              </div>
+              <div class="pd2-rvc-body"><%= r.body %></div>
+              <div class="pd2-rvc-verified"><i class="fa-solid fa-circle-check"></i> Verified purchase</div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Strength guide -->
+    <div class="pd2-str-guide">
+      <div class="pd2-sg-head">
+        <div>
+          <div class="pd2-sg-eyebrow">Nicotine Strength Guide</div>
+          <h2>Find Your Strength</h2>
+          <p>Compare all levels to find the right fit for you.</p>
+        </div>
+        <a href="/strength-guide" style="font-size:12px;font-weight:700;color:var(--pd2-red);">Full guide &rarr;</a>
+      </div>
+
+      <div class="pd2-sg-spectrum">
+        <div class="pd2-sg-marker" style="left:<%= strengthPosition %>%;"></div>
+        <div class="pd2-sg-marker-label" style="left:<%= strengthPosition %>%;">You are here</div>
+      </div>
+
+      <div class="pd2-sg-levels">
+        <div class="pd2-sg-lvl pd2-sg-1 <%= strengthClass === 'low' ? 'is-current' : '' %>"><div class="pd2-sg-num">1</div><div class="pd2-sg-name">Light</div><div class="pd2-sg-mg">Under 6mg</div><% if (strengthClass === 'low') { %><div class="pd2-sg-who">&#9650; This product</div><% } %></div>
+        <div class="pd2-sg-lvl pd2-sg-2 <%= strengthClass === 'medium' ? 'is-current' : '' %>"><div class="pd2-sg-num">2</div><div class="pd2-sg-name">Medium</div><div class="pd2-sg-mg">6&ndash;12mg</div><% if (strengthClass === 'medium') { %><div class="pd2-sg-who">&#9650; This product</div><% } %></div>
+        <div class="pd2-sg-lvl pd2-sg-3 <%= strengthClass === 'strong' ? 'is-current' : '' %>"><div class="pd2-sg-num">3</div><div class="pd2-sg-name">Strong</div><div class="pd2-sg-mg">12&ndash;20mg</div><% if (strengthClass === 'strong') { %><div class="pd2-sg-who">&#9650; This product</div><% } %></div>
+        <div class="pd2-sg-lvl pd2-sg-4 <%= strengthClass === 'xstrong' ? 'is-current' : '' %>"><div class="pd2-sg-num">4</div><div class="pd2-sg-name">X-Strong</div><div class="pd2-sg-mg">20&ndash;30mg</div><% if (strengthClass === 'xstrong') { %><div class="pd2-sg-who">&#9650; This product</div><% } %></div>
+        <div class="pd2-sg-lvl pd2-sg-5 <%= strengthClass === 'extreme' ? 'is-current' : '' %>"><div class="pd2-sg-num">5</div><div class="pd2-sg-name">Extreme</div><div class="pd2-sg-mg">30mg+</div><% if (strengthClass === 'extreme') { %><div class="pd2-sg-who">&#9650; This product</div><% } %></div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    <% if (related && related.length) { %>
+      <div class="pd2-related">
+        <div class="pd2-related-head">
+          <h2>You Might Also Like</h2>
           <a href="/shop?brand=<%= encodeURIComponent(product.brand || '') %>">View All</a>
         </div>
-
-        <div class="pd-related__shell">
-          <button class="pd-related__nav pd-related__nav--prev" type="button" aria-label="Scroll previous products">
-            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-          </button>
-
-          <div class="pd-related__track" id="pdRelatedTrack">
-            <% related.forEach((item) => { %>
-              <%
-                const relatedImage = item.images && item.images.length ? item.images[0] : "";
-                const relatedPrice = Number(item.discountPrice && item.discountPrice > 0 ? item.discountPrice : item.price || 0);
-                const relatedStrengthClass = (item.strength || "medium").toLowerCase().replace("-", "");
-              %>
-              <a class="pd-related-card" href="/products/<%= item.slug || item._id %>">
-                <div class="pd-related-card__media">
-                  <span class="pd-strength-badge pd-strength-badge--<%= relatedStrengthClass %> pd-strength-badge--sm"><%= item.strength || "Medium" %></span>
+        <div class="pd2-related-shell">
+          <button class="pd2-related-nav pd2-related-nav--prev" type="button" aria-label="Scroll previous"><i class="fa-solid fa-chevron-left"></i></button>
+          <div class="pd2-related-track" id="pdRelatedTrack">
+            <% related.forEach((item) => {
+              const relatedImage = item.images && item.images.length ? item.images[0] : "";
+              const relatedPrice = Number(item.discountPrice && item.discountPrice > 0 ? item.discountPrice : item.price || 0);
+              const relatedStrengthClass = STRENGTH_CLASS[item.strength] || "medium";
+            %>
+              <a class="pd2-pc" href="/products/<%= item.slug || item._id %>">
+                <div class="pd2-pc-img">
                   <% if (relatedImage) { %>
                     <img src="<%= optimiseImageUrl(relatedImage, { width: 420, quality: 'auto:good' }) %>" alt="<%= item.name %>" loading="lazy" decoding="async">
-                  <% } else { %>
-                    <span>No image</span>
-                  <% } %>
-                  <!-- V4 strength colour bar on related card -->
-                  <div class="pdv4-sbar pdv4-sbar--<%= relatedStrengthClass %>"></div>
+                  <% } else { %><span style="color:var(--pd2-mu);font-size:11px;">No image</span><% } %>
+                  <div class="pd2-pc-strip pd2-str-<%= relatedStrengthClass %>"></div>
                 </div>
-
-                <div class="pd-related-card__body">
-                  <div class="pd-related-card__brand"><%= item.brand || "Snus Village" %></div>
-                  <div class="pd-related-card__name"><%= item.name %></div>
-                  <div class="pd-related-card__footer">
-                    <div class="pd-related-card__price">£<%= relatedPrice.toFixed(2) %></div>
-                    <span class="pd-related-card__view">View</span>
+                <div class="pd2-pc-body">
+                  <div class="pd2-pc-brand"><%= item.brand || "Snus Village" %></div>
+                  <div class="pd2-pc-name"><%= item.name %></div>
+                  <div class="pd2-pc-foot">
+                    <span class="pd2-pc-price">&pound;<%= relatedPrice.toFixed(2) %></span>
+                    <span class="pd2-pc-nic"><%= item.nicotine ? item.nicotine + "mg" : "" %></span>
                   </div>
                 </div>
               </a>
             <% }) %>
           </div>
-
-          <button class="pd-related__nav pd-related__nav--next" type="button" aria-label="Scroll next products">
-            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-          </button>
+          <button class="pd2-related-nav pd2-related-nav--next" type="button" aria-label="Scroll next"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-      </section>
+      </div>
     <% } %>
-  </section>
-
-  <!-- V4 strength guide strip -->
-  <div class="pdv4-strength-strip" aria-label="Nicotine strength guide">
-    <div class="pdv4-strength-strip__item pdv4-strength-strip__item--low <%= strengthClass === 'low' ? 'pdv4-strength-strip__item--active' : '' %>">
-      <div class="pdv4-strength-strip__name">Low</div>
-      <div class="pdv4-strength-strip__range">Under 6mg/g</div>
-    </div>
-    <div class="pdv4-strength-strip__item pdv4-strength-strip__item--medium <%= strengthClass === 'medium' ? 'pdv4-strength-strip__item--active' : '' %>">
-      <div class="pdv4-strength-strip__name">Medium</div>
-      <div class="pdv4-strength-strip__range">6 – 12mg/g</div>
-    </div>
-    <div class="pdv4-strength-strip__item pdv4-strength-strip__item--strong <%= strengthClass === 'strong' ? 'pdv4-strength-strip__item--active' : '' %>">
-      <div class="pdv4-strength-strip__name">Strong</div>
-      <div class="pdv4-strength-strip__range">12 – 18mg/g</div>
-    </div>
-    <div class="pdv4-strength-strip__item pdv4-strength-strip__item--xstrong <%= strengthClass === 'xstrong' ? 'pdv4-strength-strip__item--active' : '' %>">
-      <div class="pdv4-strength-strip__name">X-Strong</div>
-      <div class="pdv4-strength-strip__range">18 – 30mg/g</div>
-    </div>
-    <div class="pdv4-strength-strip__item pdv4-strength-strip__item--extreme <%= strengthClass === 'extreme' ? 'pdv4-strength-strip__item--active' : '' %>">
-      <div class="pdv4-strength-strip__name">Extreme</div>
-      <div class="pdv4-strength-strip__range">30mg/g+</div>
-    </div>
   </div>
 </div>
+
+<% if (inStock) { %>
+  <div class="pd2-sticky-bar">
+    <span class="pd2-sb-price">&pound;<%= activePrice.toFixed(2) %></span>
+    <button class="pd2-sb-add add-cart" data-id="<%= product._id %>" data-quantity-input="#pdQuantity"><i class="fa-solid fa-bag-shopping"></i> Add to Cart</button>
+  </div>
+<% } %>
+
+<div class="pd2-toast" id="pdToast"><i class="fa-solid fa-circle-check"></i><span id="pdToastMsg">Added!</span></div>
 
 <% if (sumupPublicKey && inStock) { %>
   <script src="https://js.sumup.com/swift-checkout/v1/sdk.js"></script>
@@ -317,22 +393,17 @@
 <script>
   (function () {
     const mainImage = document.getElementById("pdMainImage");
-    const thumbnailButtons = Array.from(document.querySelectorAll(".pd-gallery__thumb"));
-    const galleryPrev = document.querySelector(".pd-gallery__nav--prev");
-    const galleryNext = document.querySelector(".pd-gallery__nav--next");
+    const thumbnailButtons = Array.from(document.querySelectorAll(".pd2-thumb"));
+    const galleryPrev = document.querySelector(".pd2-gallery-nav--prev");
+    const galleryNext = document.querySelector(".pd2-gallery-nav--next");
     let activeIndex = 0;
 
     function showImage(index) {
       if (!mainImage || !thumbnailButtons.length) return;
-
       activeIndex = (index + thumbnailButtons.length) % thumbnailButtons.length;
       const selected = thumbnailButtons[activeIndex];
       const imageUrl = selected.dataset.productImage;
-
-      if (imageUrl) {
-        mainImage.src = imageUrl;
-      }
-
+      if (imageUrl) mainImage.src = imageUrl;
       thumbnailButtons.forEach((button, buttonIndex) => {
         button.classList.toggle("is-active", buttonIndex === activeIndex);
       });
@@ -341,40 +412,108 @@
     thumbnailButtons.forEach((button, index) => {
       button.addEventListener("click", () => showImage(index));
     });
-
     galleryPrev?.addEventListener("click", () => showImage(activeIndex - 1));
     galleryNext?.addEventListener("click", () => showImage(activeIndex + 1));
 
+    // ---- Tabs ----
+    const tabButtons = Array.from(document.querySelectorAll(".pd2-tab-btn"));
+    function switchTab(id) {
+      tabButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.tab === id));
+      document.querySelectorAll(".pd2-tab-pane").forEach((p) => p.classList.remove("is-active"));
+      document.getElementById("pd2-tab-" + id)?.classList.add("is-active");
+    }
+    tabButtons.forEach((btn) => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+    document.querySelectorAll("[data-tab-link]").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab(el.dataset.tabLink);
+        document.querySelector(".pd2-tabs-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    // ---- Quantity ----
     const quantityInput = document.getElementById("pdQuantity");
-    const quantityChips = Array.from(document.querySelectorAll(".pd-qty-chip"));
+    const quantityChips = Array.from(document.querySelectorAll(".pd2-qty-chip"));
 
     function setQuantity(value) {
       if (!quantityInput) return;
-
       const max = Number(quantityInput.max || value);
       const quantity = Math.max(1, Math.min(Number(value || 1), max));
       quantityInput.value = quantity;
-
-      quantityChips.forEach((chip) => {
-        chip.classList.toggle("is-active", Number(chip.dataset.quantity) === quantity);
-      });
-
+      quantityChips.forEach((chip) => chip.classList.toggle("is-active", Number(chip.dataset.quantity) === quantity));
       if (expressSection && !expressProcessing) {
         window.clearTimeout(expressRefreshTimer);
         expressRefreshTimer = window.setTimeout(initialiseProductExpress, 400);
       }
     }
 
-    quantityChips.forEach((chip) => {
-      chip.addEventListener("click", () => setQuantity(chip.dataset.quantity));
+    quantityChips.forEach((chip) => chip.addEventListener("click", () => setQuantity(chip.dataset.quantity)));
+    quantityInput?.addEventListener("input", () => setQuantity(quantityInput.value));
+    document.querySelector("[data-qty-dec]")?.addEventListener("click", () => setQuantity(Number(quantityInput.value || 1) - 1));
+    document.querySelector("[data-qty-inc]")?.addEventListener("click", () => setQuantity(Number(quantityInput.value || 1) + 1));
+
+    // ---- Add to cart toast (sitewide cart.js already performs the real AJAX add) ----
+    function showToast(msg) {
+      const el = document.getElementById("pdToast");
+      if (!el) return;
+      document.getElementById("pdToastMsg").textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2600);
+    }
+    document.querySelectorAll(".add-cart").forEach((btn) => {
+      btn.addEventListener("click", () => showToast("Added to cart!"));
     });
 
-    quantityInput?.addEventListener("input", () => setQuantity(quantityInput.value));
+    // ---- Wishlist ----
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+    document.getElementById("pdWishBtn")?.addEventListener("click", async function () {
+      const btn = this;
+      try {
+        const res = await fetch(`/wishlist/toggle/${btn.dataset.productId}`, {
+          method: "POST",
+          headers: { Accept: "application/json", "x-csrf-token": csrfToken },
+        });
+        if (res.status === 401) { window.location.href = "/auth/login"; return; }
+        const data = await res.json().catch(() => ({}));
+        if (!data.ok) return;
+        btn.classList.toggle("on", data.wishlisted);
+        const icon = btn.querySelector("i");
+        if (icon) icon.className = data.wishlisted ? "fa-solid fa-heart" : "fa-regular fa-heart";
+        showToast(data.wishlisted ? "Added to wishlist" : "Removed from wishlist");
+      } catch (err) {
+        showToast("Something went wrong");
+      }
+    });
 
+    // ---- Review star input ----
+    const starInput = document.getElementById("pdStarInput");
+    const ratingField = document.getElementById("pdReviewRating");
+    const reviewForm = document.getElementById("pdReviewForm");
+    if (starInput && ratingField) {
+      const stars = Array.from(starInput.querySelectorAll("i"));
+      function paintStars(value) {
+        stars.forEach((s) => s.classList.toggle("is-filled", Number(s.dataset.star) <= value));
+      }
+      stars.forEach((s) => {
+        s.addEventListener("click", () => {
+          ratingField.value = s.dataset.star;
+          paintStars(Number(s.dataset.star));
+        });
+        s.addEventListener("mouseenter", () => paintStars(Number(s.dataset.star)));
+      });
+      starInput.addEventListener("mouseleave", () => paintStars(Number(ratingField.value)));
+      reviewForm?.addEventListener("submit", (e) => {
+        if (!Number(ratingField.value)) {
+          e.preventDefault();
+          showToast("Please choose a star rating.");
+        }
+      });
+    }
+
+    // ---- SumUp express checkout (unchanged real integration) ----
     const expressSection = document.getElementById("pdExpressCheckout");
     const expressContainer = document.getElementById("pdExpressCheckoutContainer");
     const expressError = document.getElementById("pdExpressCheckoutError");
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
     let expressClient;
     let expressRequest;
     let expressButtons;
@@ -391,11 +530,7 @@
     async function expressPost(url, body) {
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
+        headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrfToken },
         body: JSON.stringify(body),
       });
       const result = await response.json().catch(() => ({}));
@@ -420,8 +555,7 @@
 
     function configureProductShipping(request) {
       request.onShippingAddressChange(async (address) => {
-        const countryCode =
-          address?.countryCode || address?.country || address?.country_code || "GB";
+        const countryCode = address?.countryCode || address?.country || address?.country_code || "GB";
         const quote = await productQuote({ countryCode });
         return { total: quote.total, shippingOptions: quote.shippingOptions };
       });
@@ -436,16 +570,9 @@
       const details = response?.details || {};
       const contact = details.contactInformation || details.contact || details.payer || {};
       const address = details.shippingAddress || details.shipping_address || {};
-      const fullName = String(
-        contact.name || contact.fullName || address.recipient || address.name || ""
-      ).trim().split(/\s+/);
+      const fullName = String(contact.name || contact.fullName || address.recipient || address.name || "").trim().split(/\s+/);
       const lines = address.addressLine || address.addressLines || address.address_line || [];
-      const selected =
-        details.shippingOption?.id ||
-        details.shippingOption ||
-        details.shippingOptions?.id ||
-        details.shippingOptions?.[0]?.id ||
-        expressDeliveryService;
+      const selected = details.shippingOption?.id || details.shippingOption || details.shippingOptions?.id || details.shippingOptions?.[0]?.id || expressDeliveryService;
 
       return {
         customer: {
@@ -458,9 +585,7 @@
           address: Array.isArray(lines) ? lines.filter(Boolean).join(", ") : String(lines || ""),
           city: address.city || address.locality || address.town || "",
           postcode: address.postalCode || address.postcode || address.postal_code || "",
-          countryCode: String(
-            address.countryCode || address.country || address.country_code || ""
-          ).toUpperCase(),
+          countryCode: String(address.countryCode || address.country || address.country_code || "").toUpperCase(),
         },
         deliveryService: selected === "next-day" ? "next_day" : selected,
       };
@@ -475,28 +600,15 @@
 
       try {
         const paymentResponse = await expressRequest.show(event);
-        const attemptId = window.crypto?.randomUUID
-          ? window.crypto.randomUUID()
-          : `wallet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const order = await expressPost(
-          "/checkout/express/create-order",
-          productRequestBody({ ...walletOrderDetails(paymentResponse), attemptId })
-        );
+        const attemptId = window.crypto?.randomUUID ? window.crypto.randomUUID() : `wallet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const order = await expressPost("/checkout/express/create-order", productRequestBody({ ...walletOrderDetails(paymentResponse), attemptId }));
         returnUrl = order.returnUrl;
         await expressClient.processCheckout(order.checkoutId, paymentResponse);
         window.location.assign(returnUrl);
       } catch (error) {
-        const cancelled =
-          window.SumUp?.SwiftCheckout?.Errors?.PaymentRequestCancelledError;
-        if (returnUrl) {
-          window.location.assign(returnUrl);
-          return;
-        }
-        expressMessage(
-          cancelled && error instanceof cancelled
-            ? "Express checkout was cancelled. You have not been charged."
-            : error?.message || "Use cart express checkout or the normal checkout."
-        );
+        const cancelled = window.SumUp?.SwiftCheckout?.Errors?.PaymentRequestCancelledError;
+        if (returnUrl) { window.location.assign(returnUrl); return; }
+        expressMessage(cancelled && error instanceof cancelled ? "Express checkout was cancelled. You have not been charged." : error?.message || "Use cart express checkout or the normal checkout.");
         expressProcessing = false;
         expressSection.classList.remove("is-processing");
       }
@@ -513,10 +625,6 @@
       const hadWorkingButton = !expressSection.hidden;
 
       function giveUp() {
-        // Keep showing the last working button rather than leaving the
-        // customer with nothing. Only retry-and-hide on a first load that
-        // never had a button to fall back to (e.g. a slow network on
-        // initial page load), not on every failed quantity-change rebuild.
         if (myGeneration === expressGeneration && !hadWorkingButton && !isRetry) {
           window.clearTimeout(expressRetryTimer);
           expressRetryTimer = window.setTimeout(() => initialiseProductExpress(true), 1500);
@@ -525,21 +633,13 @@
 
       try {
         const quote = await productQuote({ countryCode: "GB" });
-        if (myGeneration !== expressGeneration) return; // superseded by a newer quantity change
+        if (myGeneration !== expressGeneration) return;
 
         const nextClient = new window.SumUp.SwiftCheckout(publicKey);
-        const options = {
-          countryCode: "GB",
-          locale: "en-GB",
-          total: quote.total,
-          shippingOptions: quote.shippingOptions,
-        };
+        const options = { countryCode: "GB", locale: "en-GB", total: quote.total, shippingOptions: quote.shippingOptions };
         const googleMerchantId = expressSection.dataset.googlePayMerchantId;
         if (googleMerchantId) {
-          options.methodData = [{
-            supportedMethods: "google_pay",
-            data: { merchantInfo: { merchantId: googleMerchantId, merchantName: "Snus Village" } },
-          }];
+          options.methodData = [{ supportedMethods: "google_pay", data: { merchantInfo: { merchantId: googleMerchantId, merchantName: "Snus Village" } } }];
         }
         const nextRequest = nextClient.paymentRequest(options);
         configureProductShipping(nextRequest);
@@ -547,10 +647,7 @@
         if (myGeneration !== expressGeneration) return;
 
         let methods = await nextRequest.availablePaymentMethods();
-        const demoMode = [
-          "#sumup:google-pay-demo-mode",
-          "#sumup-widget:google-pay-demo-mode",
-        ].includes(window.location.hash);
+        const demoMode = ["#sumup:google-pay-demo-mode", "#sumup-widget:google-pay-demo-mode"].includes(window.location.hash);
         if (demoMode && !methods.some((method) => method.id === "google_pay")) {
           methods.push({ id: "google_pay" });
         } else if (!googleMerchantId) {
@@ -560,19 +657,12 @@
         if (myGeneration !== expressGeneration) return;
 
         const nextButtons = nextClient.elements({ label: "buy" });
-
-        // Only tear down the previous (working) button once the replacement
-        // is fully ready to mount, so a slow/failed rebuild never leaves the
-        // customer looking at an empty box.
         expressButtons?.unmount?.();
         expressContainer.replaceChildren();
         expressClient = nextClient;
         expressRequest = nextRequest;
         expressButtons = nextButtons;
-        expressButtons.onSubmit(submitProductWallet).mount({
-          paymentMethods: methods,
-          container: expressContainer,
-        });
+        expressButtons.onSubmit(submitProductWallet).mount({ paymentMethods: methods, container: expressContainer });
         expressSection.hidden = false;
         expressMessage("");
       } catch (error) {
@@ -583,18 +673,14 @@
 
     initialiseProductExpress();
 
+    // ---- Related carousel ----
     const relatedTrack = document.getElementById("pdRelatedTrack");
-    const relatedPrev = document.querySelector(".pd-related__nav--prev");
-    const relatedNext = document.querySelector(".pd-related__nav--next");
-
+    const relatedPrev = document.querySelector(".pd2-related-nav--prev");
+    const relatedNext = document.querySelector(".pd2-related-nav--next");
     function scrollRelated(direction) {
       if (!relatedTrack) return;
-      relatedTrack.scrollBy({
-        left: direction * Math.max(260, relatedTrack.clientWidth * 0.8),
-        behavior: "smooth",
-      });
+      relatedTrack.scrollBy({ left: direction * Math.max(260, relatedTrack.clientWidth * 0.8), behavior: "smooth" });
     }
-
     relatedPrev?.addEventListener("click", () => scrollRelated(-1));
     relatedNext?.addEventListener("click", () => scrollRelated(1));
   })();

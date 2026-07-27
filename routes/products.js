@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Products");
+const Review = require("../models/Review");
+const Order = require("../models/order");
 const mongoose = require("mongoose");
+const { isAuth } = require("../middleware/authMiddleware");
+
+const STRENGTH_ORDER = ["LOW", "MEDIUM", "STRONG", "X-STRONG", "EXTREME"];
 
 function cleanText(value) {
   return String(value || "")
@@ -90,6 +95,41 @@ router.get("/:id", async (req, res) => {
       .limit(10)
       .lean();
 
+    const reviews = await Review.find({ product: product._id }).sort({ createdAt: -1 }).limit(50).lean();
+
+    const reviewStats = { count: reviews.length, average: 0, breakdown: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } };
+    if (reviews.length) {
+      let total = 0;
+      reviews.forEach((r) => {
+        total += r.rating;
+        reviewStats.breakdown[r.rating] = (reviewStats.breakdown[r.rating] || 0) + 1;
+      });
+      reviewStats.average = total / reviews.length;
+    }
+
+    let canReview = false;
+    let alreadyReviewed = false;
+
+    if (req.session?.user?._id) {
+      alreadyReviewed = reviews.some((r) => String(r.user) === String(req.session.user._id));
+
+      if (!alreadyReviewed) {
+        const purchase = await Order.findOne({
+          user: req.session.user._id,
+          paymentStatus: "paid",
+          "items.product": product._id,
+        }).lean();
+        canReview = Boolean(purchase);
+      }
+    }
+
+    const strengthIndex = Math.max(STRENGTH_ORDER.indexOf(product.strength), 0);
+    const strengthPosition = strengthIndex * 20 + 10; // centre of that fifth of the spectrum
+
+    const isWishlisted = (req.session?.user?.wishlist || []).some(
+      (id) => String(id) === String(product._id)
+    );
+
     const seo = buildProductSeo(product);
     const displayPrice = product.discountPrice || product.price || 0;
     const schema = JSON.stringify({
@@ -107,7 +147,14 @@ router.get("/:id", async (req, res) => {
         'availability': (product.stock > 0 || product.isActive !== false)
           ? 'https://schema.org/InStock'
           : 'https://schema.org/OutOfStock'
-      }
+      },
+      ...(reviewStats.count ? {
+        'aggregateRating': {
+          '@type': 'AggregateRating',
+          'ratingValue': reviewStats.average.toFixed(1),
+          'reviewCount': reviewStats.count
+        }
+      } : {})
     });
     res.render('products/products', {
       title: seo.title,
@@ -116,12 +163,81 @@ router.get("/:id", async (req, res) => {
       schema,
       product,
       related,
+      reviews,
+      reviewStats,
+      canReview,
+      alreadyReviewed,
+      strengthPosition,
+      isWishlisted,
+      standardShippingFee: Number(process.env.STANDARD_SHIPPING_FEE || 1.99),
+      nextDayShippingFee: Number(process.env.NEXT_DAY_SHIPPING_FEE || 4.99),
+      nextDayDeliveryCutoff: process.env.NEXT_DAY_DELIVERY_CUTOFF || "4:30pm",
       sumupPublicKey: process.env.SUMUP_PUBLIC_KEY || "",
       googlePayMerchantId: process.env.GOOGLE_PAY_MERCHANT_ID || "",
     });
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");
+  }
+});
+
+router.post("/:id/reviews", isAuth, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).send("Product not found");
+    }
+
+    const returnUrl = `${productUrl(product)}#reviews`;
+    const rating = Math.max(1, Math.min(5, Math.round(Number(req.body.rating))));
+    const body = cleanText(req.body.body).slice(0, 2000);
+
+    if (!rating || !body) {
+      req.flash("error", "Please add a star rating and a review.");
+      return res.redirect(returnUrl);
+    }
+
+    const existing = await Review.findOne({ product: product._id, user: req.session.user._id });
+    if (existing) {
+      req.flash("error", "You've already reviewed this product.");
+      return res.redirect(returnUrl);
+    }
+
+    const purchase = await Order.findOne({
+      user: req.session.user._id,
+      paymentStatus: "paid",
+      "items.product": product._id,
+    }).lean();
+
+    if (!purchase) {
+      req.flash("error", "Only customers who've purchased this product can leave a review.");
+      return res.redirect(returnUrl);
+    }
+
+    const displayName = [req.session.user.firstName, req.session.user.lastName?.[0]]
+      .filter(Boolean)
+      .join(" ") + (req.session.user.lastName ? "." : "") || "Verified Customer";
+
+    await Review.create({
+      product: product._id,
+      user: req.session.user._id,
+      order: purchase._id,
+      displayName,
+      rating,
+      body,
+    });
+
+    req.flash("success", "Thanks — your review has been posted.");
+    res.redirect(returnUrl);
+  } catch (error) {
+    if (error.code === 11000) {
+      req.flash("error", "You've already reviewed this product.");
+    } else {
+      console.log(error);
+      req.flash("error", "Unable to post your review right now.");
+    }
+    res.redirect(`/products/${req.params.id}#reviews`);
   }
 });
 
