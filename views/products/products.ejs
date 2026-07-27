@@ -657,12 +657,34 @@
         if (myGeneration !== expressGeneration) return;
 
         const nextButtons = nextClient.elements({ label: "buy" });
+
+        // Mount into an off-screen container first — only tear down the
+        // previous (working) button once the replacement has actually
+        // rendered, so a failed or slow remount never leaves the customer
+        // looking at an empty box.
+        const tempContainer = document.createElement("div");
+        tempContainer.style.cssText = "position:absolute;left:-9999px;top:-9999px;visibility:hidden;";
+        document.body.appendChild(tempContainer);
+
+        try {
+          await nextButtons.onSubmit(submitProductWallet).mount({ paymentMethods: methods, container: tempContainer });
+        } catch (mountErr) {
+          tempContainer.remove();
+          throw mountErr;
+        }
+
+        if (myGeneration !== expressGeneration) {
+          nextButtons.unmount?.();
+          tempContainer.remove();
+          return;
+        }
+
         expressButtons?.unmount?.();
-        expressContainer.replaceChildren();
+        expressContainer.replaceChildren(...tempContainer.childNodes);
+        tempContainer.remove();
         expressClient = nextClient;
         expressRequest = nextRequest;
         expressButtons = nextButtons;
-        expressButtons.onSubmit(submitProductWallet).mount({ paymentMethods: methods, container: expressContainer });
         expressSection.hidden = false;
         expressMessage("");
       } catch (error) {
