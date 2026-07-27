@@ -13,7 +13,7 @@
 }
 .dsh-body{margin:0;padding:0;font-family:var(--dsh-fb);font-size:14px;color:var(--dsh-tx);background:var(--dsh-bg);}
 .dsh-body *,.dsh-body *::before,.dsh-body *::after{box-sizing:border-box;}
-.dsh-body a{text-decoration:none;color:inherit;}
+.dsh-body :where(a){text-decoration:none;color:inherit;}
 .dsh-body button{font-family:var(--dsh-fb);cursor:pointer;border:none;}
 .dsh-body input,.dsh-body select,.dsh-body textarea{font-family:var(--dsh-fb);}
 .dsh-body img{display:block;}
