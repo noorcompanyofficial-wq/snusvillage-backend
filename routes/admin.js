@@ -3381,6 +3381,11 @@ router.post("/orders/:id/send-royal-mail", isAdmin, requireAdminRole(PERMISSIONS
       return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
+    if (order.fulfilment?.method === "click_collect") {
+      req.flash("error", "Click & Collect orders cannot be pushed to Royal Mail");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+
     if (order.royalMail && order.royalMail.syncStatus === "sent") {
       req.flash("error", "This order has already been sent to Royal Mail");
       return res.redirect(req.get("Referrer") || "/admin/orders");
@@ -3429,6 +3434,12 @@ router.post("/orders/:id/send-royal-mail", isAdmin, requireAdminRole(PERMISSIONS
     }
 
     await order.save();
+
+    if (order.royalMail.syncStatus === "sent") {
+      req.flash("success", "Order successfully pushed to Royal Mail");
+    } else {
+      req.flash("error", order.royalMail.syncError || "Royal Mail did not accept the order");
+    }
 
     res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {

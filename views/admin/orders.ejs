@@ -77,7 +77,17 @@
           <td><span class="pill p-<%= order.orderStatus || 'new' %>"><%= order.orderStatus || "new" %></span></td>
           <td><span class="pill p-<%= order.royalMail?.syncStatus || 'not_sent' %>"><%= order.royalMail?.syncStatus || "not_sent" %></span></td>
           <td class="t-sub"><%= new Date(order.createdAt).toLocaleString("en-GB") %></td>
-          <td><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>">View</a></td>
+          <td>
+            <div class="t-actions">
+              <a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>">View</a>
+              <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
+                <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST" onsubmit="return confirm('Push this delivery order to Royal Mail?');">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn-sm btn-blue">Push To Royal Mail</button>
+                </form>
+              <% } %>
+            </div>
+          </td>
         </tr>
       <% }) %>
     </tbody></table></div>

@@ -104,7 +104,7 @@
         </div>
         <div class="t-actions">
           <% if (!isClickCollect && order.royalMail?.syncStatus !== "sent") { %>
-            <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-blue">Send To Royal Mail</button></form>
+            <form action="/admin/orders/<%= order._id %>/send-royal-mail" method="POST" onsubmit="return confirm('Push this delivery order to Royal Mail?');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-blue">Push To Royal Mail</button></form>
           <% } %>
           <% if (!isClickCollect && order.royalMail?.syncStatus === "sent" && !order.royalMail?.labelGenerated) { %>
             <form action="/admin/orders/<%= order._id %>/generate-label" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost">Generate Label</button></form>
