@@ -127,6 +127,30 @@ function csvCell(value) {
   return '"' + text.replace(/"/g, '""') + '"';
 }
 
+// Spreadsheet apps export CSV with different delimiters depending on the
+// user's regional settings (Excel in many EU locales defaults to ";", some
+// exports use tabs) — csv-parse defaults to "," and, given a mismatched
+// delimiter, silently folds the whole header into a single bogus column
+// instead of erroring, so every row then fails "missing required field"
+// with no clue why. Sniff the header line and pick whichever candidate
+// delimiter actually splits it into more than one column.
+function detectCsvDelimiter(buffer) {
+  const firstLine = buffer.toString("utf8").split(/\r\n|\r|\n/, 1)[0] || "";
+  const candidates = [",", ";", "\t"];
+  let best = ",";
+  let bestCount = 0;
+
+  candidates.forEach((candidate) => {
+    const count = firstLine.split(candidate).length - 1;
+    if (count > bestCount) {
+      bestCount = count;
+      best = candidate;
+    }
+  });
+
+  return best;
+}
+
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -2850,9 +2874,19 @@ router.post(
           skip_empty_lines: true,
           trim: true,
           bom: true,
+          delimiter: detectCsvDelimiter(req.file.buffer),
         });
       } catch (parseErr) {
         req.flash("error", "Could not read that CSV file: " + parseErr.message);
+        return res.redirect("/admin/products/import");
+      }
+
+      if (records.length && Object.keys(records[0]).length === 1) {
+        req.flash(
+          "error",
+          "That file doesn't look like a valid CSV — its header only parsed into a single column. " +
+            "Try re-saving it as a standard comma-separated CSV file and upload it again."
+        );
         return res.redirect("/admin/products/import");
       }
 
