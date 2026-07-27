@@ -502,6 +502,17 @@ async function finalisePaidOrder(order) {
     return order;
   }
 
+  // Both the browser redirect and the webhook can race to finalise the same
+  // order, so atomically claim it first — only one caller proceeds.
+  const claimed = await Order.findOneAndUpdate(
+    { _id: order._id, "sumup.fulfilmentFinalised": { $ne: true } },
+    { $set: { "sumup.fulfilmentFinalised": true } }
+  );
+
+  if (!claimed) {
+    return order;
+  }
+
   order.paymentStatus = "paid";
   order.orderStatus = order.orderStatus === "new" ? "processing" : order.orderStatus;
   order.sumup = {
@@ -509,6 +520,7 @@ async function finalisePaidOrder(order) {
     status: "PAID",
     paidAt: order.sumup?.paidAt || new Date(),
     error: "",
+    fulfilmentFinalised: true,
   };
 
   await order.save();
@@ -563,13 +575,6 @@ async function finalisePaidOrder(order) {
   if (order.sumup?.clearCartOnPayment !== false) {
     await clearCartForPaidOrder(order);
   }
-
-  order.sumup = {
-    ...order.sumup,
-    fulfilmentFinalised: true,
-  };
-
-  await order.save();
 
   return order;
 }
@@ -1066,6 +1071,42 @@ router.get("/sumup/return/:orderId", async (req, res, next) => {
     return res.redirect(`/checkout/payment-pending/${order._id}`);
   } catch (error) {
     next(error);
+  }
+});
+
+// Server-to-server backup for the browser redirect above — catches payments
+// that complete after the customer closes the tab before being redirected
+// back. SumUp's payload only carries a checkout id, so we never trust it
+// directly: we always re-fetch the real status from SumUp before acting.
+router.post("/sumup/webhook", async (req, res) => {
+  try {
+    const checkoutId = req.body?.id;
+
+    if (!checkoutId) {
+      return res.status(200).end();
+    }
+
+    const order = await Order.findOne({ "sumup.checkoutId": checkoutId });
+
+    if (!order || order.sumup?.fulfilmentFinalised) {
+      return res.status(200).end();
+    }
+
+    const checkoutStatus = await getCheckoutStatus(checkoutId);
+    const status = checkoutStatus.status || "";
+
+    if (status === "PAID") {
+      await finalisePaidOrder(order);
+    } else {
+      order.paymentStatus = status === "FAILED" || status === "EXPIRED" ? "failed" : "pending";
+      order.sumup = { ...order.sumup, status, error: `Payment status: ${status || "unknown"}` };
+      await order.save();
+    }
+
+    return res.status(200).end();
+  } catch (error) {
+    console.log("SumUp webhook error:", error.message);
+    return res.status(500).end();
   }
 });
 

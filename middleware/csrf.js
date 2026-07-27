@@ -2,6 +2,10 @@ const crypto = require("crypto");
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
+// Server-to-server callbacks (no browser session/cookie, so no CSRF token to check).
+// Each of these routes must independently verify the request against the origin API.
+const CSRF_EXEMPT_PATHS = new Set(["/checkout/sumup/webhook"]);
+
 function ensureCsrfToken(req, res, next) {
   if (!req.session) return next();
 
@@ -15,6 +19,7 @@ function ensureCsrfToken(req, res, next) {
 
 function verifyCsrfToken(req, res, next) {
   if (SAFE_METHODS.has(req.method)) return next();
+  if (CSRF_EXEMPT_PATHS.has(req.path)) return next();
 
   // Multer parses multipart bodies at the route level, after this
   // global middleware runs, so req.body is still empty here for file

@@ -44,6 +44,7 @@ async function createCheckout(order, req, { hosted = false } = {}) {
       merchant_code: merchantCode,
       description: `Snus Village Order ${order._id.toString().slice(-6).toUpperCase()}`,
       redirect_url: `${baseUrl}/checkout/sumup/return/${order._id}`,
+      return_url: `${baseUrl}/checkout/sumup/webhook`,
       ...(hosted ? { hosted_checkout: { enabled: true } } : {}),
     }),
   });
