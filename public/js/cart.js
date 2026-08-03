@@ -49,7 +49,7 @@ document.addEventListener("click", async (e) => {
 
   try {
     btn.disabled = true;
-    await fetch(`/cart/add/${id}`, {
+    const res = await fetch(`/cart/add/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,12 +58,21 @@ document.addEventListener("click", async (e) => {
       },
       body: JSON.stringify({ quantity }),
     });
+    const data = await res.json().catch(() => ({}));
 
-    cart?.classList.add("active");
-    overlay?.classList.add("active");
-    loadCart();
+    // Stock can run out or already be maxed in the cart between the page
+    // loading and this click — let every page's own toast/UI react to the
+    // real outcome instead of always claiming success.
+    document.dispatchEvent(new CustomEvent("cart:added", { detail: { ok: res.ok, ...data } }));
+
+    if (res.ok) {
+      cart?.classList.add("active");
+      overlay?.classList.add("active");
+      loadCart();
+    }
   } catch (err) {
     console.error("Add to cart error:", err);
+    document.dispatchEvent(new CustomEvent("cart:added", { detail: { ok: false, message: "Something went wrong. Please try again." } }));
   } finally {
     btn.disabled = false;
   }

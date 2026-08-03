@@ -319,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`Added ${btn.dataset.productName}!`);
         if (typeof window.loadCart === "function") window.loadCart();
       } else {
-        showToast("Could not add to cart");
+        showToast(data.message || "Could not add to cart");
       }
     } catch (err) {
       showToast("Could not add to cart");

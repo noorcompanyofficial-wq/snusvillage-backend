@@ -460,8 +460,15 @@
       el.classList.add("show");
       setTimeout(() => el.classList.remove("show"), 2600);
     }
-    document.querySelectorAll(".add-cart").forEach((btn) => {
-      btn.addEventListener("click", () => showToast("Added to cart!"));
+    document.addEventListener("cart:added", (event) => {
+      const { ok, message, capped } = event.detail || {};
+      if (!ok) {
+        showToast(message || "Could not add that to your cart.");
+      } else if (capped) {
+        showToast(message);
+      } else {
+        showToast("Added to cart!");
+      }
     });
 
     // ---- Wishlist ----
@@ -540,28 +547,36 @@
       return result;
     }
 
-    function productRequestBody(extra = {}) {
+    // The quantity used for a quote/mounted wallet button must never be
+    // re-read live at submit time — if the customer bumps the quantity
+    // input between mounting the button and clicking it (or during the
+    // debounced re-quote below), a live read would create the order for
+    // the NEW quantity while the wallet sheet only ever authorised the
+    // OLD (smaller) total, silently undercharging the customer. Every
+    // quote/mount/submit for a given button instance is pinned to the
+    // exact quantity captured when that instance started building.
+    function productRequestBody(quantityAtMount, extra = {}) {
       return {
         productId: expressSection?.dataset.productId || "",
-        quantity: Number(quantityInput?.value || 1),
+        quantity: quantityAtMount,
         deliveryService: expressDeliveryService,
         ...extra,
       };
     }
 
-    async function productQuote(extra) {
-      return expressPost("/checkout/express/quote", productRequestBody(extra));
+    async function productQuote(quantityAtMount, extra) {
+      return expressPost("/checkout/express/quote", productRequestBody(quantityAtMount, extra));
     }
 
-    function configureProductShipping(request) {
+    function configureProductShipping(request, quantityAtMount) {
       request.onShippingAddressChange(async (address) => {
         const countryCode = address?.countryCode || address?.country || address?.country_code || "GB";
-        const quote = await productQuote({ countryCode });
+        const quote = await productQuote(quantityAtMount, { countryCode });
         return { total: quote.total, shippingOptions: quote.shippingOptions };
       });
       request.onShippingOptionsChange(async (option) => {
         expressDeliveryService = option?.id || option?.shippingOption || option || "standard";
-        const quote = await productQuote({ countryCode: "GB" });
+        const quote = await productQuote(quantityAtMount, { countryCode: "GB" });
         return { total: quote.total, shippingOptions: quote.shippingOptions };
       });
     }
@@ -591,7 +606,7 @@
       };
     }
 
-    async function submitProductWallet(event) {
+    async function submitProductWallet(event, quantityAtMount) {
       if (expressProcessing || !expressRequest) return;
       expressProcessing = true;
       expressSection.classList.add("is-processing");
@@ -601,7 +616,7 @@
       try {
         const paymentResponse = await expressRequest.show(event);
         const attemptId = window.crypto?.randomUUID ? window.crypto.randomUUID() : `wallet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const order = await expressPost("/checkout/express/create-order", productRequestBody({ ...walletOrderDetails(paymentResponse), attemptId }));
+        const order = await expressPost("/checkout/express/create-order", productRequestBody(quantityAtMount, { ...walletOrderDetails(paymentResponse), attemptId }));
         returnUrl = order.returnUrl;
         await expressClient.processCheckout(order.checkoutId, paymentResponse);
         window.location.assign(returnUrl);
@@ -623,6 +638,7 @@
 
       const myGeneration = ++expressGeneration;
       const hadWorkingButton = !expressSection.hidden;
+      const quantityAtMount = Number(quantityInput?.value || 1);
 
       function giveUp() {
         if (myGeneration === expressGeneration && !hadWorkingButton && !isRetry) {
@@ -632,7 +648,7 @@
       }
 
       try {
-        const quote = await productQuote({ countryCode: "GB" });
+        const quote = await productQuote(quantityAtMount, { countryCode: "GB" });
         if (myGeneration !== expressGeneration) return;
 
         const nextClient = new window.SumUp.SwiftCheckout(publicKey);
@@ -642,7 +658,7 @@
           options.methodData = [{ supportedMethods: "google_pay", data: { merchantInfo: { merchantId: googleMerchantId, merchantName: "Snus Village" } } }];
         }
         const nextRequest = nextClient.paymentRequest(options);
-        configureProductShipping(nextRequest);
+        configureProductShipping(nextRequest, quantityAtMount);
         if (!(await nextRequest.canMakePayment())) return giveUp();
         if (myGeneration !== expressGeneration) return;
 
@@ -667,7 +683,7 @@
         document.body.appendChild(tempContainer);
 
         try {
-          await nextButtons.onSubmit(submitProductWallet).mount({ paymentMethods: methods, container: tempContainer });
+          await nextButtons.onSubmit((event) => submitProductWallet(event, quantityAtMount)).mount({ paymentMethods: methods, container: tempContainer });
         } catch (mountErr) {
           tempContainer.remove();
           throw mountErr;

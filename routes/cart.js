@@ -94,21 +94,41 @@ router.post("/add/:productId", async (req, res, next) => {
     }
 
     const itemIndex = cart.items.findIndex((i) => getCartProductId(i) === productId);
+    const alreadyInCart = itemIndex > -1 ? cart.items[itemIndex].quantity : 0;
+    const availableToAdd = Math.max(0, product.stock - alreadyInCart);
+    const isWantsJson = req.headers.accept && req.headers.accept.includes("application/json");
+
+    if (availableToAdd <= 0) {
+      const message = `You already have the maximum available quantity (${product.stock}) of this product in your cart.`;
+      if (isWantsJson) {
+        return res.status(409).json({ ok: false, message, addedQuantity: 0, requestedQuantity: quantity });
+      }
+      req.flash("error", message);
+      return res.redirect("/cart");
+    }
+
+    const addedQuantity = Math.min(quantity, availableToAdd);
 
     if (itemIndex > -1) {
-      cart.items[itemIndex].quantity = Math.min(
-        cart.items[itemIndex].quantity + quantity,
-        product.stock
-      );
+      cart.items[itemIndex].quantity = alreadyInCart + addedQuantity;
     } else {
-      cart.items.push({ product: productId, quantity, priceAtTime: finalPrice });
+      cart.items.push({ product: productId, quantity: addedQuantity, priceAtTime: finalPrice });
     }
 
     await cart.save();
 
+    const wasCapped = addedQuantity < quantity;
+    const message = wasCapped
+      ? `Only ${addedQuantity} more of this product ${addedQuantity === 1 ? "was" : "were"} in stock, so we added ${addedQuantity} instead of ${quantity}.`
+      : "";
+
     // JSON response for fetch calls (sidebar), redirect for form submits
-    if (req.headers.accept && req.headers.accept.includes("application/json")) {
-      return res.json({ ok: true });
+    if (isWantsJson) {
+      return res.json({ ok: true, addedQuantity, requestedQuantity: quantity, capped: wasCapped, message });
+    }
+
+    if (wasCapped) {
+      req.flash("error", message);
     }
     res.redirect("/cart");
   } catch (error) {
