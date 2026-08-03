@@ -11,7 +11,7 @@
 .admin-body,.admin-body *,.admin-body *::before,.admin-body *::after{box-sizing:border-box;margin:0;padding:0;}
 .admin-body{height:100%;font-family:var(--fb);font-size:13px;background:var(--bg);color:var(--tx);}
 .admin-body :where(a){text-decoration:none;color:inherit;}
-.admin-body button{font-family:var(--fb);cursor:pointer;border:none;background:none;}
+.admin-body :where(button){font-family:var(--fb);cursor:pointer;border:none;background:none;}
 .admin-body input,.admin-body select,.admin-body textarea{font-family:var(--fb);}
 
 .shell{display:grid;grid-template-columns:var(--sb-w) 1fr;height:100vh;overflow:hidden;transition:grid-template-columns .2s;}
