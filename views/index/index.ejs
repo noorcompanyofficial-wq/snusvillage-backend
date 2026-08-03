@@ -105,7 +105,15 @@
       </div>
     </div>
 
-    <% if (storeSettings && storeSettings.promoPopupEnabled !== false) { %>
+    <%
+      // Only ever show a code that actually works at checkout — driven by
+      // whichever real DiscountCode an admin has flagged as the welcome
+      // discount on the Discounts page, not free-text settings fields.
+      const welcomeBadge = welcomeDiscount
+        ? (welcomeDiscount.type === "percentage" ? `${Number(welcomeDiscount.value || 0).toFixed(0)}% Off` : `£${Number(welcomeDiscount.value || 0).toFixed(2)} Off`)
+        : "";
+    %>
+    <% if (storeSettings && storeSettings.promoPopupEnabled !== false && welcomeDiscount) { %>
       <div
         class="promo-popup"
         id="promoPopup"
@@ -118,11 +126,11 @@
         <button class="promo-popup__close" id="promoPopupClose" type="button" aria-label="Close">
           <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
-        <div class="promo-popup__badge">10% Off</div>
+        <div class="promo-popup__badge"><%= welcomeBadge %></div>
         <h2 class="promo-popup__heading" id="promoPopupHeading"><%= storeSettings.promoPopupHeading || "Welcome to Snus Village!" %></h2>
         <p class="promo-popup__body"><%= storeSettings.promoPopupBody || "Enjoy 10% off your first order, on us." %></p>
         <button class="promo-popup__code" id="promoPopupCode" type="button" title="Click to copy">
-          <span><%= storeSettings.promoPopupCode || "WELCOME10" %></span>
+          <span><%= welcomeDiscount.code %></span>
           <i class="fa-regular fa-copy" aria-hidden="true"></i>
         </button>
         <a class="promo-popup__cta" href="<%= storeSettings.promoPopupButtonLink || '/shop' %>">

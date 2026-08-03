@@ -69,6 +69,13 @@ const discountCodeSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // The one code the homepage welcome popup advertises — only one code
+    // should ever have this set, enforced in the admin route, not here.
+    isWelcomeDiscount: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

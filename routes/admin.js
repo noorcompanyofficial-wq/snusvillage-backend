@@ -1740,6 +1740,11 @@ router.post("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async 
     }
 
     const expiresAt = req.body.expiresAt ? new Date(req.body.expiresAt) : null;
+    const isWelcomeDiscount = req.body.isWelcomeDiscount === "on";
+
+    if (isWelcomeDiscount) {
+      await DiscountCode.updateMany({ isWelcomeDiscount: true }, { $set: { isWelcomeDiscount: false } });
+    }
 
     await DiscountCode.create({
       code,
@@ -1752,8 +1757,10 @@ router.post("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async 
       appliesToCategory: String(req.body.appliesToCategory || "").trim(),
       expiresAt,
       isActive: req.body.isActive === "on",
+      isWelcomeDiscount,
     });
 
+    global.__snusWelcomeDiscountCacheBust = Date.now();
     req.flash("success", "Discount code created");
     res.redirect("/admin/discounts");
   } catch (err) {
@@ -1765,6 +1772,39 @@ router.post("/discounts", isAdmin, requireAdminRole(PERMISSIONS.website), async 
       req.flash("error", "Unable to create discount code: " + err.message);
     }
 
+    res.redirect("/admin/discounts");
+  }
+});
+
+router.post("/discounts/:id/set-welcome", isAdmin, requireAdminRole(PERMISSIONS.website), async (req, res) => {
+  try {
+    const discount = await DiscountCode.findById(req.params.id);
+
+    if (!discount) {
+      req.flash("error", "Discount code not found");
+      return res.redirect("/admin/discounts");
+    }
+
+    const makingWelcome = !discount.isWelcomeDiscount;
+
+    if (makingWelcome) {
+      await DiscountCode.updateMany({ isWelcomeDiscount: true }, { $set: { isWelcomeDiscount: false } });
+    }
+
+    discount.isWelcomeDiscount = makingWelcome;
+    await discount.save();
+
+    global.__snusWelcomeDiscountCacheBust = Date.now();
+    req.flash(
+      "success",
+      makingWelcome
+        ? `${discount.code} is now the homepage welcome discount`
+        : `${discount.code} is no longer the homepage welcome discount`
+    );
+    res.redirect("/admin/discounts");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to update welcome discount");
     res.redirect("/admin/discounts");
   }
 });
@@ -1781,6 +1821,7 @@ router.post("/discounts/:id/toggle", isAdmin, requireAdminRole(PERMISSIONS.websi
     discount.isActive = !discount.isActive;
     await discount.save();
 
+    global.__snusWelcomeDiscountCacheBust = Date.now();
     req.flash("success", `Discount code ${discount.isActive ? "enabled" : "disabled"}`);
     res.redirect("/admin/discounts");
   } catch (err) {
@@ -1794,6 +1835,7 @@ router.post("/discounts/:id/delete", isAdmin, requireAdminRole(PERMISSIONS.websi
   try {
     await DiscountCode.findByIdAndDelete(req.params.id);
 
+    global.__snusWelcomeDiscountCacheBust = Date.now();
     req.flash("success", "Discount code deleted");
     res.redirect("/admin/discounts");
   } catch (err) {

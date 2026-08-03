@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const fs = require("fs");
 const StoreSettings = require("./models/StoreSettings");
+const DiscountCode = require("./models/DiscountCode");
 const pageViewTracker = require("./middleware/pageViewTracker");
 
 require("dotenv").config();
@@ -78,6 +79,40 @@ async function getCachedStoreSettings() {
   } catch (err) {
     console.log("Store settings load failed:", err.message);
     return cachedStoreSettings || defaultStoreSettings;
+  }
+}
+
+let cachedWelcomeDiscount = null;
+let cachedWelcomeDiscountAt = 0;
+const WELCOME_DISCOUNT_CACHE_MS = 60 * 1000;
+
+// The homepage popup must never advertise a code that doesn't actually
+// work, so it's driven directly by whichever real DiscountCode an admin
+// has flagged as the welcome discount (managed on the Discounts page),
+// not by free-text settings fields.
+async function getCachedWelcomeDiscount() {
+  const cacheAge = Date.now() - cachedWelcomeDiscountAt;
+  const cacheBustAt = Number(global.__snusWelcomeDiscountCacheBust || 0);
+
+  if (cacheAge < WELCOME_DISCOUNT_CACHE_MS && cacheBustAt <= cachedWelcomeDiscountAt) {
+    return cachedWelcomeDiscount;
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    return cachedWelcomeDiscount;
+  }
+
+  try {
+    const discount = await DiscountCode.findOne({ isWelcomeDiscount: true, isActive: true }).lean();
+    const isExpired = discount?.expiresAt && new Date(discount.expiresAt) < new Date();
+    const usageFinished = discount?.usageLimit > 0 && discount.usedCount >= discount.usageLimit;
+
+    cachedWelcomeDiscount = discount && !isExpired && !usageFinished ? discount : null;
+    cachedWelcomeDiscountAt = Date.now();
+    return cachedWelcomeDiscount;
+  } catch (err) {
+    console.log("Welcome discount load failed:", err.message);
+    return cachedWelcomeDiscount;
   }
 }
 
@@ -360,6 +395,7 @@ app.use(async (req, res, next) => {
   const siteUrl = (process.env.APP_URL || "https://www.snusvillage.com").replace(/\/$/, "");
   const cleanPath = req.path === "/" ? "" : req.path;
   const storeSettings = await getCachedStoreSettings();
+  const welcomeDiscount = await getCachedWelcomeDiscount();
 
   res.locals.user = req.session?.user || null;
   res.locals.currentPath = req.path;
@@ -370,6 +406,7 @@ app.use(async (req, res, next) => {
   res.locals.optimiseImageUrl = optimiseImageUrl;
   res.locals.relTime = relTime;
   res.locals.storeSettings = storeSettings;
+  res.locals.welcomeDiscount = welcomeDiscount;
   next();
 });
 

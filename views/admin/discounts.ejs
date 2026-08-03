@@ -24,10 +24,14 @@
     <div class="fld" style="margin-bottom:0;"><label>Applies To Brand</label><input name="appliesToBrand" placeholder="White Fox"></div>
     <div class="fld" style="margin-bottom:0;"><label>Applies To Category</label><input name="appliesToCategory" placeholder="Nicotine Pouches"></div>
     <div class="fld" style="margin-bottom:0;"><label>Expiry Date</label><input type="date" name="expiresAt"></div>
-    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;">
-      <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx);"><input type="checkbox" name="isActive" checked style="width:auto;min-height:0;"> Active Code</label>
+    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx);"><input type="checkbox" name="isActive" checked style="width:auto;min-height:0;"> Active Code</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--tx);"><input type="checkbox" name="isWelcomeDiscount" style="width:auto;min-height:0;"> Use as homepage welcome discount</label>
+      </div>
       <button class="btn btn-red" type="submit"><i class="fa-solid fa-plus"></i> Create Discount</button>
     </div>
+    <p style="grid-column:1/-1;font-size:11px;color:var(--mu);margin-top:-4px;">Only one code can be the welcome discount at a time — checking this here will unset it from any other code. This is the code shown in the homepage promo popup, so make sure the discount % here matches what the popup promises (edit popup wording in Settings).</p>
   </form>
 </div>
 
@@ -51,8 +55,10 @@
           </div>
           <div class="disc-usage" style="text-align:center;"><strong><%= discount.usedCount || 0 %></strong><span>/ <%= discount.usageLimit > 0 ? discount.usageLimit : "&infin;" %> uses</span></div>
           <span class="disc-exp"><%= discount.expiresAt ? "Expires " + new Date(discount.expiresAt).toLocaleDateString("en-GB") : "Never expires" %></span>
+          <% if (discount.isWelcomeDiscount) { %><span class="pill p-active" style="background:rgba(217,119,6,.12);color:#b45309;"><i class="fa-solid fa-star"></i> Welcome Discount</span><% } %>
           <span class="pill <%= isLive ? 'p-active' : 'p-inactive' %>"><%= isLive ? "Active" : "Inactive" %></span>
           <div class="t-actions">
+            <form action="/admin/discounts/<%= discount._id %>/set-welcome" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost"><%= discount.isWelcomeDiscount ? "Unset Welcome" : "Set As Welcome" %></button></form>
             <form action="/admin/discounts/<%= discount._id %>/toggle" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost"><%= discount.isActive ? "Disable" : "Enable" %></button></form>
             <form action="/admin/discounts/<%= discount._id %>/delete" method="POST" onsubmit="return confirm('Delete this discount code?');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-danger">Delete</button></form>
           </div>
