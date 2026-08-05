@@ -206,4 +206,46 @@ async function getLabel(reference, hash = "") {
   }
 }
 
-module.exports = { getConfig, hasParcel2GoConfig, splitUkAddress, buildOrderPayload, createAndPayOrder, getLabel };
+async function verifyConnection() {
+  const config = getConfig();
+  if (!hasParcel2GoConfig()) {
+    return { ok: false, authentication: false, quote: false };
+  }
+
+  try {
+    const data = await request("/quotes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        Service: config.service,
+        CollectionAddress: {
+          Country: "GBR",
+          Property: config.sender.property,
+          Postcode: config.sender.postcode,
+          Town: config.sender.town,
+          VatStatus: "Individual",
+        },
+        DeliveryAddress: {
+          Country: "GBR",
+          Property: "10",
+          Postcode: "SW1A 1AA",
+          Town: "London",
+          VatStatus: "Individual",
+        },
+        Parcels: [{
+          Value: 20,
+          Weight: config.weight,
+          Length: config.length,
+          Width: config.width,
+          Height: config.height,
+        }],
+      }),
+    });
+    const quotes = Array.isArray(data?.Quotes) ? data.Quotes : [];
+    return { ok: quotes.length > 0, authentication: true, quote: quotes.length > 0 };
+  } catch (error) {
+    return { ok: false, authentication: error.status !== 401, quote: false };
+  }
+}
+
+module.exports = { getConfig, hasParcel2GoConfig, splitUkAddress, buildOrderPayload, createAndPayOrder, getLabel, verifyConnection };

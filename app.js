@@ -468,7 +468,7 @@ app.get("/health/db", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-app.get("/health/shipping", (req, res) => {
+app.get("/health/shipping", async (req, res) => {
   const provider = String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase();
   const parcel2goConfigured = Boolean(
     process.env.PARCEL2GO_CLIENT_ID &&
@@ -477,14 +477,23 @@ app.get("/health/shipping", (req, res) => {
       process.env.PARCEL2GO_SENDER_POSTCODE
   );
 
-  res.status(provider !== "parcel2go" || parcel2goConfigured ? 200 : 503).json({
-    status: provider !== "parcel2go" || parcel2goConfigured ? "ok" : "error",
+  let connection = null;
+  if (provider === "parcel2go" && parcel2goConfigured) {
+    const { verifyConnection } = require("./utils/parcel2go");
+    connection = await verifyConnection();
+  }
+  const healthy = provider !== "parcel2go" || Boolean(connection?.ok);
+
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? "ok" : "error",
     provider,
     parcel2goConfigured,
     parcel2goEnvironment:
       String(process.env.PARCEL2GO_SANDBOX || "true").toLowerCase() === "false"
         ? "live"
         : "sandbox",
+    authenticationVerified: connection?.authentication ?? null,
+    quoteVerified: connection?.quote ?? null,
   });
 });
 
