@@ -8,6 +8,7 @@ const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
 const Address = require("../models/Address");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
+const { createAndPayOrder: createAndPayParcel2GoOrder } = require("../utils/parcel2go");
 const { sendOrderEmails } = require("../utils/orderEmails");
 const {
   createHostedCheckout,
@@ -71,8 +72,17 @@ function getNextDayDeliveryCutoff() {
   return process.env.NEXT_DAY_DELIVERY_CUTOFF || "4:30pm";
 }
 
+function usesParcel2Go() {
+  return String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase() === "parcel2go";
+}
+
+function getParcel2GoCheckoutLabel() {
+  return process.env.PARCEL2GO_CHECKOUT_LABEL || "Evri Standard Delivery (via Parcel2Go)";
+}
+
 function getDeliveryServiceLabel(fulfilmentMethod, deliveryService) {
   if (fulfilmentMethod === "click_collect") return "Click & Collect";
+  if (usesParcel2Go()) return getParcel2GoCheckoutLabel();
   return deliveryService === "next_day" ? "Royal Mail Next Day" : "Standard Delivery";
 }
 
@@ -294,6 +304,9 @@ async function createExpressQuote(
   if (!["standard", "next_day"].includes(deliveryService)) {
     throw new CheckoutError("Please select a valid delivery service.");
   }
+  if (usesParcel2Go() && deliveryService !== "standard") {
+    throw new CheckoutError("Next-day delivery is not available for the selected Parcel2Go service.");
+  }
 
   let cart;
   let totals;
@@ -344,21 +357,21 @@ async function createExpressQuote(
   const standardShipping =
     totals.subtotal >= totals.freeShippingThreshold ? 0 : totals.standardShippingFee;
   const baseAfterDiscount = Math.max(0, totals.subtotal - totals.discountAmount);
-  const shippingOptions = [
+    const shippingOptions = [
     {
       id: "standard",
-      label: "Standard delivery",
-      description: standardShipping === 0 ? "Free UK delivery" : "Standard UK delivery",
+      label: usesParcel2Go() ? getParcel2GoCheckoutLabel() : "Standard delivery",
+      description: standardShipping === 0 ? "Free UK delivery" : usesParcel2Go() ? "UK courier delivery booked through Parcel2Go" : "Standard UK delivery",
       amount: { currency: "GBP", value: standardShipping.toFixed(2) },
       selected: deliveryService === "standard",
     },
-    {
+    ...(!usesParcel2Go() ? [{
       id: "next_day",
       label: "Royal Mail Next Day",
       description: `Order before ${totals.nextDayDeliveryCutoff}`,
       amount: { currency: "GBP", value: totals.nextDayShippingFee.toFixed(2) },
       selected: deliveryService === "next_day",
-    },
+    }] : []),
   ];
 
   return {
@@ -474,6 +487,21 @@ async function syncOrderToRoyalMail(order) {
   }
 }
 
+async function syncOrderToParcel2Go(order) {
+  const result = await createAndPayParcel2GoOrder(order);
+  order.parcel2go = {
+    ...order.parcel2go,
+    orderId: result.orderId || "",
+    hash: result.hash || "",
+    orderLineId: result.orderLineId || "",
+    orderLineHash: result.orderLineHash || "",
+    syncStatus: result.ok ? "sent" : result.skipped ? "not_sent" : "failed",
+    syncError: result.ok ? "" : result.message || "Parcel2Go order creation failed",
+    syncedAt: result.ok ? new Date() : null,
+  };
+  await order.save();
+}
+
 async function reduceStockForPaidOrder(order) {
   for (const item of order.items) {
     if (item.product) {
@@ -548,7 +576,11 @@ async function finalisePaidOrder(order) {
 
     await order.save();
   } else {
-    await syncOrderToRoyalMail(order);
+    if (String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase() === "parcel2go") {
+      await syncOrderToParcel2Go(order);
+    } else {
+      await syncOrderToRoyalMail(order);
+    }
   }
 
   try {
@@ -630,6 +662,10 @@ async function prepareOrder(req) {
 
   if (!isClickCollect && !["standard", "next_day"].includes(req.body.deliveryService)) {
     throw new CheckoutError("Please select a valid delivery service.");
+  }
+
+  if (!isClickCollect && usesParcel2Go() && req.body.deliveryService !== "standard") {
+    throw new CheckoutError("Please select the available Parcel2Go delivery service.");
   }
 
   const deliveryService = isClickCollect ? "standard" : req.body.deliveryService;
@@ -734,6 +770,8 @@ router.get("/", async (req, res, next) => {
       nextDayDeliveryCutoff,
       sumupPublicKey: process.env.SUMUP_PUBLIC_KEY || "",
       googlePayMerchantId: process.env.GOOGLE_PAY_MERCHANT_ID || "",
+      shippingProvider: usesParcel2Go() ? "parcel2go" : "royal_mail",
+      parcel2goCheckoutLabel: getParcel2GoCheckoutLabel(),
     });
   } catch (error) {
     next(error);

@@ -287,6 +287,20 @@ const orderSchema = new mongoose.Schema(
         default: "",
       },
     },
+
+    parcel2go: {
+      orderId: { type: String, default: "" },
+      hash: { type: String, default: "" },
+      orderLineId: { type: String, default: "" },
+      orderLineHash: { type: String, default: "" },
+      syncStatus: { type: String, enum: ["not_sent", "sent", "failed"], default: "not_sent" },
+      syncError: { type: String, default: "" },
+      syncedAt: { type: Date, default: null },
+      labelGenerated: { type: Boolean, default: false },
+      labelPath: { type: String, default: "" },
+      labelGeneratedAt: { type: Date, default: null },
+      labelError: { type: String, default: "" },
+    },
   },
   { timestamps: true }
 );

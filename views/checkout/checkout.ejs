@@ -89,17 +89,18 @@
           <label class="checkout-delivery-service-card is-active" data-delivery-service-card="standard">
             <input type="radio" name="deliveryService" value="standard" checked>
             <span>
-              <strong>Standard Delivery</strong>
+              <strong><%= shippingProvider === "parcel2go" ? parcel2goCheckoutLabel : "Standard Delivery" %></strong>
               <small>
                 <% if (subtotal >= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10)) { %>
-                  Free for this order.
+                  Free for this order<%= shippingProvider === "parcel2go" ? ", booked securely through Parcel2Go." : "." %>
                 <% } else { %>
-                  £<%= (typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99).toFixed(2) %>, or free over £<%= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10).toFixed(2) %>.
+                  £<%= (typeof standardShippingFee !== "undefined" ? standardShippingFee : 1.99).toFixed(2) %>, or free over £<%= (typeof freeShippingThreshold !== "undefined" ? freeShippingThreshold : 10).toFixed(2) %><%= shippingProvider === "parcel2go" ? ". Booked securely through Parcel2Go." : "." %>
                 <% } %>
               </small>
             </span>
           </label>
 
+          <% if (shippingProvider !== "parcel2go") { %>
           <label class="checkout-delivery-service-card" data-delivery-service-card="next_day">
             <input type="radio" name="deliveryService" value="next_day">
             <span>
@@ -107,6 +108,7 @@
               <small>£<%= (typeof nextDayShippingFee !== "undefined" ? nextDayShippingFee : 4.99).toFixed(2) %>. Order before <%= typeof nextDayDeliveryCutoff !== "undefined" ? nextDayDeliveryCutoff : "4:30pm" %>.</small>
             </span>
           </label>
+          <% } %>
         </div>
 
         <select name="country" required>

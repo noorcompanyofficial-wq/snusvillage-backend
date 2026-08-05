@@ -3525,6 +3525,92 @@ router.post("/orders/:id/send-royal-mail", isAdmin, requireAdminRole(PERMISSIONS
   }
 });
 
+router.post("/orders/:id/send-parcel2go", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      req.flash("error", "Order not found");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+    if (order.fulfilment?.method === "click_collect") {
+      req.flash("error", "Click & Collect orders cannot be pushed to Parcel2Go");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+    if (order.parcel2go?.syncStatus === "sent") {
+      req.flash("error", "This order has already been sent to Parcel2Go");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+
+    const { createAndPayOrder } = require("../utils/parcel2go");
+    const result = await createAndPayOrder(order);
+    order.parcel2go = {
+      ...order.parcel2go,
+      orderId: result.orderId || "",
+      hash: result.hash || "",
+      orderLineId: result.orderLineId || "",
+      orderLineHash: result.orderLineHash || "",
+      syncStatus: result.ok ? "sent" : result.skipped ? "not_sent" : "failed",
+      syncError: result.ok ? "" : result.message || "Parcel2Go booking failed",
+      syncedAt: result.ok ? new Date() : null,
+    };
+    await order.save();
+    req.flash(result.ok ? "success" : "error", result.ok ? "Order booked and paid with Parcel2Go" : order.parcel2go.syncError);
+    res.redirect(req.get("Referrer") || "/admin/orders");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", err.message || "Unable to send order to Parcel2Go");
+    res.redirect(req.get("Referrer") || "/admin/orders");
+  }
+});
+
+router.post("/orders/:id/generate-parcel2go-label", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order?.parcel2go?.orderId) {
+      req.flash("error", "Order must be sent to Parcel2Go before generating a label");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+    const { getLabel } = require("../utils/parcel2go");
+    const result = await getLabel(order.parcel2go.orderId, order.parcel2go.hash);
+    if (!result.ok) {
+      order.parcel2go.labelGenerated = false;
+      order.parcel2go.labelError = result.message || "Unable to generate Parcel2Go label";
+      await order.save();
+      req.flash("error", order.parcel2go.labelError);
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+    const labelsDir = path.join(__dirname, "..", "private", "labels");
+    if (!fs.existsSync(labelsDir)) fs.mkdirSync(labelsDir, { recursive: true });
+    const filePath = path.join(labelsDir, `parcel2go-label-${order._id}.pdf`);
+    fs.writeFileSync(filePath, result.buffer);
+    order.parcel2go.labelGenerated = true;
+    order.parcel2go.labelPath = filePath;
+    order.parcel2go.labelGeneratedAt = new Date();
+    order.parcel2go.labelError = "";
+    await order.save();
+    res.redirect(req.get("Referrer") || "/admin/orders");
+  } catch (err) {
+    console.log(err);
+    req.flash("error", err.message || "Unable to generate Parcel2Go label");
+    res.redirect(req.get("Referrer") || "/admin/orders");
+  }
+});
+
+router.get("/orders/:id/download-parcel2go-label", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order?.parcel2go?.labelPath || !fs.existsSync(order.parcel2go.labelPath)) {
+      req.flash("error", "Parcel2Go label not found");
+      return res.redirect(req.get("Referrer") || "/admin/orders");
+    }
+    res.download(order.parcel2go.labelPath, `parcel2go-label-${order._id}.pdf`);
+  } catch (err) {
+    console.log(err);
+    req.flash("error", "Unable to download Parcel2Go label");
+    res.redirect(req.get("Referrer") || "/admin/orders");
+  }
+});
+
 
 
 router.post("/orders/:id/generate-label", isAdmin, requireAdminRole(PERMISSIONS.orders), async (req, res) => {

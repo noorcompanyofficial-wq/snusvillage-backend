@@ -39,6 +39,28 @@
     </div>
 
     <div class="sec">
+      <div class="sec-head"><h2>Parcel2Go</h2></div>
+      <div class="sec-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div><div class="stat-lbl">Status</div><span class="pill p-<%= order.parcel2go?.syncStatus || 'not_sent' %>"><%= order.parcel2go?.syncStatus || "not_sent" %></span></div>
+          <div><div class="stat-lbl">Order ID</div><strong><%= order.parcel2go?.orderId || "N/A" %></strong></div>
+          <div><div class="stat-lbl">Order Line ID</div><strong><%= order.parcel2go?.orderLineId || "N/A" %></strong></div>
+          <% if (order.parcel2go?.syncError) { %><div style="grid-column:1/-1;"><div class="stat-lbl">Error</div><strong style="color:#dc2626;"><%= order.parcel2go.syncError %></strong></div><% } %>
+          <% if (order.parcel2go?.labelError) { %><div style="grid-column:1/-1;"><div class="stat-lbl">Label Error</div><strong style="color:#dc2626;"><%= order.parcel2go.labelError %></strong></div><% } %>
+        </div>
+        <div class="t-actions">
+          <% if (!isClickCollect && order.parcel2go?.syncStatus !== "sent") { %>
+            <form action="/admin/orders/<%= order._id %>/send-parcel2go" method="POST" onsubmit="return confirm('Book and pay for this delivery using the Parcel2Go prepay balance?');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-blue">Push To Parcel2Go</button></form>
+          <% } %>
+          <% if (!isClickCollect && order.parcel2go?.syncStatus === "sent" && !order.parcel2go?.labelGenerated) { %>
+            <form action="/admin/orders/<%= order._id %>/generate-parcel2go-label" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost">Generate Parcel2Go Label</button></form>
+          <% } %>
+          <% if (order.parcel2go?.labelGenerated) { %><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>/download-parcel2go-label" data-no-spa>Download Parcel2Go Label</a><% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
       <div class="sec-head"><h2><%= isClickCollect ? "Collection" : "Delivery" %></h2></div>
       <div class="sec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div><div class="stat-lbl">Method</div><strong><%= order.fulfilment?.deliveryServiceLabel || (isClickCollect ? "Click & Collect" : "Delivery") %></strong></div>
