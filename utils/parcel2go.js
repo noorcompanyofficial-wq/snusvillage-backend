@@ -45,9 +45,31 @@ async function readResponse(response) {
 
 function errorMessage(data, fallback) {
   if (typeof data === "string") return data;
+  if (Array.isArray(data?.Errors) && data.Errors.length) {
+    return data.Errors.map((entry) => entry.Error || entry.Message).filter(Boolean).join(", ");
+  }
   if (data?.Message || data?.message) return String(data.Message || data.message);
   if (data?.ModelState) return JSON.stringify(data.ModelState);
   return fallback;
+}
+
+function splitUkAddress(value) {
+  const address = String(value || "").trim();
+  const parts = address.split(",").map((part) => part.trim()).filter(Boolean);
+  const firstLine = parts.shift() || address;
+  const numberedProperty = firstLine.match(/^(\d+[a-z]?(?:\s*[-/]\s*\d+[a-z]?)?)\s+(.+)$/i);
+
+  if (numberedProperty) {
+    return {
+      property: numberedProperty[1],
+      street: [numberedProperty[2], ...parts].join(", "),
+    };
+  }
+
+  return {
+    property: firstLine,
+    street: parts.join(", ") || firstLine,
+  };
 }
 
 async function getAccessToken() {
@@ -97,11 +119,13 @@ function orderReference(order) {
 function buildOrderPayload(order) {
   const config = getConfig();
   const fullName = `${order.customer?.firstName || ""} ${order.customer?.lastName || ""}`.trim();
+  const deliveryLines = splitUkAddress(order.delivery?.address);
   const deliveryAddress = {
     ContactName: fullName,
     Email: order.customer?.email || "",
     Phone: order.customer?.phone || "",
-    Property: order.delivery?.address || "",
+    Property: deliveryLines.property,
+    Street: deliveryLines.street,
     Town: order.delivery?.city || "",
     Postcode: order.delivery?.postcode || "",
     CountryIsoCode: "GBR",
@@ -182,4 +206,4 @@ async function getLabel(reference, hash = "") {
   }
 }
 
-module.exports = { getConfig, hasParcel2GoConfig, buildOrderPayload, createAndPayOrder, getLabel };
+module.exports = { getConfig, hasParcel2GoConfig, splitUkAddress, buildOrderPayload, createAndPayOrder, getLabel };
