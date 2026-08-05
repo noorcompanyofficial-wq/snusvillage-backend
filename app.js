@@ -468,6 +468,25 @@ app.get("/health/db", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+app.get("/health/shipping", (req, res) => {
+  const provider = String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase();
+  const parcel2goConfigured = Boolean(
+    process.env.PARCEL2GO_CLIENT_ID &&
+      process.env.PARCEL2GO_CLIENT_SECRET &&
+      process.env.PARCEL2GO_SERVICE_SLUG &&
+      process.env.PARCEL2GO_SENDER_POSTCODE
+  );
+
+  res.status(provider !== "parcel2go" || parcel2goConfigured ? 200 : 503).json({
+    status: provider !== "parcel2go" || parcel2goConfigured ? "ok" : "error",
+    provider,
+    parcel2goConfigured,
+    parcel2goEnvironment:
+      String(process.env.PARCEL2GO_SANDBOX || "true").toLowerCase() === "false"
+        ? "live"
+        : "sandbox",
+  });
+});
 
 // ====== Routes ======
 app.use("/", indexRoutes);
