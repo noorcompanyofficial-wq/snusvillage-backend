@@ -510,6 +510,7 @@
            ======================== -->
       <section class="v4-locations" id="shops">
         <div class="v4-wrap">
+          <% if (svLocations.enabled !== false) { %>
           <div class="v4-section-head">
             <div>
               <div class="v4-eyebrow"><%= svLocations.eyebrow || 'London Stores' %></div>
@@ -536,6 +537,7 @@
               </div>
             <% }) %>
           </div>
+          <% } %>
 
           <!-- Distro panel -->
           <div class="v4-distro">

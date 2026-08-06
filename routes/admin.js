@@ -724,6 +724,7 @@ router.post(
         {
           $set: {
             key: "homepage",
+            "locations.enabled": body.locationsEnabled === "on",
             "locations.eyebrow": String(body.locationsEyebrow || "").trim(),
             "locations.heading": String(body.locationsHeading || "").trim(),
             "locations.description": String(body.locationsDescription || "").trim(),

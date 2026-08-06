@@ -118,6 +118,9 @@
 <form action="/admin/homepage/locations" method="POST" class="sec">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <div class="sec-head"><h2>Locations Section</h2><span style="font-size:11px;color:var(--mu);">Homepage branch cards</span></div>
+  <div class="sec-body" style="padding-bottom:0;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;"><input type="checkbox" name="locationsEnabled" style="width:auto;min-height:0;" <%= locations.enabled === false ? "" : "checked" %>> Show Locations Section On Website</label>
+  </div>
   <div class="sec-body fgrid">
     <div class="fld"><label>Eyebrow</label><input name="locationsEyebrow" value="<%= locations.eyebrow || 'Location' %>"></div>
     <div class="fld"><label>Heading</label><input name="locationsHeading" value="<%= locations.heading || 'Find Snus Village In London' %>"></div>

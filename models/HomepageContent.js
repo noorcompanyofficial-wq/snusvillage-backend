@@ -240,6 +240,10 @@ const homepageContentSchema = new mongoose.Schema(
     },
 
     locations: {
+      enabled: {
+        type: Boolean,
+        default: true,
+      },
       eyebrow: {
         type: String,
         default: "Location",
