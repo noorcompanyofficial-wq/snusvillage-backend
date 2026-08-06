@@ -134,6 +134,10 @@ const homepageContentSchema = new mongoose.Schema(
     },
 
     distro: {
+      enabled: {
+        type: Boolean,
+        default: true,
+      },
       kicker: {
         type: String,
         default: "Distribution Hub",

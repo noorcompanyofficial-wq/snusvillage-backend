@@ -540,6 +540,7 @@
           <% } %>
 
           <!-- Distro panel -->
+          <% if (svDistro.enabled !== false) { %>
           <div class="v4-distro">
             <div class="v4-distro__copy">
               <div class="v4-distro__eyebrow"><%= svDistro.kicker || 'Distribution Hub' %></div>
@@ -562,6 +563,7 @@
               </div>
             </div>
           </div>
+          <% } %>
         </div>
       </section>
 

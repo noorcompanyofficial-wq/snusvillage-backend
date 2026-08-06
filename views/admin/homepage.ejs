@@ -69,6 +69,9 @@
 <form action="/admin/homepage/hero-distro" method="POST" enctype="multipart/form-data" class="sec">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <div class="sec-head"><h2>SVG Distro Section</h2><span style="font-size:11px;color:var(--mu);">Text, badges and main image</span></div>
+  <div class="sec-body" style="padding-bottom:0;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;"><input type="checkbox" name="distroEnabled" style="width:auto;min-height:0;" <%= distro.enabled === false ? "" : "checked" %>> Show SVG Distro Section On Website</label>
+  </div>
   <div class="sec-body fgrid">
     <div class="fld"><label>Kicker</label><input name="distroKicker" value="<%= distro.kicker || 'Distribution Hub' %>"></div>
     <div class="fld"><label>Title</label><input name="distroTitle" value="<%= distro.title || 'SVG Distro' %>"></div>

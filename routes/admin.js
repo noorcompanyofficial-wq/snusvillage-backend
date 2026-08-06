@@ -606,6 +606,7 @@ router.post(
         {
           $set: {
             key: "homepage",
+            "distro.enabled": body.distroEnabled === "on",
             "distro.kicker": String(body.distroKicker || "").trim(),
             "distro.title": String(body.distroTitle || "").trim(),
             "distro.address": String(body.distroAddress || "").trim(),
