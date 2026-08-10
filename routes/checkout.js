@@ -77,7 +77,7 @@ function usesParcel2Go() {
 }
 
 function getParcel2GoCheckoutLabel() {
-  return process.env.PARCEL2GO_CHECKOUT_LABEL || "Evri Standard Delivery (via Parcel2Go)";
+  return process.env.PARCEL2GO_CHECKOUT_LABEL || "Evri ParcelShop Delivery (via Parcel2Go)";
 }
 
 function getDeliveryServiceLabel(fulfilmentMethod, deliveryService) {

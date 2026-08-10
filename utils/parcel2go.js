@@ -6,13 +6,17 @@ let tokenExpiresAt = 0;
 function getConfig() {
   const sandbox = String(process.env.PARCEL2GO_SANDBOX || "true").toLowerCase() !== "false";
   const origin = sandbox ? "https://sandbox.parcel2go.com" : "https://www.parcel2go.com";
+  const configuredService = String(process.env.PARCEL2GO_SERVICE_SLUG || "").trim();
+  const service = configuredService === "hermes-uk-economy"
+    ? "myhermes-parcelshop"
+    : configuredService || "myhermes-parcelshop";
 
   return {
     apiBaseUrl: String(process.env.PARCEL2GO_API_BASE_URL || `${origin}/api`).replace(/\/$/, ""),
     tokenUrl: process.env.PARCEL2GO_TOKEN_URL || `${origin}/auth/connect/token`,
     clientId: process.env.PARCEL2GO_CLIENT_ID || "",
     clientSecret: process.env.PARCEL2GO_CLIENT_SECRET || "",
-    service: process.env.PARCEL2GO_SERVICE_SLUG || "",
+    service,
     collectionDate: process.env.PARCEL2GO_COLLECTION_DATE || "",
     weight: Number(process.env.PARCEL2GO_PACKAGE_WEIGHT_KG || 0.25),
     length: Number(process.env.PARCEL2GO_PACKAGE_LENGTH_CM || 20),
