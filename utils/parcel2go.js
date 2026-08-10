@@ -50,9 +50,18 @@ async function readResponse(response) {
 function errorMessage(data, fallback) {
   if (typeof data === "string") return data;
   if (Array.isArray(data?.Errors) && data.Errors.length) {
-    return data.Errors.map((entry) => entry.Error || entry.Message).filter(Boolean).join(", ");
+    return data.Errors
+      .map((entry) => entry.ErrorMessage || entry.Error || entry.Message || entry.Description)
+      .filter(Boolean)
+      .join(", ");
   }
-  if (data?.Message || data?.message) return String(data.Message || data.message);
+  if (data?.Message || data?.message || data?.title || data?.error_description) {
+    return String(data.Message || data.message || data.title || data.error_description);
+  }
+  if (data?.errors && typeof data.errors === "object") {
+    const messages = Object.values(data.errors).flat().filter(Boolean);
+    if (messages.length) return messages.map(String).join(", ");
+  }
   if (data?.ModelState) return JSON.stringify(data.ModelState);
   return fallback;
 }
@@ -166,7 +175,9 @@ function buildOrderPayload(order) {
       ContentsSummary: "Nicotine pouches",
     }],
   };
-  if (config.collectionDate) item.CollectionDate = config.collectionDate;
+  // Parcel2Go uses CollectionDate for both courier collections and the date a
+  // parcel is handed to a ParcelShop. Default to today for drop-off bookings.
+  item.CollectionDate = config.collectionDate || new Date().toISOString().slice(0, 10);
 
   return {
     Items: [item],
@@ -181,19 +192,53 @@ function buildOrderPayload(order) {
 
 async function createAndPayOrder(order) {
   if (!hasParcel2GoConfig()) return { ok: false, skipped: true, message: "Parcel2Go configuration is incomplete" };
+  let created;
   try {
-    const created = await request("/orders", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildOrderPayload(order)),
-    });
+    if (order.parcel2go?.orderId && order.parcel2go?.hash) {
+      created = {
+        OrderId: order.parcel2go.orderId,
+        Hash: order.parcel2go.hash,
+        OrderlineIdMap: [{
+          OrderLineId: order.parcel2go.orderLineId,
+          Hash: order.parcel2go.orderLineHash,
+        }],
+      };
+    } else {
+      created = await request("/orders", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildOrderPayload(order)),
+      });
+    }
     const orderId = created?.OrderId;
     if (!orderId) return { ok: false, message: "Parcel2Go did not return an order ID", data: created };
-    const paid = await request(`/orders/${encodeURIComponent(orderId)}/paywithprepay?hash=${encodeURIComponent(created.Hash || "")}`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
-    });
     const line = created.OrderlineIdMap?.[0] || {};
-    return { ok: true, data: created, payment: paid, orderId: String(orderId), hash: created.Hash || "", orderLineId: String(line.OrderLineId || ""), orderLineHash: line.Hash || "" };
+    const references = {
+      orderId: String(orderId),
+      hash: created.Hash || "",
+      orderLineId: String(line.OrderLineId || ""),
+      orderLineHash: line.Hash || "",
+    };
+
+    try {
+      const paid = await request(`/orders/${encodeURIComponent(orderId)}/paywithprepay?hash=${encodeURIComponent(created.Hash || "")}`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: "{}",
+      });
+      return { ok: true, data: created, payment: paid, ...references };
+    } catch (error) {
+      return {
+        ok: false,
+        status: error.status,
+        data: error.data,
+        message: `Parcel2Go order ${orderId} was created, but prepay payment failed: ${error.message}`,
+        ...references,
+      };
+    }
   } catch (error) {
-    return { ok: false, status: error.status, data: error.data, message: error.message };
+    return {
+      ok: false,
+      status: error.status,
+      data: error.data,
+      message: `Parcel2Go order creation failed: ${error.message}`,
+    };
   }
 }
 
