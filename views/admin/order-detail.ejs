@@ -45,18 +45,38 @@
           <div><div class="stat-lbl">Status</div><span class="pill p-<%= order.parcel2go?.syncStatus || 'not_sent' %>"><%= order.parcel2go?.syncStatus || "not_sent" %></span></div>
           <div><div class="stat-lbl">Order ID</div><strong><%= order.parcel2go?.orderId || "N/A" %></strong></div>
           <div><div class="stat-lbl">Order Line ID</div><strong><%= order.parcel2go?.orderLineId || "N/A" %></strong></div>
+          <% if (order.parcel2go?.serviceName) { %><div><div class="stat-lbl">Selected Service</div><strong><%= order.parcel2go.serviceName %></strong></div><% } %>
+          <% if (order.parcel2go?.quotedPrice != null && Number.isFinite(Number(order.parcel2go.quotedPrice))) { %><div><div class="stat-lbl">Postage Price</div><strong>&pound;<%= Number(order.parcel2go.quotedPrice).toFixed(2) %></strong></div><% } %>
           <% if (order.parcel2go?.syncError) { %><div style="grid-column:1/-1;"><div class="stat-lbl">Error</div><strong style="color:#dc2626;"><%= order.parcel2go.syncError %></strong></div><% } %>
           <% if (order.parcel2go?.labelError) { %><div style="grid-column:1/-1;"><div class="stat-lbl">Label Error</div><strong style="color:#dc2626;"><%= order.parcel2go.labelError %></strong></div><% } %>
         </div>
         <div class="t-actions">
           <% if (!isClickCollect && order.parcel2go?.syncStatus !== "sent") { %>
-            <form action="/admin/orders/<%= order._id %>/send-parcel2go" method="POST" onsubmit="return confirm('Book and pay for this delivery using the Parcel2Go prepay balance?');"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-blue">Push To Parcel2Go</button></form>
+            <a class="btn btn-sm btn-blue" href="/admin/orders/<%= order._id %>?parcel2goQuotes=1">Compare Parcel2Go Quotes</a>
           <% } %>
           <% if (!isClickCollect && order.parcel2go?.syncStatus === "sent" && !order.parcel2go?.labelGenerated) { %>
             <form action="/admin/orders/<%= order._id %>/generate-parcel2go-label" method="POST"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="btn btn-sm btn-ghost">Generate Parcel2Go Label</button></form>
           <% } %>
           <% if (order.parcel2go?.labelGenerated) { %><a class="btn btn-sm btn-ghost" href="/admin/orders/<%= order._id %>/download-parcel2go-label" data-no-spa>Download Parcel2Go Label</a><% } %>
         </div>
+        <% if (typeof parcel2goQuoteError !== "undefined" && parcel2goQuoteError) { %>
+          <div style="margin-top:14px;color:#dc2626;font-weight:700;"><%= parcel2goQuoteError %></div>
+        <% } %>
+        <% if (typeof parcel2goQuotes !== "undefined" && parcel2goQuotes.length) { %>
+          <form action="/admin/orders/<%= order._id %>/send-parcel2go" method="POST" style="margin-top:14px;" onsubmit="return confirm('Book and pay for the selected courier using the Parcel2Go prepay balance?');">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div style="display:grid;gap:8px;">
+              <% parcel2goQuotes.forEach((quote, index) => { %>
+                <label style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--bdr);border-radius:8px;cursor:pointer;">
+                  <input type="radio" name="service" value="<%= quote.slug %>" <%= index === 0 ? "checked" : "" %> required>
+                  <span style="flex:1;"><strong style="display:block;"><%= quote.name %></strong><span style="font-size:10px;color:var(--mu);"><%= [quote.courier, quote.collectionType, quote.deliveryType].filter(Boolean).join(" · ") %></span></span>
+                  <strong style="font-size:14px;">&pound;<%= Number(quote.price).toFixed(2) %></strong>
+                </label>
+              <% }) %>
+            </div>
+            <button type="submit" class="btn btn-sm btn-blue" style="margin-top:10px;">Book Selected Service</button>
+          </form>
+        <% } %>
       </div>
     </div>
 

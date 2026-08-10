@@ -8,7 +8,6 @@ const DiscountCode = require("../models/DiscountCode");
 const StoreSettings = require("../models/StoreSettings");
 const Address = require("../models/Address");
 const { sendOrderToRoyalMail } = require("../utils/royalMail");
-const { createAndPayOrder: createAndPayParcel2GoOrder } = require("../utils/parcel2go");
 const { sendOrderEmails } = require("../utils/orderEmails");
 const {
   createHostedCheckout,
@@ -487,21 +486,6 @@ async function syncOrderToRoyalMail(order) {
   }
 }
 
-async function syncOrderToParcel2Go(order) {
-  const result = await createAndPayParcel2GoOrder(order);
-  order.parcel2go = {
-    ...order.parcel2go,
-    orderId: result.orderId || "",
-    hash: result.hash || "",
-    orderLineId: result.orderLineId || "",
-    orderLineHash: result.orderLineHash || "",
-    syncStatus: result.ok ? "sent" : result.skipped ? "not_sent" : "failed",
-    syncError: result.ok ? "" : result.message || "Parcel2Go order creation failed",
-    syncedAt: result.ok ? new Date() : null,
-  };
-  await order.save();
-}
-
 async function reduceStockForPaidOrder(order) {
   for (const item of order.items) {
     if (item.product) {
@@ -576,9 +560,7 @@ async function finalisePaidOrder(order) {
 
     await order.save();
   } else {
-    if (String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase() === "parcel2go") {
-      await syncOrderToParcel2Go(order);
-    } else {
+    if (String(process.env.SHIPPING_PROVIDER || "royal_mail").toLowerCase() !== "parcel2go") {
       await syncOrderToRoyalMail(order);
     }
   }

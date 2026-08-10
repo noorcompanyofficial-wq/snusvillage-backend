@@ -3543,10 +3543,30 @@ router.post("/orders/:id/send-parcel2go", isAdmin, requireAdminRole(PERMISSIONS.
       return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
-    const { createAndPayOrder } = require("../utils/parcel2go");
-    const result = await createAndPayOrder(order);
+    const selectedService = String(req.body.service || "").trim();
+    if (!selectedService) {
+      req.flash("error", "Choose a Parcel2Go courier service before booking");
+      return res.redirect(`/admin/orders/${order._id}?parcel2goQuotes=1`);
+    }
+
+    const { createAndPayOrder, getQuotes } = require("../utils/parcel2go");
+    const quoteResult = await getQuotes(order);
+    if (!quoteResult.ok) {
+      req.flash("error", quoteResult.message || "Unable to refresh Parcel2Go quotes");
+      return res.redirect(`/admin/orders/${order._id}?parcel2goQuotes=1`);
+    }
+    const selectedQuote = quoteResult.quotes.find((quote) => quote.slug === selectedService);
+    if (!selectedQuote) {
+      req.flash("error", "That Parcel2Go service is no longer available. Please choose another quote.");
+      return res.redirect(`/admin/orders/${order._id}?parcel2goQuotes=1`);
+    }
+
+    const result = await createAndPayOrder(order, selectedQuote.slug);
     order.parcel2go = {
       ...order.parcel2go,
+      serviceSlug: selectedQuote.slug,
+      serviceName: selectedQuote.name,
+      quotedPrice: selectedQuote.price,
       orderId: result.orderId || "",
       hash: result.hash || "",
       orderLineId: result.orderLineId || "",
@@ -3556,7 +3576,12 @@ router.post("/orders/:id/send-parcel2go", isAdmin, requireAdminRole(PERMISSIONS.
       syncedAt: result.ok ? new Date() : null,
     };
     await order.save();
-    req.flash(result.ok ? "success" : "error", result.ok ? "Order booked and paid with Parcel2Go" : order.parcel2go.syncError);
+    req.flash(
+      result.ok ? "success" : "error",
+      result.ok
+        ? `${selectedQuote.name} booked and paid for £${selectedQuote.price.toFixed(2)}`
+        : order.parcel2go.syncError
+    );
     res.redirect(req.get("Referrer") || "/admin/orders");
   } catch (err) {
     console.log(err);
@@ -3745,9 +3770,20 @@ router.get("/orders/:id", isAdmin, requireAdminRole(PERMISSIONS.orders), async (
       return res.redirect(req.get("Referrer") || "/admin/orders");
     }
 
+    let parcel2goQuotes = [];
+    let parcel2goQuoteError = "";
+    if (req.query.parcel2goQuotes === "1" && order.fulfilment?.method !== "click_collect" && order.parcel2go?.syncStatus !== "sent") {
+      const { getQuotes } = require("../utils/parcel2go");
+      const quoteResult = await getQuotes(order);
+      parcel2goQuotes = quoteResult.quotes || [];
+      parcel2goQuoteError = quoteResult.ok ? "" : quoteResult.message || "Unable to load Parcel2Go quotes";
+    }
+
     res.render("admin/order-detail", {
       layout: adminLayout(req),
       order,
+      parcel2goQuotes,
+      parcel2goQuoteError,
     });
   } catch (err) {
     console.log(err);

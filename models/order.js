@@ -289,6 +289,9 @@ const orderSchema = new mongoose.Schema(
     },
 
     parcel2go: {
+      serviceSlug: { type: String, default: "" },
+      serviceName: { type: String, default: "" },
+      quotedPrice: { type: Number, default: null },
       orderId: { type: String, default: "" },
       hash: { type: String, default: "" },
       orderLineId: { type: String, default: "" },

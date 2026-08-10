@@ -129,7 +129,7 @@ function orderReference(order) {
   return order._id.toString().slice(-12).toUpperCase();
 }
 
-function buildOrderPayload(order) {
+function buildOrderPayload(order, serviceSlug = "") {
   const config = getConfig();
   const fullName = `${order.customer?.firstName || ""} ${order.customer?.lastName || ""}`.trim();
   const deliveryLines = splitUkAddress(order.delivery?.address);
@@ -161,7 +161,7 @@ function buildOrderPayload(order) {
     OriginCountry: "GBR",
     VatStatus: "Individual",
     RecipientVatStatus: "Individual",
-    Service: config.service,
+    Service: serviceSlug || config.service,
     Reference: orderReference(order),
     CollectionAddress: collectionAddress,
     Parcels: [{
@@ -190,11 +190,66 @@ function buildOrderPayload(order) {
   };
 }
 
-async function createAndPayOrder(order) {
+function buildQuotePayload(order) {
+  const config = getConfig();
+  const deliveryLines = splitUkAddress(order.delivery?.address);
+  return {
+    CollectionAddress: {
+      Country: "GBR",
+      Property: config.sender.property,
+      Postcode: config.sender.postcode,
+      Town: config.sender.town,
+    },
+    DeliveryAddress: {
+      Country: "GBR",
+      Property: deliveryLines.property,
+      Postcode: order.delivery?.postcode || "",
+      Town: order.delivery?.city || "",
+    },
+    Parcels: [{
+      Value: Number(order.subtotal || 0),
+      Weight: config.weight,
+      Length: config.length,
+      Width: config.width,
+      Height: config.height,
+    }],
+  };
+}
+
+async function getQuotes(order) {
+  if (!hasParcel2GoConfig()) {
+    return { ok: false, skipped: true, message: "Parcel2Go configuration is incomplete", quotes: [] };
+  }
+  try {
+    const data = await request("/quotes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildQuotePayload(order)),
+    });
+    const quotes = (Array.isArray(data?.Quotes) ? data.Quotes : [])
+      .map((quote) => ({
+        slug: String(quote.Service?.Slug || ""),
+        name: String(quote.Service?.Name || quote.Service?.CourierName || "Courier service"),
+        courier: String(quote.Service?.CourierName || ""),
+        collectionType: String(quote.Service?.CollectionType || ""),
+        deliveryType: String(quote.Service?.DeliveryType || ""),
+        price: Number(quote.TotalPrice),
+      }))
+      .filter((quote) => quote.slug && Number.isFinite(quote.price))
+      .sort((a, b) => a.price - b.price);
+    return { ok: true, quotes };
+  } catch (error) {
+    return { ok: false, status: error.status, message: error.message, quotes: [] };
+  }
+}
+
+async function createAndPayOrder(order, serviceSlug = "") {
   if (!hasParcel2GoConfig()) return { ok: false, skipped: true, message: "Parcel2Go configuration is incomplete" };
+  const selectedService = String(serviceSlug || "").trim();
+  if (!selectedService) return { ok: false, message: "Please select a Parcel2Go courier service" };
   let created;
   try {
-    if (order.parcel2go?.orderId && order.parcel2go?.hash) {
+    if (order.parcel2go?.orderId && order.parcel2go?.hash && order.parcel2go?.serviceSlug === selectedService) {
       created = {
         OrderId: order.parcel2go.orderId,
         Hash: order.parcel2go.hash,
@@ -205,7 +260,7 @@ async function createAndPayOrder(order) {
       };
     } else {
       created = await request("/orders", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildOrderPayload(order)),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildOrderPayload(order, selectedService)),
       });
     }
     const orderId = created?.OrderId;
@@ -297,4 +352,4 @@ async function verifyConnection() {
   }
 }
 
-module.exports = { getConfig, hasParcel2GoConfig, splitUkAddress, buildOrderPayload, createAndPayOrder, getLabel, verifyConnection };
+module.exports = { getConfig, hasParcel2GoConfig, splitUkAddress, buildOrderPayload, buildQuotePayload, getQuotes, createAndPayOrder, getLabel, verifyConnection };
